@@ -1,0 +1,4 @@
+hf-model: mistralai/Mistral-7B-v0.1
+tokenizer: mistralai/Mistral-7B-v0.1
+eval-yaml: eval/heavy.yaml
+output-file: /opt/ml/output/data/mistral-7b-v0_1_hf_heavy.yaml

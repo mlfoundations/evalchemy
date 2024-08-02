@@ -1,0 +1,6 @@
+model: eval/sagemaker_scripts/configs/model_configs/open_lm_7b_old.json
+checkpoint: /opt/ml/input/data/model/open_lm_7b_1p25T.pt
+eval-yaml: eval/heavy.yaml
+output-file: /opt/ml/output/data/open_lm_7b_hf_heavy.yaml
+donot-compute-perplexity: ""
+config: eval/params.txt

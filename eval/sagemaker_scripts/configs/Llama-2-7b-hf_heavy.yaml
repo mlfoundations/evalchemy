@@ -1,0 +1,4 @@
+hf-model: meta-llama/Llama-2-7b-hf
+tokenizer: meta-llama/Llama-2-7b-hf
+eval-yaml: eval/heavy.yaml
+output-file: /opt/ml/output/data/llama-2-7b-hf_heavy.yaml

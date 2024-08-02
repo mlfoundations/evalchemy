@@ -1,0 +1,4 @@
+hf-model: stabilityai/stablelm-2-1_6b
+tokenizer: stabilityai/stablelm-2-1_6b
+eval-yaml: eval/heavy.yaml
+output-file: /opt/ml/output/data/stablelm_1_6b_heavy.yaml

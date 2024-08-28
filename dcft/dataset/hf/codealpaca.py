@@ -8,7 +8,7 @@ class CodeAlpacaFTDataset(BaseFTDataset):
         for d in tqdm(self.data['train']):
             self.system_prompts.append("")
             self.user_prompts.append(self.reformat_alpaca(d['instruction'], d['input']))
-            self.annotations_gtruth.append(d['output'])
+            self.annotations_original.append(d['output'])
 
     def reformat_alpaca(self, instruction, input):
         if input is None or len(input) == 0:

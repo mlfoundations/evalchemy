@@ -13,14 +13,14 @@ The results will be saved as a JSON with the following format:
     {
         "system_prompt": "",
         "user_prompt": "Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n### Instruction:\nCreate an array of length 5 which contains all even numbers between 1 and 10.\n\n### Response:",
-        "annotation_gtruth": "arr = [2, 4, 6, 8, 10]",
+        "annotation_original": "arr = [2, 4, 6, 8, 10]",
         "annotation": "Sure! Here is an array of length 5 containing all even numbers between 1 and 10:\n\n```python\neven_numbers = [2, 4, 6, 8, 10]\n```\n\nThis array includes the even numbers 2, 4, 6, 8, and 10."
     },
     ...
     {
         "system_prompt": "",
         "user_prompt": "(prompt-here)",
-        "annotation_gtruth": "(gtruth-here)",
+        "annotation_original": "(original-annotations-here)",
         "annotation": "(generation-here)"
     }
 ]
@@ -30,7 +30,7 @@ The results will be saved as a JSON with the following format:
 1. Create a new file in `dataset/hf/(your_dataset_name).py`. The class inherits from `BaseFTDataset` and the `__init__()` function should load the dataset and populate the following:
     - self.system_prompts --> One string per sample.
     - self.user_prompts --> One string per sample.
-    - self.annotations_gtruth --> These are the ground truth responses from the initial dataset. May be blank if not present.
+    - self.annotations_original --> These are the ground truth responses from the initial dataset. May be blank if not present.
 2. Add your dataset to [dataset/hf/\_\_init\_\_.py](dataset/hf/__init__.py)
 
 

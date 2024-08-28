@@ -9,6 +9,7 @@ def regenerate_dataset(args):
     # Load data
     data = get_dataclass_from_path(args.dataset)
     assert len(data.system_prompts) == len(data.user_prompts)
+    print(f"Reannotating {len(data.system_prompts)} samples")
 
     # Do generation
     generation_args = {
@@ -23,7 +24,7 @@ def regenerate_dataset(args):
     save_out = [{
                 "system_prompt": data.system_prompts[idx],
                 "user_prompt": data.user_prompts[idx],
-                "annotation_gtruth": data.annotations_gtruth[idx],
+                "annotation_original": data.annotations_original[idx],
                 "annotation": data.annotations[idx]
             } for idx in range(len(data.annotations))]
     with open(f"{args.save_dir}/{args.dataset.replace('/', '_')}.json", 'w') as f:

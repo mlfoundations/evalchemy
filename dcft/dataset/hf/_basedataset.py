@@ -12,7 +12,7 @@ class BaseFTDataset:
 
         self.system_prompts = []
         self.user_prompts = []
-        self.annotations_gtruth = []
+        self.annotations_original = []
         self.annotations = []
 
     def __len__(self):

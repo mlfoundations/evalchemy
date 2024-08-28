@@ -1,7 +1,7 @@
 class BaseAnnotator:
-    def __init__(self, annotator_name, **kwargs):
+    def __init__(self, annotator_name, annotator_config, **kwargs):
         self.annotator_name = annotator_name
-        self.generation_args = kwargs
+        self.config = annotator_config
 
-    def annotate(self, data):
+    def annotate(self, data, generation_config):
         raise NotImplementedError

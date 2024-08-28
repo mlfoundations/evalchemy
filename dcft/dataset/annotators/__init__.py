@@ -19,5 +19,14 @@ ANNOTATOR_MAP = {
     'llama3-405b': SambaNovaAnnotator,
 }
 
-def get_annotator(annotator_name, **kwargs):
-    return ANNOTATOR_MAP[annotator_name](annotator_name, **kwargs)
+class AnnotatorConfig:
+    def __init__(self, args):
+        self.annotator_name = args.annotator
+        
+        if ANNOTATOR_MAP[args.annotator] is GPTAnnotator:
+            self.max_requests_per_minute = args.max_requests_per_minute
+            self.max_tokens_per_minute = args.max_tokens_per_minute
+
+
+def get_annotator(annotator_name, annotator_config, **kwargs):
+    return ANNOTATOR_MAP[annotator_name](annotator_name, annotator_config, **kwargs)

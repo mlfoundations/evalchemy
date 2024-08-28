@@ -6,9 +6,8 @@ from tqdm import tqdm
 from dcft.dataset.annotators._baseannotator import BaseAnnotator
 
 class SambaNovaAnnotator(BaseAnnotator):
-    def __init__(self, annotator_name, **kwargs):
-        
-        super().__init__(annotator_name, **kwargs)
+    def __init__(self, annotator_name, annotator_config, **kwargs):
+        super().__init__(annotator_name, annotator_config, **kwargs)
         self.NUM_SECONDS_TO_SLEEP = 30
         self.key = os.getenv("SAMBANOVA_API_KEY")
         assert self.key is not None
@@ -16,7 +15,7 @@ class SambaNovaAnnotator(BaseAnnotator):
         self.headers = {"Authorization": f"Basic {self.key}", "Content-Type": "application/json"}
 
 
-    def annotate(self, data):
+    def annotate(self, data, generation_config):
         n = len(data.user_prompts)
         for idx in tqdm(range(n)):
             messages = [

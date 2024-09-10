@@ -1,0 +1,5 @@
+openai
+transformers
+fire
+datasets
+tiktoken

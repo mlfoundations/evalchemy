@@ -5,8 +5,10 @@ This is a placeholder repository, copied over from DCLM. This will be finetuned 
 ## Reannotating Datasets
 The datasets available can be found in [dcft/dataset/hf](dcft/dataset/hf)
 ```python
-python dcft/dataset/reannotate.py --annotator gpt-4o --dataset (path-to-hf-dataset) 
+python dcft/dataset/reannotate.py --annotator gpt-4o-2024-08-06 --dataset (path-to-hf-dataset) 
 ```
+If you are using a OpenAI model as an annotator (default) then set your OpenAI API key with `export OPENAI_API_KEY=(your key here)`.
+
 The results will be saved as a JSON with the following format:
 ```
 [

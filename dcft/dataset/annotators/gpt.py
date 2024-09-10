@@ -1,10 +1,11 @@
-
 import os
 import json
 from tqdm import tqdm
 import tiktoken
 from openai import OpenAI
 from dcft.dataset.annotators._baseannotator import BaseAnnotator
+import asyncio
+from dcft.utils.api_request_parallel_processor import process_api_requests_from_file
 
 
 class GPTAnnotator(BaseAnnotator):
@@ -38,27 +39,54 @@ class GPTAnnotator(BaseAnnotator):
     def annotate(self, data, generation_config):
         n = len(data.user_prompts)
 
-        # Create jobs.json for batch processing
+        # Create jobs.json for parallel request processing
+        jobpath = f"datasets/temp/{data.data_path.replace('/', '_')}"
+        os.makedirs(jobpath, exist_ok=True)
+        jobs_file = f"{jobpath}/jobs.json"
+
         jobs = []
+        print(f"Creating {n} jobs")
         for idx in tqdm(range(n)):
             job = self.create_job_dict(data.user_prompts[idx], generation_config, idx)
             jobs.append(job)
-        jobpath = f"datasets/temp/{data.data_path.replace('/', '_')}"
-        os.makedirs(jobpath, exist_ok=True)
-        with open(f"{jobpath}/jobs.json", "w") as f:
-            for j in jobs:
-                f.write(json.dumps(j)+'\n')
+        
+        if os.path.exists(jobs_file):
+            user_input = input(f"File {jobs_file} already exists. Do you want to override it? (y/N): ")
+            if user_input.lower() == 'y':
+                with open(jobs_file, "w") as f:
+                    for job in jobs:
+                        f.write(json.dumps(job) + "\n")
+                print(f"Jobs file {jobs_file} has been overwritten.")
+            else:
+                with open(jobs_file, "r") as f:
+                    jobs = [json.loads(line) for line in f]
+                print(f"Using existing jobs from {jobs_file}")
+                print(f"Number of jobs: {len(jobs)}")
+                print("Example job:")
+                print(json.dumps(jobs[0], indent=2))
+        else:
+            with open(jobs_file, "w") as f:
+                for job in jobs:
+                    f.write(json.dumps(job) + "\n")
 
+        print(f"Parallel processing starting, logging to {jobpath}/output.log")
         # Run batch processing
-        cmd = f"python dcft/utils/api_request_parallel_processor.py \
-            --requests_filepath {jobpath}/jobs.json \
-            --save_filepath {jobpath}/output.jsonl \
-            --max_requests_per_minute {self.config.max_requests_per_minute} \
-            --max_tokens_per_minute {self.config.max_tokens_per_minute} \
-            --token_encoding_name {self.encoder_name} \
-            --max_attempts 5 \
-            --logging_level 20"
-        os.system(cmd)
+        asyncio.run(
+            process_api_requests_from_file(
+                requests_filepath=jobs_file,
+                save_filepath=f"{jobpath}/output.jsonl",
+                request_url="https://api.openai.com/v1/chat/completions",
+                api_key=os.getenv("OPENAI_API_KEY"),
+                max_requests_per_minute=float(self.config.max_requests_per_minute),
+                max_tokens_per_minute=float(self.config.max_tokens_per_minute),
+                token_encoding_name=self.encoder_name,
+                max_attempts=5,
+                logging_level=20,
+                resume=self.config.resume,
+                log_filepath=f"{jobpath}/output.log"
+            )
+        )
+        print(f"Parallel processing complete. Check {jobpath}/output.log for details.")
 
         # Load file that was created
         outputs = {}
@@ -66,4 +94,5 @@ class GPTAnnotator(BaseAnnotator):
             for line in f:
                 l = json.loads(line)
                 outputs[l[2]['request_idx']] = l[1]['choices'][0]['message']['content']
+        print(f"Number of outputs: {len(outputs)}")
         data.annotations = [outputs[i] for i in range(n)]

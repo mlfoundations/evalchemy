@@ -22,6 +22,7 @@ ANNOTATOR_MAP = {
 class AnnotatorConfig:
     def __init__(self, args):
         self.annotator_name = args.annotator
+        self.resume = args.resume
         
         if ANNOTATOR_MAP[args.annotator] is GPTAnnotator:
             self.max_requests_per_minute = args.max_requests_per_minute

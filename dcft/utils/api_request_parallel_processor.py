@@ -105,7 +105,7 @@ from dataclasses import (
     dataclass,
     field,
 )  # for storing API inputs, outputs, and metadata
-
+from typing import Set, Optional
 
 async def process_api_requests_from_file(
     requests_filepath: str,
@@ -117,6 +117,8 @@ async def process_api_requests_from_file(
     token_encoding_name: str,
     max_attempts: int,
     logging_level: int,
+    resume: bool,
+    log_filepath: Optional[str] = None,
 ):
     """Processes API requests in parallel, throttling to stay under rate limits."""
     # constants
@@ -126,7 +128,21 @@ async def process_api_requests_from_file(
     )
 
     # initialize logging
-    logging.basicConfig(level=logging_level)
+    if log_filepath:
+        # Set up logging to both file and stdout
+        logging.basicConfig(
+            level=logging_level,
+            format='%(asctime)s - %(levelname)s - %(message)s',
+            handlers=[
+                logging.FileHandler(log_filepath, mode='a'),
+                logging.StreamHandler()
+            ]
+        )
+    else:
+        logging.basicConfig(
+            level=logging_level,
+            format='%(asctime)s - %(levelname)s - %(message)s'
+        )
     logging.debug(f"Logging initialized at level {logging_level}")
 
     # infer API endpoint and construct request header
@@ -155,6 +171,21 @@ async def process_api_requests_from_file(
     file_not_finished = True  # after file is empty, we'll skip reading it
     logging.debug(f"Initialization complete.")
 
+    completed_request_ids: Set[int] = set()
+    if os.path.exists(save_filepath):
+        if resume:
+            logging.warning(f"Resuming progress from existing file: {save_filepath}")
+            with open(save_filepath, "r") as f:
+                for line in f:
+                    data = json.loads(line)
+                    completed_request_ids.add(data[2].get("request_idx"))
+            logging.info(f"Found {len(completed_request_ids)} completed requests")
+        else:
+            user_input = input(f"File {save_filepath} already exists.\nTo resume if there are remaining requests without responses, run with --resume flag.\nOverwrite? (Y/n): ")
+            if user_input.lower() != "y" and user_input.lower() != "":
+                logging.info("Aborting operation.")
+                return
+
     # initialize file reading
     with open(requests_filepath) as file:
         # `requests` will provide requests one at a time
@@ -173,6 +204,10 @@ async def process_api_requests_from_file(
                         try:
                             # get new request
                             request_json = json.loads(next(requests))
+                            request_idx = request_json['metadata']['request_idx']
+                            if resume and request_idx in completed_request_ids:
+                                logging.info(f"Skipping already completed request {request_idx}")
+                                continue
                             next_request = APIRequest(
                                 task_id=next(task_id_generator),
                                 request_json=request_json,
@@ -466,6 +501,8 @@ if __name__ == "__main__":
     parser.add_argument("--token_encoding_name", default="cl100k_base")
     parser.add_argument("--max_attempts", type=int, default=5)
     parser.add_argument("--logging_level", default=logging.INFO)
+    parser.add_argument("--resume", action="store_true", help="Resume progress from existing save file")
+    parser.add_argument("--log_filepath", default=None, help="Path to the log file (optional)")
     args = parser.parse_args()
 
     if args.save_filepath is None:
@@ -483,6 +520,8 @@ if __name__ == "__main__":
             token_encoding_name=args.token_encoding_name,
             max_attempts=int(args.max_attempts),
             logging_level=int(args.logging_level),
+            resume=args.resume,
+            log_filepath=args.log_filepath,
         )
     )
 

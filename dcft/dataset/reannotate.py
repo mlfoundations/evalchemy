@@ -30,7 +30,9 @@ def regenerate_dataset(args):
                 "annotation_original": data.annotations_original[idx],
                 "annotation": data.annotations[idx]
             } for idx in range(len(data.annotations))]
-    with open(f"{args.save_dir}/{args.dataset.replace('/', '_')}.json", 'w') as f:
+    
+    save_name = f"{args.dataset.replace('/', '_')}_{args.annotator}"
+    with open(f"{args.save_dir}/{save_name}.json", 'w') as f:
         json.dump(save_out, f, indent=4)
         
 
@@ -39,6 +41,7 @@ def main():
     parser.add_argument("--annotator", type=str, default="gpt-4o-2024-08-06", choices=list(ANNOTATOR_MAP.keys()))
     parser.add_argument("--dataset", type=str, required=True, help="")
     parser.add_argument("--save_dir", type=str, default="datasets/reannotated")
+    parser.add_argument("--resume", action="store_true", help="Resume from a previous run")
 
     # Generation parameters
     parser.add_argument("--temperature", type=float, default=1.0)
@@ -61,12 +64,13 @@ def main():
     args = parser.parse_args()
     regenerate_dataset(args)
 
+    save_name = f"{args.dataset.replace('/', '_')}_{args.annotator}"
     save_yaml = {
         "uuid": str(uuid.uuid4()),
         "creation_date": datetime.now().strftime("%Y_%m_%d-%H_%M_%S"),
         "params": args.__dict__
     }
-    with open(f'{args.save_dir}/config.yml', 'w') as f:
+    with open(f'{args.save_dir}/{save_name}.yml', 'w') as f:
         yaml.dump(save_yaml, f)
 
 if __name__ == "__main__":

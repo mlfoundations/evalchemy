@@ -35,6 +35,32 @@ class GPTAnnotator(BaseAnnotator):
                 "request_idx" : idx,
             } if idx is not None else {}
         }
+
+    def _create_and_write_jobs(self, n, data, generation_config, jobs_file):
+        """
+        Create job dictionaries and write them to the jobs file.
+        
+        Args:
+            n (int): Number of jobs to create
+            data (object): Data object containing user prompts
+            generation_config (object): Configuration for job generation
+            jobs_file (str): Path to the jobs file
+        
+        Returns:
+            list: List of created job dictionaries
+        """
+        print(f"Templating {n} API requests jobs")
+        jobs = []
+        for idx in tqdm(range(n)):
+            job = self.create_job_dict(data.user_prompts[idx], generation_config, idx)
+            jobs.append(job)
+        
+        with open(jobs_file, "w") as f:
+            for job in jobs:
+                f.write(json.dumps(job) + "\n")
+        print(f"Jobs file {jobs_file} has been created/overwritten.")
+        
+        return jobs
         
     def annotate(self, data, generation_config):
         n = len(data.user_prompts)
@@ -44,30 +70,23 @@ class GPTAnnotator(BaseAnnotator):
         os.makedirs(jobpath, exist_ok=True)
         jobs_file = f"{jobpath}/jobs.json"
 
-        jobs = []
-        print(f"Creating {n} jobs")
-        for idx in tqdm(range(n)):
-            job = self.create_job_dict(data.user_prompts[idx], generation_config, idx)
-            jobs.append(job)
-        
+        # Check if the jobs file already exists
         if os.path.exists(jobs_file):
             user_input = input(f"File {jobs_file} already exists. Do you want to override it? (y/N): ")
-            if user_input.lower() == 'y':
-                with open(jobs_file, "w") as f:
-                    for job in jobs:
-                        f.write(json.dumps(job) + "\n")
-                print(f"Jobs file {jobs_file} has been overwritten.")
-            else:
+            if user_input.lower() != 'y':
+                # Load existing jobs from file
                 with open(jobs_file, "r") as f:
                     jobs = [json.loads(line) for line in f]
                 print(f"Using existing jobs from {jobs_file}")
                 print(f"Number of jobs: {len(jobs)}")
                 print("Example job:")
                 print(json.dumps(jobs[0], indent=2))
+            else:
+                # Create new jobs and write to file
+                jobs = self._create_and_write_jobs(n, data, generation_config, jobs_file)
         else:
-            with open(jobs_file, "w") as f:
-                for job in jobs:
-                    f.write(json.dumps(job) + "\n")
+            # Create new jobs and write to file
+            jobs = self._create_and_write_jobs(n, data, generation_config, jobs_file)
 
         print(f"Parallel processing starting, logging to {jobpath}/output.log")
         # Run batch processing

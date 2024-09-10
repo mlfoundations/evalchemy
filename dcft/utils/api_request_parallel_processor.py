@@ -106,6 +106,7 @@ from dataclasses import (
     field,
 )  # for storing API inputs, outputs, and metadata
 from typing import Set, Optional
+from tqdm.asyncio import tqdm
 
 async def process_api_requests_from_file(
     requests_filepath: str,
@@ -130,20 +131,23 @@ async def process_api_requests_from_file(
     # initialize logging
     if log_filepath:
         # Set up logging to both file and stdout
+        # File logging is always at DEBUG level, while console logging uses the specified logging_level
+        file_handler = logging.FileHandler(log_filepath, mode='a')
+        file_handler.setLevel(logging.DEBUG)
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging_level)
+        
         logging.basicConfig(
-            level=logging_level,
+            level=logging.DEBUG,  # Set to DEBUG to capture all levels
             format='%(asctime)s - %(levelname)s - %(message)s',
-            handlers=[
-                logging.FileHandler(log_filepath, mode='a'),
-                logging.StreamHandler()
-            ]
+            handlers=[file_handler, console_handler]
         )
     else:
         logging.basicConfig(
             level=logging_level,
             format='%(asctime)s - %(levelname)s - %(message)s'
         )
-    logging.debug(f"Logging initialized at level {logging_level}")
+    logging.debug(f"Logging initialized. Console logging level: {logging_level}")
 
     # infer API endpoint and construct request header
     api_endpoint = api_endpoint_from_url(request_url)
@@ -191,22 +195,28 @@ async def process_api_requests_from_file(
         # `requests` will provide requests one at a time
         requests = file.__iter__()
         logging.debug(f"File opened. Entering main loop")
+
+        # Count total number of requests
+        total_requests = sum(1 for _ in open(requests_filepath))
+
+        # Create progress bar
+        pbar = tqdm(total=total_requests, desc="Processing requests")
+
         async with aiohttp.ClientSession() as session:  # Initialize ClientSession here
             while True:
                 # get next request (if one is not already waiting for capacity)
                 if next_request is None:
                     if not queue_of_requests_to_retry.empty():
                         next_request = queue_of_requests_to_retry.get_nowait()
-                        logging.debug(
-                            f"Retrying request {next_request.task_id}: {next_request}"
-                        )
+                        logging.debug(f"Retrying request {next_request.task_id}")
                     elif file_not_finished:
                         try:
                             # get new request
                             request_json = json.loads(next(requests))
                             request_idx = request_json['metadata']['request_idx']
                             if resume and request_idx in completed_request_ids:
-                                logging.info(f"Skipping already completed request {request_idx}")
+                                logging.debug(f"Skipping already completed request {request_idx}")
+                                status_tracker.num_tasks_already_completed += 1
                                 continue
                             next_request = APIRequest(
                                 task_id=next(task_id_generator),
@@ -219,9 +229,7 @@ async def process_api_requests_from_file(
                             )
                             status_tracker.num_tasks_started += 1
                             status_tracker.num_tasks_in_progress += 1
-                            logging.debug(
-                                f"Reading request {next_request.task_id}: {next_request}"
-                            )
+                            logging.debug(f"Reading request {next_request.task_id}")
                         except StopIteration:
                             # if file runs out, set flag to stop reading it
                             logging.debug("Read file exhausted")
@@ -267,6 +275,11 @@ async def process_api_requests_from_file(
                         )
                         next_request = None  # reset next_request to empty
 
+                # Update progress bar when a task is completed
+                total_completed = status_tracker.num_tasks_succeeded + status_tracker.num_tasks_failed + status_tracker.num_tasks_already_completed
+                if total_completed > pbar.n:
+                    pbar.update(total_completed - pbar.n)
+
                 # if all tasks are finished, break
                 if status_tracker.num_tasks_in_progress == 0:
                     break
@@ -292,6 +305,9 @@ async def process_api_requests_from_file(
                         f"Pausing to cool down until {time.ctime(status_tracker.time_of_last_rate_limit_error + seconds_to_pause_after_rate_limit_error)}"
                     )
 
+        # Close the progress bar
+        pbar.close()
+
         # after finishing, log final status
         logging.info(
             f"""Parallel processing complete. Results saved to {save_filepath}"""
@@ -313,6 +329,7 @@ async def process_api_requests_from_file(
 class StatusTracker:
     """Stores metadata about the script's progress. Only one instance is created."""
 
+    num_tasks_already_completed: int = 0
     num_tasks_started: int = 0
     num_tasks_in_progress: int = 0  # script ends when this reaches 0
     num_tasks_succeeded: int = 0
@@ -344,7 +361,7 @@ class APIRequest:
         status_tracker: StatusTracker,
     ):
         """Calls the OpenAI API and saves results."""
-        logging.info(f"Starting request #{self.task_id}")
+        logging.debug(f"Starting request #{self.task_id}")
         error = None
         try:
             async with session.post(

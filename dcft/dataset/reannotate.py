@@ -32,7 +32,7 @@ def regenerate_dataset(args):
             } for idx in range(len(data.annotations))]
     
     save_name = f"{args.dataset.replace('/', '_')}_{args.annotator}"
-    with open(f"{args.save_dir}/{save_name}.json", 'w') as f:
+    with open(f"{args.save_dir}/{save_name}/reannotated.json", 'w') as f:
         json.dump(save_out, f, indent=4)
         
 
@@ -70,7 +70,7 @@ def main():
         "creation_date": datetime.now().strftime("%Y_%m_%d-%H_%M_%S"),
         "params": args.__dict__
     }
-    with open(f'{args.save_dir}/{save_name}.yml', 'w') as f:
+    with open(f'{args.save_dir}/{save_name}/config.yaml', 'w') as f:
         yaml.dump(save_yaml, f)
 
 if __name__ == "__main__":

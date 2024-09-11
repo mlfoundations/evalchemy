@@ -58,7 +58,7 @@ class GPTAnnotator(BaseAnnotator):
         with open(jobs_file, "w") as f:
             for job in jobs:
                 f.write(json.dumps(job) + "\n")
-        print(f"Jobs file {jobs_file} has been created/overwritten.")
+        print(f"Jobs file {jobs_file} written to disk.")
         
         return jobs
         

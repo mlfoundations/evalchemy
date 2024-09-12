@@ -1,11 +1,12 @@
 import json
 from datasets import load_dataset
 
+
 class BaseFTDataset:
     def __init__(self, data_path):
         self.data_path = data_path
         try:
-            with open(data_path, 'r') as f:
+            with open(data_path, "r") as f:
                 self.data = json.loads(f)
         except:
             self.data = load_dataset(data_path)

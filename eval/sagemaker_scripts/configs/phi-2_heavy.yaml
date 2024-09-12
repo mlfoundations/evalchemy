@@ -1,4 +1,0 @@
-hf-model: microsoft/phi-2
-tokenizer: microsoft/phi-2
-eval-yaml: eval/heavy.yaml
-output-file: /opt/ml/output/data/phi-2_heavy.yaml

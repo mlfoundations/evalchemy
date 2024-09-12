@@ -1,8 +1,0 @@
-- source: cc_v3_fasttext
-  weight: 1.0
-  steps:
-    - func: starcoder_v2_repo_splitter
-      max_files: 100  
-    - func: starcoder_v2_format_modifier
-      add_metadata_prob: 0.5
-      add_sentinels: True

@@ -1,4 +1,4 @@
-''' This is the script from: https://huggingface.co/edugp/kenlm/blob/main/model.py
+""" This is the script from: https://huggingface.co/edugp/kenlm/blob/main/model.py
 
 The `setup.py` downlods two models to the "wikipedia" directory:
 1. .bin file (~4GB): https://huggingface.co/edugp/kenlm/blob/main/wikipedia/en.arpa.bin
@@ -24,7 +24,7 @@ print(model.get_perplexity("I am very perplexed"))
 print(model.get_perplexity("im hella trippin"))
 # Output: 46793.5 (high perplexity, since the sentence is colloquial and contains grammar mistakes)
 
-'''
+"""
 
 import os
 import re
@@ -37,14 +37,14 @@ import sentencepiece
 from core.constants import CONTENT
 from core.factory_utils import factory_function
 
-PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 MODEL_SUBDIRECTORY = "baselines/mappers/enrichers/quality_prediction_enrichment_models"
 
 
 class SentencePiece:
     def __init__(
-            self,
-            model: str,
+        self,
+        model: str,
     ):
         super().__init__()
         self.sp = sentencepiece.SentencePieceProcessor()
@@ -94,24 +94,22 @@ class KenlmModel:
         "►": "-",
     }
     unicode_punct_re = re.compile(f"[{''.join(unicode_punct.keys())}]")
-    non_printing_chars_re = re.compile(
-        f"[{''.join(map(chr, list(range(0, 32)) + list(range(127, 160))))}]"
-    )
+    non_printing_chars_re = re.compile(f"[{''.join(map(chr, list(range(0, 32)) + list(range(127, 160))))}]")
     kenlm_model_dir = None
     sentence_piece_model_dir = None
 
     def __init__(
-            self,
-            model_dataset: str,
-            language: str,
-            lower_case: bool = False,
-            remove_accents: bool = False,
-            normalize_numbers: bool = True,
-            punctuation: int = 1,
+        self,
+        model_dataset: str,
+        language: str,
+        lower_case: bool = False,
+        remove_accents: bool = False,
+        normalize_numbers: bool = True,
+        punctuation: int = 1,
     ):
         if os.path.exists(MODEL_SUBDIRECTORY):
             model_dir = MODEL_SUBDIRECTORY
-        else: 
+        else:
             model_dir = os.path.join(PROJECT_ROOT, MODEL_SUBDIRECTORY)
 
         self.model = kenlm.Model(os.path.join(model_dir, f"{language}.arpa.bin"))
@@ -123,9 +121,9 @@ class KenlmModel:
 
     @classmethod
     def from_pretrained(
-            cls,
-            model_dataset: str,
-            language: str,
+        cls,
+        model_dataset: str,
+        language: str,
     ):
         return cls(
             model_dataset,
@@ -159,12 +157,12 @@ class KenlmModel:
         return round(self.pp(doc_log_score, doc_length), 1)
 
     def normalize(
-            self,
-            line: str,
-            accent: bool = True,
-            case: bool = True,
-            numbers: bool = True,
-            punct: int = 1,
+        self,
+        line: str,
+        accent: bool = True,
+        case: bool = True,
+        numbers: bool = True,
+        punct: int = 1,
     ) -> str:
         line = line.strip()
         if not line:
@@ -203,12 +201,12 @@ class KenlmModel:
 
 @factory_function
 def ken_lm_perplexity_enricher(key: str = "kenlm_perplexity", overwrite: bool = False) -> Callable[[Dict], List[Dict]]:
-    '''
+    """
     Enriches a page with the perplexity of its content.
     :param key: the key to use for storing the perplexity
     :param overwrite: whether to overwrite an existing key
     :return: a function that enriches a page
-    '''
+    """
 
     ken_lm_model = KenlmModel.from_pretrained("wikipedia", "en")
 

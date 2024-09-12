@@ -18,6 +18,7 @@ import nltk
 from nltk.tokenize.punkt import PunktSentenceTokenizer
 from unidecode import unidecode
 
+
 def do_once(func):
     """
     A decorator that runs a function only once.
@@ -32,33 +33,35 @@ def do_once(func):
             fn_str_parts.append(args_str)
         if len(kwargs) > 0:
             sorted_kwargs = sorted(kwargs.keys())
-            kwargs_str = "_".join([f'{k}:{kwargs[k]}' for k in sorted_kwargs])
+            kwargs_str = "_".join([f"{k}:{kwargs[k]}" for k in sorted_kwargs])
             fn_str_parts.append(kwargs_str)
-        name = "|".join(fn_str_parts)    
-        
+        name = "|".join(fn_str_parts)
+
         if name not in done:
             done.add(name)
             return func(*args, **kwargs)
 
     return wrapper
 
+
 sent_tokenizer = None
+
 
 @do_once
 def _prep_nltk_tokenizer(tokenizer_lang):
     try:
-        nltk.data.find('tokenizers/punkt')
+        nltk.data.find("tokenizers/punkt")
         global sent_tokenizer
-        if tokenizer_lang in ['en', 'english']:
+        if tokenizer_lang in ["en", "english"]:
             # This is the specific tokenizer used in C4
             sent_tokenizer = nltk.data.load("nltk:tokenizers/punkt/english.pickle")
         else:
             sent_tokenizer = PunktSentenceTokenizer()
     except LookupError:
-        nltk.download('punkt')
+        nltk.download("punkt")
 
 
-def split_paragraphs(text: str, paragraph_end='\n', remove_empty: bool = True) -> List[str]:
+def split_paragraphs(text: str, paragraph_end="\n", remove_empty: bool = True) -> List[str]:
     r"""
     Split a string into paragraphs. A paragraph is defined as a sequence of zero or more characters, followed
     by a newline character(s), or a sequence of one or more characters, followed by the end of the string.
@@ -77,7 +80,7 @@ def split_paragraphs(text: str, paragraph_end='\n', remove_empty: bool = True) -
     return paragraphs
 
 
-def split_sentences(text: str, remove_empty: bool = True, tokenizer='blingfire', tokenizer_lang=None) -> List[str]:
+def split_sentences(text: str, remove_empty: bool = True, tokenizer="blingfire", tokenizer_lang=None) -> List[str]:
     """
     Split a string into sentences.
     Note - this is not perfect (as you can see by the e.g. example below)
@@ -95,10 +98,10 @@ def split_sentences(text: str, remove_empty: bool = True, tokenizer='blingfire',
     """
     if len(text) == 0:
         return []
-    if tokenizer == 'blingfire':
+    if tokenizer == "blingfire":
         assert BLINGFIRE_AVAILABLE, "Blingfire is not available. Please install it with `pip install blingfire`"
         _, offsets = blingfire.text_to_sentences_and_offsets(text)
-    elif tokenizer == 'nltk':
+    elif tokenizer == "nltk":
         _prep_nltk_tokenizer(tokenizer_lang)
         offsets = [(start, end) for start, end in sent_tokenizer.span_tokenize(text)]
     else:
@@ -110,8 +113,9 @@ def split_sentences(text: str, remove_empty: bool = True, tokenizer='blingfire',
         raise NotImplementedError("remove_empty=False is not implemented yet")
 
 
-def split_words(text: str, model='fasttext', ignore_punctuation: bool = False, ignore_whitespace: bool = True) -> \
-        List[str]:
+def split_words(
+    text: str, model="fasttext", ignore_punctuation: bool = False, ignore_whitespace: bool = True
+) -> List[str]:
     """
     Counts the number of words in a text string.
 
@@ -127,11 +131,11 @@ def split_words(text: str, model='fasttext', ignore_punctuation: bool = False, i
     Raises:
         ValueError: If an unknown word tokenizer model is specified.
     """
-    if model == 'uniseg':
+    if model == "uniseg":
         tokens = words(text)
-    elif model == 'fasttext':
+    elif model == "fasttext":
         tokens = fasttext.FastText.tokenize(text)
-    elif model == 'split':
+    elif model == "split":
         tokens = text.split()
     else:
         raise ValueError(f"Unknown word tokenizer: {model}")
@@ -146,7 +150,7 @@ def split_words(text: str, model='fasttext', ignore_punctuation: bool = False, i
         return list(tokens)
 
 
-def join_sentences(lines: List[str], sep=' ') -> str:
+def join_sentences(lines: List[str], sep=" ") -> str:
     """
     Join a list of sentences into a single string (paragraph).
 
@@ -160,7 +164,7 @@ def join_sentences(lines: List[str], sep=' ') -> str:
     return sep.join(lines)
 
 
-def join_paragraphs(paragraphs: List[str], sep='\n') -> str:
+def join_paragraphs(paragraphs: List[str], sep="\n") -> str:
     """
     Join a list of paragraphs into a single string.
 
@@ -177,7 +181,7 @@ def join_paragraphs(paragraphs: List[str], sep='\n') -> str:
 def normalize_url(url: str) -> str:
     """
     Normalizes urls as a way to assist with dedup. The specific rule is taken
-    from the TFDS C4 repo: 
+    from the TFDS C4 repo:
 
     https://github.com/tensorflow/datasets/blob/fbacae9034d61870ae8d639c7d3f4a667c434879/
     tensorflow_datasets/text/c4_utils.py#L501
@@ -186,19 +190,19 @@ def normalize_url(url: str) -> str:
         url (str): The url to normalize
 
     Returns:
-        str: A normalized url 
+        str: A normalized url
 
     """
     url = re.sub(r"https?:\/\/(www\.)?", "", url)
     url = re.sub(r"\?(utm_|ref|feed).*", "", url)
     url = url.rstrip("/")
-    
+
     return url
 
 
 def normalize_whitespace_and_lowercase(text: str) -> str:
     """
-    Normalizes paragraphs by stripping whitespace and converting to lowercase. 
+    Normalizes paragraphs by stripping whitespace and converting to lowercase.
 
     Args:
         text (str): The text to normalize
@@ -210,7 +214,7 @@ def normalize_whitespace_and_lowercase(text: str) -> str:
     return text.strip().lower()
 
 
-def normalize_timestamps(timestamp: str, date_format = '%Y-%m-%dT%H:%M:%SZ', default_val=-1.0) -> float:
+def normalize_timestamps(timestamp: str, date_format="%Y-%m-%dT%H:%M:%SZ", default_val=-1.0) -> float:
     """
     Converts timestamp strings into a float which can be used for comparisons.
 
@@ -218,7 +222,7 @@ def normalize_timestamps(timestamp: str, date_format = '%Y-%m-%dT%H:%M:%SZ', def
         timestamp (str): The timestamp to convert
         date_format (str): The string specifying the format for the timestamp
         default_val (float): The value assigned to any timestamp where the timestamp and date_format
-        are not compatible with each other. 
+        are not compatible with each other.
 
     Returns:
         float: A numeric representation of the timestamp
@@ -232,6 +236,7 @@ def normalize_timestamps(timestamp: str, date_format = '%Y-%m-%dT%H:%M:%SZ', def
 
 def hash_text(text: str):
     return hashlib.md5(text.encode("utf-8")).hexdigest()
+
 
 UNICODE_PUNCT = {
     "，": ",",
@@ -302,9 +307,9 @@ def ccnet_dedup_normalizer(line: str) -> str:
 
 
 DEDUP_NORMALIZERS = {
-    'normalize_url': normalize_url,
-    'normalize_timestamps': normalize_timestamps,
-    'normalize_whitespace_and_lowercase': normalize_whitespace_and_lowercase,
-    'hash_text': hash_text,
-    'ccnet_dedup_normalizer': ccnet_dedup_normalizer
+    "normalize_url": normalize_url,
+    "normalize_timestamps": normalize_timestamps,
+    "normalize_whitespace_and_lowercase": normalize_whitespace_and_lowercase,
+    "hash_text": hash_text,
+    "ccnet_dedup_normalizer": ccnet_dedup_normalizer,
 }

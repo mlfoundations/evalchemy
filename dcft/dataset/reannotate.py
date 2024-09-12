@@ -24,18 +24,21 @@ def regenerate_dataset(args):
     # Save outputs
     assert len(data.annotations) == len(data.user_prompts)
     os.makedirs(args.save_dir, exist_ok=True)
-    save_out = [{
-                "system_prompt": data.system_prompts[idx],
-                "user_prompt": data.user_prompts[idx],
-                "annotation_original": data.annotations_original[idx],
-                "annotation": data.annotations[idx]
-            } for idx in range(len(data.annotations))]
-    with open(f"{args.save_dir}/{args.dataset.replace('/', '_')}.json", 'w') as f:
+    save_out = [
+        {
+            "system_prompt": data.system_prompts[idx],
+            "user_prompt": data.user_prompts[idx],
+            "annotation_original": data.annotations_original[idx],
+            "annotation": data.annotations[idx],
+        }
+        for idx in range(len(data.annotations))
+    ]
+    with open(f"{args.save_dir}/{args.dataset.replace('/', '_')}.json", "w") as f:
         json.dump(save_out, f, indent=4)
-        
+
 
 def main():
-    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser = argparse.ArgumentParser(description="Process some integers.")
     parser.add_argument("--annotator", type=str, default="gpt-4o-2024-08-06", choices=list(ANNOTATOR_MAP.keys()))
     parser.add_argument("--dataset", type=str, required=True, help="")
     parser.add_argument("--save_dir", type=str, default="datasets/reannotated")
@@ -64,10 +67,11 @@ def main():
     save_yaml = {
         "uuid": str(uuid.uuid4()),
         "creation_date": datetime.now().strftime("%Y_%m_%d-%H_%M_%S"),
-        "params": args.__dict__
+        "params": args.__dict__,
     }
-    with open(f'{args.save_dir}/config.yml', 'w') as f:
+    with open(f"{args.save_dir}/config.yml", "w") as f:
         yaml.dump(save_yaml, f)
+
 
 if __name__ == "__main__":
     main()

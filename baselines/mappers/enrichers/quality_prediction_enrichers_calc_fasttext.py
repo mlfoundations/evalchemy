@@ -1,9 +1,10 @@
-'''
+"""
 This script classifies a given text as either 'CC' or 'Wikipedia' using a FastText model from the RedPajama project.
 More details about the model can be found in this GitHub issue: https://github.com/togethercomputer/RedPajama-Data/issues/24
 Model download is done via `setup.py` script.
 The download link is: https://drive.google.com/file/d/1DnsfpWWE0jFPCoYe6clwqb3Ub5Ac92s1/view?usp=share_link
-'''
+"""
+
 import os
 from typing import Dict, List, Callable
 
@@ -12,9 +13,10 @@ import fasttext
 from core.constants import CONTENT
 from core.factory_utils import factory_function
 
-PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 MODEL_SUBDIRECTORY = "baselines/mappers/enrichers/quality_prediction_enrichment_models"
-RPJ_MODEL_FILENAME = 'model.bin'
+RPJ_MODEL_FILENAME = "model.bin"
+
 
 def load_fasttext_model(model_filename):
     if os.path.exists(MODEL_SUBDIRECTORY):
@@ -24,8 +26,9 @@ def load_fasttext_model(model_filename):
 
     return fasttext.load_model(model_path)
 
+
 def classify_fasttext_hq_prob(model: fasttext.FastText._FastText, content: str) -> dict:
-    '''
+    """
     This function classifies a given text as either 'CC' or 'Wikipedia' and returns the label along with its probability.
 
     Parameters:
@@ -34,7 +37,7 @@ def classify_fasttext_hq_prob(model: fasttext.FastText._FastText, content: str) 
 
     Returns:
     dict: A value for 'hq_prob' - the probability to be a high-quality page.
-    '''
+    """
 
     # Initialize an empty dictionary for the output
     output = {}
@@ -59,9 +62,10 @@ def classify_fasttext_hq_prob(model: fasttext.FastText._FastText, content: str) 
 
 
 @factory_function
-def classify_fasttext_hq_prob_enricher(model_filename=RPJ_MODEL_FILENAME, key: str = "fasttext_hq_prob", overwrite: bool = False) -> Callable[
-    [Dict], List[Dict]]:
-    '''
+def classify_fasttext_hq_prob_enricher(
+    model_filename=RPJ_MODEL_FILENAME, key: str = "fasttext_hq_prob", overwrite: bool = False
+) -> Callable[[Dict], List[Dict]]:
+    """
     Enriches the given page with the text type (CC or Wikipedia).
 
     Parameters:
@@ -72,7 +76,7 @@ def classify_fasttext_hq_prob_enricher(model_filename=RPJ_MODEL_FILENAME, key: s
 
     Returns:
         A function that enriches the given page with the text type (HQ or CC).
-    '''
+    """
     model = load_fasttext_model(model_filename)
 
     def enrich(page: Dict) -> List[Dict]:

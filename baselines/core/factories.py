@@ -27,19 +27,19 @@ def _normalize_path_from_root(pth):
 def _fix_builtin_path_to_relative(file_path):
     relative_path = os.path.relpath(file_path, _BASELINES_PATH)  # Get the relative path
     module_path = os.path.splitext(relative_path)[0]  # Remove .py extension
-    module_path = module_path.replace('..', '.').replace(os.sep, '.')  # Replace path separator with a dot
+    module_path = module_path.replace("..", ".").replace(os.sep, ".")  # Replace path separator with a dot
     return module_path
 
 
 def _get_package_modules(package_root_path):
-    if '.' in package_root_path:
-        package_root_path = package_root_path.replace('.', os.sep)  # Replace dots with path separator
+    if "." in package_root_path:
+        package_root_path = package_root_path.replace(".", os.sep)  # Replace dots with path separator
     package_root_path = os.path.realpath(package_root_path)  # Normalize the path
-    py_files = glob.glob(package_root_path + '/**/*.py', recursive=True)
+    py_files = glob.glob(package_root_path + "/**/*.py", recursive=True)
 
     modules = []
     for file_path in py_files:
-        if os.path.basename(file_path) == '__init__.py':
+        if os.path.basename(file_path) == "__init__.py":
             continue  # Skip __init__.py files
         module_path = _fix_builtin_path_to_relative(file_path)
         modules.append(module_path)
@@ -47,10 +47,10 @@ def _get_package_modules(package_root_path):
     return modules
 
 
-_MAPPERS_MODULES = _get_package_modules(_normalize_path_from_root('mappers'))  # assumes working dir is root dir!
-_AGGREGATORS_MODULES = [_fix_builtin_path_to_relative(_normalize_path_from_root('aggregators'))]
+_MAPPERS_MODULES = _get_package_modules(_normalize_path_from_root("mappers"))  # assumes working dir is root dir!
+_AGGREGATORS_MODULES = [_fix_builtin_path_to_relative(_normalize_path_from_root("aggregators"))]
 # currently the transforms used for aggreagtors sit within the same module
-_TRANSFORMS_MODULES = [_fix_builtin_path_to_relative(_normalize_path_from_root('aggregators'))]
+_TRANSFORMS_MODULES = [_fix_builtin_path_to_relative(_normalize_path_from_root("aggregators"))]
 
 
 def _import_module_from_path(path):
@@ -59,8 +59,10 @@ def _import_module_from_path(path):
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
     except Exception as e:
-        raise FileNotFoundError(f"Failed to import module {path}. Make sure the given custom function is in the "
-                                f"correct path, given as a relative to the working directory ({os.getcwd()})")
+        raise FileNotFoundError(
+            f"Failed to import module {path}. Make sure the given custom function is in the "
+            f"correct path, given as a relative to the working directory ({os.getcwd()})"
+        )
     return module
 
 
@@ -79,9 +81,9 @@ def _load_function(func, default_modules, prep_func=None, **kwargs):
     :param kwargs: The arguments to be passed to the function.
     :return: A partial function with the given arguments.
     """
-    arguments = {k: v for k, v in kwargs.items() if k not in ["module", "func"] and not k.startswith('_')}
+    arguments = {k: v for k, v in kwargs.items() if k not in ["module", "func"] and not k.startswith("_")}
 
-    if '.' not in func:
+    if "." not in func:
         # a builtin function
         for module_name in default_modules:
             module_name = importlib.import_module(module_name, package=_BASELINES_PATH)
@@ -92,11 +94,13 @@ def _load_function(func, default_modules, prep_func=None, **kwargs):
 
     else:
         # a custom function from a module
-        module_name, func = func.rsplit('.', 1)
-        if module_name.startswith('.'):
-            raise ValueError(f"Relative imports are not supported, please specify absolute path or "
-                             f"use a higher level working directory")
-        module_name = module_name.replace('.', os.path.sep) + '.py'
+        module_name, func = func.rsplit(".", 1)
+        if module_name.startswith("."):
+            raise ValueError(
+                f"Relative imports are not supported, please specify absolute path or "
+                f"use a higher level working directory"
+            )
+        module_name = module_name.replace(".", os.path.sep) + ".py"
         if not os.path.isabs(module_name):
             module_name = os.path.join(os.getcwd(), module_name)
         module = _import_module_from_path(module_name)

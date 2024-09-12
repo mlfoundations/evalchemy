@@ -15,8 +15,10 @@ from pathlib import Path as LocalPath
 def is_s3(file_path: str):
     return file_path.startswith("s3://")
 
+
 def is_compressed(file_path: str):
     return any(file_path.endswith(z) for z in (".zst", ".zstd", ".gz"))
+
 
 def delete_file(file_path: str):
     """Deletes the file at the given path (local or S3). If the file does not exist, raises an error.
@@ -46,6 +48,7 @@ def _jsonl_bytes_reader(fh: BinaryIO):
             for item in jsonl_reader:
                 yield item
 
+
 def read_jsonl(file_path: str):
     """Read a JSONL file from a given path (local or S3)."""
     if is_s3(file_path):
@@ -54,18 +57,19 @@ def read_jsonl(file_path: str):
         path = LocalPath(file_path)
 
     if any(file_path.endswith(z) for z in (".zst", ".zstd")):
-        with path.open('rb') as f:
+        with path.open("rb") as f:
             with zstd.ZstdDecompressor().stream_reader(f) as reader:
                 for line in _jsonl_bytes_reader(reader):
                     yield line
     elif file_path.endswith(".gz"):
-        with gzip.open(path, 'rb') as f:
+        with gzip.open(path, "rb") as f:
             for line in _jsonl_bytes_reader(f):
                 yield line
     else:
-        with path.open('rb') as f:    
+        with path.open("rb") as f:
             for line in _jsonl_bytes_reader(f):
                 yield line
+
 
 def write_jsonl(data, file_path: str, mode: str = "w"):
     """Write data to a JSONL file at a given path (local or S3)."""
@@ -76,7 +80,7 @@ def write_jsonl(data, file_path: str, mode: str = "w"):
 
     if is_compressed(file_path):
         data = [json.dumps(d) for d in data]
-        data = "\n".join(data).encode('utf8')
+        data = "\n".join(data).encode("utf8")
 
     if any(file_path.endswith(z) for z in (".zst", ".zstd")):
         with path.open("wb") as f:
@@ -90,6 +94,7 @@ def write_jsonl(data, file_path: str, mode: str = "w"):
             for item in data:
                 json_str = json.dumps(item)
                 f.write(f"{json_str}\n")
+
 
 def makedirs_if_missing(dir_path: str):
     """

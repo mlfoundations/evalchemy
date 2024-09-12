@@ -1,5 +1,5 @@
 def is_factory(func):
-    return hasattr(func, '_is_factory')
+    return hasattr(func, "_is_factory")
 
 
 def factory_function(func):

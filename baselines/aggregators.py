@@ -16,9 +16,13 @@ def percentiles(values):
     """
     if not isinstance(values, list):
         raise TypeError("Values must be a list.")
-    vals = dict(zip(["min", "max", "median", "p25", "p75", "p90", "p95", "p99"],
-                    np.percentile(values, [0., 100, 50, 25, 75, 90, 95, 99], method="nearest")))
-    vals['mean'] = np.mean(values)
+    vals = dict(
+        zip(
+            ["min", "max", "median", "p25", "p75", "p90", "p95", "p99"],
+            np.percentile(values, [0.0, 100, 50, 25, 75, 90, 95, 99], method="nearest"),
+        )
+    )
+    vals["mean"] = np.mean(values)
     return vals
 
 
@@ -39,7 +43,7 @@ def histogram(values):
         return dict(zip(bin_edges, hist))
 
 
-def threshold_transform(weighted_values: Dict[str, float], threshold, default='unknown') -> str:
+def threshold_transform(weighted_values: Dict[str, float], threshold, default="unknown") -> str:
     """
     Given a dict where the keys are weighted by the values, return the key with the highest value,
     if it is above the given threshold (otherwise return the default value).

@@ -32,6 +32,7 @@ def regenerate_dataset(args):
             } for idx in range(len(data.annotations))]
     
     save_name = f"{args.dataset.replace('/', '_')}_{args.annotator}"
+    os.makedirs(f"{args.save_dir}/{save_name}", exist_ok=True)
     with open(f"{args.save_dir}/{save_name}/reannotated.json", 'w') as f:
         json.dump(save_out, f, indent=4)
         

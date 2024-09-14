@@ -84,7 +84,7 @@ class GPTAnnotator(BaseAnnotator):
                 print(json.dumps(jobs[0], indent=2))
             else:
                 # Create new jobs and write to file
-                error_message = (f"WARNING: Existing job file {jobs_file}. "
+                error_message = (f"Existing job file {jobs_file}. "
                                  f"Delete the jobs file and re-run the annotator: `rm -rf {jobs_file}`. "
                                  f"Or run the annotator with the --resume flag to continue from the previous run.")
                 raise ValueError(error_message)

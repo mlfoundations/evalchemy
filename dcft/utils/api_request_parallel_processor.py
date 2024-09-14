@@ -189,7 +189,7 @@ async def process_api_requests_from_file(
                     data = json.loads(line)
                     if isinstance(data[1], list):
                         # this means that the request failed and we have a list of errors
-                        logging.debug(f"Request {data[2].get("request_idx")} previously failed due to errors: {data[1]}, removing from output and will retry")
+                        logging.debug(f"Request {data[2].get('request_idx')} previously failed due to errors: {data[1]}, removing from output and will retry")
                         num_previously_failed_requests += 1
                     else:
                         completed_request_ids.add(data[2].get("request_idx"))

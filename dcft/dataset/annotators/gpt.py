@@ -72,8 +72,9 @@ class GPTAnnotator(BaseAnnotator):
 
         # Check if the jobs file already exists
         if os.path.exists(jobs_file):
-            user_input = input(f"File {jobs_file} already exists. Do you want to override it? (y/N): ")
-            if user_input.lower() != 'y':
+            if self.config.resume:
+                print(f"Resuming from previous run, loading existing jobs from {jobs_file}")
+                print(f"To regenerate the jobs file, delete the jobs file and re-run the annotator: `rm -rf {jobs_file}`")
                 # Load existing jobs from file
                 with open(jobs_file, "r") as f:
                     jobs = [json.loads(line) for line in f]
@@ -83,10 +84,12 @@ class GPTAnnotator(BaseAnnotator):
                 print(json.dumps(jobs[0], indent=2))
             else:
                 # Create new jobs and write to file
-                jobs = self._create_and_write_jobs(n, data, generation_config, jobs_file)
-        else:
-            # Create new jobs and write to file
-            jobs = self._create_and_write_jobs(n, data, generation_config, jobs_file)
+                error_message = (f"WARNING: Existing job file {jobs_file}. "
+                                 f"Delete the jobs file and re-run the annotator: `rm -rf {jobs_file}`. "
+                                 f"Or run the annotator with the --resume flag to continue from the previous run.")
+                raise ValueError(error_message)
+        
+        jobs = self._create_and_write_jobs(n, data, generation_config, jobs_file)
 
         print(f"Parallel processing starting, logging to {jobpath}/output.log")
         # Run batch processing

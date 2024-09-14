@@ -106,6 +106,7 @@ from dataclasses import (
     field,
 )  # for storing API inputs, outputs, and metadata
 from typing import Set, Optional
+import pdb
 from tqdm.asyncio import tqdm
 
 async def process_api_requests_from_file(
@@ -178,12 +179,24 @@ async def process_api_requests_from_file(
     completed_request_ids: Set[int] = set()
     if os.path.exists(save_filepath):
         if resume:
+            # save all successfully completed requests to a temporary file, then overwrite the original file with the temporary file
             logging.warning(f"Resuming progress from existing file: {save_filepath}")
-            with open(save_filepath, "r") as f:
-                for line in f:
+            logging.warning(f"Removing all failed requests from {save_filepath} so they can be retried")
+            temp_filepath = f"{save_filepath}.temp"
+            num_previously_failed_requests = 0
+            with open(save_filepath, "r") as input_file, open(temp_filepath, "w") as output_file:
+                for line in input_file:
                     data = json.loads(line)
-                    completed_request_ids.add(data[2].get("request_idx"))
-            logging.info(f"Found {len(completed_request_ids)} completed requests")
+                    if isinstance(data[1], list):
+                        # this means that the request failed and we have a list of errors
+                        logging.debug(f"Request {data[2].get("request_idx")} previously failed due to errors: {data[1]}, removing from output and will retry")
+                        num_previously_failed_requests += 1
+                    else:
+                        completed_request_ids.add(data[2].get("request_idx"))
+                        output_file.write(line)
+            logging.info(f"Found {len(completed_request_ids)} completed requests and {num_previously_failed_requests} previously failed requests")
+            logging.info("Failed requests and remaining requests will now be processed.")
+            os.replace(temp_filepath, save_filepath)
         else:
             user_input = input(f"File {save_filepath} already exists.\nTo resume if there are remaining requests without responses, run with --resume flag.\nOverwrite? (Y/n): ")
             if user_input.lower() != "y" and user_input.lower() != "":

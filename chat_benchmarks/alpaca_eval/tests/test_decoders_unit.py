@@ -1,4 +1,5 @@
 """Runs all unit tests for the decoders."""
+
 import math
 from types import SimpleNamespace
 

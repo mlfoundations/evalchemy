@@ -1,6 +1,7 @@
 """
 Main module for analyzing an evaluation benchmark (annotator and data).
 """
+
 import logging
 from itertools import combinations
 from typing import Callable, Optional, Sequence, Union

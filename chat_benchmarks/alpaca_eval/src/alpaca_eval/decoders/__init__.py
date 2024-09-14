@@ -92,6 +92,16 @@ def get_fn_completions(name: Union[str, Callable]) -> Callable:
             logging.exception(f"You need {packages} to use vllm_completions. Error:")
             raise e
 
+    elif name == "sambanova_completions":
+        try:
+            from .sambanova_api import sambanova_completions
+
+            return sambanova_completions
+        except ImportError as e:
+            packages = ["vllm", "ray", "transformers"]
+            logging.exception(f"You need {packages} to use vllm_completions. Error:")
+            raise e
+
     elif name == "bedrock_anthropic_completions":
         try:
             from .bedrock_anthropic import bedrock_anthropic_completions
@@ -101,16 +111,6 @@ def get_fn_completions(name: Union[str, Callable]) -> Callable:
             packages = ["boto3"]
             logging.exception(f"You need {packages} to use bedrock_anthropic. Error:")
             raise e
-
-    elif name == "cache_completions":
-        from .cache import cache_completions
-
-        return cache_completions
-
-    elif name == "test_completions":
-        from .test import test_completions
-
-        return test_completions
 
     else:
         raise ValueError(f"Unknown decoder: {name}")

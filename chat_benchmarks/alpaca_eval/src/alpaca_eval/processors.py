@@ -225,6 +225,7 @@ class ChainOfThoughtProcessor(BaseProcessor):
     0  {'M': 'output_2', 'm': 'output_1'}         M is better
     1  {'M': 'output_1', 'm': 'output_2'}         M is better
     """
+
     # those columns should be added to the final result
     other_output_keys_to_keep = ["referenced_models", "concise_explanation"]
 

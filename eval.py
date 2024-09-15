@@ -248,7 +248,7 @@ def cli_evaluate(args: Union[argparse.Namespace, None] = None) -> None:
         lm = model
 
     lm.model_identifier = sanitize_model_name(f"model_{model}_model_args_{model_args}")
-    
+
     if evaluation_tracker is not None:
         evaluation_tracker.general_config_tracker.log_experiment_args(
             model_source=model,

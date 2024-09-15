@@ -24,32 +24,6 @@ Please continue to complete the function. You are not allowed to modify the give
         languge.lower(), question.strip()
     )
 
-
-def generate_one(example, lang, model):
-    prompt = build_deepseekcoder_instruction(languge_settings[lang]["full_name"], example["prompt"])
-    inputs = model.apply_chat_template([{"role": "user", "content": prompt}])
-
-    outputs = model.generate_until(
-        [
-            Instance(
-                "generate_until",
-                {},
-                (
-                    inputs,
-                    {
-                        "max_new_tokens": 1024,
-                        "do_sample": False,
-                    },
-                ),
-                0,
-            )
-        ]
-    )
-    example["output"] = outputs
-
-    return extract_generation_code(example, lang_code=lang)
-
-
 def eval_instruct(model):
     results = {}
     temp_dir_obj = tempfile.TemporaryDirectory()

@@ -4,6 +4,7 @@ import os
 import torch
 import re
 from pathlib import Path
+import tempfile
 from tqdm import tqdm
 from lm_eval.api.instance import Instance
 
@@ -65,13 +66,13 @@ def convert_for_evaluation(example):
     return example
 
 
-def eval_instruct(model, output_path, **kwargs):
-    saved_path = output_path
-    temp_dir = "tmp"
-    os.makedirs(temp_dir, exist_ok=True)
+def eval_instruct(model,  **kwargs):
+    temp_dir_obj = tempfile.TemporaryDirectory()
+    temp_dir = temp_dir_obj.name
     problem_file = os.path.join(data_abs_dir, f"mbpp.jsonl")
 
     examples = list(read_test_examples(problem_file))
+    
     print("Read {} examples for evaluation over.".format(len(examples)))
     all_instances = []
     for idx, example in enumerate(tqdm(examples, desc="Generating")):
@@ -102,33 +103,25 @@ def eval_instruct(model, output_path, **kwargs):
     genererated_examples = [convert_for_evaluation(example) for example in generated_examples]
 
     print("Generate all over!!!")
-    with open(f"{output_path}_mbpp", "w", encoding="utf-8") as fw:
+    with open(f"{temp_dir}/mbpp.jsonl", "w", encoding="utf-8") as fw:
         for ex in generated_examples:
             fw.write(json.dumps(ex) + "\n")
-        print("Save {} processed examples into {} over!".format(len(generated_examples), saved_path))
-    results = {"saved_path": f"{output_path}_mbpp"}
+        print("Save {} processed examples into {} over!".format(len(generated_examples), temp_dir))
+    results = {"temp_dir_obj": temp_dir_obj}
     return results
 
 
 def evaluate(results):
-    temp_dir = "tmp"
+    temp_dir_obj = results['temp_dir_obj']
+    temp_dir = temp_dir_obj.name
+
     result = evaluate_functional_correctness(
-        input_file=results["saved_path"],
+        input_file=f"{temp_dir}/mbpp.jsonl",
         tmp_dir=temp_dir,
         problem_file=os.path.join(data_abs_dir, f"mbpp_test.jsonl"),
         language="python",
         is_mbpp=True,
     )
+
+    temp_dir_obj.cleanup()
     return result
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--model", type=str, help="model name or path")
-    parser.add_argument("--output_path", type=str, help="output path of your generation")
-    parser.add_argument("--temp_dir", type=str, help="temp dir for evaluation", default="tmp")
-    args = parser.parse_args()
-
-    os.environ["TOKENIZERS_PARALLELISM"] = "false"
-    generate_main(args)
-    pass

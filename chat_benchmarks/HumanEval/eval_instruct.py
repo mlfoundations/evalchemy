@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 import torch
+import tempfile
 from pathlib import Path
 from tqdm import tqdm
 from lm_eval.api.instance import Instance
@@ -49,12 +50,12 @@ def generate_one(example, lang, model):
     return extract_generation_code(example, lang_code=lang)
 
 
-def eval_instruct(model, output_path):
+def eval_instruct(model):
     results = {}
-    saved_path = output_path
-    temp_dir = "tmp"
-    for lang in ["python"]:
-        os.makedirs(temp_dir, exist_ok=True)
+    temp_dir_obj = tempfile.TemporaryDirectory()
+    temp_dir = temp_dir_obj.name
+
+    for lang in ["python", "sh"]:
         problem_file = os.path.join(data_abs_dir, f"humaneval-{lang}.jsonl")
 
         examples = [json.loads(x) for x in open(problem_file) if x.strip()]
@@ -82,40 +83,43 @@ def eval_instruct(model, output_path):
 
         outputs = model.generate_until(all_instances)
 
-        outputs = [extract_generation_code(example, lang_code=lang) for example in outputs]
-        for idx, example in enumerate(tqdm(examples, desc="Generating")):
-            example["generation"] = outputs[idx]
-            generated_examples.append(example)
+        for idx, example in enumerate(examples):
+            example['output'] = outputs[idx]
+
+        generated_examples = [extract_generation_code(example, lang_code=lang) for example in examples]
 
         results[lang] = generated_examples
-        with open(f"{saved_path}_{lang}", "w", encoding="utf-8") as fw:
+        temp_file_path = os.path.join(temp_dir, f"generated_{lang}.jsonl")
+        with open(temp_file_path, "w", encoding="utf-8") as fw:
             for ex in generated_examples:
                 fw.write(json.dumps(ex) + "\n")
-            print("Save {} processed examples into {} over!".format(len(generated_examples), saved_path))
+        print("Save {} processed examples into temporary file over!".format(len(generated_examples)))
+    
     print("Generate all over!!!")
-    results["output_path"] = output_path
+    results["temp_dir_obj"] = temp_dir_obj
     return results
 
 
 def evaluate(results):
-    output_path = results["output_path"]
+    temp_dir_obj = results["temp_dir_obj"]
+    temp_dir = temp_dir_obj.name
 
-    temp_dir = "tmp"
-    results = {}
-    for lang in ["python"]:
+    evaluation_results = {}
+    for lang in ["python", "sh"]:
         problem_file = os.path.join(data_abs_dir, f"humaneval-{lang}.jsonl")
+        temp_file_path = os.path.join(temp_dir, f"generated_{lang}.jsonl")
 
         result = evaluate_functional_correctness(
-            input_file=f"{output_path}_{lang}",
+            input_file=temp_file_path,
             tmp_dir=temp_dir,
             n_workers=8,
             timeout=3.0,
             problem_file=problem_file,
             language=lang,
         )
-        results[lang] = result
-    return results
-
+        evaluation_results[lang] = result
+    temp_dir_obj.cleanup()
+    return evaluation_results
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

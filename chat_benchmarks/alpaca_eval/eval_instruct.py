@@ -1,19 +1,22 @@
 from alpaca_eval.main import evaluate as alpaca_eval_evaluate
 from lm_eval.api.instance import Instance
+import torch
+import datasets 
+from tqdm import tqdm
 
 def eval_instruct(model):
     eval_set = datasets.load_dataset("tatsu-lab/alpaca_eval", "alpaca_eval")["eval"]
     outputs = []
     with torch.no_grad():
         all_instances = []
-        for example in tqdm(eval_set):
+        for idx, example in enumerate(tqdm(eval_set)):
             instruction = example['instruction']
-            
+            instruction = model.apply_chat_template([{"role": "user", "content": instruction}])
 
             all_instances.append(
                 Instance(
                     "generate_until",
-                    instance,
+                    example,
                     (
                         instruction,
                         {
@@ -27,15 +30,23 @@ def eval_instruct(model):
             )
             
         outputs = model.generate_until(all_instances)
-            
         model_outputs = []
-        for idx, output in enumerate(outputs):
+        for idx, example in enumerate(tqdm(eval_set)):
+            instruction = example['instruction']
             instance = {}
             instance['instruction'] = instruction
-            instance['generator'] = "model"
             instance['dataset'] = example['dataset']
             instance['datasplit'] = "eval"
-
-            instance['output'] = output
+            instance['generator'] = model.model_identifier
+            instance['output'] = outputs[idx]
             model_outputs.append(instance)
-        results['model_outputs'] = model_outputs
+            
+    results = {}
+    results['model_outputs'] = model_outputs
+    results['model_identifier'] = model.model_identifier
+    return results
+
+def evaluate(results):
+    model_outputs = results['model_outputs']
+    leaderboard = alpaca_eval_evaluate(model_outputs=model_outputs, is_return_instead_of_print=True)
+    return leaderboard[0].loc[results['model_identifier']].to_dict()

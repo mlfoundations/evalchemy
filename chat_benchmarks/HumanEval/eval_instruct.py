@@ -84,7 +84,7 @@ def eval_instruct(model):
         outputs = model.generate_until(all_instances)
 
         for idx, example in enumerate(examples):
-            example['output'] = outputs[idx]
+            example["output"] = outputs[idx]
 
         generated_examples = [extract_generation_code(example, lang_code=lang) for example in examples]
 
@@ -94,7 +94,7 @@ def eval_instruct(model):
             for ex in generated_examples:
                 fw.write(json.dumps(ex) + "\n")
         print("Save {} processed examples into temporary file over!".format(len(generated_examples)))
-    
+
     print("Generate all over!!!")
     results["temp_dir_obj"] = temp_dir_obj
     return results
@@ -120,6 +120,7 @@ def evaluate(results):
         evaluation_results[lang] = result
     temp_dir_obj.cleanup()
     return evaluation_results
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

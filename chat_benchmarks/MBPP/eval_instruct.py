@@ -66,13 +66,13 @@ def convert_for_evaluation(example):
     return example
 
 
-def eval_instruct(model,  **kwargs):
+def eval_instruct(model, **kwargs):
     temp_dir_obj = tempfile.TemporaryDirectory()
     temp_dir = temp_dir_obj.name
     problem_file = os.path.join(data_abs_dir, f"mbpp.jsonl")
 
     examples = list(read_test_examples(problem_file))
-    
+
     print("Read {} examples for evaluation over.".format(len(examples)))
     all_instances = []
     for idx, example in enumerate(tqdm(examples, desc="Generating")):
@@ -112,7 +112,7 @@ def eval_instruct(model,  **kwargs):
 
 
 def evaluate(results):
-    temp_dir_obj = results['temp_dir_obj']
+    temp_dir_obj = results["temp_dir_obj"]
     temp_dir = temp_dir_obj.name
 
     result = evaluate_functional_correctness(

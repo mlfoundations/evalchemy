@@ -64,7 +64,7 @@ def evaluate(
     eval_instruct_results = [
         eval_instruct_task(lm) for eval_instruct_task in task_manager.get_list_eval_instructs(task_list)
     ]
-    
+
     with concurrent.futures.ThreadPoolExecutor() as executor:
         evaluate_results = list(
             executor.map(

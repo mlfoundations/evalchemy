@@ -57,14 +57,10 @@ def process_record(r):
         right_key = _serialize_json(r["states"][1])
         if left_key not in chat_dict:
             # TODO: this sometimes happens, it means we have the vote but we cannot find previous chat, need to investigate what happens
-            print(
-                f'WARNING: Cannot find vote context for conversation {r["states"][0]["conv_id"]}'
-            )
+            print(f'WARNING: Cannot find vote context for conversation {r["states"][0]["conv_id"]}')
             return
         if right_key not in chat_dict:
-            print(
-                f'WARNING: Cannot find vote context for conversation {r["states"][1]["conv_id"]}'
-            )
+            print(f'WARNING: Cannot find vote context for conversation {r["states"][1]["conv_id"]}')
             return
         vote_time_data = {
             "timestamp": tstamp,
@@ -109,9 +105,7 @@ def process_file(infile: str, outfile: str):
 today = datetime.datetime.today().isoformat().split("T", 1)[0]
 # sort it to make sure the date is continuous for each server
 filelist = sorted(glob.glob("/mnt/disks/data/fastchat_logs/server*/202*-*-*-conv.json"))
-filelist = [
-    f for f in filelist if today not in f
-]  # skip today because date could be partial
+filelist = [f for f in filelist if today not in f]  # skip today because date could be partial
 
 # TODO: change this to select different range of data
 filelist = [f for f in filelist if "2024-03-" in f]

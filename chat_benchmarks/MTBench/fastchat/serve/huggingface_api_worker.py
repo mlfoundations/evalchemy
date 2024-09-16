@@ -21,6 +21,7 @@ Register models in a JSON file with the following format:
 
 "model_path", "api_base", "token", and "context_length" are necessary, while others are optional.
 """
+
 import argparse
 import asyncio
 import json
@@ -155,9 +156,7 @@ class HuggingfaceApiWorker(BaseModelWorker):
             else:
                 url = f"{self.api_base}/{self.model_path}"
             client = InferenceClient(url, token=self.token)
-            res = client.text_generation(
-                prompt, stream=True, details=True, **gen_kwargs
-            )
+            res = client.text_generation(prompt, stream=True, details=True, **gen_kwargs)
 
             reason = None
             text = ""
@@ -173,10 +172,7 @@ class HuggingfaceApiWorker(BaseModelWorker):
                     break
                 if could_be_stop(text, stop):
                     continue
-                if (
-                    chunk.details is not None
-                    and chunk.details.finish_reason is not None
-                ):
+                if chunk.details is not None and chunk.details.finish_reason is not None:
                     reason = chunk.details.finish_reason
                 if reason not in ["stop", "length"]:
                     reason = None
@@ -283,9 +279,7 @@ def create_huggingface_api_worker():
     parser.add_argument("--host", type=str, default="localhost")
     parser.add_argument("--port", type=int, default=21002)
     parser.add_argument("--worker-address", type=str, default="http://localhost:21002")
-    parser.add_argument(
-        "--controller-address", type=str, default="http://localhost:21001"
-    )
+    parser.add_argument("--controller-address", type=str, default="http://localhost:21001")
     # all model-related parameters are listed in --model-info-file
     parser.add_argument(
         "--model-info-file",

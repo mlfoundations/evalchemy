@@ -4,6 +4,7 @@ Clean chatbot arena battle log.
 Usage:
 python3 clean_battle_data.py --mode conv_release
 """
+
 import argparse
 import datetime
 import json
@@ -188,9 +189,7 @@ def process_data(
         else:
             models_hidden = models_public
 
-        if (models_public[0] == "" and models_public[1] != "") or (
-            models_public[1] == "" and models_public[0] != ""
-        ):
+        if (models_public[0] == "" and models_public[1] != "") or (models_public[1] == "" and models_public[0] != ""):
             count_dict["invalid"] += 1
             continue
 
@@ -200,10 +199,7 @@ def process_data(
         else:
             flag_anony = False
             models = models_public
-            if (
-                models_hidden[0] not in models_public[0]
-                or models_hidden[1] not in models_public[1]
-            ):
+            if models_hidden[0] not in models_public[0] or models_hidden[1] not in models_public[1]:
                 count_dict["invalid"] += 1
                 continue
 
@@ -263,12 +259,8 @@ def process_data(
             continue
 
         question_id = row["states"][0]["conv_id"]
-        conversation_a = to_openai_format(
-            row["states"][0]["messages"][row["states"][0]["offset"] :]
-        )
-        conversation_b = to_openai_format(
-            row["states"][1]["messages"][row["states"][1]["offset"] :]
-        )
+        conversation_a = to_openai_format(row["states"][0]["messages"][row["states"][0]["offset"] :])
+        conversation_b = to_openai_format(row["states"][1]["messages"][row["states"][1]["offset"] :])
 
         ip = row["ip"]
         if ip not in all_ips:
@@ -287,13 +279,9 @@ def process_data(
             count_dict["anony"] += 1
 
         for conv in conversation_a:
-            conv["num_tokens"] = len(
-                encoding.encode(conv["content"], allowed_special="all")
-            )
+            conv["num_tokens"] = len(encoding.encode(conv["content"], allowed_special="all"))
         for conv in conversation_b:
-            conv["num_tokens"] = len(
-                encoding.encode(conv["content"], allowed_special="all")
-            )
+            conv["num_tokens"] = len(encoding.encode(conv["content"], allowed_special="all"))
 
         # Save the results
         battles.append(
@@ -331,14 +319,9 @@ def clean_battle_data(
     with Pool(num_threads) as p:
         # split data into chunks
         chunk_size = len(data) // min(100, len(data))
-        data_chunks = [
-            data[i : i + chunk_size] for i in range(0, len(data), chunk_size)
-        ]
+        data_chunks = [data[i : i + chunk_size] for i in range(0, len(data), chunk_size)]
 
-        args_list = [
-            (data_chunk, exclude_model_names, sanitize_ip, ban_ip_list)
-            for data_chunk in data_chunks
-        ]
+        args_list = [(data_chunk, exclude_model_names, sanitize_ip, ban_ip_list) for data_chunk in data_chunks]
         ret_all = list(tqdm(p.starmap(process_data, args_list), total=len(data_chunks)))
 
         for ret in ret_all:
@@ -354,9 +337,9 @@ def clean_battle_data(
     battles.sort(key=lambda x: x["tstamp"])
     last_updated_tstamp = battles[-1]["tstamp"]
 
-    last_updated_datetime = datetime.datetime.fromtimestamp(
-        last_updated_tstamp, tz=timezone("US/Pacific")
-    ).strftime("%Y-%m-%d %H:%M:%S %Z")
+    last_updated_datetime = datetime.datetime.fromtimestamp(last_updated_tstamp, tz=timezone("US/Pacific")).strftime(
+        "%Y-%m-%d %H:%M:%S %Z"
+    )
 
     print(f"#votes: {len(data)}")
     print(count_dict)
@@ -376,9 +359,7 @@ def clean_battle_data(
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--max-num-files", type=int)
-    parser.add_argument(
-        "--mode", type=str, choices=["simple", "conv_release"], default="simple"
-    )
+    parser.add_argument("--mode", type=str, choices=["simple", "conv_release"], default="simple")
     parser.add_argument("--exclude-model-names", type=str, nargs="+")
     parser.add_argument("--ban-ip-file", type=str)
     parser.add_argument("--sanitize-ip", action="store_true", default=False)
@@ -387,13 +368,9 @@ if __name__ == "__main__":
     log_files = get_log_files(args.max_num_files)
     ban_ip_list = json.load(open(args.ban_ip_file)) if args.ban_ip_file else None
 
-    battles = clean_battle_data(
-        log_files, args.exclude_model_names or [], ban_ip_list, args.sanitize_ip
-    )
+    battles = clean_battle_data(log_files, args.exclude_model_names or [], ban_ip_list, args.sanitize_ip)
     last_updated_tstamp = battles[-1]["tstamp"]
-    cutoff_date = datetime.datetime.fromtimestamp(
-        last_updated_tstamp, tz=timezone("US/Pacific")
-    ).strftime("%Y%m%d")
+    cutoff_date = datetime.datetime.fromtimestamp(last_updated_tstamp, tz=timezone("US/Pacific")).strftime("%Y%m%d")
 
     if args.mode == "simple":
         for x in battles:

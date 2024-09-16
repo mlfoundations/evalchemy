@@ -14,11 +14,7 @@ def is_code_conversation(text: str) -> tuple[bool, list[str]]:
     if "```plaintext" in text:
         lines = text.split("\n")
         line1_idx = [idx for idx, line in enumerate(lines) if "```plaintext" in line][0]
-        line2_idx = [
-            line1_idx + 1 + idx
-            for idx, line in enumerate(lines)
-            if "```" in line[line1_idx + 1 :]
-        ]
+        line2_idx = [line1_idx + 1 + idx for idx, line in enumerate(lines) if "```" in line[line1_idx + 1 :]]
         if line2_idx:
             line2_idx = line2_idx[0]
             text = "\n".join(lines[:line1_idx]) + "\n".join(lines[line2_idx + 1 :])
@@ -30,11 +26,7 @@ def is_code_conversation(text: str) -> tuple[bool, list[str]]:
         otext = text
         lines = text.split("\n")
         line1_idx = [idx for idx, line in enumerate(lines) if "```markdown" in line][0]
-        line2_idx = [
-            line1_idx + 1 + idx
-            for idx, line in enumerate(lines)
-            if "```" in line[line1_idx + 1 :]
-        ]
+        line2_idx = [line1_idx + 1 + idx for idx, line in enumerate(lines) if "```" in line[line1_idx + 1 :]]
         if line2_idx:
             line2_idx = line2_idx[0]
             text = "\n".join(lines[:line1_idx]) + "\n".join(lines[line2_idx + 1 :])
@@ -96,9 +88,7 @@ def is_code_conversation(text: str) -> tuple[bool, list[str]]:
     ]
     found_array = [string in text for string in strings]
     if any(found_array):
-        matched_strings = [
-            string for string, found in zip(strings, found_array) if found
-        ]
+        matched_strings = [string for string, found in zip(strings, found_array) if found]
         return True, matched_strings
 
     # 5. Programming concept regexes
@@ -164,9 +154,7 @@ if __name__ == "__main__":
     if args.n_cpus == -1:
         args.n_cpus = mp.cpu_count()
 
-    print(
-        f"Processing {args.clean_battle_file} and saving to {args.output_clean_battle_file} with {args.n_cpus} cpus"
-    )
+    print(f"Processing {args.clean_battle_file} and saving to {args.output_clean_battle_file} with {args.n_cpus} cpus")
 
     output_data = process_battle_file(args.clean_battle_file, args.n_cpus)
 

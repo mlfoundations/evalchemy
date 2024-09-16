@@ -7,6 +7,7 @@
 Usage:
 python3 -m fastchat.serve.openai_api_server
 """
+
 import asyncio
 import argparse
 import json
@@ -129,9 +130,7 @@ async def check_api_key(
 
 
 def create_error_response(code: int, message: str) -> JSONResponse:
-    return JSONResponse(
-        ErrorResponse(message=message, code=code).model_dump(), status_code=400
-    )
+    return JSONResponse(ErrorResponse(message=message, code=code).model_dump(), status_code=400)
 
 
 @app.exception_handler(RequestValidationError)
@@ -153,14 +152,10 @@ async def check_model(request) -> Optional[JSONResponse]:
 
 
 async def check_length(request, prompt, max_tokens, worker_addr):
-    if (
-        not isinstance(max_tokens, int) or max_tokens <= 0
-    ):  # model worker not support max_tokens=None
+    if not isinstance(max_tokens, int) or max_tokens <= 0:  # model worker not support max_tokens=None
         max_tokens = 1024 * 1024
 
-    context_len = await fetch_remote(
-        worker_addr + "/model_details", {"model": request.model}, "context_length"
-    )
+    context_len = await fetch_remote(worker_addr + "/model_details", {"model": request.model}, "context_length")
     token_num = await fetch_remote(
         worker_addr + "/count_token",
         {"model": request.model, "prompt": prompt},
@@ -214,9 +209,7 @@ def check_requests(request) -> Optional[JSONResponse]:
             ErrorCode.PARAM_OUT_OF_RANGE,
             f"{request.top_k} is out of Range. Either set top_k to -1 or >=1.",
         )
-    if request.stop is not None and (
-        not isinstance(request.stop, str) and not isinstance(request.stop, list)
-    ):
+    if request.stop is not None and (not isinstance(request.stop, str) and not isinstance(request.stop, list)):
         return create_error_response(
             ErrorCode.PARAM_OUT_OF_RANGE,
             f"{request.stop} is not valid under any of the given schemas - 'stop'",
@@ -306,15 +299,9 @@ async def get_gen_params(
             elif msg_role == "user":
                 if type(message["content"]) == list:
                     image_list = [
-                        item["image_url"]["url"]
-                        for item in message["content"]
-                        if item["type"] == "image_url"
+                        item["image_url"]["url"] for item in message["content"] if item["type"] == "image_url"
                     ]
-                    text_list = [
-                        item["text"]
-                        for item in message["content"]
-                        if item["type"] == "text"
-                    ]
+                    text_list = [item["text"] for item in message["content"] if item["type"] == "text"]
 
                     # TODO(chris): This only applies to LLaVA model. Implement an image_token string in the conv template.
                     text = "<image>\n" * len(image_list)
@@ -373,9 +360,7 @@ async def get_worker_address(model_name: str) -> str:
     :raises: :class:`ValueError`: No available worker for requested model
     """
     controller_address = app_settings.controller_address
-    worker_addr = await fetch_remote(
-        controller_address + "/get_worker_address", {"model": model_name}, "address"
-    )
+    worker_addr = await fetch_remote(controller_address + "/get_worker_address", {"model": model_name}, "address")
 
     # No available worker
     if worker_addr == "":
@@ -387,9 +372,7 @@ async def get_worker_address(model_name: str) -> str:
 async def get_conv(model_name: str, worker_addr: str):
     conv_template = conv_template_map.get((worker_addr, model_name))
     if conv_template is None:
-        conv_template = await fetch_remote(
-            worker_addr + "/worker_get_conv_template", {"model": model_name}, "conv"
-        )
+        conv_template = await fetch_remote(worker_addr + "/worker_get_conv_template", {"model": model_name}, "conv")
         conv_template_map[(worker_addr, model_name)] = conv_template
     return conv_template
 
@@ -447,9 +430,7 @@ async def create_chat_completion(request: ChatCompletionRequest):
     gen_params["max_new_tokens"] = max_new_tokens
 
     if request.stream:
-        generator = chat_completion_stream_generator(
-            request.model, gen_params, request.n, worker_addr
-        )
+        generator = chat_completion_stream_generator(request.model, gen_params, request.n, worker_addr)
         return StreamingResponse(generator, media_type="text/event-stream")
 
     choices = []
@@ -499,9 +480,7 @@ async def chat_completion_stream_generator(
             delta=DeltaMessage(role="assistant"),
             finish_reason=None,
         )
-        chunk = ChatCompletionStreamResponse(
-            id=id, choices=[choice_data], model=model_name
-        )
+        chunk = ChatCompletionStreamResponse(id=id, choices=[choice_data], model=model_name)
         yield f"data: {chunk.model_dump_json(exclude_unset=True)}\n\n"
 
         previous_text = ""
@@ -512,11 +491,7 @@ async def chat_completion_stream_generator(
                 return
             decoded_unicode = content["text"].replace("\ufffd", "")
             delta_text = decoded_unicode[len(previous_text) :]
-            previous_text = (
-                decoded_unicode
-                if len(decoded_unicode) > len(previous_text)
-                else previous_text
-            )
+            previous_text = decoded_unicode if len(decoded_unicode) > len(previous_text) else previous_text
 
             if len(delta_text) == 0:
                 delta_text = None
@@ -525,9 +500,7 @@ async def chat_completion_stream_generator(
                 delta=DeltaMessage(content=delta_text),
                 finish_reason=content.get("finish_reason", None),
             )
-            chunk = ChatCompletionStreamResponse(
-                id=id, choices=[choice_data], model=model_name
-            )
+            chunk = ChatCompletionStreamResponse(id=id, choices=[choice_data], model=model_name)
             if delta_text is None:
                 if content.get("finish_reason", None) is not None:
                     finish_stream_events.append(chunk)
@@ -552,9 +525,7 @@ async def create_completion(request: CompletionRequest):
 
     worker_addr = await get_worker_address(request.model)
     for text in request.prompt:
-        max_tokens, error_check_ret = await check_length(
-            request, text, request.max_tokens, worker_addr
-        )
+        max_tokens, error_check_ret = await check_length(request, text, request.max_tokens, worker_addr)
         if error_check_ret is not None:
             return error_check_ret
 
@@ -562,9 +533,7 @@ async def create_completion(request: CompletionRequest):
             request.max_tokens = max_tokens
 
     if request.stream:
-        generator = generate_completion_stream_generator(
-            request, request.n, worker_addr
-        )
+        generator = generate_completion_stream_generator(request, request.n, worker_addr)
         return StreamingResponse(generator, media_type="text/event-stream")
     else:
         text_completions = []
@@ -586,9 +555,7 @@ async def create_completion(request: CompletionRequest):
                 use_beam_search=request.use_beam_search,
             )
             for i in range(request.n):
-                content = asyncio.create_task(
-                    generate_completion(gen_params, worker_addr)
-                )
+                content = asyncio.create_task(generate_completion(gen_params, worker_addr))
                 text_completions.append(content)
 
         try:
@@ -613,14 +580,10 @@ async def create_completion(request: CompletionRequest):
             for usage_key, usage_value in task_usage.model_dump().items():
                 setattr(usage, usage_key, getattr(usage, usage_key) + usage_value)
 
-        return CompletionResponse(
-            model=request.model, choices=choices, usage=UsageInfo.model_validate(usage)
-        )
+        return CompletionResponse(model=request.model, choices=choices, usage=UsageInfo.model_validate(usage))
 
 
-async def generate_completion_stream_generator(
-    request: CompletionRequest, n: int, worker_addr: str
-):
+async def generate_completion_stream_generator(request: CompletionRequest, n: int, worker_addr: str):
     model_name = request.model
     id = f"cmpl-{shortuuid.random()}"
     finish_stream_events = []
@@ -648,11 +611,7 @@ async def generate_completion_stream_generator(
                     return
                 decoded_unicode = content["text"].replace("\ufffd", "")
                 delta_text = decoded_unicode[len(previous_text) :]
-                previous_text = (
-                    decoded_unicode
-                    if len(decoded_unicode) > len(previous_text)
-                    else previous_text
-                )
+                previous_text = decoded_unicode if len(decoded_unicode) > len(previous_text) else previous_text
                 # todo: index is not apparent
                 choice_data = CompletionResponseStreamChoice(
                     index=i,
@@ -719,8 +678,7 @@ async def create_embeddings(request: EmbeddingsRequest, model_name: str = None):
     token_num = 0
     batch_size = WORKER_API_EMBEDDING_BATCH_SIZE
     batches = [
-        request.input[i : min(i + batch_size, len(request.input))]
-        for i in range(0, len(request.input), batch_size)
+        request.input[i : min(i + batch_size, len(request.input))] for i in range(0, len(request.input), batch_size)
     ]
     for num_batch, batch in enumerate(batches):
         payload = {
@@ -789,11 +747,7 @@ async def count_tokens(request: APITokenCheckRequest):
         if token_num + item.max_tokens > context_len:
             can_fit = False
 
-        checkedList.append(
-            APITokenCheckResponseItem(
-                fits=can_fit, contextLength=context_len, tokenCount=token_num
-            )
-        )
+        checkedList.append(APITokenCheckResponseItem(fits=can_fit, contextLength=context_len, tokenCount=token_num))
 
     return APITokenCheckResponse(prompts=checkedList)
 
@@ -840,9 +794,7 @@ async def create_chat_completion(request: APIChatCompletionRequest):
     gen_params["max_new_tokens"] = max_new_tokens
 
     if request.stream:
-        generator = chat_completion_stream_generator(
-            request.model, gen_params, request.n, worker_addr
-        )
+        generator = chat_completion_stream_generator(request.model, gen_params, request.n, worker_addr)
         return StreamingResponse(generator, media_type="text/event-stream")
 
     choices = []
@@ -876,26 +828,14 @@ async def create_chat_completion(request: APIChatCompletionRequest):
 
 
 def create_openai_api_server():
-    parser = argparse.ArgumentParser(
-        description="FastChat ChatGPT-Compatible RESTful API server."
-    )
+    parser = argparse.ArgumentParser(description="FastChat ChatGPT-Compatible RESTful API server.")
     parser.add_argument("--host", type=str, default="localhost", help="host name")
     parser.add_argument("--port", type=int, default=8000, help="port number")
-    parser.add_argument(
-        "--controller-address", type=str, default="http://localhost:21001"
-    )
-    parser.add_argument(
-        "--allow-credentials", action="store_true", help="allow credentials"
-    )
-    parser.add_argument(
-        "--allowed-origins", type=json.loads, default=["*"], help="allowed origins"
-    )
-    parser.add_argument(
-        "--allowed-methods", type=json.loads, default=["*"], help="allowed methods"
-    )
-    parser.add_argument(
-        "--allowed-headers", type=json.loads, default=["*"], help="allowed headers"
-    )
+    parser.add_argument("--controller-address", type=str, default="http://localhost:21001")
+    parser.add_argument("--allow-credentials", action="store_true", help="allow credentials")
+    parser.add_argument("--allowed-origins", type=json.loads, default=["*"], help="allowed origins")
+    parser.add_argument("--allowed-methods", type=json.loads, default=["*"], help="allowed methods")
+    parser.add_argument("--allowed-headers", type=json.loads, default=["*"], help="allowed headers")
     parser.add_argument(
         "--api-keys",
         type=lambda s: s.split(","),

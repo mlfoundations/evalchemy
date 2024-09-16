@@ -36,9 +36,7 @@ STYLE_CONTROL_ELEMENTS_V1 = [
 def compute_elo(battles, K=4, SCALE=400, BASE=10, INIT_RATING=1000):
     rating = defaultdict(lambda: INIT_RATING)
 
-    for rd, model_a, model_b, winner in battles[
-        ["model_a", "model_b", "winner"]
-    ].itertuples():
+    for rd, model_a, model_b, winner in battles[["model_a", "model_b", "winner"]].itertuples():
         ra = rating[model_a]
         rb = rating[model_b]
         ea = 1 / (1 + BASE ** ((rb - ra) / SCALE))
@@ -66,9 +64,7 @@ def get_bootstrap_result(battles, func_compute_elo, num_round=1000):
     return df[df.median().sort_values(ascending=False).index]
 
 
-def compute_elo_mle_with_tie(
-    df, SCALE=400, BASE=10, INIT_RATING=1000, sample_weight=None
-):
+def compute_elo_mle_with_tie(df, SCALE=400, BASE=10, INIT_RATING=1000, sample_weight=None):
     from sklearn.linear_model import LogisticRegression
 
     ptbl_a_win = pd.pivot_table(
@@ -157,15 +153,11 @@ def compute_pairwise_win_fraction(battles, model_order, limit_show_number=None):
     )
 
     # Table counting number of A-B pairs
-    num_battles_ptbl = pd.pivot_table(
-        battles, index="model_a", columns="model_b", aggfunc="size", fill_value=0
-    )
+    num_battles_ptbl = pd.pivot_table(battles, index="model_a", columns="model_b", aggfunc="size", fill_value=0)
 
     # Computing the proportion of wins for each model as A and as B
     # against all other models
-    row_beats_col_freq = (a_win_ptbl + b_win_ptbl.T) / (
-        num_battles_ptbl + num_battles_ptbl.T
-    )
+    row_beats_col_freq = (a_win_ptbl + b_win_ptbl.T) / (num_battles_ptbl + num_battles_ptbl.T)
 
     if model_order is None:
         prop_wins = row_beats_col_freq.mean(axis=1).sort_values(ascending=False)
@@ -217,17 +209,13 @@ def visualize_pairwise_win_fraction(battles, model_order, scale=1):
         title_y=0.07,
         title_x=0.5,
     )
-    fig.update_traces(
-        hovertemplate="Model A: %{y}<br>Model B: %{x}<br>Fraction of A Wins: %{z}<extra></extra>"
-    )
+    fig.update_traces(hovertemplate="Model A: %{y}<br>Model B: %{x}<br>Fraction of A Wins: %{z}<extra></extra>")
 
     return fig
 
 
 def visualize_battle_count(battles, model_order, scale=1):
-    ptbl = pd.pivot_table(
-        battles, index="model_a", columns="model_b", aggfunc="size", fill_value=0
-    )
+    ptbl = pd.pivot_table(battles, index="model_a", columns="model_b", aggfunc="size", fill_value=0)
     battle_counts = ptbl + ptbl.T
     fig = px.imshow(
         battle_counts.loc[model_order, model_order],
@@ -242,25 +230,19 @@ def visualize_battle_count(battles, model_order, scale=1):
         title_y=0.07,
         title_x=0.5,
     )
-    fig.update_traces(
-        hovertemplate="Model A: %{y}<br>Model B: %{x}<br>Count: %{z}<extra></extra>"
-    )
+    fig.update_traces(hovertemplate="Model A: %{y}<br>Model B: %{x}<br>Count: %{z}<extra></extra>")
     return fig
 
 
 def visualize_average_win_rate(battles, limit_show_number, scale=1):
-    row_beats_col_freq = compute_pairwise_win_fraction(
-        battles, None, limit_show_number=limit_show_number
-    )
+    row_beats_col_freq = compute_pairwise_win_fraction(battles, None, limit_show_number=limit_show_number)
     fig = px.bar(
         row_beats_col_freq.mean(axis=1).sort_values(ascending=False),
         text_auto=".2f",
         height=500 * scale,
         width=700 * scale,
     )
-    fig.update_layout(
-        yaxis_title="Average Win Rate", xaxis_title="Model", showlegend=False
-    )
+    fig.update_layout(yaxis_title="Average Win Rate", xaxis_title="Model", showlegend=False)
     return fig
 
 
@@ -299,9 +281,7 @@ def limit_user_votes(battles, daily_vote_per_user):
 
     print("Before limiting user votes: ", len(battles))
     # add date
-    battles["date"] = battles["tstamp"].apply(
-        lambda x: datetime.fromtimestamp(x).strftime("%Y-%m-%d")
-    )
+    battles["date"] = battles["tstamp"].apply(lambda x: datetime.fromtimestamp(x).strftime("%Y-%m-%d"))
 
     battles_new = pd.DataFrame()
     for date in battles["date"].unique():
@@ -316,9 +296,7 @@ def limit_user_votes(battles, daily_vote_per_user):
 
 
 def get_model_pair_stats(battles):
-    battles["ordered_pair"] = battles.apply(
-        lambda x: tuple(sorted([x["model_a"], x["model_b"]])), axis=1
-    )
+    battles["ordered_pair"] = battles.apply(lambda x: tuple(sorted([x["model_a"], x["model_b"]])), axis=1)
 
     model_pair_stats = {}
 
@@ -456,11 +434,7 @@ def construct_style_matrices(
     # creates turn each of the specified column in "conv_metadata" into a vector
     style_vector = np.array(
         [
-            df.conv_metadata.map(
-                lambda x: x[element]
-                if type(x[element]) is int
-                else sum(x[element].values())
-            ).tolist()
+            df.conv_metadata.map(lambda x: x[element] if type(x[element]) is int else sum(x[element].values())).tolist()
             for element in style_elements
         ]
     )
@@ -473,9 +447,7 @@ def construct_style_matrices(
 
     apply_ratio = np.flatnonzero(apply_ratio)
 
-    style_diff[apply_ratio] /= style_sum[
-        apply_ratio
-    ]  # Apply ratio where necessary (length, etc)
+    style_diff[apply_ratio] /= style_sum[apply_ratio]  # Apply ratio where necessary (length, etc)
 
     style_mean = np.mean(style_diff, axis=1)
     style_std = np.std(style_diff, axis=1)
@@ -495,9 +467,7 @@ def construct_style_matrices(
     return X, Y, models
 
 
-def get_bootstrap_result_style_control(
-    X, Y, battles, models, func_compute_elo, num_round=1000
-):
+def get_bootstrap_result_style_control(X, Y, battles, models, func_compute_elo, num_round=1000):
     elos = []
     coefs = []
     assert X.shape[0] % 2 == 0 and X.shape[0] == Y.shape[0]
@@ -505,9 +475,7 @@ def get_bootstrap_result_style_control(
         X.shape[0] / 2
     )  # Since we duplicate the battles when constructing X and Y, we don't want to sample the duplicates
 
-    battles_tie_idx = (battles["winner"] == "tie") | (
-        battles["winner"] == "tie (bothbad)"
-    )
+    battles_tie_idx = (battles["winner"] == "tie") | (battles["winner"] == "tie (bothbad)")
     for _ in tqdm(range(num_round), desc="bootstrap"):
         indices = np.random.choice(list(range(k)), size=(k), replace=True)
 
@@ -515,9 +483,7 @@ def get_bootstrap_result_style_control(
         index2tie[battles_tie_idx] = True
 
         nontie_indices = indices[~index2tie[indices]]
-        tie_indices = np.concatenate(
-            [indices[index2tie[indices]], indices[index2tie[indices]] + k]
-        )
+        tie_indices = np.concatenate([indices[index2tie[indices]], indices[index2tie[indices]] + k])
 
         _X = np.concatenate([X[nontie_indices], X[nontie_indices], X[tie_indices]])
         _Y = np.concatenate([Y[nontie_indices], Y[nontie_indices], Y[tie_indices]])
@@ -572,12 +538,7 @@ def report_elo_analysis_results(
         battles = battles[~battles["language"].str.contains("unknown")]
 
     # remove excluded models
-    battles = battles[
-        ~(
-            battles["model_a"].isin(exclude_models)
-            | battles["model_b"].isin(exclude_models)
-        )
-    ]
+    battles = battles[~(battles["model_a"].isin(exclude_models) | battles["model_b"].isin(exclude_models))]
 
     # Only use anonymous votes
     battles = battles[battles["anony"]].reset_index(drop=True)
@@ -604,14 +565,10 @@ def report_elo_analysis_results(
             )
             elo_rating_final, coef_final = fit_mle_elo(X, Y, models)
         else:
-            bootstrap_df = get_bootstrap_result(
-                battles, compute_elo_mle_with_tie, num_round=num_bootstrap
-            )
+            bootstrap_df = get_bootstrap_result(battles, compute_elo_mle_with_tie, num_round=num_bootstrap)
             elo_rating_final = compute_elo_mle_with_tie(battles)
     elif rating_system == "elo":
-        bootstrap_df = get_bootstrap_result(
-            battles, compute_elo, num_round=num_bootstrap
-        )
+        bootstrap_df = get_bootstrap_result(battles, compute_elo, num_round=num_bootstrap)
         elo_rating_median = get_median_elo_from_bootstrap(bootstrap_df)
         elo_rating_final = elo_rating_median
 
@@ -637,9 +594,7 @@ def report_elo_analysis_results(
             "variance": bootstrap_df.var(),
             "rating_q975": bootstrap_df.quantile(0.975),
             "rating_q025": bootstrap_df.quantile(0.025),
-            "num_battles": battles["model_a"]
-            .value_counts()
-            .add(battles["model_b"].value_counts(), fill_value=0),
+            "num_battles": battles["model_a"].value_counts().add(battles["model_b"].value_counts(), fill_value=0),
             "final_ranking": pd.Series(ranking),
         }
     )
@@ -650,23 +605,17 @@ def report_elo_analysis_results(
 
     # Plots
     leaderboard_table = visualize_leaderboard_table(elo_rating_final)
-    win_fraction_heatmap = visualize_pairwise_win_fraction(
-        battles_no_ties, model_order, scale=scale
-    )
-    battle_count_heatmap = visualize_battle_count(
-        battles_no_ties, model_order, scale=scale
-    )
-    average_win_rate_bar = visualize_average_win_rate(
-        battles_no_ties, limit_show_number, scale=scale
-    )
+    win_fraction_heatmap = visualize_pairwise_win_fraction(battles_no_ties, model_order, scale=scale)
+    battle_count_heatmap = visualize_battle_count(battles_no_ties, model_order, scale=scale)
+    average_win_rate_bar = visualize_average_win_rate(battles_no_ties, limit_show_number, scale=scale)
     bootstrap_elo_rating = visualize_bootstrap_elo_rating(
         bootstrap_df, elo_rating_final, limit_show_number, scale=scale
     )
 
     last_updated_tstamp = battles["tstamp"].max()
-    last_updated_datetime = datetime.datetime.fromtimestamp(
-        last_updated_tstamp, tz=timezone("US/Pacific")
-    ).strftime("%Y-%m-%d %H:%M:%S %Z")
+    last_updated_datetime = datetime.datetime.fromtimestamp(last_updated_tstamp, tz=timezone("US/Pacific")).strftime(
+        "%Y-%m-%d %H:%M:%S %Z"
+    )
 
     return {
         "rating_system": rating_system,
@@ -681,12 +630,14 @@ def report_elo_analysis_results(
         "last_updated_tstamp": last_updated_tstamp,
         "bootstrap_df": bootstrap_df,
         "leaderboard_table_df": leaderboard_table_df,
-        "style_coefficients": {
-            "bootstrap": np.vstack(boostrap_coef),
-            "final": coef_final,
-        }
-        if rating_system == "bt" and style_control
-        else {},
+        "style_coefficients": (
+            {
+                "bootstrap": np.vstack(boostrap_coef),
+                "final": coef_final,
+            }
+            if rating_system == "bt" and style_control
+            else {}
+        ),
     }
 
 
@@ -702,9 +653,7 @@ if __name__ == "__main__":
     parser.add_argument("--clean-battle-file", type=str)
     parser.add_argument("--max-num-files", type=int)
     parser.add_argument("--num-bootstrap", type=int, default=100)
-    parser.add_argument(
-        "--rating-system", type=str, choices=["bt", "elo"], default="bt"
-    )
+    parser.add_argument("--rating-system", type=str, choices=["bt", "elo"], default="bt")
     parser.add_argument("--exclude-models", type=str, nargs="+", default=[])
     parser.add_argument("--exclude-tie", action="store_true", default=False)
     parser.add_argument("--exclude-unknown-lang", action="store_true", default=False)
@@ -733,9 +682,7 @@ if __name__ == "__main__":
         "chinese": lambda x: x["language"] == "Chinese",
         "english": lambda x: x["language"] == "English",
     }
-    assert all(
-        [cat in filter_func_map for cat in args.category]
-    ), f"Invalid category: {args.category}"
+    assert all([cat in filter_func_map for cat in args.category]), f"Invalid category: {args.category}"
 
     results = {}
     for cat in args.category:
@@ -764,9 +711,7 @@ if __name__ == "__main__":
         print(f"last update : {results[cat]['last_updated_datetime']}")
 
         last_updated_tstamp = results[cat]["last_updated_tstamp"]
-        cutoff_date = datetime.datetime.fromtimestamp(
-            last_updated_tstamp, tz=timezone("US/Pacific")
-        ).strftime("%Y%m%d")
+        cutoff_date = datetime.datetime.fromtimestamp(last_updated_tstamp, tz=timezone("US/Pacific")).strftime("%Y%m%d")
         print(f"last update : {cutoff_date}")
 
     with open(f"elo_results_{cutoff_date}.pkl", "wb") as fout:

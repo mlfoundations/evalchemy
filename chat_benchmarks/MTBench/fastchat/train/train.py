@@ -38,23 +38,15 @@ class ModelArguments:
     model_name_or_path: Optional[str] = field(default="facebook/opt-125m")
     trust_remote_code: bool = field(
         default=False,
-        metadata={
-            "help": "Whether or not to allow for custom models defined on the Hub in their own modeling files"
-        },
+        metadata={"help": "Whether or not to allow for custom models defined on the Hub in their own modeling files"},
     )
-    padding_side: str = field(
-        default="right", metadata={"help": "The padding side in tokenizer"}
-    )
+    padding_side: str = field(default="right", metadata={"help": "The padding side in tokenizer"})
 
 
 @dataclass
 class DataArguments:
-    data_path: str = field(
-        default=None, metadata={"help": "Path to the training data."}
-    )
-    eval_data_path: str = field(
-        default=None, metadata={"help": "Path to the evaluation data."}
-    )
+    data_path: str = field(default=None, metadata={"help": "Path to the training data."})
+    eval_data_path: str = field(default=None, metadata={"help": "Path to the evaluation data."})
     lazy_preprocess: bool = False
 
 
@@ -64,9 +56,7 @@ class TrainingArguments(transformers.TrainingArguments):
     optim: str = field(default="adamw_torch")
     model_max_length: int = field(
         default=512,
-        metadata={
-            "help": "Maximum sequence length. Sequences will be right padded (and possibly truncated)."
-        },
+        metadata={"help": "Maximum sequence length. Sequences will be right padded (and possibly truncated)."},
     )
 
 
@@ -83,9 +73,7 @@ def trainer_save_model_safe(trainer: transformers.Trainer):
     from torch.distributed.fsdp import StateDictType, FullStateDictConfig
 
     save_policy = FullStateDictConfig(offload_to_cpu=True, rank0_only=True)
-    with FSDP.state_dict_type(
-        trainer.model, StateDictType.FULL_STATE_DICT, save_policy
-    ):
+    with FSDP.state_dict_type(trainer.model, StateDictType.FULL_STATE_DICT, save_policy):
         trainer.save_model()
 
 
@@ -232,13 +220,9 @@ class LazySupervisedDataset(Dataset):
         return ret
 
 
-def make_supervised_data_module(
-    tokenizer: transformers.PreTrainedTokenizer, data_args
-) -> Dict:
+def make_supervised_data_module(tokenizer: transformers.PreTrainedTokenizer, data_args) -> Dict:
     """Make dataset and collator for supervised fine-tuning."""
-    dataset_cls = (
-        LazySupervisedDataset if data_args.lazy_preprocess else SupervisedDataset
-    )
+    dataset_cls = LazySupervisedDataset if data_args.lazy_preprocess else SupervisedDataset
     rank0_print("Loading data...")
 
     train_json = json.load(open(data_args.data_path, "r"))
@@ -256,9 +240,7 @@ def make_supervised_data_module(
 def train():
     global local_rank
 
-    parser = transformers.HfArgumentParser(
-        (ModelArguments, DataArguments, TrainingArguments)
-    )
+    parser = transformers.HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
     local_rank = training_args.local_rank
 
@@ -297,9 +279,7 @@ def train():
     data_module = make_supervised_data_module(tokenizer=tokenizer, data_args=data_args)
 
     # Start trainner
-    trainer = Trainer(
-        model=model, tokenizer=tokenizer, args=training_args, **data_module
-    )
+    trainer = Trainer(model=model, tokenizer=tokenizer, args=training_args, **data_module)
     if list(pathlib.Path(training_args.output_dir).glob("checkpoint-*")):
         trainer.train(resume_from_checkpoint=True)
     else:

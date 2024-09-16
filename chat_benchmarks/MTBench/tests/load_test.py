@@ -25,9 +25,7 @@ async def litellm_completion(args, tokenizer, image_url=None):
                 },
             ]
         else:
-            messages = [
-                {"role": "user", "content": "Tell me a story about this image."}
-            ]
+            messages = [{"role": "user", "content": "Tell me a story about this image."}]
 
         start = time.time()
         response = await litellm_client.chat.completions.create(
@@ -76,9 +74,7 @@ async def main(args):
                 else:
                     y_dimension = 512
                 image_url = f"https://placehold.co/1024x{y_dimension}/png"
-                task = asyncio.create_task(
-                    litellm_completion(args, tokenizer, image_url)
-                )
+                task = asyncio.create_task(litellm_completion(args, tokenizer, image_url))
             else:
                 task = asyncio.create_task(litellm_completion(args, tokenizer))
             all_tasks.append(task)
@@ -87,16 +83,10 @@ async def main(args):
 
     all_completions = await asyncio.gather(*all_tasks)
 
-    successful_completions = [
-        c for c in all_completions if isinstance(c, tuple) and len(c) == 3
-    ]
+    successful_completions = [c for c in all_completions if isinstance(c, tuple) and len(c) == 3]
     ttft_list = np.array([float(c[1]) for c in successful_completions])
     itl_list_flattened = np.array(
-        [
-            float(item)
-            for sublist in [c[2] for c in successful_completions]
-            for item in sublist
-        ]
+        [float(item) for sublist in [c[2] for c in successful_completions] for item in sublist]
     )
 
     # Write errors to error_log.txt

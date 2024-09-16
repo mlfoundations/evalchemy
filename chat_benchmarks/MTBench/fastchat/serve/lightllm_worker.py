@@ -63,9 +63,7 @@ class LightLLMWorker(BaseModelWorker):
             conv_template,
         )
 
-        logger.info(
-            f"Loading the model {self.model_names} on worker {worker_id}, worker type: LightLLM worker..."
-        )
+        logger.info(f"Loading the model {self.model_names} on worker {worker_id}, worker type: LightLLM worker...")
         self.tokenizer = tokenizer
         self.context_len = context_len
 
@@ -130,9 +128,7 @@ class LightLLMWorker(BaseModelWorker):
         )
         sampling_params.verify()
 
-        results_generator = httpserver_manager.generate(
-            prompt, sampling_params, request_id, MultimodalParams()
-        )
+        results_generator = httpserver_manager.generate(prompt, sampling_params, request_id, MultimodalParams())
 
         completion_tokens = 0
         text_outputs = ""
@@ -173,14 +169,8 @@ class LightLLMWorker(BaseModelWorker):
             }
 
             if finish_reason is not None:
-                yield (
-                    json.dumps({**ret, "finish_reason": None}, ensure_ascii=False)
-                    + "\0"
-                ).encode("utf-8")
-            yield (
-                json.dumps({**ret, "finish_reason": finish_reason}, ensure_ascii=False)
-                + "\0"
-            ).encode("utf-8")
+                yield (json.dumps({**ret, "finish_reason": None}, ensure_ascii=False) + "\0").encode("utf-8")
+            yield (json.dumps({**ret, "finish_reason": finish_reason}, ensure_ascii=False) + "\0").encode("utf-8")
 
             if finish_reason is not None:  # In case of abort, we need to break the loop
                 break
@@ -271,12 +261,8 @@ if __name__ == "__main__":
         help="the model weight dir path, the app will load config, weights and tokenizer from this dir",
     )
     parser.add_argument("--worker-address", type=str, default="http://localhost:21002")
-    parser.add_argument(
-        "--controller-address", type=str, default="http://localhost:21001"
-    )
-    parser.add_argument(
-        "--conv-template", type=str, default=None, help="Conversation prompt template."
-    )
+    parser.add_argument("--controller-address", type=str, default="http://localhost:21001")
+    parser.add_argument("--conv-template", type=str, default=None, help="Conversation prompt template.")
     parser.add_argument(
         "--model-names",
         type=lambda s: s.split(","),
@@ -317,9 +303,7 @@ if __name__ == "__main__":
         default=1000,
         help="the max size for forward requests in the same time",
     )
-    parser.add_argument(
-        "--tp", type=int, default=1, help="model tp parral size, the default is 1"
-    )
+    parser.add_argument("--tp", type=int, default=1, help="model tp parral size, the default is 1")
     parser.add_argument(
         "--max_req_input_len",
         type=int,
@@ -389,12 +373,8 @@ if __name__ == "__main__":
         help="whether to add spaces between special tokens when decoding",
     )
 
-    parser.add_argument(
-        "--splitfuse_mode", action="store_true", help="use splitfuse mode"
-    )
-    parser.add_argument(
-        "--splitfuse_block_size", type=int, default=256, help="splitfuse block size"
-    )
+    parser.add_argument("--splitfuse_mode", action="store_true", help="use splitfuse mode")
+    parser.add_argument("--splitfuse_block_size", type=int, default=256, help="splitfuse block size")
     parser.add_argument(
         "--prompt_cache_strs",
         type=str,
@@ -454,9 +434,7 @@ if __name__ == "__main__":
             batch_max_tokens = max(batch_max_tokens, args.max_req_total_len)
             args.batch_max_tokens = batch_max_tokens
         else:
-            assert (
-                args.batch_max_tokens >= args.max_req_total_len
-            ), "batch_max_tokens must >= max_req_total_len"
+            assert args.batch_max_tokens >= args.max_req_total_len, "batch_max_tokens must >= max_req_total_len"
     else:
         # splitfuse 模式下
         # assert args.batch_max_tokens is not None, "need to set by yourself"

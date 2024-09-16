@@ -43,9 +43,7 @@ def generate_random_image(target_size_mb, image_format="PNG"):
     while os.path.getsize(temp_filename) < target_size_bytes:
         # Increase dimensions or change compression quality
         dimension += 1
-        pixel_data = np.random.randint(
-            0, 256, (dimension, dimension, 3), dtype=np.uint8
-        )
+        pixel_data = np.random.randint(0, 256, (dimension, dimension, 3), dtype=np.uint8)
         img = Image.fromarray(pixel_data)
         img.save(temp_filename, format=image_format)
 
@@ -62,9 +60,7 @@ class DontResizeIfLessThanMaxTest(unittest.TestCase):
         img.save(image_bytes, format="PNG")  # Save the image as JPEG
         previous_image_size = check_byte_size_in_mb(image_bytes.getvalue())
 
-        image_bytes = resize_image_and_return_image_in_bytes(
-            img, max_image_size_mb=max_image_size
-        )
+        image_bytes = resize_image_and_return_image_in_bytes(img, max_image_size_mb=max_image_size)
         new_image_size = check_byte_size_in_mb(image_bytes.getvalue())
 
         self.assertEqual(previous_image_size, new_image_size)
@@ -89,9 +85,7 @@ class DontResizeIfMaxImageSizeIsNone(unittest.TestCase):
         img.save(image_bytes, format="PNG")  # Save the image as JPEG
         previous_image_size = check_byte_size_in_mb(image_bytes.getvalue())
 
-        image_bytes = resize_image_and_return_image_in_bytes(
-            img, max_image_size_mb=None
-        )
+        image_bytes = resize_image_and_return_image_in_bytes(img, max_image_size_mb=None)
         new_image_size = check_byte_size_in_mb(image_bytes.getvalue())
 
         self.assertEqual(previous_image_size, new_image_size)

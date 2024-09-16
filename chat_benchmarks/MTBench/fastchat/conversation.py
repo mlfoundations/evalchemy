@@ -133,11 +133,7 @@ class Conversation:
             ret = system_prompt
             for i, (role, message) in enumerate(self.messages):
                 if message:
-                    ret += (
-                        role
-                        + ": "
-                        + message.replace("\r\n", "\n").replace("\n\n", "\n")
-                    )
+                    ret += role + ": " + message.replace("\r\n", "\n").replace("\n\n", "\n")
                     ret += "\n\n"
                 else:
                     ret += role + ":"
@@ -396,15 +392,11 @@ class Conversation:
                     image_urls = msg[1]
                     for image in image_urls:
                         image_url = image.to_openai_image_format()
-                        content_list.append(
-                            {"type": "image_url", "image_url": {"url": image_url}}
-                        )
+                        content_list.append({"type": "image_url", "image_url": {"url": image_url}})
 
                     ret.append({"role": "user", "content": content_list})
                 else:
-                    ret.append(
-                        {"role": "user", "content": [{"type": "text", "text": msg}]}
-                    )
+                    ret.append({"role": "user", "content": [{"type": "text", "text": msg}]})
             else:
                 if msg is not None:
                     ret.append(
@@ -509,9 +501,7 @@ class Conversation:
 
                     ret.append({"role": "user", "content": content_list})
                 else:
-                    ret.append(
-                        {"role": "user", "content": [{"type": "text", "text": msg}]}
-                    )
+                    ret.append({"role": "user", "content": [{"type": "text", "text": msg}]})
             else:
                 if msg is not None:
                     ret.append(
@@ -532,9 +522,7 @@ class Conversation:
                     text, images = msg
                     for image in images:
                         if image.image_format == ImageFormat.URL:
-                            ret.append(
-                                {"type": "human", "text": text, "media_url": image.url}
-                            )
+                            ret.append({"type": "human", "text": text, "media_url": image.url})
                         elif image.image_format == ImageFormat.BYTES:
                             ret.append(
                                 {
@@ -666,9 +654,7 @@ conv_templates: Dict[str, Conversation] = {}
 def register_conv_template(template: Conversation, override: bool = False):
     """Register a new conversation template."""
     if not override:
-        assert (
-            template.name not in conv_templates
-        ), f"{template.name} has been registered."
+        assert template.name not in conv_templates, f"{template.name} has been registered."
 
     conv_templates[template.name] = template
 

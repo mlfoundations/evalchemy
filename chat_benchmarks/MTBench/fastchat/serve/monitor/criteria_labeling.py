@@ -159,13 +159,9 @@ if __name__ == "__main__":
         cache_data = pd.read_json(args.cache_file)
         print(f"{len(cache_data)}# of cache data just loaded")
 
-        assert "criteria_tag" in cache_data.columns and len(
-            cache_data["criteria_tag"].dropna()
-        ) == len(cache_data)
+        assert "criteria_tag" in cache_data.columns and len(cache_data["criteria_tag"].dropna()) == len(cache_data)
 
-        not_labeled = input_data[
-            ~input_data["question_id"].isin(cache_data["question_id"])
-        ].copy()
+        not_labeled = input_data[~input_data["question_id"].isin(cache_data["question_id"])].copy()
     else:
         not_labeled = input_data.copy()
 
@@ -174,13 +170,9 @@ if __name__ == "__main__":
         output_data = pd.read_json(args.output_file, lines=True)
         print(f"{len(output_data)}# of existing output just loaded")
 
-        assert "criteria_tag" in output_data.columns and len(
-            output_data["criteria_tag"].dropna()
-        ) == len(output_data)
+        assert "criteria_tag" in output_data.columns and len(output_data["criteria_tag"].dropna()) == len(output_data)
 
-        not_labeled = not_labeled[
-            ~not_labeled["question_id"].isin(output_data["question_id"])
-        ]
+        not_labeled = not_labeled[~not_labeled["question_id"].isin(output_data["question_id"])]
 
     print(f"{len(not_labeled)} needs to be labeled")
 
@@ -188,9 +180,7 @@ if __name__ == "__main__":
         lambda convo: "\n".join([convo[i]["content"] for i in range(0, len(convo), 2)])
     )
 
-    with concurrent.futures.ThreadPoolExecutor(
-        max_workers=ENDPOINT_INFO["parallel"]
-    ) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=ENDPOINT_INFO["parallel"]) as executor:
         futures = []
         for index, row in tqdm.tqdm(not_labeled.iterrows()):
             future = executor.submit(
@@ -202,13 +192,9 @@ if __name__ == "__main__":
                 get_endpoint(ENDPOINT_INFO["endpoints"]),
             )
             futures.append(future)
-        for future in tqdm.tqdm(
-            concurrent.futures.as_completed(futures), total=len(futures)
-        ):
+        for future in tqdm.tqdm(concurrent.futures.as_completed(futures), total=len(futures)):
             future.result()
 
     if args.convert_to_json:
         temp = pd.read_json(args.output_file, lines=True)
-        temp.to_json(
-            args.output_file[:-1], orient="records", indent=4, force_ascii=False
-        )
+        temp.to_json(args.output_file[:-1], orient="records", indent=4, force_ascii=False)

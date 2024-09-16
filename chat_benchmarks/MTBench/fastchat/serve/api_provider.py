@@ -63,9 +63,7 @@ def get_api_provider_stream_iter(
             prompt = conv.to_anthropic_vision_api_messages()
         else:
             prompt = conv.to_openai_api_messages()
-        stream_iter = anthropic_api_stream_iter(
-            model_name, prompt, temperature, top_p, max_new_tokens
-        )
+        stream_iter = anthropic_api_stream_iter(model_name, prompt, temperature, top_p, max_new_tokens)
     elif model_api_dict["api_type"] == "anthropic_message":
         if model_api_dict.get("vision-arena", False):
             prompt = conv.to_anthropic_vision_api_messages()
@@ -152,20 +150,14 @@ def get_api_provider_stream_iter(
         )
     elif model_api_dict["api_type"] == "vertex":
         prompt = conv.to_vertex_api_messages()
-        stream_iter = vertex_api_stream_iter(
-            model_name, prompt, temperature, top_p, max_new_tokens
-        )
+        stream_iter = vertex_api_stream_iter(model_name, prompt, temperature, top_p, max_new_tokens)
     elif model_api_dict["api_type"] == "yandexgpt":
         # note: top_p parameter is unused by yandexgpt
 
         messages = []
         if conv.system_message:
             messages.append({"role": "system", "text": conv.system_message})
-        messages += [
-            {"role": role, "text": text}
-            for role, text in conv.messages
-            if text is not None
-        ]
+        messages += [{"role": role, "text": text} for role, text in conv.messages if text is not None]
 
         fixed_temperature = model_api_dict.get("fixed_temperature")
         if fixed_temperature is not None:
@@ -253,12 +245,8 @@ def openai_api_stream_iter(
         if type(message["content"]) == str:  # text-only model
             text_messages.append(message)
         else:  # vision model
-            filtered_content_list = [
-                content for content in message["content"] if content["type"] == "text"
-            ]
-            text_messages.append(
-                {"role": message["role"], "content": filtered_content_list}
-            )
+            filtered_content_list = [content for content in message["content"] if content["type"] == "text"]
+            text_messages.append({"role": message["role"], "content": filtered_content_list})
 
     gen_params = {
         "model": model_name,
@@ -432,27 +420,17 @@ def openai_assistant_api_stream_iter(
                             url = anno["url_citation"]["url"]
 
                             citation = f" [[{citation_number}]]({url})"
-                            raw_text_copy = (
-                                raw_text_copy[:start_idx]
-                                + citation
-                                + raw_text_copy[end_idx:]
-                            )
+                            raw_text_copy = raw_text_copy[:start_idx] + citation + raw_text_copy[end_idx:]
                             cur_offset += len(citation) - (end_idx - start_idx)
                         elif anno["type"] == "file_path":
-                            file_public_url = upload_openai_file_to_gcs(
-                                anno["file_path"]["file_id"]
-                            )
-                            raw_text_copy = raw_text_copy.replace(
-                                anno["text"], f"{file_public_url}"
-                            )
+                            file_public_url = upload_openai_file_to_gcs(anno["file_path"]["file_id"])
+                            raw_text_copy = raw_text_copy.replace(anno["text"], f"{file_public_url}")
                     text = raw_text_copy
                 else:
                     text_content = content["value"]
                     text += text_content
             elif delta["type"] == "image_file":
-                image_public_url = upload_openai_file_to_gcs(
-                    delta["image_file"]["file_id"]
-                )
+                image_public_url = upload_openai_file_to_gcs(delta["image_file"]["file_id"])
                 text += f"![image]({image_public_url})"
 
             list_of_text[text_index] = text
@@ -523,12 +501,8 @@ def anthropic_message_api_stream_iter(
         if type(message["content"]) == str:  # text-only model
             text_messages.append(message)
         else:  # vision model
-            filtered_content_list = [
-                content for content in message["content"] if content["type"] == "text"
-            ]
-            text_messages.append(
-                {"role": message["role"], "content": filtered_content_list}
-            )
+            filtered_content_list = [content for content in message["content"] if content["type"] == "text"]
+            text_messages.append({"role": message["role"], "content": filtered_content_list})
 
     # Make requests for logging
     gen_params = {
@@ -799,9 +773,7 @@ def ai2_api_stream_iter(
             yield data
 
 
-def mistral_api_stream_iter(
-    model_name, messages, temperature, top_p, max_new_tokens, api_key=None
-):
+def mistral_api_stream_iter(model_name, messages, temperature, top_p, max_new_tokens, api_key=None):
     from mistralai.client import MistralClient
     from mistralai.models.chat_completion import ChatMessage
 
@@ -820,10 +792,7 @@ def mistral_api_stream_iter(
     }
     logger.info(f"==== request ====\n{gen_params}")
 
-    new_messages = [
-        ChatMessage(role=message["role"], content=message["content"])
-        for message in messages
-    ]
+    new_messages = [ChatMessage(role=message["role"], content=message["content"]) for message in messages]
 
     res = client.chat_stream(
         model=model_name,
@@ -844,9 +813,7 @@ def mistral_api_stream_iter(
             yield data
 
 
-def nvidia_api_stream_iter(
-    model_name, messages, temp, top_p, max_tokens, api_base, api_key=None
-):
+def nvidia_api_stream_iter(model_name, messages, temp, top_p, max_tokens, api_base, api_key=None):
     model_2_api = {}
     api_base += model_2_api[model_name]
 
@@ -876,9 +843,7 @@ def nvidia_api_stream_iter(
     # try 3 times
     for i in range(3):
         try:
-            response = requests.post(
-                api_base, headers=headers, json=payload, stream=True, timeout=3
-            )
+            response = requests.post(api_base, headers=headers, json=payload, stream=True, timeout=3)
             break
         except Exception as e:
             logger.error(f"==== error ====\n{e}")
@@ -900,9 +865,7 @@ def nvidia_api_stream_iter(
             yield {"text": text, "error_code": 0}
 
 
-def yandexgpt_api_stream_iter(
-    model_name, messages, temperature, max_tokens, api_base, api_key, folder_id
-):
+def yandexgpt_api_stream_iter(model_name, messages, temperature, max_tokens, api_base, api_key, folder_id):
     api_key = api_key or os.environ["YANDEXGPT_API_KEY"]
     headers = {
         "Authorization": f"Api-Key {api_key}",
@@ -921,9 +884,7 @@ def yandexgpt_api_stream_iter(
     logger.info(f"==== request ====\n{payload}")
 
     # https://llm.api.cloud.yandex.net/foundationModels/v1/completion
-    response = requests.post(
-        api_base, headers=headers, json=payload, stream=True, timeout=60
-    )
+    response = requests.post(api_base, headers=headers, json=payload, stream=True, timeout=60)
     text = ""
     for line in response.iter_lines():
         if line:
@@ -945,9 +906,7 @@ def cohere_api_stream_iter(
     client_name: str,
     model_id: str,
     messages: list,
-    temperature: Optional[
-        float
-    ] = None,  # The SDK or API handles None for all parameters following
+    temperature: Optional[float] = None,  # The SDK or API handles None for all parameters following
     top_p: Optional[float] = None,
     max_new_tokens: Optional[int] = None,
     api_key: Optional[str] = None,  # default is env var CO_API_KEY
@@ -969,10 +928,7 @@ def cohere_api_stream_iter(
 
     # prepare and log requests
     chat_history = [
-        dict(
-            role=OPENAI_TO_COHERE_ROLE_MAP[message["role"]], message=message["content"]
-        )
-        for message in messages[:-1]
+        dict(role=OPENAI_TO_COHERE_ROLE_MAP[message["role"]], message=message["content"]) for message in messages[:-1]
     ]
     actual_prompt = messages[-1]["content"]
 
@@ -1058,9 +1014,7 @@ def vertex_api_stream_iter(model_name, messages, temperature, top_p, max_new_tok
     generator = GenerativeModel(model_name).generate_content(
         messages,
         stream=True,
-        generation_config=GenerationConfig(
-            top_p=top_p, max_output_tokens=max_new_tokens, temperature=temperature
-        ),
+        generation_config=GenerationConfig(top_p=top_p, max_output_tokens=max_new_tokens, temperature=temperature),
         safety_settings=safety_settings,
     )
 
@@ -1079,9 +1033,7 @@ def vertex_api_stream_iter(model_name, messages, temperature, top_p, max_new_tok
 def reka_api_stream_iter(
     model_name: str,
     messages: list,
-    temperature: Optional[
-        float
-    ] = None,  # The SDK or API handles None for all parameters following
+    temperature: Optional[float] = None,  # The SDK or API handles None for all parameters following
     top_p: Optional[float] = None,
     max_new_tokens: Optional[int] = None,
     api_key: Optional[str] = None,  # default is env var CO_API_KEY

@@ -59,9 +59,7 @@ class MLXWorker(BaseModelWorker):
             conv_template,
         )
 
-        logger.info(
-            f"Loading the model {self.model_names} on worker {worker_id}, worker type: MLX worker..."
-        )
+        logger.info(f"Loading the model {self.model_names} on worker {worker_id}, worker type: MLX worker...")
 
         self.model_name = model_path
         self.mlx_model, self.mlx_tokenizer = load(model_path)
@@ -119,9 +117,7 @@ class MLXWorker(BaseModelWorker):
 
         finish_reason = "length"
 
-        iterator = await run_in_threadpool(
-            generate_step, context_mlx, self.mlx_model, temperature
-        )
+        iterator = await run_in_threadpool(generate_step, context_mlx, self.mlx_model, temperature)
 
         for i in range(max_new_tokens):
             (token, _) = await run_in_threadpool(next, iterator)
@@ -249,24 +245,19 @@ if __name__ == "__main__":
     parser.add_argument("--host", type=str, default="localhost")
     parser.add_argument("--port", type=int, default=21002)
     parser.add_argument("--worker-address", type=str, default="http://localhost:21002")
-    parser.add_argument(
-        "--controller-address", type=str, default="http://localhost:21001"
-    )
+    parser.add_argument("--controller-address", type=str, default="http://localhost:21001")
     parser.add_argument("--model-path", type=str, default="microsoft/phi-2")
     parser.add_argument(
         "--model-names",
         type=lambda s: s.split(","),
         help="Optional display comma separated names",
     )
-    parser.add_argument(
-        "--conv-template", type=str, default=None, help="Conversation prompt template."
-    )
+    parser.add_argument("--conv-template", type=str, default=None, help="Conversation prompt template.")
     parser.add_argument(
         "--trust_remote_code",
         action="store_false",
         default=True,
-        help="Trust remote code (e.g., from HuggingFace) when"
-        "downloading the model and tokenizer.",
+        help="Trust remote code (e.g., from HuggingFace) when" "downloading the model and tokenizer.",
     )
 
     args, unknown = parser.parse_known_args()

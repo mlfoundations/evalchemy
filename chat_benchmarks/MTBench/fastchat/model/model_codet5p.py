@@ -48,9 +48,7 @@ def generate_stream_codet5p(
     )
 
     class CodeBlockStopper(StoppingCriteria):
-        def __call__(
-            self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs
-        ) -> bool:
+        def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs) -> bool:
             # Code-completion is open-end generation.
             # We check \n\n to stop at end of a code block.
             if list(input_ids[0][-2:]) == [628, 198]:

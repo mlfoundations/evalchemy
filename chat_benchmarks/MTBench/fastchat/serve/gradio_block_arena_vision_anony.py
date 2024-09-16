@@ -156,9 +156,7 @@ def vote_last_response(states, vote_type, model_selectors, request: gr.Request):
         fout.write(json.dumps(data) + "\n")
     get_remote_logger().log(data)
 
-    gr.Info(
-        "🎉 Thanks for voting! Your vote shapes the leaderboard, please vote RESPONSIBLY."
-    )
+    gr.Info("🎉 Thanks for voting! Your vote shapes the leaderboard, please vote RESPONSIBLY.")
     if ":" not in model_selectors[0]:
         for i in range(5):
             names = (
@@ -175,43 +173,27 @@ def vote_last_response(states, vote_type, model_selectors, request: gr.Request):
         yield names + (disable_text,) + (disable_btn,) * 4
 
 
-def leftvote_last_response(
-    state0, state1, model_selector0, model_selector1, request: gr.Request
-):
+def leftvote_last_response(state0, state1, model_selector0, model_selector1, request: gr.Request):
     logger.info(f"leftvote (anony). ip: {get_ip(request)}")
-    for x in vote_last_response(
-        [state0, state1], "leftvote", [model_selector0, model_selector1], request
-    ):
+    for x in vote_last_response([state0, state1], "leftvote", [model_selector0, model_selector1], request):
         yield x
 
 
-def rightvote_last_response(
-    state0, state1, model_selector0, model_selector1, request: gr.Request
-):
+def rightvote_last_response(state0, state1, model_selector0, model_selector1, request: gr.Request):
     logger.info(f"rightvote (anony). ip: {get_ip(request)}")
-    for x in vote_last_response(
-        [state0, state1], "rightvote", [model_selector0, model_selector1], request
-    ):
+    for x in vote_last_response([state0, state1], "rightvote", [model_selector0, model_selector1], request):
         yield x
 
 
-def tievote_last_response(
-    state0, state1, model_selector0, model_selector1, request: gr.Request
-):
+def tievote_last_response(state0, state1, model_selector0, model_selector1, request: gr.Request):
     logger.info(f"tievote (anony). ip: {get_ip(request)}")
-    for x in vote_last_response(
-        [state0, state1], "tievote", [model_selector0, model_selector1], request
-    ):
+    for x in vote_last_response([state0, state1], "tievote", [model_selector0, model_selector1], request):
         yield x
 
 
-def bothbad_vote_last_response(
-    state0, state1, model_selector0, model_selector1, request: gr.Request
-):
+def bothbad_vote_last_response(state0, state1, model_selector0, model_selector1, request: gr.Request):
     logger.info(f"bothbad_vote (anony). ip: {get_ip(request)}")
-    for x in vote_last_response(
-        [state0, state1], "bothbad_vote", [model_selector0, model_selector1], request
-    ):
+    for x in vote_last_response([state0, state1], "bothbad_vote", [model_selector0, model_selector1], request):
         yield x
 
 
@@ -221,17 +203,10 @@ def regenerate(state0, state1, request: gr.Request):
     if state0.regen_support and state1.regen_support:
         for i in range(num_sides):
             states[i].conv.update_last_message(None)
-        return (
-            states
-            + [x.to_gradio_chatbot() for x in states]
-            + [None]
-            + [disable_btn] * 6
-        )
+        return states + [x.to_gradio_chatbot() for x in states] + [None] + [disable_btn] * 6
     states[0].skip_next = True
     states[1].skip_next = True
-    return (
-        states + [x.to_gradio_chatbot() for x in states] + [None] + [no_change_btn] * 6
-    )
+    return states + [x.to_gradio_chatbot() for x in states] + [None] + [no_change_btn] * 6
 
 
 def clear_history(request: gr.Request):
@@ -248,9 +223,7 @@ def clear_history(request: gr.Request):
     )
 
 
-def add_text(
-    state0, state1, model_selector0, model_selector1, chat_input, request: gr.Request
-):
+def add_text(state0, state1, model_selector0, model_selector1, chat_input, request: gr.Request):
     if isinstance(chat_input, dict):
         text, images = chat_input["text"], chat_input["files"]
     else:
@@ -310,9 +283,7 @@ def add_text(
 
     images = convert_images_to_conversation_format(images)
 
-    text, image_flagged, csam_flag = moderate_input(
-        state0, text, text, model_list, images, ip
-    )
+    text, image_flagged, csam_flag = moderate_input(state0, text, text, model_list, images, ip)
 
     conv = states[0].conv
     if (len(conv.messages) - conv.offset) // 2 >= CONVERSATION_TURN_LIMIT:
@@ -338,10 +309,7 @@ def add_text(
             states
             + [x.to_gradio_chatbot() for x in states]
             + [
-                {
-                    "text": IMAGE_MODERATION_MSG
-                    + " PLEASE CLICK 🎲 NEW ROUND TO START A NEW CONVERSATION."
-                },
+                {"text": IMAGE_MODERATION_MSG + " PLEASE CLICK 🎲 NEW ROUND TO START A NEW CONVERSATION."},
                 "",
             ]
             + [no_change_btn] * 7
@@ -350,9 +318,7 @@ def add_text(
 
     text = text[:BLIND_MODE_INPUT_CHAR_LEN_LIMIT]  # Hard cut-off
     for i in range(num_sides):
-        post_processed_text = _prepare_text_with_image(
-            states[i], text, images, csam_flag=csam_flag
-        )
+        post_processed_text = _prepare_text_with_image(states[i], text, images, csam_flag=csam_flag)
         states[i].conv.append_message(states[i].conv.roles[0], post_processed_text)
         states[i].conv.append_message(states[i].conv.roles[1], None)
         states[i].skip_next = False
@@ -412,12 +378,8 @@ def build_side_by_side_vision_ui_anony(text_models, vl_models, random_questions=
                     f"🔍 Expand to see the descriptions of {len(text_models) + len(vl_models)} models",
                     open=False,
                 ):
-                    model_description_md = get_model_description_md(
-                        text_models + vl_models
-                    )
-                    gr.Markdown(
-                        model_description_md, elem_id="model_description_markdown"
-                    )
+                    model_description_md = get_model_description_md(text_models + vl_models)
+                    gr.Markdown(model_description_md, elem_id="model_description_markdown")
 
                 with gr.Row():
                     for i in range(num_sides):
@@ -433,23 +395,15 @@ def build_side_by_side_vision_ui_anony(text_models, vl_models, random_questions=
                 with gr.Row():
                     for i in range(num_sides):
                         with gr.Column():
-                            model_selectors[i] = gr.Markdown(
-                                anony_names[i], elem_id="model_selector_md"
-                            )
+                            model_selectors[i] = gr.Markdown(anony_names[i], elem_id="model_selector_md")
     with gr.Row():
         slow_warning = gr.Markdown("", elem_id="notice_markdown")
 
     with gr.Row():
-        leftvote_btn = gr.Button(
-            value="👈  A is better", visible=False, interactive=False
-        )
-        rightvote_btn = gr.Button(
-            value="👉  B is better", visible=False, interactive=False
-        )
+        leftvote_btn = gr.Button(value="👈  A is better", visible=False, interactive=False)
+        rightvote_btn = gr.Button(value="👉  B is better", visible=False, interactive=False)
         tie_btn = gr.Button(value="🤝  Tie", visible=False, interactive=False)
-        bothbad_btn = gr.Button(
-            value="👎  Both are bad", visible=False, interactive=False
-        )
+        bothbad_btn = gr.Button(value="👎  Both are bad", visible=False, interactive=False)
 
     with gr.Row():
         textbox = gr.Textbox(
@@ -535,25 +489,15 @@ def build_side_by_side_vision_ui_anony(text_models, vl_models, random_questions=
         states + model_selectors,
         model_selectors + [textbox, leftvote_btn, rightvote_btn, tie_btn, bothbad_btn],
     )
-    regenerate_btn.click(
-        regenerate, states, states + chatbots + [textbox] + btn_list
-    ).then(
+    regenerate_btn.click(regenerate, states, states + chatbots + [textbox] + btn_list).then(
         bot_response_multi,
         states + [temperature, top_p, max_output_tokens],
         states + chatbots + btn_list,
-    ).then(
-        flash_buttons, [], btn_list
-    )
+    ).then(flash_buttons, [], btn_list)
     clear_btn.click(
         clear_history,
         None,
-        states
-        + chatbots
-        + model_selectors
-        + [multimodal_textbox, textbox]
-        + btn_list
-        + [random_btn]
-        + [slow_warning],
+        states + chatbots + model_selectors + [multimodal_textbox, textbox] + btn_list + [random_btn] + [slow_warning],
     )
 
     share_js = """
@@ -589,12 +533,7 @@ function (a, b, c, d) {
     multimodal_textbox.submit(
         add_text,
         states + model_selectors + [multimodal_textbox],
-        states
-        + chatbots
-        + [multimodal_textbox, textbox]
-        + btn_list
-        + [random_btn]
-        + [slow_warning],
+        states + chatbots + [multimodal_textbox, textbox] + btn_list + [random_btn] + [slow_warning],
     ).then(set_invisible_image, [], [image_column]).then(
         bot_response_multi,
         states + [temperature, top_p, max_output_tokens],
@@ -608,12 +547,7 @@ function (a, b, c, d) {
     textbox.submit(
         add_text,
         states + model_selectors + [textbox],
-        states
-        + chatbots
-        + [multimodal_textbox, textbox]
-        + btn_list
-        + [random_btn]
-        + [slow_warning],
+        states + chatbots + [multimodal_textbox, textbox] + btn_list + [random_btn] + [slow_warning],
     ).then(
         bot_response_multi,
         states + [temperature, top_p, max_output_tokens],
@@ -632,12 +566,7 @@ function (a, b, c, d) {
         ).then(set_visible_image, [multimodal_textbox], [image_column]).then(
             clear_history_example,
             None,
-            states
-            + chatbots
-            + model_selectors
-            + [multimodal_textbox, textbox]
-            + btn_list
-            + [random_btn],
+            states + chatbots + model_selectors + [multimodal_textbox, textbox] + btn_list + [random_btn],
         )
 
     return states + model_selectors

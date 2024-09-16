@@ -3,6 +3,7 @@ Usage:
 python3 summarize_cluster.py --in results_c20_kmeans_cluster.pkl --model gpt-4 --num-prompts 100
 python3 summarize_cluster.py --in results_c20_kmeans_cluster.pkl --model azure-gpt-4-32k --num-prompts 200
 """
+
 import argparse
 import pickle
 
@@ -38,17 +39,12 @@ if __name__ == "__main__":
     for i, info in enumerate(cluster_infos):
         num_samples, topk_prompts, random_prompts = info
         percentage = num_samples / num_total_prompts
-        print(
-            f"cluster {i}, #prompts {num_samples}, percentage: {percentage * 100:.2f}%"
-        )
+        print(f"cluster {i}, #prompts {num_samples}, percentage: {percentage * 100:.2f}%")
         instruct = "Given a list of user messages, use less than 8 words to summarize a central topic for all messages in English. Your output should only include a single line. Try to be specific."
         split = int(args.num_prompts * 0.8)
         prompt = "\n".join(
             [truncate_string(x, l=200) for x in topk_prompts[:split]]
-            + [
-                truncate_string(x, l=200)
-                for x in random_prompts[: args.num_prompts - split]
-            ]
+            + [truncate_string(x, l=200) for x in random_prompts[: args.num_prompts - split]]
         )
         prompt = "BEGIN OF THE MESSAGE LIST\n" + prompt + "\nEND OF THE MESSAGE LIST."
 

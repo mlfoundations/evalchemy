@@ -41,9 +41,7 @@ def create_embedding_data_frame(data_path, model, max_tokens=500):
     df = pd.read_csv(data_path, index_col=0)
     df = df[["Time", "ProductId", "UserId", "Score", "Summary", "Text"]]
     df = df.dropna()
-    df["combined"] = (
-        "Title: " + df.Summary.str.strip() + "; Content: " + df.Text.str.strip()
-    )
+    df["combined"] = "Title: " + df.Summary.str.strip() + "; Content: " + df.Text.str.strip()
     top_n = 1000
     df = df.sort_values("Time").tail(top_n * 2)
     df.drop("Time", axis=1, inplace=True)
@@ -56,9 +54,7 @@ def create_embedding_data_frame(data_path, model, max_tokens=500):
 
 def search_reviews(df, product_description, n=3, pprint=False, model="vicuna-7b-v1.1"):
     product_embedding = get_embedding_from_api(product_description, model=model)
-    df["similarity"] = df.embedding.apply(
-        lambda x: cosine_similarity(x, product_embedding)
-    )
+    df["similarity"] = df.embedding.apply(lambda x: cosine_similarity(x, product_embedding))
 
     results = (
         df.sort_values("similarity", ascending=False)
@@ -89,9 +85,7 @@ def print_model_search(input_path, model):
 
 input_datapath = "amazon_fine_food_review.csv"
 if not os.path.exists(input_datapath):
-    raise Exception(
-        f"Please download data from: https://www.kaggle.com/datasets/snap/amazon-fine-food-reviews"
-    )
+    raise Exception(f"Please download data from: https://www.kaggle.com/datasets/snap/amazon-fine-food-reviews")
 
 
 print_model_search(input_datapath, "vicuna-7b-v1.1")

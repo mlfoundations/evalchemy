@@ -66,14 +66,10 @@ class SGLWorker(BaseModelWorker):
             is_multimodal_model(model_path),
         )
 
-        logger.info(
-            f"Loading the model {self.model_names} on worker {worker_id}, worker type: SGLang worker..."
-        )
+        logger.info(f"Loading the model {self.model_names} on worker {worker_id}, worker type: SGLang worker...")
 
         self.tokenizer = get_tokenizer(tokenizer_path)
-        self.context_len = get_context_length(
-            get_config(model_path, trust_remote_code=trust_remote_code)
-        )
+        self.context_len = get_context_length(get_config(model_path, trust_remote_code=trust_remote_code))
 
         if not no_register:
             self.init_heart_beat()
@@ -137,9 +133,7 @@ class SGLWorker(BaseModelWorker):
         )
 
         entire_output = prompt if echo else ""
-        async for out, meta_info in state.text_async_iter(
-            var_name="response", return_meta_data=True
-        ):
+        async for out, meta_info in state.text_async_iter(var_name="response", return_meta_data=True):
             partial_stop = any(is_partial_stop(out, i) for i in stop)
 
             # prevent yielding partial stop sequence
@@ -238,9 +232,7 @@ if __name__ == "__main__":
     parser.add_argument("--host", type=str, default="localhost")
     parser.add_argument("--port", type=int, default=21002)
     parser.add_argument("--worker-address", type=str, default="http://localhost:21002")
-    parser.add_argument(
-        "--controller-address", type=str, default="http://localhost:21001"
-    )
+    parser.add_argument("--controller-address", type=str, default="http://localhost:21001")
     parser.add_argument("--model-path", type=str, default="lmsys/vicuna-7b-v1.5")
     parser.add_argument("--tokenizer-path", type=str, default="")
     parser.add_argument(
@@ -251,15 +243,12 @@ if __name__ == "__main__":
     parser.add_argument("--limit-worker-concurrency", type=int, default=1024)
     parser.add_argument("--no-register", action="store_true")
     parser.add_argument("--num-gpus", type=int, default=1)
-    parser.add_argument(
-        "--conv-template", type=str, default=None, help="Conversation prompt template."
-    )
+    parser.add_argument("--conv-template", type=str, default=None, help="Conversation prompt template.")
     parser.add_argument(
         "--trust-remote-code",
         action="store_false",
         default=True,
-        help="Trust remote code (e.g., from HuggingFace) when"
-        "downloading the model and tokenizer.",
+        help="Trust remote code (e.g., from HuggingFace) when" "downloading the model and tokenizer.",
     )
     parser.add_argument(
         "--mem-fraction-static",
@@ -282,9 +271,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     args.tp_size = args.num_gpus if args.num_gpus > 1 else 1
-    args.tokenizer_path = (
-        args.model_path if args.tokenizer_path == "" else args.tokenizer_path
-    )
+    args.tokenizer_path = args.model_path if args.tokenizer_path == "" else args.tokenizer_path
 
     multiprocessing.set_start_method("spawn", force=True)
     runtime = sgl.Runtime(

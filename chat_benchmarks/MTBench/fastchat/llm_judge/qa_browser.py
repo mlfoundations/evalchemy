@@ -42,9 +42,7 @@ def display_question(category_selector, request: gr.Request):
     )
 
 
-def display_pairwise_answer(
-    question_selector, model_selector1, model_selector2, request: gr.Request
-):
+def display_pairwise_answer(question_selector, model_selector1, model_selector2, request: gr.Request):
     q = question_selector_map[question_selector]
     qid = q["question_id"]
 
@@ -61,10 +59,7 @@ def display_pairwise_answer(
         multi_turn=False,
     )
 
-    explanation = (
-        "##### Model Judgment (first turn)\n"
-        + get_pairwise_judge_explanation(gamekey, judgment_dict)
-    )
+    explanation = "##### Model Judgment (first turn)\n" + get_pairwise_judge_explanation(gamekey, judgment_dict)
 
     judgment_dict_turn2 = resolve_pairwise_judgment_dict(
         q,
@@ -73,9 +68,8 @@ def display_pairwise_answer(
         multi_turn=True,
     )
 
-    explanation_turn2 = (
-        "##### Model Judgment (second turn)\n"
-        + get_pairwise_judge_explanation(gamekey, judgment_dict_turn2)
+    explanation_turn2 = "##### Model Judgment (second turn)\n" + get_pairwise_judge_explanation(
+        gamekey, judgment_dict_turn2
     )
 
     return chat_mds + [explanation] + [explanation_turn2]
@@ -94,17 +88,14 @@ def display_single_answer(question_selector, model_selector1, request: gr.Reques
         q, model_judgments_normal_single, model_judgments_math_single, multi_turn=False
     )
 
-    explanation = "##### Model Judgment (first turn)\n" + get_single_judge_explanation(
-        gamekey, judgment_dict
-    )
+    explanation = "##### Model Judgment (first turn)\n" + get_single_judge_explanation(gamekey, judgment_dict)
 
     judgment_dict_turn2 = resolve_single_judgment_dict(
         q, model_judgments_normal_single, model_judgments_math_single, multi_turn=True
     )
 
-    explanation_turn2 = (
-        "##### Model Judgment (second turn)\n"
-        + get_single_judge_explanation(gamekey, judgment_dict_turn2)
+    explanation_turn2 = "##### Model Judgment (second turn)\n" + get_single_judge_explanation(
+        gamekey, judgment_dict_turn2
     )
 
     return chat_mds + [explanation] + [explanation_turn2]
@@ -132,12 +123,8 @@ def pairwise_to_gradio_chat_mds(question, ans_a, ans_b, turn=None):
             mds[base + 0] = "##### User\n" + question["turns"][i]
         else:
             mds[base + 0] = "##### User's follow-up question \n" + question["turns"][i]
-        mds[base + 1] = "##### Assistant A\n" + post_process_answer(
-            ans_a["choices"][0]["turns"][i].strip()
-        )
-        mds[base + 2] = "##### Assistant B\n" + post_process_answer(
-            ans_b["choices"][0]["turns"][i].strip()
-        )
+        mds[base + 1] = "##### Assistant A\n" + post_process_answer(ans_a["choices"][0]["turns"][i].strip())
+        mds[base + 2] = "##### Assistant B\n" + post_process_answer(ans_b["choices"][0]["turns"][i].strip())
 
     ref = question.get("reference", ["", ""])
 
@@ -164,9 +151,7 @@ def single_to_gradio_chat_mds(question, ans, turn=None):
             mds[base + 0] = "##### User\n" + question["turns"][i]
         else:
             mds[base + 0] = "##### User's follow-up question \n" + question["turns"][i]
-        mds[base + 1] = "##### Assistant A\n" + post_process_answer(
-            ans["choices"][0]["turns"][i].strip()
-        )
+        mds[base + 1] = "##### Assistant A\n" + post_process_answer(ans["choices"][0]["turns"][i].strip())
 
     ref = question.get("reference", ["", ""])
 
@@ -207,13 +192,9 @@ def build_pairwise_browser_tab():
     # Selectors
     with gr.Row():
         with gr.Column(scale=1, min_width=200):
-            category_selector = gr.Dropdown(
-                choices=category_selector_choices, label="Category", container=False
-            )
+            category_selector = gr.Dropdown(choices=category_selector_choices, label="Category", container=False)
         with gr.Column(scale=100):
-            question_selector = gr.Dropdown(
-                choices=question_selector_choices, label="Question", container=False
-            )
+            question_selector = gr.Dropdown(choices=question_selector_choices, label="Question", container=False)
 
     model_selectors = [None] * num_sides
     with gr.Row():
@@ -280,13 +261,9 @@ def build_single_answer_browser_tab():
     # Selectors
     with gr.Row():
         with gr.Column(scale=1, min_width=200):
-            category_selector = gr.Dropdown(
-                choices=category_selector_choices, label="Category", container=False
-            )
+            category_selector = gr.Dropdown(choices=category_selector_choices, label="Category", container=False)
         with gr.Column(scale=100):
-            question_selector = gr.Dropdown(
-                choices=question_selector_choices, label="Question", container=False
-            )
+            question_selector = gr.Dropdown(choices=question_selector_choices, label="Question", container=False)
 
     model_selectors = [None] * num_sides
     with gr.Row():
@@ -391,12 +368,8 @@ if __name__ == "__main__":
 
     question_file = f"data/{args.bench_name}/question.jsonl"
     answer_dir = f"data/{args.bench_name}/model_answer"
-    pairwise_model_judgment_file = (
-        f"data/{args.bench_name}/model_judgment/gpt-4_pair.jsonl"
-    )
-    single_model_judgment_file = (
-        f"data/{args.bench_name}/model_judgment/gpt-4_single.jsonl"
-    )
+    pairwise_model_judgment_file = f"data/{args.bench_name}/model_judgment/gpt-4_pair.jsonl"
+    single_model_judgment_file = f"data/{args.bench_name}/model_judgment/gpt-4_single.jsonl"
 
     # Load questions
     questions = load_questions(question_file, None, None)
@@ -405,16 +378,14 @@ if __name__ == "__main__":
     model_answers = load_model_answers(answer_dir)
 
     # Load model judgments
-    model_judgments_normal_single = (
-        model_judgments_math_single
-    ) = load_single_model_judgments(single_model_judgment_file)
-    model_judgments_normal_pairwise = (
-        model_judgments_math_pairwise
-    ) = load_pairwise_model_judgments(pairwise_model_judgment_file)
+    model_judgments_normal_single = model_judgments_math_single = load_single_model_judgments(
+        single_model_judgment_file
+    )
+    model_judgments_normal_pairwise = model_judgments_math_pairwise = load_pairwise_model_judgments(
+        pairwise_model_judgment_file
+    )
 
     demo = build_demo()
-    demo.queue(
-        default_concurrency_limit=10, status_update_rate=10, api_open=False
-    ).launch(
+    demo.queue(default_concurrency_limit=10, status_update_rate=10, api_open=False).launch(
         server_name=args.host, server_port=args.port, share=args.share, max_threads=200
     )

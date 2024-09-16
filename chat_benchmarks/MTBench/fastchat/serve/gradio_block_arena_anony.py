@@ -77,9 +77,7 @@ def vote_last_response(states, vote_type, model_selectors, request: gr.Request):
         fout.write(json.dumps(data) + "\n")
     get_remote_logger().log(data)
 
-    gr.Info(
-        "🎉 Thanks for voting! Your vote shapes the leaderboard, please vote RESPONSIBLY."
-    )
+    gr.Info("🎉 Thanks for voting! Your vote shapes the leaderboard, please vote RESPONSIBLY.")
     if ":" not in model_selectors[0]:
         for i in range(5):
             names = (
@@ -98,43 +96,27 @@ def vote_last_response(states, vote_type, model_selectors, request: gr.Request):
         yield names + (disable_text,) + (disable_btn,) * 5
 
 
-def leftvote_last_response(
-    state0, state1, model_selector0, model_selector1, request: gr.Request
-):
+def leftvote_last_response(state0, state1, model_selector0, model_selector1, request: gr.Request):
     logger.info(f"leftvote (anony). ip: {get_ip(request)}")
-    for x in vote_last_response(
-        [state0, state1], "leftvote", [model_selector0, model_selector1], request
-    ):
+    for x in vote_last_response([state0, state1], "leftvote", [model_selector0, model_selector1], request):
         yield x
 
 
-def rightvote_last_response(
-    state0, state1, model_selector0, model_selector1, request: gr.Request
-):
+def rightvote_last_response(state0, state1, model_selector0, model_selector1, request: gr.Request):
     logger.info(f"rightvote (anony). ip: {get_ip(request)}")
-    for x in vote_last_response(
-        [state0, state1], "rightvote", [model_selector0, model_selector1], request
-    ):
+    for x in vote_last_response([state0, state1], "rightvote", [model_selector0, model_selector1], request):
         yield x
 
 
-def tievote_last_response(
-    state0, state1, model_selector0, model_selector1, request: gr.Request
-):
+def tievote_last_response(state0, state1, model_selector0, model_selector1, request: gr.Request):
     logger.info(f"tievote (anony). ip: {get_ip(request)}")
-    for x in vote_last_response(
-        [state0, state1], "tievote", [model_selector0, model_selector1], request
-    ):
+    for x in vote_last_response([state0, state1], "tievote", [model_selector0, model_selector1], request):
         yield x
 
 
-def bothbad_vote_last_response(
-    state0, state1, model_selector0, model_selector1, request: gr.Request
-):
+def bothbad_vote_last_response(state0, state1, model_selector0, model_selector1, request: gr.Request):
     logger.info(f"bothbad_vote (anony). ip: {get_ip(request)}")
-    for x in vote_last_response(
-        [state0, state1], "bothbad_vote", [model_selector0, model_selector1], request
-    ):
+    for x in vote_last_response([state0, state1], "bothbad_vote", [model_selector0, model_selector1], request):
         yield x
 
 
@@ -144,9 +126,7 @@ def regenerate(state0, state1, request: gr.Request):
     if state0.regen_support and state1.regen_support:
         for i in range(num_sides):
             states[i].conv.update_last_message(None)
-        return (
-            states + [x.to_gradio_chatbot() for x in states] + [""] + [disable_btn] * 6
-        )
+        return states + [x.to_gradio_chatbot() for x in states] + [""] + [disable_btn] * 6
     states[0].skip_next = True
     states[1].skip_next = True
     return states + [x.to_gradio_chatbot() for x in states] + [""] + [no_change_btn] * 6
@@ -169,9 +149,7 @@ def clear_history(request: gr.Request):
 def share_click(state0, state1, model_selector0, model_selector1, request: gr.Request):
     logger.info(f"share (anony). ip: {get_ip(request)}")
     if state0 is not None and state1 is not None:
-        vote_last_response(
-            [state0, state1], "share", [model_selector0, model_selector1], request
-        )
+        vote_last_response([state0, state1], "share", [model_selector0, model_selector1], request)
 
 
 SAMPLING_WEIGHTS = {}
@@ -196,17 +174,13 @@ def get_sample_weight(model, outage_models, sampling_weights, sampling_boost_mod
     return weight
 
 
-def get_battle_pair(
-    models, battle_targets, outage_models, sampling_weights, sampling_boost_models
-):
+def get_battle_pair(models, battle_targets, outage_models, sampling_weights, sampling_boost_models):
     if len(models) == 1:
         return models[0], models[0]
 
     model_weights = []
     for model in models:
-        weight = get_sample_weight(
-            model, outage_models, sampling_weights, sampling_boost_models
-        )
+        weight = get_sample_weight(model, outage_models, sampling_weights, sampling_boost_models)
         model_weights.append(weight)
     total_weight = np.sum(model_weights)
     model_weights = model_weights / total_weight
@@ -223,11 +197,7 @@ def get_battle_pair(
         if model in ANON_MODELS and chosen_model in ANON_MODELS:
             continue
         weight = get_sample_weight(model, outage_models, sampling_weights)
-        if (
-            weight != 0
-            and chosen_model in battle_targets
-            and model in battle_targets[chosen_model]
-        ):
+        if weight != 0 and chosen_model in battle_targets and model in battle_targets[chosen_model]:
             # boost to 20% chance
             weight = 0.5 * total_weight / len(battle_targets[chosen_model])
         rival_models.append(model)
@@ -245,9 +215,7 @@ def get_battle_pair(
         return rival_model, chosen_model
 
 
-def add_text(
-    state0, state1, model_selector0, model_selector1, text, request: gr.Request
-):
+def add_text(state0, state1, model_selector0, model_selector1, text, request: gr.Request):
     ip = get_ip(request)
     logger.info(f"add_text (anony). ip: {ip}. len: {len(text)}")
     states = [state0, state1]
@@ -287,9 +255,7 @@ def add_text(
     # turn on moderation in battle mode
     all_conv_text_left = states[0].conv.get_prompt()
     all_conv_text_right = states[0].conv.get_prompt()
-    all_conv_text = (
-        all_conv_text_left[-1000:] + all_conv_text_right[-1000:] + "\nuser: " + text
-    )
+    all_conv_text = all_conv_text_left[-1000:] + all_conv_text_right[-1000:] + "\nuser: " + text
     flagged = moderation_filter(all_conv_text, model_list, do_moderation=True)
     if flagged:
         logger.info(f"violate moderation (anony). ip: {ip}. text: {text}")
@@ -440,9 +406,7 @@ def build_side_by_side_ui_anony(models):
     gr.Markdown(notice_markdown, elem_id="notice_markdown")
 
     with gr.Group(elem_id="share-region-anony"):
-        with gr.Accordion(
-            f"🔍 Expand to see the descriptions of {len(models)} models", open=False
-        ):
+        with gr.Accordion(f"🔍 Expand to see the descriptions of {len(models)} models", open=False):
             model_description_md = get_model_description_md(models)
             gr.Markdown(model_description_md, elem_id="model_description_markdown")
         with gr.Row():
@@ -459,23 +423,15 @@ def build_side_by_side_ui_anony(models):
         with gr.Row():
             for i in range(num_sides):
                 with gr.Column():
-                    model_selectors[i] = gr.Markdown(
-                        anony_names[i], elem_id="model_selector_md"
-                    )
+                    model_selectors[i] = gr.Markdown(anony_names[i], elem_id="model_selector_md")
         with gr.Row():
             slow_warning = gr.Markdown("")
 
     with gr.Row():
-        leftvote_btn = gr.Button(
-            value="👈  A is better", visible=False, interactive=False
-        )
-        rightvote_btn = gr.Button(
-            value="👉  B is better", visible=False, interactive=False
-        )
+        leftvote_btn = gr.Button(value="👈  A is better", visible=False, interactive=False)
+        rightvote_btn = gr.Button(value="👉  B is better", visible=False, interactive=False)
         tie_btn = gr.Button(value="🤝  Tie", visible=False, interactive=False)
-        bothbad_btn = gr.Button(
-            value="👎  Both are bad", visible=False, interactive=False
-        )
+        bothbad_btn = gr.Button(value="👎  Both are bad", visible=False, interactive=False)
 
     with gr.Row():
         textbox = gr.Textbox(
@@ -530,46 +486,32 @@ def build_side_by_side_ui_anony(models):
     leftvote_btn.click(
         leftvote_last_response,
         states + model_selectors,
-        model_selectors
-        + [textbox, leftvote_btn, rightvote_btn, tie_btn, bothbad_btn, send_btn],
+        model_selectors + [textbox, leftvote_btn, rightvote_btn, tie_btn, bothbad_btn, send_btn],
     )
     rightvote_btn.click(
         rightvote_last_response,
         states + model_selectors,
-        model_selectors
-        + [textbox, leftvote_btn, rightvote_btn, tie_btn, bothbad_btn, send_btn],
+        model_selectors + [textbox, leftvote_btn, rightvote_btn, tie_btn, bothbad_btn, send_btn],
     )
     tie_btn.click(
         tievote_last_response,
         states + model_selectors,
-        model_selectors
-        + [textbox, leftvote_btn, rightvote_btn, tie_btn, bothbad_btn, send_btn],
+        model_selectors + [textbox, leftvote_btn, rightvote_btn, tie_btn, bothbad_btn, send_btn],
     )
     bothbad_btn.click(
         bothbad_vote_last_response,
         states + model_selectors,
-        model_selectors
-        + [textbox, leftvote_btn, rightvote_btn, tie_btn, bothbad_btn, send_btn],
+        model_selectors + [textbox, leftvote_btn, rightvote_btn, tie_btn, bothbad_btn, send_btn],
     )
-    regenerate_btn.click(
-        regenerate, states, states + chatbots + [textbox] + btn_list
-    ).then(
+    regenerate_btn.click(regenerate, states, states + chatbots + [textbox] + btn_list).then(
         bot_response_multi,
         states + [temperature, top_p, max_output_tokens],
         states + chatbots + btn_list,
-    ).then(
-        flash_buttons, [], btn_list
-    )
+    ).then(flash_buttons, [], btn_list)
     clear_btn.click(
         clear_history,
         None,
-        states
-        + chatbots
-        + model_selectors
-        + [textbox]
-        + btn_list
-        + [slow_warning]
-        + [send_btn],
+        states + chatbots + model_selectors + [textbox] + btn_list + [slow_warning] + [send_btn],
     )
 
     share_js = """
@@ -616,8 +558,6 @@ function (a, b, c, d) {
         bot_response_multi,
         states + [temperature, top_p, max_output_tokens],
         states + chatbots + btn_list,
-    ).then(
-        flash_buttons, [], btn_list
-    )
+    ).then(flash_buttons, [], btn_list)
 
     return states + model_selectors

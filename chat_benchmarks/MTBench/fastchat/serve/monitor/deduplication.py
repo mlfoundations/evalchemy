@@ -55,20 +55,14 @@ if __name__ == "__main__":
 
     # prompts that are more common than the percentile cutoff
     high_frequency_prompts = prompt_counts[prompt_counts > percentile_cutoff].index
-    print(
-        f"Number of high frequency prompts: {len(high_frequency_prompts)}/{len(prompt_counts)}"
-    )
+    print(f"Number of high frequency prompts: {len(high_frequency_prompts)}/{len(prompt_counts)}")
 
     # initialize a new column dedup_tag
-    dedup_tags = np.array(
-        [{"high_freq": False, "sampled": True} for _ in range(len(df))]
-    )
+    dedup_tags = np.array([{"high_freq": False, "sampled": True} for _ in range(len(df))])
     high_freq_groups = df.groupby("post_process_conv")
     for prompt in tqdm(high_frequency_prompts):
         df_high_freq = high_freq_groups.get_group(prompt)
-        sampled_indices = df_high_freq.sample(
-            n=int(percentile_cutoff), random_state=42
-        ).index
+        sampled_indices = df_high_freq.sample(n=int(percentile_cutoff), random_state=42).index
         dedup_tags[df_high_freq.index] = {"high_freq": True, "sampled": False}
         dedup_tags[sampled_indices] = {"high_freq": True, "sampled": True}
 

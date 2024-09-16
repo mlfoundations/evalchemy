@@ -45,9 +45,7 @@ class TrainingArguments(transformers.TrainingArguments):
     optim: str = field(default="adamw_torch")
     model_max_length: int = field(
         default=512,
-        metadata={
-            "help": "Maximum sequence length. Sequences will be right padded (and possibly truncated)."
-        },
+        metadata={"help": "Maximum sequence length. Sequences will be right padded (and possibly truncated)."},
     )
     flash_attn: bool = False
 
@@ -57,9 +55,7 @@ class LoraArguments:
     lora_r: int = 8
     lora_alpha: int = 16
     lora_dropout: float = 0.05
-    lora_target_modules: typing.List[str] = field(
-        default_factory=lambda: ["q_proj", "v_proj"]
-    )
+    lora_target_modules: typing.List[str] = field(default_factory=lambda: ["q_proj", "v_proj"])
     lora_weight_path: str = ""
     lora_bias: str = "none"
     q_lora: bool = False
@@ -102,9 +98,7 @@ def get_peft_state_maybe_zero_3(named_params, bias):
 
 
 def train():
-    parser = transformers.HfArgumentParser(
-        (ModelArguments, DataArguments, TrainingArguments, LoraArguments)
-    )
+    parser = transformers.HfArgumentParser((ModelArguments, DataArguments, TrainingArguments, LoraArguments))
     (
         model_args,
         data_args,
@@ -121,28 +115,24 @@ def train():
     if lora_args.q_lora:
         device_map = {"": int(os.environ.get("LOCAL_RANK") or 0)} if ddp else None
         if len(training_args.fsdp) > 0 or deepspeed.is_deepspeed_zero3_enabled():
-            logging.warning(
-                "FSDP and ZeRO3 are both currently incompatible with QLoRA."
-            )
+            logging.warning("FSDP and ZeRO3 are both currently incompatible with QLoRA.")
 
-    compute_dtype = (
-        torch.float16
-        if training_args.fp16
-        else (torch.bfloat16 if training_args.bf16 else torch.float32)
-    )
+    compute_dtype = torch.float16 if training_args.fp16 else (torch.bfloat16 if training_args.bf16 else torch.float32)
 
     model = transformers.AutoModelForCausalLM.from_pretrained(
         model_args.model_name_or_path,
         cache_dir=training_args.cache_dir,
         device_map=device_map,
-        quantization_config=BitsAndBytesConfig(
-            load_in_4bit=True,
-            bnb_4bit_use_double_quant=True,
-            bnb_4bit_quant_type="nf4",
-            bnb_4bit_compute_dtype=compute_dtype,
-        )
-        if lora_args.q_lora
-        else None,
+        quantization_config=(
+            BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_use_double_quant=True,
+                bnb_4bit_quant_type="nf4",
+                bnb_4bit_compute_dtype=compute_dtype,
+            )
+            if lora_args.q_lora
+            else None
+        ),
     )
     lora_config = LoraConfig(
         r=lora_args.lora_r,
@@ -154,9 +144,7 @@ def train():
     )
 
     if lora_args.q_lora:
-        model = prepare_model_for_kbit_training(
-            model, use_gradient_checkpointing=training_args.gradient_checkpointing
-        )
+        model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=training_args.gradient_checkpointing)
         if not ddp and torch.cuda.device_count() > 1:
             # keeps Trainer from trying its own DataParallelism when more than 1 gpu is available
             model.is_parallelizable = True
@@ -186,9 +174,7 @@ def train():
     tokenizer.pad_token = tokenizer.unk_token
 
     data_module = make_supervised_data_module(tokenizer=tokenizer, data_args=data_args)
-    trainer = Trainer(
-        model=model, tokenizer=tokenizer, args=training_args, **data_module
-    )
+    trainer = Trainer(model=model, tokenizer=tokenizer, args=training_args, **data_module)
 
     model.config.use_cache = False
 
@@ -210,9 +196,7 @@ def train():
             state_dict = state_dict_zero3
     else:
         # in other mode we use original code from fastchat team, to make sure our change is minimum
-        state_dict = get_peft_state_maybe_zero_3(
-            model.named_parameters(), lora_args.lora_bias
-        )
+        state_dict = get_peft_state_maybe_zero_3(model.named_parameters(), lora_args.lora_bias)
 
     if training_args.local_rank == 0:
         model.save_pretrained(training_args.output_dir, state_dict=state_dict)

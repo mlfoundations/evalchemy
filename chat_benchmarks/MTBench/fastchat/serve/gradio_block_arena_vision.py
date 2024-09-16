@@ -227,23 +227,17 @@ def add_text(state, model_selector, chat_input, request: gr.Request):
 
     images = convert_images_to_conversation_format(images)
 
-    text, image_flagged, csam_flag = moderate_input(
-        state, text, all_conv_text, [state.model_name], images, ip
-    )
+    text, image_flagged, csam_flag = moderate_input(state, text, all_conv_text, [state.model_name], images, ip)
 
     if image_flagged:
         logger.info(f"image flagged. ip: {ip}. text: {text}")
         state.skip_next = True
-        return (state, state.to_gradio_chatbot(), {"text": IMAGE_MODERATION_MSG}) + (
-            no_change_btn,
-        ) * 5
+        return (state, state.to_gradio_chatbot(), {"text": IMAGE_MODERATION_MSG}) + (no_change_btn,) * 5
 
     if (len(state.conv.messages) - state.conv.offset) // 2 >= CONVERSATION_TURN_LIMIT:
         logger.info(f"conversation turn limit. ip: {ip}. text: {text}")
         state.skip_next = True
-        return (state, state.to_gradio_chatbot(), {"text": CONVERSATION_LIMIT_MSG}) + (
-            no_change_btn,
-        ) * 5
+        return (state, state.to_gradio_chatbot(), {"text": CONVERSATION_LIMIT_MSG}) + (no_change_btn,) * 5
 
     text = text[:INPUT_CHAR_LEN_LIMIT]  # Hard cut-off
     text = _prepare_text_with_image(state, text, images, csam_flag=csam_flag)
@@ -252,9 +246,7 @@ def add_text(state, model_selector, chat_input, request: gr.Request):
     return (state, state.to_gradio_chatbot(), None) + (disable_btn,) * 5
 
 
-def build_single_vision_language_model_ui(
-    models, add_promotion_links=False, random_questions=None
-):
+def build_single_vision_language_model_ui(models, add_promotion_links=False, random_questions=None):
     promotion = (
         f"""
 - [GitHub](https://github.com/lm-sys/FastChat) | [Dataset](https://github.com/lm-sys/FastChat/blob/main/docs/dataset_release.md) | [Twitter](https://twitter.com/lmsysorg) | [Discord](https://discord.gg/HSWAKCrnFx)
@@ -286,9 +278,7 @@ Note: You can only chat with <span style='color: #DE3163; font-weight: bold'>one
                 container=False,
             )
 
-        with gr.Accordion(
-            f"🔍 Expand to see the descriptions of {len(models)} models", open=False
-        ):
+        with gr.Accordion(f"🔍 Expand to see the descriptions of {len(models)} models", open=False):
             model_description_md = get_model_description_md(models)
             gr.Markdown(model_description_md, elem_id="model_description_markdown")
 
@@ -309,9 +299,7 @@ Note: You can only chat with <span style='color: #DE3163; font-weight: bold'>one
                 interactive=False,
             )
         with gr.Column(scale=8):
-            chatbot = gr.Chatbot(
-                elem_id="chatbot", label="Scroll down and start chatting", height=650
-            )
+            chatbot = gr.Chatbot(elem_id="chatbot", label="Scroll down and start chatting", height=650)
 
     with gr.Row():
         textbox.render()
@@ -399,16 +387,14 @@ Note: You can only chat with <span style='color: #DE3163; font-weight: bold'>one
     )
     clear_btn.click(clear_history, None, [state, chatbot, textbox] + btn_list)
 
-    model_selector.change(
-        clear_history, None, [state, chatbot, textbox] + btn_list
-    ).then(set_visible_image, [textbox], [image_column])
-    examples.dataset.click(
+    model_selector.change(clear_history, None, [state, chatbot, textbox] + btn_list).then(
+        set_visible_image, [textbox], [image_column]
+    )
+    examples.dataset.click(clear_history_example, None, [state, chatbot, textbox] + btn_list)
+
+    textbox.input(add_image, [textbox], [imagebox]).then(set_visible_image, [textbox], [image_column]).then(
         clear_history_example, None, [state, chatbot, textbox] + btn_list
     )
-
-    textbox.input(add_image, [textbox], [imagebox]).then(
-        set_visible_image, [textbox], [image_column]
-    ).then(clear_history_example, None, [state, chatbot, textbox] + btn_list)
 
     textbox.submit(
         add_text,

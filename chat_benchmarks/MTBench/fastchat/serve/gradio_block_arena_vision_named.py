@@ -65,13 +65,7 @@ enable_moderation = False
 
 def clear_history_example(request: gr.Request):
     logger.info(f"clear_history_example (named). ip: {get_ip(request)}")
-    return (
-        [None] * num_sides
-        + [None] * num_sides
-        + [enable_multimodal]
-        + [invisible_btn] * 4
-        + [disable_btn] * 2
-    )
+    return [None] * num_sides + [None] * num_sides + [enable_multimodal] + [invisible_btn] * 4 + [disable_btn] * 2
 
 
 def vote_last_response(states, vote_type, model_selectors, request: gr.Request):
@@ -88,43 +82,27 @@ def vote_last_response(states, vote_type, model_selectors, request: gr.Request):
     get_remote_logger().log(data)
 
 
-def leftvote_last_response(
-    state0, state1, model_selector0, model_selector1, request: gr.Request
-):
+def leftvote_last_response(state0, state1, model_selector0, model_selector1, request: gr.Request):
     logger.info(f"leftvote (named). ip: {get_ip(request)}")
-    vote_last_response(
-        [state0, state1], "leftvote", [model_selector0, model_selector1], request
-    )
+    vote_last_response([state0, state1], "leftvote", [model_selector0, model_selector1], request)
     return (None,) + (disable_btn,) * 4
 
 
-def rightvote_last_response(
-    state0, state1, model_selector0, model_selector1, request: gr.Request
-):
+def rightvote_last_response(state0, state1, model_selector0, model_selector1, request: gr.Request):
     logger.info(f"rightvote (named). ip: {get_ip(request)}")
-    vote_last_response(
-        [state0, state1], "rightvote", [model_selector0, model_selector1], request
-    )
+    vote_last_response([state0, state1], "rightvote", [model_selector0, model_selector1], request)
     return (None,) + (disable_btn,) * 4
 
 
-def tievote_last_response(
-    state0, state1, model_selector0, model_selector1, request: gr.Request
-):
+def tievote_last_response(state0, state1, model_selector0, model_selector1, request: gr.Request):
     logger.info(f"tievote (named). ip: {get_ip(request)}")
-    vote_last_response(
-        [state0, state1], "tievote", [model_selector0, model_selector1], request
-    )
+    vote_last_response([state0, state1], "tievote", [model_selector0, model_selector1], request)
     return (None,) + (disable_btn,) * 4
 
 
-def bothbad_vote_last_response(
-    state0, state1, model_selector0, model_selector1, request: gr.Request
-):
+def bothbad_vote_last_response(state0, state1, model_selector0, model_selector1, request: gr.Request):
     logger.info(f"bothbad_vote (named). ip: {get_ip(request)}")
-    vote_last_response(
-        [state0, state1], "bothbad_vote", [model_selector0, model_selector1], request
-    )
+    vote_last_response([state0, state1], "bothbad_vote", [model_selector0, model_selector1], request)
     return (None,) + (disable_btn,) * 4
 
 
@@ -134,33 +112,18 @@ def regenerate(state0, state1, request: gr.Request):
     if state0.regen_support and state1.regen_support:
         for i in range(num_sides):
             states[i].conv.update_last_message(None)
-        return (
-            states
-            + [x.to_gradio_chatbot() for x in states]
-            + [None]
-            + [disable_btn] * 6
-        )
+        return states + [x.to_gradio_chatbot() for x in states] + [None] + [disable_btn] * 6
     states[0].skip_next = True
     states[1].skip_next = True
-    return (
-        states + [x.to_gradio_chatbot() for x in states] + [None] + [no_change_btn] * 6
-    )
+    return states + [x.to_gradio_chatbot() for x in states] + [None] + [no_change_btn] * 6
 
 
 def clear_history(request: gr.Request):
     logger.info(f"clear_history (named). ip: {get_ip(request)}")
-    return (
-        [None] * num_sides
-        + [None] * num_sides
-        + [enable_multimodal]
-        + [invisible_btn] * 4
-        + [disable_btn] * 2
-    )
+    return [None] * num_sides + [None] * num_sides + [enable_multimodal] + [invisible_btn] * 4 + [disable_btn] * 2
 
 
-def add_text(
-    state0, state1, model_selector0, model_selector1, chat_input, request: gr.Request
-):
+def add_text(state0, state1, model_selector0, model_selector1, chat_input, request: gr.Request):
     text, images = chat_input["text"], chat_input["files"]
     ip = get_ip(request)
     logger.info(f"add_text (named). ip: {ip}. len: {len(text)}")
@@ -188,15 +151,11 @@ def add_text(
     model_list = [states[i].model_name for i in range(num_sides)]
     all_conv_text_left = states[0].conv.get_prompt()
     all_conv_text_right = states[0].conv.get_prompt()
-    all_conv_text = (
-        all_conv_text_left[-1000:] + all_conv_text_right[-1000:] + "\nuser: " + text
-    )
+    all_conv_text = all_conv_text_left[-1000:] + all_conv_text_right[-1000:] + "\nuser: " + text
 
     images = convert_images_to_conversation_format(images)
 
-    text, image_flagged, csam_flag = moderate_input(
-        state0, text, all_conv_text, model_list, images, ip
-    )
+    text, image_flagged, csam_flag = moderate_input(state0, text, all_conv_text, model_list, images, ip)
 
     conv = states[0].conv
     if (len(conv.messages) - conv.offset) // 2 >= CONVERSATION_TURN_LIMIT:
@@ -229,9 +188,7 @@ def add_text(
 
     text = text[:INPUT_CHAR_LEN_LIMIT]  # Hard cut-off
     for i in range(num_sides):
-        post_processed_text = _prepare_text_with_image(
-            states[i], text, images, csam_flag=csam_flag
-        )
+        post_processed_text = _prepare_text_with_image(states[i], text, images, csam_flag=csam_flag)
         states[i].conv.append_message(states[i].conv.roles[0], post_processed_text)
         states[i].conv.append_message(states[i].conv.roles[1], None)
         states[i].skip_next = False
@@ -286,9 +243,7 @@ def build_side_by_side_vision_ui_named(models, random_questions=None):
                     open=False,
                 ):
                     model_description_md = get_model_description_md(models)
-                    gr.Markdown(
-                        model_description_md, elem_id="model_description_markdown"
-                    )
+                    gr.Markdown(model_description_md, elem_id="model_description_markdown")
 
                 with gr.Row():
                     for i in range(num_sides):
@@ -313,16 +268,10 @@ def build_side_by_side_vision_ui_named(models, random_questions=None):
                             )
 
     with gr.Row():
-        leftvote_btn = gr.Button(
-            value="👈  A is better", visible=False, interactive=False
-        )
-        rightvote_btn = gr.Button(
-            value="👉  B is better", visible=False, interactive=False
-        )
+        leftvote_btn = gr.Button(value="👈  A is better", visible=False, interactive=False)
+        rightvote_btn = gr.Button(value="👉  B is better", visible=False, interactive=False)
         tie_btn = gr.Button(value="🤝  Tie", visible=False, interactive=False)
-        bothbad_btn = gr.Button(
-            value="👎  Both are bad", visible=False, interactive=False
-        )
+        bothbad_btn = gr.Button(value="👎  Both are bad", visible=False, interactive=False)
 
     with gr.Row():
         textbox = gr.MultimodalTextbox(
@@ -400,15 +349,11 @@ def build_side_by_side_vision_ui_named(models, random_questions=None):
         states + model_selectors,
         [textbox, leftvote_btn, rightvote_btn, tie_btn, bothbad_btn],
     )
-    regenerate_btn.click(
-        regenerate, states, states + chatbots + [textbox] + btn_list
-    ).then(
+    regenerate_btn.click(regenerate, states, states + chatbots + [textbox] + btn_list).then(
         bot_response_multi,
         states + [temperature, top_p, max_output_tokens],
         states + chatbots + btn_list,
-    ).then(
-        flash_buttons, [], btn_list
-    )
+    ).then(flash_buttons, [], btn_list)
     clear_btn.click(clear_history, None, states + chatbots + [textbox] + btn_list)
 
     share_js = """
@@ -434,13 +379,13 @@ function (a, b, c, d) {
     share_btn.click(share_click, states + model_selectors, [], js=share_js)
 
     for i in range(num_sides):
-        model_selectors[i].change(
-            clear_history, None, states + chatbots + [textbox] + btn_list
-        ).then(set_visible_image, [textbox], [image_column])
+        model_selectors[i].change(clear_history, None, states + chatbots + [textbox] + btn_list).then(
+            set_visible_image, [textbox], [image_column]
+        )
 
-    textbox.input(add_image, [textbox], [imagebox]).then(
-        set_visible_image, [textbox], [image_column]
-    ).then(clear_history_example, None, states + chatbots + [textbox] + btn_list)
+    textbox.input(add_image, [textbox], [imagebox]).then(set_visible_image, [textbox], [image_column]).then(
+        clear_history_example, None, states + chatbots + [textbox] + btn_list
+    )
 
     textbox.submit(
         add_text,

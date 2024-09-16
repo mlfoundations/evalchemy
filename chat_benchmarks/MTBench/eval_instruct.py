@@ -6,7 +6,7 @@ import pandas as pd
 import shortuuid
 import time
 import numpy as np
-import json 
+import json
 from concurrent.futures import ThreadPoolExecutor
 
 from fastchat.llm_judge.common import (
@@ -32,27 +32,29 @@ from lm_eval.api.instance import Instance
 from lm_eval.utils import eval_logger
 from typing import List, Optional
 
+
 @dataclass
 class ShowResultsConfig:
     """Configuration for the evaluation script."""
-    
+
     bench_name: str = "mt_bench"
     """Name of the benchmark."""
-    
+
     input_file: str = None
     """Path to the input file."""
-    
+
     judge_model: str = "gpt-4"
     """Model used for judging."""
-    
+
     baseline_model: str = "gpt-3.5-turbo"
     """Baseline model for comparison."""
-    
+
     model_list: Optional[List[str]] = None
     """List of models to be evaluated."""
-    
+
     mode: str = "single"
     """Evaluation mode. Can be 'pairwise-baseline', 'pairwise-all', or 'single'."""
+
 
 @dataclass
 class EvaluateInstructConfig:
@@ -68,6 +70,7 @@ class EvaluateInstructConfig:
     dtype: str = None
     revision: str = "main"
 
+
 @dataclass
 class EvaluateConfig:
     bench_name: str = "mt_bench"
@@ -78,6 +81,7 @@ class EvaluateConfig:
     model_list: list[str] = None
     parallel: int = 4
     first_n: int = None
+
 
 def run_eval(
     model,
@@ -110,7 +114,8 @@ def run_eval(
         dtype=dtype,
         revision=revision,
     )
-    
+
+
 def get_model_answers(
     model,
     model_id,
@@ -124,24 +129,23 @@ def get_model_answers(
     revision,
 ):
     os.makedirs(os.path.dirname(answer_file), exist_ok=True)
-    
+
     # Initialize structures to keep track of conversations and choices
     all_convs = [[] for _ in questions]
-    all_choices = [{"index": 0, "turns": []}  for _ in questions]
-    
+    all_choices = [{"index": 0, "turns": []} for _ in questions]
+
     max_turns = max(len(q["turns"]) for q in questions)
-    
+
     for turn_num in range(max_turns):
         eval_logger.info(f"Processing Turn {turn_num + 1}")
         batch_instances = []
-        
+
         for q_idx, question in enumerate(tqdm(questions)):
             if turn_num < len(question["turns"]):
                 temperature = temperature_config.get(question["category"], 0.7)
                 do_sample = temperature >= 1e-4
-                
-                
-                all_convs[q_idx].append({'role': 'user', 'content': question["turns"][turn_num]})
+
+                all_convs[q_idx].append({"role": "user", "content": question["turns"][turn_num]})
                 conv = all_convs[q_idx]
 
                 prompt = model.apply_chat_template(conv)
@@ -153,18 +157,18 @@ def get_model_answers(
                             prompt,
                             {"max_new_tokens": max_new_token, "do_sample": do_sample, "temperature": temperature},
                         ),
-                        q_idx
+                        q_idx,
                     )
                 )
-        
+
         if batch_instances:
             outputs = model.generate_until(batch_instances)
-            
+
             for q_idx in range(len(outputs)):
                 output = outputs[q_idx]
-                all_convs[q_idx].append({'role': 'assistant', 'content': output})
+                all_convs[q_idx].append({"role": "assistant", "content": output})
                 all_choices[q_idx]["turns"].append(output)
-        
+
         # Write completed questions to file
         for q_idx, question in enumerate(questions):
             if turn_num == len(question["turns"]) - 1:
@@ -177,11 +181,12 @@ def get_model_answers(
                         "tstamp": time.time(),
                     }
                     fout.write(json.dumps(ans_json) + "\n")
-    
+
     eval_logger.info(f"Completed processing all questions. Results written to {answer_file}")
 
+
 def eval_instruct(model):
-    
+
     question_file = f"eval/chat_benchmarks/MTBench/fastchat/llm_judge/data/mt_bench/question.jsonl"
 
     config = EvaluateInstructConfig()
@@ -209,6 +214,7 @@ def eval_instruct(model):
     results["model_id"] = model.model_identifier
     return results
 
+
 def evaluate(results):
     config = EvaluateConfig()
 
@@ -228,21 +234,17 @@ def evaluate(results):
     if config.first_n:
         questions = questions[: config.first_n]
 
-    models = [results['model_id']]
+    models = [results["model_id"]]
     if config.mode == "single":
         judges = make_judge_single(config.judge_model, judge_prompts)
         play_a_match_func = play_a_match_single
-        output_file = (
-            f"eval/chat_benchmarks/MTBench/fastchat/llm_judge/data/mt_bench/model_judgment/gpt-4_single.jsonl"
-        )
+        output_file = f"eval/chat_benchmarks/MTBench/fastchat/llm_judge/data/mt_bench/model_judgment/gpt-4_single.jsonl"
         make_match_func = make_match_single
         baseline_model = None
     else:
         judges = make_judge_pairwise(config.judge_model, judge_prompts)
         play_a_match_func = play_a_match_pair
-        output_file = (
-            f"eval/chat_benchmarks/MTBench/fastchat/llm_judge/data/mt_bench/model_judgment/gpt-4_pair.jsonl"
-        )
+        output_file = f"eval/chat_benchmarks/MTBench/fastchat/llm_judge/data/mt_bench/model_judgment/gpt-4_pair.jsonl"
         if config.mode == "pairwise-all":
             make_match_func = make_match_all_pairs
             baseline_model = None
@@ -257,9 +259,7 @@ def evaluate(results):
 
     # Make matches
     matches = []
-    matches += make_match_func(
-        question_default, models, model_answers, judges["default"], baseline_model
-    )
+    matches += make_match_func(question_default, models, model_answers, judges["default"], baseline_model)
     matches += make_match_func(
         question_math,
         models,
@@ -309,13 +309,12 @@ def evaluate(results):
         np.random.shuffle(matches)
 
         with ThreadPoolExecutor(config.parallel) as executor:
-            for match in tqdm(
-                executor.map(play_a_match_wrapper, matches), total=len(matches)
-            ):
+            for match in tqdm(executor.map(play_a_match_wrapper, matches), total=len(matches)):
                 pass
 
-
-    df_all = pd.read_json(f"eval/chat_benchmarks/MTBench/fastchat/llm_judge/data/mt_bench/model_judgment/gpt-4_single.jsonl", lines=True)
+    df_all = pd.read_json(
+        f"eval/chat_benchmarks/MTBench/fastchat/llm_judge/data/mt_bench/model_judgment/gpt-4_single.jsonl", lines=True
+    )
 
     df = df_all[["model", "score", "turn"]]
     df = df[df["score"] != -1]
@@ -324,7 +323,6 @@ def evaluate(results):
     df_1 = df[df["turn"] == 1].groupby(["model", "turn"]).mean()
     print(df_1.sort_values(by="score", ascending=False))
 
-    
     print("\n########## Second turn ##########")
     df_2 = df[df["turn"] == 2].groupby(["model", "turn"]).mean()
     print(df_2.sort_values(by="score", ascending=False))
@@ -332,5 +330,9 @@ def evaluate(results):
     print("\n########## Average ##########")
     df_3 = df[["model", "score"]].groupby(["model"]).mean()
     print(df_3.sort_values(by="score", ascending=False))
-    results = {"Turn 1": df_1.loc[results['model_id']].score.values[0], "Turn 2": df_2.loc[results['model_id']].score.values[0], "Average": df_3.loc[results['model_id']].score}
+    results = {
+        "Turn 1": df_1.loc[results["model_id"]].score.values[0],
+        "Turn 2": df_2.loc[results["model_id"]].score.values[0],
+        "Average": df_3.loc[results["model_id"]].score,
+    }
     return results

@@ -17,9 +17,7 @@ Creates a directory with images and JSON files for VQA examples. Final json is l
 """
 
 
-def download_images_and_create_json(
-    dataset_info, cache_dir="~/vqa_examples_cache", base_dir="./vqa_examples"
-):
+def download_images_and_create_json(dataset_info, cache_dir="~/vqa_examples_cache", base_dir="./vqa_examples"):
     for dataset_name, info in dataset_info.items():
         dataset_cache_dir = os.path.join(cache_dir, dataset_name)
         os.makedirs(dataset_cache_dir, exist_ok=True)
@@ -32,9 +30,7 @@ def download_images_and_create_json(
                 split=info["split"],
             )
         else:
-            dataset = load_dataset(
-                info["path"], cache_dir=dataset_cache_dir, split=info["split"]
-            )
+            dataset = load_dataset(info["path"], cache_dir=dataset_cache_dir, split=info["split"])
         dataset_dir = os.path.join(base_dir, dataset_name)
         os.makedirs(dataset_dir, exist_ok=True)
 
@@ -106,9 +102,7 @@ if __name__ == "__main__":
         },
     }
 
-    download_images_and_create_json(
-        datasets_info, cache_dir=args.data_dir, base_dir=args.output_dir
-    )
+    download_images_and_create_json(datasets_info, cache_dir=args.data_dir, base_dir=args.output_dir)
     dataset_json = []
     for dataset_name in datasets_info.keys():
         with open(f"{args.output_dir}/{dataset_name}/data.json") as f:

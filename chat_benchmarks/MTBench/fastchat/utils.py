@@ -1,6 +1,7 @@
 """
 Common utilities.
 """
+
 from asyncio import AbstractEventLoop
 from io import BytesIO
 import base64
@@ -39,8 +40,7 @@ def build_logger(logger_name, logger_filename):
         else:
             if platform.system() == "Windows":
                 warnings.warn(
-                    "If you are running on Windows, "
-                    "we recommend you use Python >= 3.9 for UTF-8 encoding."
+                    "If you are running on Windows, " "we recommend you use Python >= 3.9 for UTF-8 encoding."
                 )
             logging.basicConfig(level=logging.INFO)
     logging.getLogger().handlers[0].setFormatter(formatter)
@@ -67,9 +67,7 @@ def build_logger(logger_name, logger_filename):
     if LOGDIR != "":
         os.makedirs(LOGDIR, exist_ok=True)
         filename = os.path.join(LOGDIR, logger_filename)
-        handler = logging.handlers.TimedRotatingFileHandler(
-            filename, when="D", utc=True, encoding="utf-8"
-        )
+        handler = logging.handlers.TimedRotatingFileHandler(filename, when="D", utc=True, encoding="utf-8")
         handler.setFormatter(formatter)
 
         for l in [stdout_logger, stderr_logger, logger]:
@@ -132,11 +130,7 @@ def get_gpu_memory(max_gpus=None):
     import torch
 
     gpu_memory = []
-    num_gpus = (
-        torch.cuda.device_count()
-        if max_gpus is None
-        else min(max_gpus, torch.cuda.device_count())
-    )
+    num_gpus = torch.cuda.device_count() if max_gpus is None else min(max_gpus, torch.cuda.device_count())
 
     for gpu_id in range(num_gpus):
         with torch.cuda.device(gpu_id):
@@ -217,9 +211,7 @@ def clean_flant5_ckpt(ckpt_path):
     weightmap = index_json["weight_map"]
 
     share_weight_file = weightmap["shared.weight"]
-    share_weight = torch.load(os.path.join(ckpt_path, share_weight_file))[
-        "shared.weight"
-    ]
+    share_weight = torch.load(os.path.join(ckpt_path, share_weight_file))["shared.weight"]
 
     for weight_name in ["decoder.embed_tokens.weight", "encoder.embed_tokens.weight"]:
         weight_file = weightmap[weight_name]
@@ -272,9 +264,7 @@ alert_js = """
 """
 
 
-def iter_over_async(
-    async_gen: AsyncGenerator, event_loop: AbstractEventLoop
-) -> Generator:
+def iter_over_async(async_gen: AsyncGenerator, event_loop: AbstractEventLoop) -> Generator:
     """
     Convert async generator to sync generator
 
@@ -462,9 +452,7 @@ def image_moderation_provider(image, api_type):
         print(response)
         return response["IsImageAdultClassified"]
     elif api_type == "csam":
-        endpoint = (
-            "https://api.microsoftmoderator.com/photodna/v1.0/Match?enhance=false"
-        )
+        endpoint = "https://api.microsoftmoderator.com/photodna/v1.0/Match?enhance=false"
         api_key = os.environ["PHOTODNA_API_KEY"]
         response = image_moderation_request(image, endpoint, api_key)
         return response["IsMatch"]

@@ -42,9 +42,7 @@ class ModelArguments:
 
 @dataclass
 class DataArguments:
-    data_path: str = field(
-        default=None, metadata={"help": "Path to the training data."}
-    )
+    data_path: str = field(default=None, metadata={"help": "Path to the training data."})
     lazy_preprocess: bool = False
 
 
@@ -54,9 +52,7 @@ class TrainingArguments(transformers.TrainingArguments):
     optim: str = field(default="adamw_torch")
     model_max_length: int = field(
         default=512,
-        metadata={
-            "help": "Maximum sequence length. Sequences will be right padded (and possibly truncated)."
-        },
+        metadata={"help": "Maximum sequence length. Sequences will be right padded (and possibly truncated)."},
     )
 
 
@@ -155,9 +151,7 @@ def mask_targets(conversations, targets, tokenizer, conv):
         user_turn_separator, assistant_turn_separator = get_prompt_separator(conv)
         turns = conversation.split(user_turn_separator)
         for i, turn in enumerate(turns):
-            if (
-                i < len(turns) - 1 and turn == ""
-            ):  # Last turn is the user_turn_separator
+            if i < len(turns) - 1 and turn == "":  # Last turn is the user_turn_separator
                 break
 
             if i != 0:
@@ -171,9 +165,7 @@ def mask_targets(conversations, targets, tokenizer, conv):
             else:
                 parts = [turn]
 
-            instruction_len = len(
-                tokenizer(parts[0], add_special_tokens=False).input_ids
-            )
+            instruction_len = len(tokenizer(parts[0], add_special_tokens=False).input_ids)
 
             target[cur_len : cur_len + instruction_len] = IGNORE_TOKEN_ID
             cur_len += turn_len
@@ -188,16 +180,11 @@ def mask_targets(conversations, targets, tokenizer, conv):
         if cur_len < tokenizer.model_max_length:
             if cur_len != total_len:
                 target[:] = IGNORE_TOKEN_ID
-                rank0_print(
-                    f"WARNING: tokenization mismatch: {cur_len} vs. {total_len}."
-                    f" (ignored)"
-                )
+                rank0_print(f"WARNING: tokenization mismatch: {cur_len} vs. {total_len}." f" (ignored)")
     return targets
 
 
-def preprocess(
-    sources, tokenizer: transformers.PreTrainedTokenizer, template_id, **kwargs
-) -> Dict:
+def preprocess(sources, tokenizer: transformers.PreTrainedTokenizer, template_id, **kwargs) -> Dict:
     systems = None if not kwargs else kwargs.get("systems", None)
 
     # If the data volume is small, process it directly in the main thread
@@ -207,15 +194,9 @@ def preprocess(
         targets = mask_targets(conversations, targets, tokenizer, conv)
     else:  # If the data volume is large, use multithreading for processing
         with Pool() as p:
-            conversations, conv = p.apply_async(
-                apply_prompt_template, (sources, template_id, systems)
-            ).get()
-            input_ids, targets = p.apply_async(
-                tokenize_conversations, (conversations, tokenizer)
-            ).get()
-            targets = p.apply_async(
-                mask_targets, (conversations, targets, tokenizer, conv)
-            ).get()
+            conversations, conv = p.apply_async(apply_prompt_template, (sources, template_id, systems)).get()
+            input_ids, targets = p.apply_async(tokenize_conversations, (conversations, tokenizer)).get()
+            targets = p.apply_async(mask_targets, (conversations, targets, tokenizer, conv)).get()
             p.close()
             p.join()
 
@@ -229,9 +210,7 @@ def preprocess(
 class SupervisedDataset(Dataset):
     """Dataset for supervised fine-tuning."""
 
-    def __init__(
-        self, raw_data, tokenizer: transformers.PreTrainedTokenizer, template_id
-    ):
+    def __init__(self, raw_data, tokenizer: transformers.PreTrainedTokenizer, template_id):
         super(SupervisedDataset, self).__init__()
 
         rank0_print("Formatting inputs...")
@@ -258,9 +237,7 @@ class SupervisedDataset(Dataset):
 class LazySupervisedDataset(Dataset):
     """Dataset for supervised fine-tuning."""
 
-    def __init__(
-        self, raw_data, tokenizer: transformers.PreTrainedTokenizer, template_id
-    ):
+    def __init__(self, raw_data, tokenizer: transformers.PreTrainedTokenizer, template_id):
         super(LazySupervisedDataset, self).__init__()
         self.tokenizer = tokenizer
         self.template_id = template_id
@@ -300,9 +277,7 @@ def make_supervised_data_module(
 ) -> Dict:
     """Make dataset and collator for supervised fine-tuning."""
     train_ratio = min(train_ratio, 1.0)
-    dataset_cls = (
-        LazySupervisedDataset if data_args.lazy_preprocess else SupervisedDataset
-    )
+    dataset_cls = LazySupervisedDataset if data_args.lazy_preprocess else SupervisedDataset
     rank0_print("Loading data...")
     data_path = data_args.data_path
     if data_path.endswith(".json"):
@@ -325,21 +300,15 @@ def make_supervised_data_module(
     eval_raw_data = [raw_data[i] for i in eval_indices]
     rank0_print(f"#train {len(train_raw_data)}, #eval {len(eval_raw_data)}")
 
-    train_dataset = dataset_cls(
-        train_raw_data, tokenizer=tokenizer, template_id=template_id
-    )
-    eval_dataset = dataset_cls(
-        eval_raw_data, tokenizer=tokenizer, template_id=template_id
-    )
+    train_dataset = dataset_cls(train_raw_data, tokenizer=tokenizer, template_id=template_id)
+    eval_dataset = dataset_cls(eval_raw_data, tokenizer=tokenizer, template_id=template_id)
     return dict(train_dataset=train_dataset, eval_dataset=eval_dataset)
 
 
 def train():
     global local_rank
 
-    parser = transformers.HfArgumentParser(
-        (ModelArguments, DataArguments, TrainingArguments)
-    )
+    parser = transformers.HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
     local_rank = training_args.local_rank
     config = transformers.AutoConfig.from_pretrained(
@@ -384,9 +353,7 @@ def train():
         train_ratio=0.98,
         data_args=data_args,
     )
-    trainer = Trainer(
-        model=model, tokenizer=tokenizer, args=training_args, **data_module
-    )
+    trainer = Trainer(model=model, tokenizer=tokenizer, args=training_args, **data_module)
 
     if list(pathlib.Path(training_args.output_dir).glob("checkpoint-*")):
         trainer.train(resume_from_checkpoint=True)

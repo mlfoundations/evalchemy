@@ -13,6 +13,7 @@ Other commands:
 - Type "!!save <filename>" to save the conversation history to a json file.
 - Type "!!load <filename>" to load a conversation history from a json file.
 """
+
 import argparse
 import os
 import re
@@ -192,9 +193,7 @@ class ProgrammaticChatIO(ChatIO):
 def main(args):
     if args.gpus:
         if len(args.gpus.split(",")) < args.num_gpus:
-            raise ValueError(
-                f"Larger --num-gpus ({args.num_gpus}) than --gpus {args.gpus}!"
-            )
+            raise ValueError(f"Larger --num-gpus ({args.num_gpus}) than --gpus {args.gpus}!")
         os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
         os.environ["XPU_VISIBLE_DEVICES"] = args.gpus
     if args.enable_exllama:
@@ -263,12 +262,8 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     add_model_args(parser)
-    parser.add_argument(
-        "--conv-template", type=str, default=None, help="Conversation prompt template."
-    )
-    parser.add_argument(
-        "--conv-system-msg", type=str, default=None, help="Conversation system message."
-    )
+    parser.add_argument("--conv-template", type=str, default=None, help="Conversation prompt template.")
+    parser.add_argument("--conv-system-msg", type=str, default=None, help="Conversation system message.")
     parser.add_argument("--temperature", type=float, default=0.7)
     parser.add_argument("--repetition_penalty", type=float, default=1.0)
     parser.add_argument("--max-new-tokens", type=int, default=512)

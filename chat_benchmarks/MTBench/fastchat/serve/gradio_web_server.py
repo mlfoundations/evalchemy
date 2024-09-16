@@ -51,9 +51,7 @@ no_change_btn = gr.Button()
 enable_btn = gr.Button(interactive=True, visible=True)
 disable_btn = gr.Button(interactive=False)
 invisible_btn = gr.Button(interactive=False, visible=False)
-enable_text = gr.Textbox(
-    interactive=True, visible=True, placeholder="👉 Enter your prompt and press ENTER"
-)
+enable_text = gr.Textbox(interactive=True, visible=True, placeholder="👉 Enter your prompt and press ENTER")
 disable_text = gr.Textbox(
     interactive=False,
     visible=True,
@@ -237,9 +235,7 @@ def load_demo(url_params, request: gr.Request):
     logger.info(f"load_demo. ip: {ip}. params: {url_params}")
 
     if args.model_list_mode == "reload":
-        models, all_models = get_model_list(
-            controller_url, args.register_api_endpoint_file, vision_arena=False
-        )
+        models, all_models = get_model_list(controller_url, args.register_api_endpoint_file, vision_arena=False)
 
     return load_demo_single(models, url_params)
 
@@ -334,9 +330,7 @@ def add_text(state, model_selector, text, request: gr.Request):
     if (len(state.conv.messages) - state.conv.offset) // 2 >= CONVERSATION_TURN_LIMIT:
         logger.info(f"conversation turn limit. ip: {ip}. text: {text}")
         state.skip_next = True
-        return (state, state.to_gradio_chatbot(), CONVERSATION_LIMIT_MSG, None) + (
-            no_change_btn,
-        ) * 5
+        return (state, state.to_gradio_chatbot(), CONVERSATION_LIMIT_MSG, None) + (no_change_btn,) * 5
 
     text = text[:INPUT_CHAR_LEN_LIMIT]  # Hard cut-off
     state.conv.append_message(state.conv.roles[0], text)
@@ -390,9 +384,7 @@ def model_worker_stream_iter(
 def is_limit_reached(model_name, ip):
     monitor_url = "http://localhost:9090"
     try:
-        ret = requests.get(
-            f"{monitor_url}/is_limit_reached?model={model_name}&user_id={ip}", timeout=1
-        )
+        ret = requests.get(f"{monitor_url}/is_limit_reached?model={model_name}&user_id={ip}", timeout=1)
         obj = ret.json()
         return obj
     except Exception as e:
@@ -432,16 +424,12 @@ def bot_response(
             return
 
     conv, model_name = state.conv, state.model_name
-    model_api_dict = (
-        api_endpoint_info[model_name] if model_name in api_endpoint_info else None
-    )
+    model_api_dict = api_endpoint_info[model_name] if model_name in api_endpoint_info else None
     images = conv.get_images()
 
     if model_api_dict is None:
         # Query worker address
-        ret = requests.post(
-            controller_url + "/get_worker_address", json={"model": model_name}
-        )
+        ret = requests.post(controller_url + "/get_worker_address", json={"model": model_name})
         worker_addr = ret.json()["address"]
         logger.info(f"model_name: {model_name}, worker_addr: {worker_addr}")
 
@@ -490,9 +478,7 @@ def bot_response(
             if recommended_config is not None:
                 temperature = recommended_config.get("temperature", temperature)
                 top_p = recommended_config.get("top_p", top_p)
-                max_new_tokens = recommended_config.get(
-                    "max_new_tokens", max_new_tokens
-                )
+                max_new_tokens = recommended_config.get("max_new_tokens", max_new_tokens)
 
         stream_iter = get_api_provider_stream_iter(
             conv,
@@ -533,10 +519,7 @@ def bot_response(
         conv.update_last_message(output)
         yield (state, state.to_gradio_chatbot()) + (enable_btn,) * 5
     except requests.exceptions.RequestException as e:
-        conv.update_last_message(
-            f"{SERVER_ERROR_MSG}\n\n"
-            f"(error_code: {ErrorCode.GRADIO_REQUEST_ERROR}, {e})"
-        )
+        conv.update_last_message(f"{SERVER_ERROR_MSG}\n\n" f"(error_code: {ErrorCode.GRADIO_REQUEST_ERROR}, {e})")
         yield (state, state.to_gradio_chatbot()) + (
             disable_btn,
             disable_btn,
@@ -547,8 +530,7 @@ def bot_response(
         return
     except Exception as e:
         conv.update_last_message(
-            f"{SERVER_ERROR_MSG}\n\n"
-            f"(error_code: {ErrorCode.GRADIO_STREAM_UNKNOWN_ERROR}, {e})"
+            f"{SERVER_ERROR_MSG}\n\n" f"(error_code: {ErrorCode.GRADIO_STREAM_UNKNOWN_ERROR}, {e})"
         )
         yield (state, state.to_gradio_chatbot()) + (
             disable_btn,
@@ -562,13 +544,9 @@ def bot_response(
     finish_tstamp = time.time()
     logger.info(f"{output}")
 
-    conv.save_new_images(
-        has_csam_images=state.has_csam_image, use_remote_storage=use_remote_storage
-    )
+    conv.save_new_images(has_csam_images=state.has_csam_image, use_remote_storage=use_remote_storage)
 
-    filename = get_conv_log_filename(
-        is_vision=state.is_vision, has_csam_image=state.has_csam_image
-    )
+    filename = get_conv_log_filename(is_vision=state.is_vision, has_csam_image=state.has_csam_image)
 
     with open(filename, "a") as fout:
         data = {
@@ -1038,9 +1016,7 @@ if __name__ == "__main__":
 
     # Set global variables
     set_global_vars(args.controller_url, args.moderate, args.use_remote_storage)
-    models, all_models = get_model_list(
-        args.controller_url, args.register_api_endpoint_file, vision_arena=False
-    )
+    models, all_models = get_model_list(args.controller_url, args.register_api_endpoint_file, vision_arena=False)
 
     # Set authorization credentials
     auth = None

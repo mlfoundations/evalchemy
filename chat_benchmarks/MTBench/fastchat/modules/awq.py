@@ -10,9 +10,7 @@ from transformers import AutoTokenizer, AutoConfig, AutoModelForCausalLM, modeli
 class AWQConfig:
     ckpt: str = field(
         default=None,
-        metadata={
-            "help": "Load quantized model. The path to the local AWQ checkpoint."
-        },
+        metadata={"help": "Load quantized model. The path to the local AWQ checkpoint."},
     )
     wbits: int = field(default=16, metadata={"help": "#bits to use for quantization"})
     groupsize: int = field(
@@ -34,9 +32,7 @@ def load_awq_quantized(model_name, awq_config: AWQConfig, device):
         sys.exit(-1)
 
     config = AutoConfig.from_pretrained(model_name, trust_remote_code=True)
-    tokenizer = AutoTokenizer.from_pretrained(
-        model_name, use_fast=False, trust_remote_code=True
-    )
+    tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=False, trust_remote_code=True)
 
     def skip(*args, **kwargs):
         pass

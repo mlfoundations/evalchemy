@@ -88,9 +88,7 @@ def load_demo(url_params, request: gr.Request):
     side_by_side_anony_updates = load_demo_side_by_side_anony(all_models, url_params)
     side_by_side_named_updates = load_demo_side_by_side_named(models, url_params)
 
-    side_by_side_vision_anony_updates = load_demo_side_by_side_vision_anony(
-        all_models, all_vl_models, url_params
-    )
+    side_by_side_vision_anony_updates = load_demo_side_by_side_vision_anony(all_models, all_vl_models, url_params)
 
     return (
         (gr.Tabs(selected=inner_selected),)
@@ -149,22 +147,13 @@ window.__gradio_mode__ = "app";
 
             with gr.Tab("💬 Direct Chat", id=3) as direct_tab:
                 direct_tab.select(None, None, None, js=alert_js)
-                single_model_list = build_single_model_ui(
-                    models, add_promotion_links=True
-                )
+                single_model_list = build_single_model_ui(models, add_promotion_links=True)
 
-            demo_tabs = (
-                [inner_tabs]
-                + single_model_list
-                + side_by_side_anony_list
-                + side_by_side_named_list
-            )
+            demo_tabs = [inner_tabs] + single_model_list + side_by_side_anony_list + side_by_side_named_list
 
             if elo_results_file:
                 with gr.Tab("🏆 Leaderboard", id=4):
-                    build_leaderboard_tab(
-                        elo_results_file, leaderboard_table_file, show_plot=True
-                    )
+                    build_leaderboard_tab(elo_results_file, leaderboard_table_file, show_plot=True)
 
             with gr.Tab("ℹ️ About Us", id=5):
                 about = build_about()
@@ -222,12 +211,8 @@ if __name__ == "__main__":
         action="store_true",
         help="Shows term of use before loading the demo",
     )
-    parser.add_argument(
-        "--vision-arena", action="store_true", help="Show tabs for vision arena."
-    )
-    parser.add_argument(
-        "--random-questions", type=str, help="Load random questions from a JSON file"
-    )
+    parser.add_argument("--vision-arena", action="store_true", help="Show tabs for vision arena.")
+    parser.add_argument("--random-questions", type=str, help="Load random questions from a JSON file")
     parser.add_argument(
         "--register-api-endpoint-file",
         type=str,
@@ -239,12 +224,8 @@ if __name__ == "__main__":
         help='Set the gradio authentication file path. The file should contain one or more user:password pairs in this format: "u1:p1,u2:p2,u3:p3"',
         default=None,
     )
-    parser.add_argument(
-        "--elo-results-file", type=str, help="Load leaderboard results and plots"
-    )
-    parser.add_argument(
-        "--leaderboard-table-file", type=str, help="Load leaderboard results and plots"
-    )
+    parser.add_argument("--elo-results-file", type=str, help="Load leaderboard results and plots")
+    parser.add_argument("--leaderboard-table-file", type=str, help="Load leaderboard results and plots")
     parser.add_argument(
         "--gradio-root-path",
         type=str,

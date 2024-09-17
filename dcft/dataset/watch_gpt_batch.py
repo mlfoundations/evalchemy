@@ -25,7 +25,8 @@ class BatchWatcher:
                 if batch_id in completed_batches:
                     continue
                 batch = self.client.batches.retrieve(batch_id)
-                logging.info(f"Batch {batch_id} status: {batch.status}")
+                logging.info(f"Batch {batch_id} status: {batch.status} "
+                             f"request_counts: {batch.request_counts}")
 
                 if batch.status in ["completed", "failed", "expired", "cancelled"]:
                     logging.info(f"Batch {batch_id} processing finished with status: {batch.status}")

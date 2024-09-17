@@ -49,10 +49,7 @@ This script will create and submit multiple batch jobs if necessary, depending o
 
 ### Step 2: Monitor and Download Results
 
-You can view batches and their progress (number of requests completed out of total) in your dashboard: https://platform.openai.com/batches/.
-
-
-Alternatively, you can monitor all the jobs using `watch_gpt_batch.py`. After running the reannotate.py script with the --batch flag, you will see an output similar to this:
+You can monitor all the jobs using `watch_gpt_batch.py`. After running the reannotate.py script with the --batch flag, you will see an output similar to this:
 
 ```
 Run python dcft/dataset/watch_gpt_batch.py --batch_ids batch_id1,batch_id2 --dataset glaiveai/glaive-code-assistant --annotator gpt-4o-mini to monitor the batch and download its results
@@ -62,6 +59,8 @@ Run the provided script to monitor the batch process and download the results. T
 - Monitor the batch process until completion by checking the status of the batch every X seconds (default: 60 seconds)
 - Download and process the results
 - Save the reannotated dataset
+
+Alternatively, you can view batches and their progress (number of requests completed out of total) in your dashboard: https://platform.openai.com/batches/.
 
 ### Internals
 

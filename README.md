@@ -9,6 +9,8 @@ python dcft/dataset/reannotate.py --annotator gpt-4o-2024-08-06 --dataset (path-
 ```
 If you are using a OpenAI model as an annotator (default) then set your OpenAI API key with `export OPENAI_API_KEY=(your key here)`.
 
+See [dcft/dataset/README.md](dcft/dataset/README.md) for more advanced usage, such as batch processing and resuming interrupted jobs.
+
 The results will be saved as a JSON with the following format:
 ```
 [
@@ -34,7 +36,6 @@ The results will be saved as a JSON with the following format:
     - self.user_prompts --> One string per sample.
     - self.annotations_original --> These are the ground truth responses from the initial dataset. May be blank if not present.
 2. Add your dataset to [dataset/hf/\_\_init\_\_.py](dataset/hf/__init__.py)
-
 
 ### Implementing new annotators for reannotation
 Currently the pipeline supports all OpenAI models, as well as Llama3-405B through the SambaNova API.

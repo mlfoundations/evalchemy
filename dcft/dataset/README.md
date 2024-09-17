@@ -34,7 +34,7 @@ python reannotate.py --annotator <annotator_name> --dataset <path_to_dataset> --
 
 ### Batch Processing (OpenAI only)
 
-For large datasets, you can use batch processing with OpenAI's API.
+For large datasets, you can use batch processing with [OpenAI's batch API](https://platform.openai.com/docs/guides/batch/overview) which is [50% cheaper](https://openai.com/api/pricing/).
 
 ### Step 1: Initiate Batch Processing
 
@@ -106,6 +106,6 @@ During processing, the scripts create temporary files to allow for resuming inte
 
 ## Notes
 
-- Ensure you have the necessary API keys and permissions set up for the chosen annotator.
+- Ensure you have the necessary API keys and permissions set up for the chosen annotator. (e.g. `OPENAI_API_KEY` environment variable)
 - For batch processing, make sure you have sufficient API quota and credits.
 - Always check the output and error files to ensure successful processing.

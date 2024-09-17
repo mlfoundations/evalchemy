@@ -14,14 +14,14 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 from human_eval.evaluation import evaluate_functional_correctness
 
 
-def build_deepseekcoder_instruction(languge: str, question: str):
+def build_deepseekcoder_instruction(language: str, question: str):
     return """
 Please continue to complete the function. You are not allowed to modify the given code and do the completion only. Please return all completed function in a codeblock. Here is the given code to do completion:
 ```{}
 {}
 ```
 """.strip().format(
-        languge.lower(), question.strip()
+        language.lower(), question.strip()
     )
 
 def eval_instruct(model):

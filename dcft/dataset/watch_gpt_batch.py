@@ -19,6 +19,7 @@ class BatchWatcher:
                 print(f"Batch processing finished with status: {batch.status}")
                 return batch
             
+            print(f"Sleeping for {self.check_interval} seconds...")
             time.sleep(self.check_interval)
 
     def download_results(self, output_path):

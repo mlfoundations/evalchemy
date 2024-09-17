@@ -3,6 +3,7 @@ import json
 import os
 import uuid
 from datetime import datetime
+import logging
 
 import yaml
 
@@ -11,11 +12,13 @@ from dcft.dataset.generation import GenerationConfig
 from dcft.dataset.hf import get_dataclass_from_path
 
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 def regenerate_dataset(args):
     # Load data
     data = get_dataclass_from_path(args.dataset)
     assert len(data.system_prompts) == len(data.user_prompts)
-    print(f"Reannotating {len(data.system_prompts)} samples")
+    logging.info(f"Reannotating {len(data.system_prompts)} samples")
 
     # Do generation
     annotator_config = AnnotatorConfig(args)
@@ -31,8 +34,8 @@ def regenerate_dataset(args):
         assert data.batch_object is not None
         with open(f"{args.save_dir}/{save_name}/batch_object.json", "w") as f:
             json.dump(data.batch_object.model_dump(), f, indent=4)
-        print(f"Batch object saved to {args.save_dir}/{save_name}/batch_object.json")
-        print(
+        logging.info(f"Batch object saved to {args.save_dir}/{save_name}/batch_object.json")
+        logging.info(
             f"Run `python dcft/dataset/watch_gpt_batch.py --batch_id "
             f"{data.batch_object.id} --dataset {args.dataset} --annotator {args.annotator}` "
             f" to monitor the batch and download its results."

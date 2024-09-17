@@ -1,0 +1,111 @@
+# Dataset Reannotation Tools
+
+This directory contains scripts for reannotating datasets.
+
+## reannotate.py
+
+This script allows you to reannotate existing datasets using various annotators and write
+the results to `datasets/reannotated/<dataset_name>_<annotator>/reannotated.json` by default (you can
+change this with the `--save_dir` flag).
+
+### Online Processing
+
+To reannotate a dataset without resuming:
+
+```bash
+python reannotate.py --annotator <annotator_name> --dataset <path_to_dataset>
+```
+
+
+For example, running the following command will reannotate the `glaiveai/glaive-code-assistant` dataset with the `gpt-4o-mini` annotator:
+
+```bash
+python reannotate.py --annotator gpt-4o-mini --dataset glaiveai/glaive-code-assistant
+```
+
+You can find the reannotated dataset at `datasets/reannotated/glaiveai_glaive-code-assistant_gpt-4o-mini/reannotated.json`.
+
+#### Resuming from a previous run
+To resume from a previous run:
+
+```bash
+python reannotate.py --annotator <annotator_name> --dataset <path_to_dataset> --resume
+```
+
+### Batch Processing (OpenAI only)
+
+For large datasets, you can use batch processing with OpenAI's API.
+
+### Step 1: Initiate Batch Processing
+
+Use the `--batch` flag with `reannotate.py`:
+
+```bash
+python reannotate.py --annotator <gpt_annotator> --dataset <path_to_dataset> --batch
+```
+
+Optional arguments:
+- `--output_file`: Path to save batch results (default: "batch_results.jsonl")
+- `--error_file`: Path to save batch errors (default: "batch_errors.jsonl")
+- `--save_dir`: Directory to save processed results (default: "datasets/reannotated")
+
+This script will monitor the batch job, download results when complete, and save the reannotated dataset.
+
+### Step 2: Monitor and Download Results
+
+After running the reannotate.py script with the --batch flag, you will see an output similar to this:
+
+```
+Run python dcft/dataset/watch_gpt_batch.py --batch_id batch_16wSsxg5PCkbWKTNcQHJztc1 --dataset glaiveai/glaive-code-assistant --annotator gpt-4o-mini to monitor the batch and download its results
+```
+
+Run the provided script to monitor the batch process and download the results. This script will:
+- Monitor the batch process until completion by checking the status of the batch every X seconds (default: 60 seconds)
+- Download and process the results
+- Save the reannotated dataset
+
+### Internals
+
+#### Output Files
+
+The reannotate.py script generates the following files:
+
+1. Reannotated dataset: `<save_dir>/<dataset_name>_<annotator>/reannotated.json`
+   - Contains the reannotated data with original and new annotations.
+2. Configuration file: `<save_dir>/<dataset_name>_<annotator>/config.yaml`
+   - Stores the configuration used for the reannotation process.
+
+#### Temporary Files
+
+During processing, the scripts create temporary files to allow for resuming interrupted operations and monitoring status:
+
+1. Jobs file: `datasets/temp/<dataset_name>_<annotator>/jobs.json` or `datasets/temp/<dataset_name>_<annotator>/jobs_batch.json`
+   - Contains the job dictionaries for API requests.
+   - Used in both online and batch processing.
+   - Created by the `_create_and_write_jobs` method in the `GPTAnnotator` class.
+
+2. Output file: `datasets/temp/<dataset_name>_<annotator>/output.jsonl`
+   - Used in online processing.
+   - Contains the raw output from the API requests.
+   - Created by the `process_api_requests_from_file` function.
+
+3. Log file: `datasets/temp/<dataset_name>_<annotator>/output.log`
+   - Used in online processing.
+   - Contains logs from the parallel processing of API requests.
+   - Created by the `process_api_requests_from_file` function.
+
+4. Batch object file (for batch processing): `<save_dir>/<dataset_name>_<annotator>/batch_object.json`
+   - Contains information about the initiated batch job.
+   - Created by the `regenerate_dataset` function in `reannotate.py`.
+
+5. Batch results file (for batch processing): Specified by `--output_file` (default: "batch_results.jsonl")
+   - Contains the raw results from the OpenAI API.
+   
+6. Batch errors file (for batch processing): Specified by `--error_file` (default: "batch_errors.jsonl")
+   - Contains any errors encountered during the batch process.
+
+## Notes
+
+- Ensure you have the necessary API keys and permissions set up for the chosen annotator.
+- For batch processing, make sure you have sufficient API quota and credits.
+- Always check the output and error files to ensure successful processing.

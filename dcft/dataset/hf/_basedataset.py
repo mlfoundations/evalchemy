@@ -14,6 +14,7 @@ class BaseFTDataset:
         self.user_prompts = []
         self.annotations_original = []
         self.annotations = []
+        self.batch_object = None
 
     def __len__(self):
         return len(self.data)

@@ -22,19 +22,24 @@ def regenerate_dataset(args):
     annotator.annotate(data, generation_config)
 
     # Save outputs
-    assert len(data.annotations) == len(data.user_prompts)
     os.makedirs(args.save_dir, exist_ok=True)
-    save_out = [{
-                "system_prompt": data.system_prompts[idx],
-                "user_prompt": data.user_prompts[idx],
-                "annotation_original": data.annotations_original[idx],
-                "annotation": data.annotations[idx]
-            } for idx in range(len(data.annotations))]
-    
     save_name = f"{args.dataset.replace('/', '_')}_{args.annotator}"
     os.makedirs(f"{args.save_dir}/{save_name}", exist_ok=True)
-    with open(f"{args.save_dir}/{save_name}/reannotated.json", 'w') as f:
-        json.dump(save_out, f, indent=4)
+    if args.batch:
+        assert data.batch_object is not None
+        with open(f"{args.save_dir}/{save_name}/batch_object.json", 'w') as f:
+            json.dump(data.batch_object.model_dump(), f, indent=4)
+        print(f"Batch object saved to {args.save_dir}/{save_name}/batch_object.json")
+    else:
+        assert len(data.annotations) == len(data.user_prompts)
+        save_out = [{
+                    "system_prompt": data.system_prompts[idx],
+                    "user_prompt": data.user_prompts[idx],
+                    "annotation_original": data.annotations_original[idx],
+                    "annotation": data.annotations[idx]
+                } for idx in range(len(data.annotations))]
+        with open(f"{args.save_dir}/{save_name}/reannotated.json", 'w') as f:
+            json.dump(save_out, f, indent=4)
         
 
 def main():
@@ -43,7 +48,9 @@ def main():
     parser.add_argument("--dataset", type=str, required=True, help="")
     parser.add_argument("--save_dir", type=str, default="datasets/reannotated")
     parser.add_argument("--resume", action="store_true", help="Resume from a previous run")
-
+    parser.add_argument("--batch", action="store_true",
+        help="Whether to run in batch mode, available for GPT API annotator only")
+    
     # Generation parameters
     parser.add_argument("--temperature", type=float, default=1.0)
     parser.add_argument("--top_p", type=float, default=1.0)

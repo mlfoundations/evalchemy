@@ -27,6 +27,7 @@ class AnnotatorConfig:
         if ANNOTATOR_MAP[args.annotator] is GPTAnnotator:
             self.max_requests_per_minute = args.max_requests_per_minute
             self.max_tokens_per_minute = args.max_tokens_per_minute
+            self.batch = args.batch
 
 
 def get_annotator(annotator_name, annotator_config, **kwargs):

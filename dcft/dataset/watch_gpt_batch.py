@@ -59,8 +59,6 @@ def watch(args):
         
         # Restore data object
         data = get_dataclass_from_path(args.dataset)
-        data.user_prompts = data.user_prompts[:2]
-        data.system_prompts = data.system_prompts[:2]
         n = len(data.user_prompts)
 
         # Process batch results

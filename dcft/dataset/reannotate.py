@@ -14,8 +14,6 @@ from dcft.dataset.hf import get_dataclass_from_path
 def regenerate_dataset(args):
     # Load data
     data = get_dataclass_from_path(args.dataset)
-    data.user_prompts = data.user_prompts[:2]
-    data.system_prompts = data.system_prompts[:2]
     assert len(data.system_prompts) == len(data.user_prompts)
     print(f"Reannotating {len(data.system_prompts)} samples")
 
@@ -56,7 +54,7 @@ def regenerate_dataset(args):
 
 def main():
     parser = argparse.ArgumentParser(description="Process some integers.")
-    parser.add_argument("--annotator", type=str, default="gpt-4o-2024-08-06", choices=list(ANNOTATOR_MAP.keys()))
+    parser.add_argument("--annotator", type=str, default="gpt-4o-mini", choices=list(ANNOTATOR_MAP.keys()))
     parser.add_argument("--dataset", type=str, required=True, help="")
     parser.add_argument("--save_dir", type=str, default="datasets/reannotated")
     parser.add_argument("--resume", action="store_true", help="Resume from a previous run")

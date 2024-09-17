@@ -22,7 +22,7 @@ def get_rate_limits(annotator):
     response = requests.post(
         "https://api.openai.com/v1/chat/completions", 
         headers={"Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}"}, 
-        json={"model": annotator, "messages": [{"role": "user", "content": "Hello"}]}
+        json={"model": annotator, "messages": []}
     )
     
     # Extract rate limit information from headers

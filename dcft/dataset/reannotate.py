@@ -1,15 +1,47 @@
-import os
-import json
-import yaml
 import argparse
+import json
+import os
 import uuid
 from datetime import datetime
-from dcft.dataset.hf import get_dataclass_from_path
-from dcft.dataset.annotators import get_annotator, ANNOTATOR_MAP, AnnotatorConfig
+
+import requests
+import yaml
+
+from dcft.dataset.annotators import (
+    ANNOTATOR_MAP,
+    AnnotatorConfig,
+    get_annotator,
+    is_gpt_annotator,
+)
 from dcft.dataset.generation import GenerationConfig
+from dcft.dataset.hf import get_dataclass_from_path
+
+
+def get_rate_limits(annotator):
+    # Send a dummy request to get rate limit information
+    response = requests.post(
+        "https://api.openai.com/v1/chat/completions", 
+        headers={"Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}"}, 
+        json={"model": annotator, "messages": [{"role": "user", "content": "Hello"}]}
+    )
+    
+    # Extract rate limit information from headers
+    max_requests = int(response.headers.get('x-ratelimit-limit-requests', 1500))
+    max_tokens = int(response.headers.get('x-ratelimit-limit-tokens', 6250000))
+    
+    return max_requests, max_tokens
 
 
 def regenerate_dataset(args):
+    # Get rate limits
+    if is_gpt_annotator(args.annotator):
+        max_requests, max_tokens = get_rate_limits(args.annotator)
+        args.max_requests_per_minute = max_requests
+        args.max_tokens_per_minute = max_tokens 
+    
+    print(f"Setting max_requests_per_minute to {args.max_requests_per_minute}")
+    print(f"Setting max_tokens_per_minute to {args.max_tokens_per_minute}")
+
     # Load data
     data = get_dataclass_from_path(args.dataset)
     assert len(data.system_prompts) == len(data.user_prompts)
@@ -52,8 +84,6 @@ def main():
 
     # GPT API annotator parameters
     # More details at https://platform.openai.com/docs/api-reference/chat/create
-    parser.add_argument("--max_requests_per_minute", type=int, default=1500)
-    parser.add_argument("--max_tokens_per_minute", type=int, default=6250000)
     parser.add_argument("--frequency_penalty", type=float, default=0)
     parser.add_argument("--logit_bias", type=str, default=None)
     parser.add_argument("--logprobs", type=bool, default=False)

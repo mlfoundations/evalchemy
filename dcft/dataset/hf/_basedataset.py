@@ -1,5 +1,7 @@
 import json
+
 from datasets import load_dataset
+
 
 class BaseFTDataset:
     def __init__(self, data_path):
@@ -14,7 +16,7 @@ class BaseFTDataset:
         self.user_prompts = []
         self.annotations_original = []
         self.annotations = []
-        self.batch_object = None
+        self.batch_objects = None
 
     def __len__(self):
         return len(self.data)

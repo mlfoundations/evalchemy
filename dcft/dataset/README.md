@@ -34,7 +34,7 @@ python reannotate.py --annotator <annotator_name> --dataset <path_to_dataset> --
 
 ### Batch Processing (OpenAI only)
 
-For large datasets, you can use batch processing with [OpenAI's batch API](https://platform.openai.com/docs/guides/batch/overview) which is [50% cheaper](https://openai.com/api/pricing/).
+For large datasets, you can use batch processing with [OpenAI's batch API](https://platform.openai.com/docs/guides/batch/overview) which is [50% cheaper](https://openai.com/api/pricing/). The script automatically chunks the data into batches of 50,000 examples or less to comply with OpenAI's batch API limits.
 
 ### Step 1: Initiate Batch Processing
 
@@ -44,19 +44,15 @@ Use the `--batch` flag with `reannotate.py`:
 python reannotate.py --annotator <gpt_annotator> --dataset <path_to_dataset> --batch
 ```
 
-Optional arguments:
-- `--output_file`: Path to save batch results (default: "batch_results.jsonl")
-- `--error_file`: Path to save batch errors (default: "batch_errors.jsonl")
-- `--save_dir`: Directory to save processed results (default: "datasets/reannotated")
 
-This script will monitor the batch job, download results when complete, and save the reannotated dataset.
+This script will create and submit multiple batch jobs if necessary, depending on the size of your dataset.
 
 ### Step 2: Monitor and Download Results
 
 After running the reannotate.py script with the --batch flag, you will see an output similar to this:
 
 ```
-Run python dcft/dataset/watch_gpt_batch.py --batch_id batch_16wSsxg5PCkbWKTNcQHJztc1 --dataset glaiveai/glaive-code-assistant --annotator gpt-4o-mini to monitor the batch and download its results
+Run python dcft/dataset/watch_gpt_batch.py --batch_ids batch_id1,batch_id2 --dataset glaiveai/glaive-code-assistant --annotator gpt-4o-mini to monitor the batch and download its results
 ```
 
 Run the provided script to monitor the batch process and download the results. This script will:
@@ -94,8 +90,8 @@ During processing, the scripts create temporary files to allow for resuming inte
    - Contains logs from the parallel processing of API requests.
    - Created by the `process_api_requests_from_file` function.
 
-4. Batch object file (for batch processing): `<save_dir>/<dataset_name>_<annotator>/batch_object.json`
-   - Contains information about the initiated batch job.
+4. Batch object file (for batch processing): `<save_dir>/<dataset_name>_<annotator>/batch_objects.json`
+   - Contains information about the initiated batch jobs.
    - Created by the `regenerate_dataset` function in `reannotate.py`.
 
 5. Batch results file (for batch processing): Specified by `--output_file` (default: "batch_results.jsonl")

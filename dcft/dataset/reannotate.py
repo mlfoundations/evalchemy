@@ -1,16 +1,15 @@
 import argparse
 import json
+import logging
 import os
 import uuid
 from datetime import datetime
-import logging
 
 import yaml
 
 from dcft.dataset.annotators import ANNOTATOR_MAP, AnnotatorConfig, get_annotator
 from dcft.dataset.generation import GenerationConfig
 from dcft.dataset.hf import get_dataclass_from_path
-
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -31,14 +30,14 @@ def regenerate_dataset(args):
     save_name = f"{args.dataset.replace('/', '_')}_{args.annotator}"
     os.makedirs(f"{args.save_dir}/{save_name}", exist_ok=True)
     if args.batch:
-        assert data.batch_object is not None
-        with open(f"{args.save_dir}/{save_name}/batch_object.json", "w") as f:
-            json.dump(data.batch_object.model_dump(), f, indent=4)
-        logging.info(f"Batch object saved to {args.save_dir}/{save_name}/batch_object.json")
+        assert data.batch_objects is not None
+        with open(f"{args.save_dir}/{save_name}/batch_objects.json", "w") as f:
+            json.dump([obj.model_dump() for obj in data.batch_objects], f, indent=4)
+        logging.info(f"Batch objects saved to {args.save_dir}/{save_name}/batch_objects.json")
         logging.info(
-            f"Run `python dcft/dataset/watch_gpt_batch.py --batch_id "
-            f"{data.batch_object.id} --dataset {args.dataset} --annotator {args.annotator}` "
-            f" to monitor the batch and download its results."
+            f"Run `python dcft/dataset/watch_gpt_batch.py --batch_ids "
+            f"{','.join([obj.id for obj in data.batch_objects])} --dataset {args.dataset} --annotator {args.annotator}` "
+            f" to monitor the batches and download their results."
         )
     else:
         assert len(data.annotations) == len(data.user_prompts)

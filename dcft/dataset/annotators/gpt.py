@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import uuid
+from math import ceil
 
 import tiktoken
 from openai import OpenAI
@@ -49,7 +50,7 @@ class GPTAnnotator(BaseAnnotator):
             }
         return request_body
 
-    def _create_and_write_jobs(self, n, data, generation_config, jobs_file):
+    def _create_and_write_jobs(self, n, data, generation_config, jobs_file, start_idx=0):
         """
         Create job dictionaries and write them to the jobs file.
 
@@ -65,7 +66,7 @@ class GPTAnnotator(BaseAnnotator):
         print(f"Templating {n} API requests jobs")
         jobs = []
         for idx in tqdm(range(n)):
-            job = self.create_job_dict(data.user_prompts[idx], generation_config, self.config.batch, idx)
+            job = self.create_job_dict(data.user_prompts[start_idx + idx], generation_config, self.config.batch, start_idx + idx)
             jobs.append(job)
 
         with open(jobs_file, "w") as f:
@@ -81,42 +82,51 @@ class GPTAnnotator(BaseAnnotator):
         # Create jobs.json for parallel request processing
         job_path = f"datasets/temp/{data.data_path.replace('/', '_')}"
         os.makedirs(job_path, exist_ok=True)
-        jobs_file = f"{job_path}/jobs_batch.json" if self.config.batch else f"{job_path}/jobs.json"
-
-        # Check if the jobs file already exists
-        if os.path.exists(jobs_file):
-            if self.config.resume:
-                print(f"Resuming from previous run, loading existing jobs from {jobs_file}")
-                print(
-                    f"To regenerate the jobs file, delete the jobs file and re-run the annotator: `rm -rf {jobs_file}`"
-                )
-                # Load existing jobs from file
-                with open(jobs_file, "r") as f:
-                    jobs = [json.loads(line) for line in f]
-                print(f"Using existing jobs from {jobs_file}")
-                print(f"Number of jobs: {len(jobs)}")
-                print("Example job:")
-                print(json.dumps(jobs[0], indent=2))
-            else:
-                # Create new jobs and write to file
-                error_message = (
-                    f"Existing job file {jobs_file}. "
-                    f"Delete the jobs file and re-run the annotator: `rm -rf {jobs_file}`. "
-                    f"Or run the annotator with the --resume flag to continue from the previous run."
-                )
-                raise ValueError(error_message)
-
-        jobs = self._create_and_write_jobs(n, data, generation_config, jobs_file)
 
         if self.config.batch:
-            self.run_batch(data, job_path)
+            num_batches = ceil(n / self.config.max_batch_api_chunk_size)
+            batch_objects = []
+            for i in range(num_batches):
+                start_idx = i * self.config.max_batch_api_chunk_size
+                end_idx = min((i + 1) * self.config.max_batch_api_chunk_size, n)
+                jobs_file = f"{job_path}/jobs_batch_{i}.json"
+                
+                jobs = self._create_and_write_jobs(end_idx - start_idx, data, generation_config, jobs_file, start_idx)
+                batch_object = self.run_batch(data, job_path, i)
+                batch_objects.append(batch_object)
+            
+            data.batch_objects = batch_objects
         else:
+            jobs_file = f"{job_path}/jobs.json"
+            if os.path.exists(jobs_file):
+                if self.config.resume:
+                    print(f"Resuming from previous run, loading existing jobs from {jobs_file}")
+                    print(
+                        f"To regenerate the jobs file, delete the jobs file and re-run the annotator: `rm -rf {jobs_file}`"
+                    )
+                    # Load existing jobs from file
+                    with open(jobs_file, "r") as f:
+                        jobs = [json.loads(line) for line in f]
+                    print(f"Using existing jobs from {jobs_file}")
+                    print(f"Number of jobs: {len(jobs)}")
+                    print("Example job:")
+                    print(json.dumps(jobs[0], indent=2))
+                else:
+                    # Create new jobs and write to file
+                    error_message = (
+                        f"Existing job file {jobs_file}. "
+                        f"Delete the jobs file and re-run the annotator: `rm -rf {jobs_file}`. "
+                        f"Or run the annotator with the --resume flag to continue from the previous run."
+                    )
+                    raise ValueError(error_message)
+
+            jobs = self._create_and_write_jobs(n, data, generation_config, jobs_file)
             self.run_online(data, job_path, n)
 
-    def run_batch(self, data, job_path):
-        print(f"Batch generation starting.")
+    def run_batch(self, data, job_path, batch_index):
+        print(f"Batch generation starting for batch {batch_index}.")
         batch_input_file = self.client.files.create(
-            file=open(f"{job_path}/jobs_batch.json", "rb"), purpose="batch")
+            file=open(f"{job_path}/jobs_batch_{batch_index}.json", "rb"), purpose="batch")
         batch_input_file_id = batch_input_file.id
         print(f"File uploaded: {batch_input_file}")
 
@@ -125,8 +135,8 @@ class GPTAnnotator(BaseAnnotator):
             endpoint="/v1/chat/completions",
             completion_window="24h",
         )
-        print(f"Batch request submitted, received batch object: " f"{batch_object}")
-        data.batch_object = batch_object
+        print(f"Batch request submitted, received batch object: {batch_object}")
+        return batch_object
 
     def run_online(self, data, job_path, n):
         print(

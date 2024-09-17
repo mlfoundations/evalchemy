@@ -1,9 +1,9 @@
 import argparse
 import json
+import logging
 import os
 import time
 from typing import Any, Dict, List
-import logging
 
 from openai import OpenAI
 
@@ -13,32 +13,42 @@ from dcft.dataset.reannotate import regenerate_dataset
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class BatchWatcher:
-    def __init__(self, batch_id, check_interval=60):
+    def __init__(self, batch_ids, check_interval=60):
         self.client = OpenAI()
-        self.batch_id = batch_id
+        self.batch_ids = batch_ids
         self.check_interval = check_interval
 
     def watch(self):
-        while True:
-            batch = self.client.batches.retrieve(self.batch_id)
-            logging.info(f"Current batch status: {batch.status}")
+        completed_batches = []
+        while len(completed_batches) < len(self.batch_ids):
+            for batch_id in self.batch_ids:
+                if batch_id in completed_batches:
+                    continue
+                batch = self.client.batches.retrieve(batch_id)
+                logging.info(f"Batch {batch_id} status: {batch.status}")
 
-            if batch.status in ["completed", "failed", "expired", "cancelled"]:
-                logging.info(f"Batch processing finished with status: {batch.status}")
-                return batch
+                if batch.status in ["completed", "failed", "expired", "cancelled"]:
+                    logging.info(f"Batch {batch_id} processing finished with status: {batch.status}")
+                    completed_batches.append(batch_id)
 
-            logging.info(f"Sleeping for {self.check_interval} seconds...")
-            time.sleep(self.check_interval)
+            if len(completed_batches) < len(self.batch_ids):
+                logging.info(f"Sleeping for {self.check_interval} seconds...")
+                time.sleep(self.check_interval)
+
+        return [self.client.batches.retrieve(batch_id) for batch_id in self.batch_ids]
 
     def download_results(self, output_path):
-        batch = self.client.batches.retrieve(self.batch_id)
-        if batch.status == "completed" and batch.output_file_id:
-            file_content = self.client.files.content(batch.output_file_id)
-            with open(output_path, "wb") as f:
-                f.write(file_content.content)
-            logging.info(f"Batch results downloaded and saved to: {output_path}")
-        else:
-            logging.warning("Batch results are not available for download.")
+        all_results = []
+        for batch_id in self.batch_ids:
+            batch = self.client.batches.retrieve(batch_id)
+            if batch.status == "completed" and batch.output_file_id:
+                file_content = self.client.files.content(batch.output_file_id)
+                all_results.extend(file_content.content.decode().splitlines())
+        
+        with open(output_path, "w") as f:
+            for result in all_results:
+                f.write(result + "\n")
+        logging.info(f"All batch results downloaded and saved to: {output_path}")
 
     def download_errors(self, error_path):
         batch = self.client.batches.retrieve(self.batch_id)
@@ -52,11 +62,11 @@ class BatchWatcher:
 
 
 def watch(args):
-    watcher = BatchWatcher(args.batch_id)
-    final_batch = watcher.watch()
-    logging.info(f"Final batch details: {final_batch}")
+    watcher = BatchWatcher(args.batch_ids)
+    final_batches = watcher.watch()
+    logging.info(f"All batches completed")
 
-    if final_batch.status == "completed":
+    if all(batch.status == "completed" for batch in final_batches):
         watcher.download_results(args.output_file)
         
         # Restore data object
@@ -92,13 +102,13 @@ def watch(args):
             json.dump(save_out, f, indent=4)
         logging.info(f"Updated data saved to {save_path}")
 
-    if final_batch.error_file_id:
-        watcher.download_errors(args.error_file)
-
+    for batch in final_batches:
+        if batch.error_file_id:
+            watcher.download_errors(f"{args.error_file}.{batch.id}")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Watch a batch request using its ID and download results or errors.")
-    parser.add_argument("--batch_id", type=str, help="The batch ID to watch")
+    parser = argparse.ArgumentParser(description="Watch batch requests using their IDs and download results or errors.")
+    parser.add_argument("--batch_ids", type=str, help="Comma-separated list of batch IDs to watch")
     parser.add_argument(
         "--output_file",
         type=str,
@@ -116,5 +126,6 @@ if __name__ == "__main__":
     parser.add_argument("--annotator", type=str, default="gpt-4o-2024-08-06", help="Name of the annotator")
 
     args = parser.parse_args()
+    args.batch_ids = args.batch_ids.split(',')
 
     watch(args)

@@ -24,9 +24,13 @@ class AnnotatorConfig:
     def __init__(self, args):
         self.annotator_name = args.annotator
 
-        if ANNOTATOR_MAP[args.annotator] is GPTAnnotator:
+        if is_gpt_annotator(args.annotator):
             self.max_requests_per_minute = args.max_requests_per_minute
             self.max_tokens_per_minute = args.max_tokens_per_minute
+
+
+def is_gpt_annotator(annotator_name):
+    return ANNOTATOR_MAP[annotator_name] is GPTAnnotator
 
 
 def get_annotator(annotator_name, annotator_config, **kwargs):

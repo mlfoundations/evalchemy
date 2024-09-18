@@ -219,7 +219,7 @@ async def process_api_requests_from_file(
                 if next_request is None:
                     if not queue_of_requests_to_retry.empty():
                         next_request = queue_of_requests_to_retry.get_nowait()
-                        logging.debug(f"Retrying request {next_request.task_id}")
+                        logging.debug(f"Retrying request {next_request.task_id}: {next_request}")
                     elif file_not_finished:
                         try:
                             # get new request
@@ -240,7 +240,7 @@ async def process_api_requests_from_file(
                             )
                             status_tracker.num_tasks_started += 1
                             status_tracker.num_tasks_in_progress += 1
-                            logging.debug(f"Reading request {next_request.task_id}")
+                            logging.debug(f"Reading request {next_request.task_id}: {next_request}")
                         except StopIteration:
                             # if file runs out, set flag to stop reading it
                             logging.debug("Read file exhausted")

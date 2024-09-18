@@ -32,5 +32,9 @@ class AnnotatorConfig:
             self.max_batch_api_chunk_size = 50000
 
 
+def is_gpt_annotator(annotator_name):
+    return ANNOTATOR_MAP[annotator_name] is GPTAnnotator
+
+
 def get_annotator(annotator_name, annotator_config, **kwargs):
     return ANNOTATOR_MAP[annotator_name](annotator_name, annotator_config, **kwargs)

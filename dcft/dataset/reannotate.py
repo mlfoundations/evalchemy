@@ -7,14 +7,42 @@ from datetime import datetime
 
 import yaml
 
-from dcft.dataset.annotators import ANNOTATOR_MAP, AnnotatorConfig, get_annotator
-from dcft.dataset.generation import GenerationConfig
+from dcft.dataset.annotators import ANNOTATOR_MAP, Annota
 from dcft.dataset.hf import get_dataclass_from_path
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 
+def get_rate_limits(annotator):
+    # Send a dummy request to get rate limit information
+    response = requests.post(
+        "https://api.openai.com/v1/chat/completions",
+        headers={"Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}"},
+        json={"model": annotator, "messages": []},
+    )
+
+    # Extract rate limit information from headers
+    max_requests = int(response.headers.get("x-ratelimit-limit-requests", 1500))
+    max_tokens = int(response.headers.get("x-ratelimit-limit-tokens", 6250000))
+
+    return max_requests, max_tokens
+
+
+
 def regenerate_dataset(args):
+    # Get rate limits
+    if is_gpt_annotator(args.annotator) and (
+        args.max_requests_per_minute is None or args.max_tokens_per_minute is None
+    ):
+        max_requests, max_tokens = get_rate_limits(args.annotator)
+        args.max_requests_per_minute = (
+            max_requests if args.max_requests_per_minute is None else args.max_requests_per_minute
+        )
+        args.max_tokens_per_minute = max_tokens if args.max_tokens_per_minute is None else args.max_tokens_per_minute
+
+    print(f"Setting max_requests_per_minute to {args.max_requests_per_minute}")
+    print(f"Setting max_tokens_per_minute to {args.max_tokens_per_minute}")
+
     # Load data
     data = get_dataclass_from_path(args.dataset)
     assert len(data.system_prompts) == len(data.user_prompts)
@@ -74,14 +102,14 @@ def main():
 
     # GPT API annotator parameters
     # More details at https://platform.openai.com/docs/api-reference/chat/create
-    parser.add_argument("--max_requests_per_minute", type=int, default=1500)
-    parser.add_argument("--max_tokens_per_minute", type=int, default=6250000)
     parser.add_argument("--frequency_penalty", type=float, default=0)
     parser.add_argument("--logit_bias", type=str, default=None)
     parser.add_argument("--logprobs", type=bool, default=False)
     parser.add_argument("--top_logprobs", type=int, default=None)
     parser.add_argument("--n", type=int, default=1, help="how many completions to generate for each input")
     parser.add_argument("--presence_penalty", type=float, default=0)
+    parser.add_argument("--max_requests_per_minute", type=int, default=None)
+    parser.add_argument("--max_tokens_per_minute", type=int, default=None)
 
     args = parser.parse_args()
     regenerate_dataset(args)

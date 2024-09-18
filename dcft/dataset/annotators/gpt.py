@@ -81,7 +81,6 @@ class GPTAnnotator(BaseAnnotator):
     def annotate(self, data, generation_config):
         n = len(data.user_prompts)
 
-        # Create jobs.json for parallel request processing
         job_path = f"datasets/temp/{data.data_path.replace('/', '_')}"
         os.makedirs(job_path, exist_ok=True)
 

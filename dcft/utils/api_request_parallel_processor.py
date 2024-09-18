@@ -105,6 +105,9 @@ from dataclasses import (
     dataclass,
     field,
 )  # for storing API inputs, outputs, and metadata
+from typing import Set, Optional
+import pdb
+from tqdm.asyncio import tqdm
 
 
 async def process_api_requests_from_file(
@@ -117,6 +120,8 @@ async def process_api_requests_from_file(
     token_encoding_name: str,
     max_attempts: int,
     logging_level: int,
+    resume: bool,
+    log_filepath: Optional[str] = None,
 ):
     """Processes API requests in parallel, throttling to stay under rate limits."""
     # constants
@@ -124,8 +129,22 @@ async def process_api_requests_from_file(
     seconds_to_sleep_each_loop = 0.001  # 1 ms limits max throughput to 1,000 requests per second
 
     # initialize logging
-    logging.basicConfig(level=logging_level)
-    logging.debug(f"Logging initialized at level {logging_level}")
+    if log_filepath:
+        # Set up logging to both file and stdout
+        # File logging is always at DEBUG level, while console logging uses the specified logging_level
+        file_handler = logging.FileHandler(log_filepath, mode="a")
+        file_handler.setLevel(logging.DEBUG)
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging_level)
+
+        logging.basicConfig(
+            level=logging.DEBUG,  # Set to DEBUG to capture all levels
+            format="%(asctime)s - %(levelname)s - %(message)s",
+            handlers=[file_handler, console_handler],
+        )
+    else:
+        logging.basicConfig(level=logging_level, format="%(asctime)s - %(levelname)s - %(message)s")
+    logging.debug(f"Logging initialized. Console logging level: {logging_level}")
 
     # infer API endpoint and construct request header
     api_endpoint = api_endpoint_from_url(request_url)
@@ -149,11 +168,51 @@ async def process_api_requests_from_file(
     file_not_finished = True  # after file is empty, we'll skip reading it
     logging.debug(f"Initialization complete.")
 
+    completed_request_ids: Set[int] = set()
+    if os.path.exists(save_filepath):
+        if resume:
+            # save all successfully completed requests to a temporary file, then overwrite the original file with the temporary file
+            logging.warning(f"Resuming progress from existing file: {save_filepath}")
+            logging.warning(f"Removing all failed requests from {save_filepath} so they can be retried")
+            temp_filepath = f"{save_filepath}.temp"
+            num_previously_failed_requests = 0
+            with open(save_filepath, "r") as input_file, open(temp_filepath, "w") as output_file:
+                for line in input_file:
+                    data = json.loads(line)
+                    if isinstance(data[1], list):
+                        # this means that the request failed and we have a list of errors
+                        logging.debug(
+                            f"Request {data[2].get('request_idx')} previously failed due to errors: {data[1]}, removing from output and will retry"
+                        )
+                        num_previously_failed_requests += 1
+                    else:
+                        completed_request_ids.add(data[2].get("request_idx"))
+                        output_file.write(line)
+            logging.info(
+                f"Found {len(completed_request_ids)} completed requests and {num_previously_failed_requests} previously failed requests"
+            )
+            logging.info("Failed requests and remaining requests will now be processed.")
+            os.replace(temp_filepath, save_filepath)
+        else:
+            user_input = input(
+                f"File {save_filepath} already exists.\nTo resume if there are remaining requests without responses, run with --resume flag.\nOverwrite? (Y/n): "
+            )
+            if user_input.lower() != "y" and user_input.lower() != "":
+                logging.info("Aborting operation.")
+                return
+
     # initialize file reading
     with open(requests_filepath) as file:
         # `requests` will provide requests one at a time
         requests = file.__iter__()
         logging.debug(f"File opened. Entering main loop")
+
+        # Count total number of requests
+        total_requests = sum(1 for _ in open(requests_filepath))
+
+        # Create progress bar
+        pbar = tqdm(total=total_requests, desc="Processing requests")
+
         async with aiohttp.ClientSession() as session:  # Initialize ClientSession here
             while True:
                 # get next request (if one is not already waiting for capacity)
@@ -165,6 +224,11 @@ async def process_api_requests_from_file(
                         try:
                             # get new request
                             request_json = json.loads(next(requests))
+                            request_idx = request_json["metadata"]["request_idx"]
+                            if resume and request_idx in completed_request_ids:
+                                logging.debug(f"Skipping already completed request {request_idx}")
+                                status_tracker.num_tasks_already_completed += 1
+                                continue
                             next_request = APIRequest(
                                 task_id=next(task_id_generator),
                                 request_json=request_json,
@@ -217,6 +281,15 @@ async def process_api_requests_from_file(
                         )
                         next_request = None  # reset next_request to empty
 
+                # Update progress bar when a task is completed
+                total_completed = (
+                    status_tracker.num_tasks_succeeded
+                    + status_tracker.num_tasks_failed
+                    + status_tracker.num_tasks_already_completed
+                )
+                if total_completed > pbar.n:
+                    pbar.update(total_completed - pbar.n)
+
                 # if all tasks are finished, break
                 if status_tracker.num_tasks_in_progress == 0:
                     break
@@ -235,6 +308,9 @@ async def process_api_requests_from_file(
                     logging.warn(
                         f"Pausing to cool down until {time.ctime(status_tracker.time_of_last_rate_limit_error + seconds_to_pause_after_rate_limit_error)}"
                     )
+
+        # Close the progress bar
+        pbar.close()
 
         # after finishing, log final status
         logging.info(f"""Parallel processing complete. Results saved to {save_filepath}""")
@@ -255,6 +331,7 @@ async def process_api_requests_from_file(
 class StatusTracker:
     """Stores metadata about the script's progress. Only one instance is created."""
 
+    num_tasks_already_completed: int = 0
     num_tasks_started: int = 0
     num_tasks_in_progress: int = 0  # script ends when this reaches 0
     num_tasks_succeeded: int = 0
@@ -286,7 +363,7 @@ class APIRequest:
         status_tracker: StatusTracker,
     ):
         """Calls the OpenAI API and saves results."""
-        logging.info(f"Starting request #{self.task_id}")
+        logging.debug(f"Starting request #{self.task_id}")
         error = None
         try:
             async with session.post(url=request_url, headers=request_header, json=self.request_json) as response:
@@ -421,6 +498,8 @@ if __name__ == "__main__":
     parser.add_argument("--token_encoding_name", default="cl100k_base")
     parser.add_argument("--max_attempts", type=int, default=5)
     parser.add_argument("--logging_level", default=logging.INFO)
+    parser.add_argument("--resume", action="store_true", help="Resume progress from existing save file")
+    parser.add_argument("--log_filepath", default=None, help="Path to the log file (optional)")
     args = parser.parse_args()
 
     if args.save_filepath is None:
@@ -438,6 +517,8 @@ if __name__ == "__main__":
             token_encoding_name=args.token_encoding_name,
             max_attempts=int(args.max_attempts),
             logging_level=int(args.logging_level),
+            resume=args.resume,
+            log_filepath=args.log_filepath,
         )
     )
 

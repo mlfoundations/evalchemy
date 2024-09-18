@@ -2,17 +2,17 @@ from dcft.dataset.hf._basedataset import BaseFTDataset
 from tqdm import tqdm
 
 
-class CodeAlpacaFTDataset(BaseFTDataset):
+class PlatypusFTDataset(BaseFTDataset):
     def __init__(self, data):
         super().__init__(data)
 
-        print("Loading and reformatting CodeAlpaca dataset")
+        print(f"Loading and reformatting {self.__class__.__name__} dataset")
         for d in tqdm(self.data["train"]):
             self.system_prompts.append("")
-            self.user_prompts.append(self.reformat_alpaca(d["instruction"], d["input"]))
+            self.user_prompts.append(self.reformat(d["instruction"], d["input"]))
             self.annotations_original.append(d["output"])
 
-    def reformat_alpaca(self, instruction, input):
+    def reformat(self, instruction, input):
         if input is None or len(input) == 0:
             return (
                 "Below is an instruction that describes a task. "

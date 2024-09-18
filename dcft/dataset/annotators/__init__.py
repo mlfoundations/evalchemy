@@ -23,10 +23,13 @@ ANNOTATOR_MAP = {
 class AnnotatorConfig:
     def __init__(self, args):
         self.annotator_name = args.annotator
+        self.resume = args.resume
 
-        if is_gpt_annotator(args.annotator):
+        if ANNOTATOR_MAP[args.annotator] is GPTAnnotator:
             self.max_requests_per_minute = args.max_requests_per_minute
             self.max_tokens_per_minute = args.max_tokens_per_minute
+            self.batch = args.batch
+            self.max_batch_api_chunk_size = 50000
 
 
 def is_gpt_annotator(annotator_name):

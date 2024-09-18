@@ -52,7 +52,7 @@ This script will create and submit multiple batch jobs if necessary, depending o
 You can monitor all the jobs using `watch_gpt_batch.py`. After running the reannotate.py script with the --batch flag, you will see an output similar to this:
 
 ```
-Run python dcft/dataset/watch_gpt_batch.py --batch_ids batch_id1,batch_id2 --dataset glaiveai/glaive-code-assistant --annotator gpt-4o-mini to monitor the batch and download its results
+Run python dcft/dataset/watch_gpt_batch.py --batch_objects_file datasets/reannotated/glaiveai_glaive-code-assistant_gpt-4o-mini/batch_objects.json --dataset glaiveai/glaive-code-assistant --annotator gpt-4o-mini to monitor the batch and download its results
 ```
 
 Run the provided script to monitor the batch process and download the results. This script will:

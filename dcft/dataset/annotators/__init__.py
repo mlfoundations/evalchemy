@@ -29,8 +29,7 @@ class AnnotatorConfig:
             self.max_requests_per_minute = args.max_requests_per_minute
             self.max_tokens_per_minute = args.max_tokens_per_minute
             self.batch = args.batch
-            # self.max_batch_api_chunk_size = 50000
-            self.max_batch_api_chunk_size = 100 # trying for smaller batches to see if completion time is faster
+            self.max_batch_api_chunk_size = 100 
 
 
 def is_gpt_annotator(annotator_name):

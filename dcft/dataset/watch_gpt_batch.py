@@ -10,7 +10,8 @@ from openai import OpenAI
 from dcft.dataset.hf import get_dataclass_from_path
 from dcft.dataset.reannotate import regenerate_dataset
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
 
 class BatchWatcher:
     def __init__(self, batch_ids, check_interval=60):
@@ -25,8 +26,7 @@ class BatchWatcher:
                 if batch_id in completed_batches:
                     continue
                 batch = self.client.batches.retrieve(batch_id)
-                logging.info(f"Batch {batch_id} status: {batch.status} "
-                             f"request_counts: {batch.request_counts}")
+                logging.info(f"Batch {batch_id} status: {batch.status} " f"request_counts: {batch.request_counts}")
 
                 if batch.status in ["completed", "failed", "expired", "cancelled"]:
                     logging.info(f"Batch {batch_id} processing finished with status: {batch.status}")
@@ -45,7 +45,7 @@ class BatchWatcher:
             if batch.status == "completed" and batch.output_file_id:
                 file_content = self.client.files.content(batch.output_file_id)
                 all_results.extend(file_content.content.decode().splitlines())
-        
+
         with open(output_path, "w") as f:
             for result in all_results:
                 f.write(result + "\n")
@@ -69,19 +69,17 @@ def watch(args):
 
     if all(batch.status == "completed" for batch in final_batches):
         watcher.download_results(args.output_file)
-        
+
         # Restore data object
         data = get_dataclass_from_path(args.dataset)
         n = len(data.user_prompts)
 
         # Process batch results
         outputs = {}
-        with open(args.output_file, 'r') as f:
+        with open(args.output_file, "r") as f:
             for line in f:
                 l = json.loads(line)
-                outputs[int(l['custom_id'])] = (
-                    l['response']['body']['choices'][0]['message']['content']
-                )
+                outputs[int(l["custom_id"])] = l["response"]["body"]["choices"][0]["message"]["content"]
         logging.info(f"Number of outputs: {len(outputs)}")
         data.annotations = [outputs.get(i, {}) for i in range(n)]
 
@@ -107,6 +105,7 @@ def watch(args):
         if batch.error_file_id:
             watcher.download_errors(f"{args.error_file}.{batch.id}")
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Watch batch requests using their IDs and download results or errors.")
     parser.add_argument("--batch_ids", type=str, help="Comma-separated list of batch IDs to watch")
@@ -123,10 +122,12 @@ if __name__ == "__main__":
         help="Path to save the batch errors (default: batch_errors.jsonl)",
     )
     parser.add_argument("--dataset", type=str, required=True, help="Path to the original dataset")
-    parser.add_argument("--save_dir", type=str, default="datasets/reannotated", help="Directory to save processed results")
+    parser.add_argument(
+        "--save_dir", type=str, default="datasets/reannotated", help="Directory to save processed results"
+    )
     parser.add_argument("--annotator", type=str, default="gpt-4o-2024-08-06", help="Name of the annotator")
 
     args = parser.parse_args()
-    args.batch_ids = args.batch_ids.split(',')
+    args.batch_ids = args.batch_ids.split(",")
 
     watch(args)

@@ -1,15 +1,16 @@
 from dcft.dataset.hf._basedataset import BaseFTDataset
 from tqdm import tqdm
 
+
 class PlatypusFTDataset(BaseFTDataset):
     def __init__(self, data):
         super().__init__(data)
-        
+
         print(f"Loading and reformatting {self.__class__.__name__} dataset")
-        for d in tqdm(self.data['train']):
+        for d in tqdm(self.data["train"]):
             self.system_prompts.append("")
-            self.user_prompts.append(self.reformat(d['instruction'], d['input']))
-            self.annotations_original.append(d['output'])
+            self.user_prompts.append(self.reformat(d["instruction"], d["input"]))
+            self.annotations_original.append(d["output"])
 
     def reformat(self, instruction, input):
         if input is None or len(input) == 0:

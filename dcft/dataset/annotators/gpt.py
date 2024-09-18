@@ -66,7 +66,9 @@ class GPTAnnotator(BaseAnnotator):
         print(f"Templating {n} API requests jobs")
         jobs = []
         for idx in tqdm(range(n)):
-            job = self.create_job_dict(data.user_prompts[start_idx + idx], generation_config, self.config.batch, start_idx + idx)
+            job = self.create_job_dict(
+                data.user_prompts[start_idx + idx], generation_config, self.config.batch, start_idx + idx
+            )
             jobs.append(job)
 
         with open(jobs_file, "w") as f:
@@ -90,11 +92,11 @@ class GPTAnnotator(BaseAnnotator):
                 start_idx = i * self.config.max_batch_api_chunk_size
                 end_idx = min((i + 1) * self.config.max_batch_api_chunk_size, n)
                 jobs_file = f"{job_path}/jobs_batch_{i}.json"
-                
+
                 jobs = self._create_and_write_jobs(end_idx - start_idx, data, generation_config, jobs_file, start_idx)
                 batch_object = self.run_batch(data, job_path, i)
                 batch_objects.append(batch_object)
-            
+
             data.batch_objects = batch_objects
         else:
             jobs_file = f"{job_path}/jobs.json"
@@ -126,7 +128,8 @@ class GPTAnnotator(BaseAnnotator):
     def run_batch(self, data, job_path, batch_index):
         print(f"Batch generation starting for batch {batch_index}.")
         batch_input_file = self.client.files.create(
-            file=open(f"{job_path}/jobs_batch_{batch_index}.json", "rb"), purpose="batch")
+            file=open(f"{job_path}/jobs_batch_{batch_index}.json", "rb"), purpose="batch"
+        )
         batch_input_file_id = batch_input_file.id
         print(f"File uploaded: {batch_input_file}")
 
@@ -139,10 +142,7 @@ class GPTAnnotator(BaseAnnotator):
         return batch_object
 
     def run_online(self, data, job_path, n):
-        print(
-            f"Online generation with parallel processing starting, "
-            f"logging to {job_path}/output.log"
-        )
+        print(f"Online generation with parallel processing starting, " f"logging to {job_path}/output.log")
         asyncio.run(
             process_api_requests_from_file(
                 requests_filepath=f"{job_path}/jobs.json",

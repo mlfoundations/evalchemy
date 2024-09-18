@@ -11,7 +11,8 @@ from dcft.dataset.annotators import ANNOTATOR_MAP, AnnotatorConfig, get_annotato
 from dcft.dataset.generation import GenerationConfig
 from dcft.dataset.hf import get_dataclass_from_path
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
 
 def regenerate_dataset(args):
     # Load data

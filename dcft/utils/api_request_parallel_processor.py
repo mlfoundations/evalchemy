@@ -109,6 +109,7 @@ from typing import Set, Optional
 import pdb
 from tqdm.asyncio import tqdm
 
+
 async def process_api_requests_from_file(
     requests_filepath: str,
     save_filepath: str,
@@ -125,29 +126,24 @@ async def process_api_requests_from_file(
     """Processes API requests in parallel, throttling to stay under rate limits."""
     # constants
     seconds_to_pause_after_rate_limit_error = 15
-    seconds_to_sleep_each_loop = (
-        0.001  # 1 ms limits max throughput to 1,000 requests per second
-    )
+    seconds_to_sleep_each_loop = 0.001  # 1 ms limits max throughput to 1,000 requests per second
 
     # initialize logging
     if log_filepath:
         # Set up logging to both file and stdout
         # File logging is always at DEBUG level, while console logging uses the specified logging_level
-        file_handler = logging.FileHandler(log_filepath, mode='a')
+        file_handler = logging.FileHandler(log_filepath, mode="a")
         file_handler.setLevel(logging.DEBUG)
         console_handler = logging.StreamHandler()
         console_handler.setLevel(logging_level)
-        
+
         logging.basicConfig(
             level=logging.DEBUG,  # Set to DEBUG to capture all levels
-            format='%(asctime)s - %(levelname)s - %(message)s',
-            handlers=[file_handler, console_handler]
+            format="%(asctime)s - %(levelname)s - %(message)s",
+            handlers=[file_handler, console_handler],
         )
     else:
-        logging.basicConfig(
-            level=logging_level,
-            format='%(asctime)s - %(levelname)s - %(message)s'
-        )
+        logging.basicConfig(level=logging_level, format="%(asctime)s - %(levelname)s - %(message)s")
     logging.debug(f"Logging initialized. Console logging level: {logging_level}")
 
     # infer API endpoint and construct request header
@@ -159,12 +155,8 @@ async def process_api_requests_from_file(
 
     # initialize trackers
     queue_of_requests_to_retry = asyncio.Queue()
-    task_id_generator = (
-        task_id_generator_function()
-    )  # generates integer IDs of 0, 1, 2, ...
-    status_tracker = (
-        StatusTracker()
-    )  # single instance to track a collection of variables
+    task_id_generator = task_id_generator_function()  # generates integer IDs of 0, 1, 2, ...
+    status_tracker = StatusTracker()  # single instance to track a collection of variables
     next_request = None  # variable to hold the next request to call
 
     # initialize available capacity counts
@@ -189,16 +181,22 @@ async def process_api_requests_from_file(
                     data = json.loads(line)
                     if isinstance(data[1], list):
                         # this means that the request failed and we have a list of errors
-                        logging.debug(f"Request {data[2].get('request_idx')} previously failed due to errors: {data[1]}, removing from output and will retry")
+                        logging.debug(
+                            f"Request {data[2].get('request_idx')} previously failed due to errors: {data[1]}, removing from output and will retry"
+                        )
                         num_previously_failed_requests += 1
                     else:
                         completed_request_ids.add(data[2].get("request_idx"))
                         output_file.write(line)
-            logging.info(f"Found {len(completed_request_ids)} completed requests and {num_previously_failed_requests} previously failed requests")
+            logging.info(
+                f"Found {len(completed_request_ids)} completed requests and {num_previously_failed_requests} previously failed requests"
+            )
             logging.info("Failed requests and remaining requests will now be processed.")
             os.replace(temp_filepath, save_filepath)
         else:
-            user_input = input(f"File {save_filepath} already exists.\nTo resume if there are remaining requests without responses, run with --resume flag.\nOverwrite? (Y/n): ")
+            user_input = input(
+                f"File {save_filepath} already exists.\nTo resume if there are remaining requests without responses, run with --resume flag.\nOverwrite? (Y/n): "
+            )
             if user_input.lower() != "y" and user_input.lower() != "":
                 logging.info("Aborting operation.")
                 return
@@ -226,7 +224,7 @@ async def process_api_requests_from_file(
                         try:
                             # get new request
                             request_json = json.loads(next(requests))
-                            request_idx = request_json['metadata']['request_idx']
+                            request_idx = request_json["metadata"]["request_idx"]
                             if resume and request_idx in completed_request_ids:
                                 logging.debug(f"Skipping already completed request {request_idx}")
                                 status_tracker.num_tasks_already_completed += 1
@@ -252,13 +250,11 @@ async def process_api_requests_from_file(
                 current_time = time.time()
                 seconds_since_update = current_time - last_update_time
                 available_request_capacity = min(
-                    available_request_capacity
-                    + max_requests_per_minute * seconds_since_update / 60.0,
+                    available_request_capacity + max_requests_per_minute * seconds_since_update / 60.0,
                     max_requests_per_minute,
                 )
                 available_token_capacity = min(
-                    available_token_capacity
-                    + max_tokens_per_minute * seconds_since_update / 60.0,
+                    available_token_capacity + max_tokens_per_minute * seconds_since_update / 60.0,
                     max_tokens_per_minute,
                 )
                 last_update_time = current_time
@@ -266,10 +262,7 @@ async def process_api_requests_from_file(
                 # if enough capacity available, call API
                 if next_request:
                     next_request_tokens = next_request.token_consumption
-                    if (
-                        available_request_capacity >= 1
-                        and available_token_capacity >= next_request_tokens
-                    ):
+                    if available_request_capacity >= 1 and available_token_capacity >= next_request_tokens:
                         # update counters
                         available_request_capacity -= 1
                         available_token_capacity -= next_request_tokens
@@ -289,7 +282,11 @@ async def process_api_requests_from_file(
                         next_request = None  # reset next_request to empty
 
                 # Update progress bar when a task is completed
-                total_completed = status_tracker.num_tasks_succeeded + status_tracker.num_tasks_failed + status_tracker.num_tasks_already_completed
+                total_completed = (
+                    status_tracker.num_tasks_succeeded
+                    + status_tracker.num_tasks_failed
+                    + status_tracker.num_tasks_already_completed
+                )
                 if total_completed > pbar.n:
                     pbar.update(total_completed - pbar.n)
 
@@ -301,16 +298,10 @@ async def process_api_requests_from_file(
                 await asyncio.sleep(seconds_to_sleep_each_loop)
 
                 # if a rate limit error was hit recently, pause to cool down
-                seconds_since_rate_limit_error = (
-                    time.time() - status_tracker.time_of_last_rate_limit_error
-                )
-                if (
-                    seconds_since_rate_limit_error
-                    < seconds_to_pause_after_rate_limit_error
-                ):
+                seconds_since_rate_limit_error = time.time() - status_tracker.time_of_last_rate_limit_error
+                if seconds_since_rate_limit_error < seconds_to_pause_after_rate_limit_error:
                     remaining_seconds_to_pause = (
-                        seconds_to_pause_after_rate_limit_error
-                        - seconds_since_rate_limit_error
+                        seconds_to_pause_after_rate_limit_error - seconds_since_rate_limit_error
                     )
                     await asyncio.sleep(remaining_seconds_to_pause)
                     # ^e.g., if pause is 15 seconds and final limit was hit 5 seconds ago
@@ -322,9 +313,7 @@ async def process_api_requests_from_file(
         pbar.close()
 
         # after finishing, log final status
-        logging.info(
-            f"""Parallel processing complete. Results saved to {save_filepath}"""
-        )
+        logging.info(f"""Parallel processing complete. Results saved to {save_filepath}""")
         if status_tracker.num_tasks_failed > 0:
             logging.warning(
                 f"{status_tracker.num_tasks_failed} / {status_tracker.num_tasks_started} requests failed. Errors logged to {save_filepath}."
@@ -377,26 +366,18 @@ class APIRequest:
         logging.debug(f"Starting request #{self.task_id}")
         error = None
         try:
-            async with session.post(
-                url=request_url, headers=request_header, json=self.request_json
-            ) as response:
+            async with session.post(url=request_url, headers=request_header, json=self.request_json) as response:
                 response = await response.json()
             if "error" in response:
-                logging.warning(
-                    f"Request {self.task_id} failed with error {response['error']}"
-                )
+                logging.warning(f"Request {self.task_id} failed with error {response['error']}")
                 status_tracker.num_api_errors += 1
                 error = response
                 if "rate limit" in response["error"].get("message", "").lower():
                     status_tracker.time_of_last_rate_limit_error = time.time()
                     status_tracker.num_rate_limit_errors += 1
-                    status_tracker.num_api_errors -= (
-                        1  # rate limit errors are counted separately
-                    )
+                    status_tracker.num_api_errors -= 1  # rate limit errors are counted separately
 
-        except (
-            Exception
-        ) as e:  # catching naked exceptions is bad practice, but in this case we'll log & save them
+        except Exception as e:  # catching naked exceptions is bad practice, but in this case we'll log & save them
             logging.warning(f"Request {self.task_id} failed with Exception {e}")
             status_tracker.num_other_errors += 1
             error = e
@@ -405,9 +386,7 @@ class APIRequest:
             if self.attempts_left:
                 retry_queue.put_nowait(self)
             else:
-                logging.error(
-                    f"Request {self.request_json} failed after all attempts. Saving errors: {self.result}"
-                )
+                logging.error(f"Request {self.request_json} failed after all attempts. Saving errors: {self.result}")
                 data = (
                     [self.request_json, [str(e) for e in self.result], self.metadata]
                     if self.metadata
@@ -417,11 +396,7 @@ class APIRequest:
                 status_tracker.num_tasks_in_progress -= 1
                 status_tracker.num_tasks_failed += 1
         else:
-            data = (
-                [self.request_json, response, self.metadata]
-                if self.metadata
-                else [self.request_json, response]
-            )
+            data = [self.request_json, response, self.metadata] if self.metadata else [self.request_json, response]
             append_to_jsonl(data, save_filepath)
             status_tracker.num_tasks_in_progress -= 1
             status_tracker.num_tasks_succeeded += 1
@@ -436,9 +411,7 @@ def api_endpoint_from_url(request_url):
     match = re.search("^https://[^/]+/v\\d+/(.+)$", request_url)
     if match is None:
         # for Azure OpenAI deployment urls
-        match = re.search(
-            r"^https://[^/]+/openai/deployments/[^/]+/(.+?)(\?|$)", request_url
-        )
+        match = re.search(r"^https://[^/]+/openai/deployments/[^/]+/(.+?)(\?|$)", request_url)
     return match[1]
 
 
@@ -485,9 +458,7 @@ def num_tokens_consumed_from_request(
                 num_tokens = prompt_tokens + completion_tokens * len(prompt)
                 return num_tokens
             else:
-                raise TypeError(
-                    'Expecting either string or list of strings for "prompt" field in completion request'
-                )
+                raise TypeError('Expecting either string or list of strings for "prompt" field in completion request')
     # if embeddings request, tokens = input tokens
     elif api_endpoint == "embeddings":
         input = request_json["input"]
@@ -498,14 +469,10 @@ def num_tokens_consumed_from_request(
             num_tokens = sum([len(encoding.encode(i)) for i in input])
             return num_tokens
         else:
-            raise TypeError(
-                'Expecting either string or list of strings for "inputs" field in embedding request'
-            )
+            raise TypeError('Expecting either string or list of strings for "inputs" field in embedding request')
     # more logic needed to support other API calls (e.g., edits, inserts, DALL-E)
     else:
-        raise NotImplementedError(
-            f'API endpoint "{api_endpoint}" not implemented in this script'
-        )
+        raise NotImplementedError(f'API endpoint "{api_endpoint}" not implemented in this script')
 
 
 def task_id_generator_function():

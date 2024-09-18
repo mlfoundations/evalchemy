@@ -7,7 +7,8 @@ dataset_map = {
     "sahil2801/CodeAlpaca-20k": CodeAlpacaFTDataset,
     "glaiveai/glaive-code-assistant": CodeGlaiveFTDataset,
     "garage-bAInd/Open-Platypus": PlatypusFTDataset,
-    "causal-lm/cot_alpaca_gpt4": COTAlpacaFTDataset,  # Add the appropriate identifier for the dataset
+    "causal-lm/cot_alpaca_gpt4": COTAlpacaFTDataset,  
+    "teknium/GPT4-LLM-Cleaned": COTAlpacaFTDataset,
 }
 
 

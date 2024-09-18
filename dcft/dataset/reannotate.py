@@ -7,7 +7,12 @@ from datetime import datetime
 
 import yaml
 
-from dcft.dataset.annotators import ANNOTATOR_MAP, Annota
+from dcft.dataset.annotators import (
+    ANNOTATOR_MAP,
+    AnnotatorConfig,
+    get_annotator,
+    is_gpt_annotator,
+)
 from dcft.dataset.hf import get_dataclass_from_path
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -26,7 +31,6 @@ def get_rate_limits(annotator):
     max_tokens = int(response.headers.get("x-ratelimit-limit-tokens", 6250000))
 
     return max_requests, max_tokens
-
 
 
 def regenerate_dataset(args):

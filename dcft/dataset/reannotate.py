@@ -34,10 +34,14 @@ def get_rate_limits(annotator):
 
 def regenerate_dataset(args):
     # Get rate limits
-    if is_gpt_annotator(args.annotator):
+    if is_gpt_annotator(args.annotator) and (
+        args.max_requests_per_minute is None or args.max_tokens_per_minute is None
+    ):
         max_requests, max_tokens = get_rate_limits(args.annotator)
-        args.max_requests_per_minute = max_requests
-        args.max_tokens_per_minute = max_tokens
+        args.max_requests_per_minute = (
+            max_requests if args.max_requests_per_minute is None else args.max_requests_per_minute
+        )
+        args.max_tokens_per_minute = max_tokens if args.max_tokens_per_minute is None else args.max_tokens_per_minute
 
     print(f"Setting max_requests_per_minute to {args.max_requests_per_minute}")
     print(f"Setting max_tokens_per_minute to {args.max_tokens_per_minute}")
@@ -90,6 +94,8 @@ def main():
     parser.add_argument("--top_logprobs", type=int, default=None)
     parser.add_argument("--n", type=int, default=1, help="how many completions to generate for each input")
     parser.add_argument("--presence_penalty", type=float, default=0)
+    parser.add_argument("--max_requests_per_minute", type=int, default=None)
+    parser.add_argument("--max_tokens_per_minute", type=int, default=None)
 
     args = parser.parse_args()
     regenerate_dataset(args)

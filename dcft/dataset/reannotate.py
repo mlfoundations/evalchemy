@@ -5,6 +5,7 @@ import os
 import uuid
 from datetime import datetime
 
+import requests
 import yaml
 
 from dcft.dataset.annotators import (
@@ -13,6 +14,7 @@ from dcft.dataset.annotators import (
     get_annotator,
     is_gpt_annotator,
 )
+from dcft.dataset.generation import GenerationConfig
 from dcft.dataset.hf import get_dataclass_from_path
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")

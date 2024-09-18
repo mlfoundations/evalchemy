@@ -20,7 +20,7 @@ python reannotate.py --annotator <annotator_name> --dataset <path_to_dataset>
 For example, running the following command will reannotate the `glaiveai/glaive-code-assistant` dataset with the `gpt-4o-mini` annotator:
 
 ```bash
-python reannotate.py --annotator gpt-4o-mini --dataset glaiveai/glaive-code-assistant
+python dcft/dataset/reannotate.py --annotator gpt-4o-mini --dataset glaiveai/glaive-code-assistant
 ```
 
 You can find the reannotated dataset at `datasets/reannotated/glaiveai_glaive-code-assistant_gpt-4o-mini/reannotated.json`.
@@ -29,7 +29,7 @@ You can find the reannotated dataset at `datasets/reannotated/glaiveai_glaive-co
 To resume from a previous run:
 
 ```bash
-python reannotate.py --annotator <annotator_name> --dataset <path_to_dataset> --resume
+python dcft/dataset/reannotate.py --annotator <annotator_name> --dataset <path_to_dataset> --resume
 ```
 
 ### Batch Processing (OpenAI only)
@@ -41,7 +41,7 @@ For large datasets, you can use batch processing with [OpenAI's batch API](https
 Use the `--batch` flag with `reannotate.py`:
 
 ```bash
-python reannotate.py --annotator <gpt_annotator> --dataset <path_to_dataset> --batch
+python dcft/dataset/reannotate.py --annotator <gpt_annotator> --dataset <path_to_dataset> --batch
 ```
 
 

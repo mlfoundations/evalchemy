@@ -20,15 +20,15 @@ from dcft.dataset.hf import get_dataclass_from_path
 def get_rate_limits(annotator):
     # Send a dummy request to get rate limit information
     response = requests.post(
-        "https://api.openai.com/v1/chat/completions", 
-        headers={"Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}"}, 
-        json={"model": annotator, "messages": []}
+        "https://api.openai.com/v1/chat/completions",
+        headers={"Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}"},
+        json={"model": annotator, "messages": []},
     )
-    
+
     # Extract rate limit information from headers
-    max_requests = int(response.headers.get('x-ratelimit-limit-requests', 1500))
-    max_tokens = int(response.headers.get('x-ratelimit-limit-tokens', 6250000))
-    
+    max_requests = int(response.headers.get("x-ratelimit-limit-requests", 1500))
+    max_tokens = int(response.headers.get("x-ratelimit-limit-tokens", 6250000))
+
     return max_requests, max_tokens
 
 
@@ -37,8 +37,8 @@ def regenerate_dataset(args):
     if is_gpt_annotator(args.annotator):
         max_requests, max_tokens = get_rate_limits(args.annotator)
         args.max_requests_per_minute = max_requests
-        args.max_tokens_per_minute = max_tokens 
-    
+        args.max_tokens_per_minute = max_tokens
+
     print(f"Setting max_requests_per_minute to {args.max_requests_per_minute}")
     print(f"Setting max_tokens_per_minute to {args.max_tokens_per_minute}")
 

@@ -3,6 +3,8 @@
 This is a placeholder repository, copied over from DCLM. This will be finetuned (ha) in the future.
 
 ## Reannotating Datasets
+More about how to use the reannotation tools in [dcft/dataset/README.md](dcft/dataset/README.md)
+
 The datasets available can be found in [dcft/dataset/hf](dcft/dataset/hf)
 ```python
 python dcft/dataset/reannotate.py --annotator gpt-4o-2024-08-06 --dataset (path-to-hf-dataset) 

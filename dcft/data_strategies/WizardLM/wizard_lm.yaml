@@ -1,0 +1,7 @@
+name: evol_instruct
+instruction_seeder: !function WizardLM.utils.seed_instructions
+instruction_generation: !function WizardLM.utils.instruction_generation
+instruction_filtering: !function WizardLM.utils.instruction_filtering
+annotation_seeder: !function WizardLM.utils.seed_annotations
+annotation_generation: !function WizardLM.utils.annotation_generation
+model_pair_filtering: !function WizardLM.utils.model_pair_filtering

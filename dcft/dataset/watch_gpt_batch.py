@@ -1,11 +1,12 @@
 import argparse
+import asyncio
 import json
 import logging
 import os
 import time
 from typing import Any, Dict, List
 
-from openai import OpenAI
+from openai import AsyncOpenAI
 
 from dcft.dataset.hf import get_dataclass_from_path
 from dcft.dataset.reannotate import regenerate_dataset
@@ -15,62 +16,73 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 
 class BatchWatcher:
     def __init__(self, batch_objects_file, check_interval=60):
-        self.client = OpenAI()
+        self.client = AsyncOpenAI()
         with open(batch_objects_file, 'r') as f:
             self.batch_objects = json.load(f)
         self.batch_ids = [obj['id'] for obj in self.batch_objects]
         self.check_interval = check_interval
 
-    def watch(self):
-        completed_batches = []
-        while len(completed_batches) < len(self.batch_ids):
-            for batch_id in self.batch_ids:
-                if batch_id in completed_batches:
-                    continue
-                batch = self.client.batches.retrieve(batch_id)
-                logging.info(f"Batch {batch_id} status: {batch.status} " f"request_counts: {batch.request_counts}")
+    async def check_batch_status(self, batch_id):
+        batch = await self.client.batches.retrieve(batch_id)
+        logging.info(f"Batch {batch_id} status: {batch.status} request_counts: {batch.request_counts}")
+        return batch_id, batch.status
 
-                if batch.status in ["completed", "failed", "expired", "cancelled"]:
-                    logging.info(f"Batch {batch_id} processing finished with status: {batch.status}")
-                    completed_batches.append(batch_id)
+    async def watch(self):
+        completed_batches = set()
+        while len(completed_batches) < len(self.batch_ids):
+            tasks = []
+            for batch_id in self.batch_ids:
+                if batch_id not in completed_batches:
+                    tasks.append(self.check_batch_status(batch_id))
+            
+            results = await asyncio.gather(*tasks)
+            
+            for batch_id, status in results:
+                if status in ["completed", "failed", "expired", "cancelled"]:
+                    logging.info(f"Batch {batch_id} processing finished with status: {status}")
+                    completed_batches.add(batch_id)
 
             if len(completed_batches) < len(self.batch_ids):
                 logging.info(f"Sleeping for {self.check_interval} seconds...")
-                time.sleep(self.check_interval)
+                await asyncio.sleep(self.check_interval)
 
-        return [self.client.batches.retrieve(batch_id) for batch_id in self.batch_ids]
+        return [await self.client.batches.retrieve(batch_id) for batch_id in self.batch_ids]
 
-    def download_results(self, output_path):
-        all_results = []
-        for batch_id in self.batch_ids:
-            batch = self.client.batches.retrieve(batch_id)
-            if batch.status == "completed" and batch.output_file_id:
-                file_content = self.client.files.content(batch.output_file_id)
-                all_results.extend(file_content.content.decode().splitlines())
+    async def download_batch_result(self, batch_id):
+        batch = await self.client.batches.retrieve(batch_id)
+        if batch.status == "completed" and batch.output_file_id:
+            file_content = await self.client.files.content(batch.output_file_id)
+            return file_content.text.splitlines()
+        return []
+
+    async def download_results(self, output_path):
+        tasks = [self.download_batch_result(batch_id) for batch_id in self.batch_ids]
+        results = await asyncio.gather(*tasks)
+        
+        all_results = [item for sublist in results for item in sublist]  # Flatten the list of lists
 
         with open(output_path, "w") as f:
             for result in all_results:
                 f.write(result + "\n")
         logging.info(f"All batch results downloaded and saved to: {output_path}")
 
-    def download_errors(self, error_path):
-        batch = self.client.batches.retrieve(self.batch_id)
+    async def download_errors(self, error_path, batch_id):
+        batch = await self.client.batches.retrieve(batch_id)
         if batch.error_file_id:
-            file_content = self.client.files.content(batch.error_file_id)
+            file_content = await self.client.files.content(batch.error_file_id)
             with open(error_path, "wb") as f:
                 f.write(file_content.content)
             logging.info(f"Batch errors downloaded and saved to: {error_path}")
         else:
-            logging.info("No error file available for this batch.")
+            logging.info(f"No error file available for batch {batch_id}.")
 
-
-def watch(args):
+async def watch_and_download(args):
     watcher = BatchWatcher(args.batch_objects_file)
-    final_batches = watcher.watch()
+    final_batches = await watcher.watch()
     logging.info(f"All batches completed")
 
     if all(batch.status == "completed" for batch in final_batches):
-        watcher.download_results(args.output_file)
+        await watcher.download_results(args.output_file)
 
         # Restore data object
         data = get_dataclass_from_path(args.dataset)
@@ -105,7 +117,7 @@ def watch(args):
 
     for batch in final_batches:
         if batch.error_file_id:
-            watcher.download_errors(f"{args.error_file}.{batch.id}")
+            await watcher.download_errors(f"{args.error_file}.{batch.id}", batch.id)
 
 
 if __name__ == "__main__":
@@ -131,4 +143,4 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    watch(args)
+    asyncio.run(watch_and_download(args))

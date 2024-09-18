@@ -14,9 +14,11 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 
 
 class BatchWatcher:
-    def __init__(self, batch_ids, check_interval=60):
+    def __init__(self, batch_objects_file, check_interval=60):
         self.client = OpenAI()
-        self.batch_ids = batch_ids
+        with open(batch_objects_file, 'r') as f:
+            self.batch_objects = json.load(f)
+        self.batch_ids = [obj['id'] for obj in self.batch_objects]
         self.check_interval = check_interval
 
     def watch(self):
@@ -63,7 +65,7 @@ class BatchWatcher:
 
 
 def watch(args):
-    watcher = BatchWatcher(args.batch_ids)
+    watcher = BatchWatcher(args.batch_objects_file)
     final_batches = watcher.watch()
     logging.info(f"All batches completed")
 
@@ -108,7 +110,7 @@ def watch(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Watch batch requests using their IDs and download results or errors.")
-    parser.add_argument("--batch_ids", type=str, help="Comma-separated list of batch IDs to watch")
+    parser.add_argument("--batch_objects_file", type=str, required=True, help="Path to the batch_objects.json file")
     parser.add_argument(
         "--output_file",
         type=str,
@@ -128,6 +130,5 @@ if __name__ == "__main__":
     parser.add_argument("--annotator", type=str, default="gpt-4o-2024-08-06", help="Name of the annotator")
 
     args = parser.parse_args()
-    args.batch_ids = args.batch_ids.split(",")
 
     watch(args)

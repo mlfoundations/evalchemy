@@ -66,13 +66,14 @@ def regenerate_dataset(args):
     os.makedirs(f"{args.save_dir}/{save_name}", exist_ok=True)
     if args.batch:
         assert data.batch_objects is not None
-        with open(f"{args.save_dir}/{save_name}/batch_objects.json", "w") as f:
+        batch_objects_file = f"{args.save_dir}/{save_name}/batch_objects.json"
+        with open(batch_objects_file, "w") as f:
             json.dump([obj.model_dump() for obj in data.batch_objects], f, indent=4)
-        logging.info(f"Batch objects saved to {args.save_dir}/{save_name}/batch_objects.json")
+        logging.info(f"Batch objects saved to {batch_objects_file}")
         logging.info(
-            f"Run `python dcft/dataset/watch_gpt_batch.py --batch_ids "
-            f"{','.join([obj.id for obj in data.batch_objects])} --dataset {args.dataset} --annotator {args.annotator}` "
-            f" to monitor the batches and download their results."
+            f"Run `python dcft/dataset/watch_gpt_batch.py --batch_objects_file {batch_objects_file} "
+            f"--dataset {args.dataset} --annotator {args.annotator}` "
+            f"to monitor the batches and download their results."
         )
     else:
         assert len(data.annotations) == len(data.user_prompts)

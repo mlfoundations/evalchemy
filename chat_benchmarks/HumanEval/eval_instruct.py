@@ -7,9 +7,7 @@ from pathlib import Path
 from tqdm import tqdm
 from lm_eval.api.instance import Instance
 
-data_abs_dir = Path(__file__).parent / "data"
-
-from utils.utils import extract_generation_code, languge_settings
+from utils.utils import extract_generation_code, language_settings
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from human_eval.evaluation import evaluate_functional_correctness
 
@@ -30,7 +28,7 @@ def eval_instruct(model):
     temp_dir = temp_dir_obj.name
 
     for lang in ["python", "sh"]:
-        problem_file = os.path.join(data_abs_dir, f"humaneval-{lang}.jsonl")
+        problem_file = os.path.join("eval/chat_benchmarks/HumanEval/data", f"humaneval-{lang}.jsonl")
 
         examples = [json.loads(x) for x in open(problem_file) if x.strip()]
         print("Read {} examples for evaluation over.".format(len(examples)))
@@ -38,7 +36,7 @@ def eval_instruct(model):
         generated_examples = []
         all_instances = []
         for idx, example in enumerate(tqdm(examples, desc="Generating")):
-            prompt = build_deepseekcoder_instruction(languge_settings[lang]["full_name"], example["prompt"])
+            prompt = build_deepseekcoder_instruction(language_settings[lang]["full_name"], example["prompt"])
             inputs = model.apply_chat_template([{"role": "user", "content": prompt}])
             all_instances.append(
                 Instance(
@@ -80,7 +78,7 @@ def evaluate(results):
 
     evaluation_results = {}
     for lang in ["python", "sh"]:
-        problem_file = os.path.join(data_abs_dir, f"humaneval-{lang}.jsonl")
+        problem_file = os.path.join("eval/chat_benchmarks/HumanEval/data", f"humaneval-{lang}.jsonl")
         temp_file_path = os.path.join(temp_dir, f"generated_{lang}.jsonl")
 
         result = evaluate_functional_correctness(
@@ -94,16 +92,3 @@ def evaluate(results):
         evaluation_results[lang] = result
     temp_dir_obj.cleanup()
     return evaluation_results
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--model", type=str, help="model name or path")
-    parser.add_argument("--output_path", type=str, help="output path of your generation")
-    parser.add_argument("--language", type=str, help="langauge")
-    parser.add_argument("--temp_dir", type=str, help="temp dir for evaluation", default="tmp")
-    args = parser.parse_args()
-
-    os.environ["TOKENIZERS_PARALLELISM"] = "false"
-    generate_main(args)
-    pass

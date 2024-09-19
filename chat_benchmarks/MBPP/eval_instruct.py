@@ -8,8 +8,6 @@ import tempfile
 from tqdm import tqdm
 from lm_eval.api.instance import Instance
 
-data_abs_dir = Path(__file__).parent / "data"
-
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from human_eval.evaluation import evaluate_functional_correctness
 
@@ -65,11 +63,10 @@ def convert_for_evaluation(example):
     example["generation"] = generation
     return example
 
-
 def eval_instruct(model, **kwargs):
     temp_dir_obj = tempfile.TemporaryDirectory()
     temp_dir = temp_dir_obj.name
-    problem_file = os.path.join(data_abs_dir, f"mbpp.jsonl")
+    problem_file = os.path.join("eval/chat_benchmarks/MBPP/data", f"mbpp.jsonl")
 
     examples = list(read_test_examples(problem_file))
 
@@ -110,7 +107,6 @@ def eval_instruct(model, **kwargs):
     results = {"temp_dir_obj": temp_dir_obj}
     return results
 
-
 def evaluate(results):
     temp_dir_obj = results["temp_dir_obj"]
     temp_dir = temp_dir_obj.name
@@ -118,7 +114,7 @@ def evaluate(results):
     result = evaluate_functional_correctness(
         input_file=f"{temp_dir}/mbpp.jsonl",
         tmp_dir=temp_dir,
-        problem_file=os.path.join(data_abs_dir, f"mbpp_test.jsonl"),
+        problem_file=os.path.join("eval/chat_benchmarks/MBPP/data", f"mbpp_test.jsonl"),
         language="python",
         is_mbpp=True,
     )

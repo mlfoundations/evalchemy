@@ -4,16 +4,17 @@ import random
 from openai_access import call_chatgpt
 from depth import createConstraintsPrompt, createDeepenPrompt, createConcretizingPrompt, createReasoningPrompt
 from breadth import createBreadthPrompt
+from datasets import load_dataset
+from tqdm import tqdm
 
+fr = load_dataset("yahma/alpaca-cleaned")['train']
 
-fr = open('alpaca_data_cleaned.json','r')
-
-all_objs = json.load(fr)
-
+all_objs = fr.to_dict()
+keys = all_objs.keys()
+all_objs = [dict(zip(keys, values)) for values in zip(*all_objs.values())]
 evol_objs = []
 
-
-for cur_obj in all_objs:
+for cur_obj in tqdm(all_objs):
 	
 	instruction = cur_obj['instruction'].strip() + '\r\n'+ cur_obj['input'].strip()
 
@@ -32,10 +33,8 @@ for cur_obj in all_objs:
 
 	evol_objs.append({"instruction":evol_instruction,"output":answer})
 
-
-
-with open('alpaca_data_evol.json', 'w') as f:	
-	json.dump(evol_objs, f, indent=4)
+	with open('alpaca_data_evol.json', 'w') as f:	
+		json.dump(evol_objs, f, indent=4)
 
 
 

@@ -3,11 +3,15 @@ import yaml
 import importlib
 import yaml
 import sys
+import pandas as pd
+from datasets import Dataset
 from typing import Dict, Any, List, Optional
 
 from dcft.data_strategies.huggingface_utils import HuggingFaceUploader
 from dcft.data_strategies.dataset_generation import InstructionGenerator, InstructionFilter, AnnotationGenerator, ModelPairFilter, AnnotationSeeder, InstructionSeeder
 from dcft.data_strategies.dataset_utils import DatasetMixer, DatasetShuffler, DatasetCache, DatasetSaver
+
+from lm_eval.utils import eval_logger
 
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if parent_dir not in sys.path:
@@ -94,7 +98,7 @@ class SyntheticDataFramework:
             self.config = yaml.safe_load(config_file)
 
         self.name = self.config['name']
-        breakpoint()
+        
         self.instruction_generator = InstructionGenerator(self.config['instruction_generation'])
         self.instruction_filter = InstructionFilter(self.config['instruction_filtering'])
         self.annotation_generator = AnnotationGenerator(self.config['annotation_generation'])
@@ -110,21 +114,26 @@ class SyntheticDataFramework:
         if not self.config:
             raise ValueError("Configuration not loaded. Use from_config() to create an instance.")
 
-        instructions = self.instruction_generator.generate()
+        eval_logger.info("Seeding Instructions")
+        instruction_seeds = self.instruction_seeder.generate()
+        eval_logger.info("Generating Instructions")
+        instructions = self.instruction_generator.generate(instruction_seeds)
+        eval_logger.info("Filtering Instructions")
         filtered_instructions = self.instruction_filter.filter(instructions)
-
+        eval_logger.info("Annotating Generations")
         annotations = self.annotation_generator.generate(filtered_instructions)
-
+        eval_logger.info("Filtering Paris")
         filtered_pairs = self.model_pair_filter.filter(annotations)
+        self._upload_to_huggingface(filtered_pairs)
+    
+    def _upload_to_huggingface(self, data_pairs):
+        df = pd.DataFrame(data_pairs)
+    
+        # Convert pandas DataFrame to Hugging Face Dataset
+        dataset = Dataset.from_pandas(df)
+        
+        dataset.push_to_hub(f"EtashGuha/{self.name}")
 
-        mixed_dataset = self.dataset_mixer.mix(filtered_pairs)
-        final_dataset = self.dataset_shuffler.shuffle(mixed_dataset)
-
-        self.dataset_cache.cache(final_dataset)
-        self.dataset_saver.save(final_dataset)
-
-        if self.config['upload_to_huggingface']:
-            self.huggingface_uploader.upload(final_dataset)
 
     def _import_utils_module(self, strategy_dir: str):
         module_name = f"dcft.data_strategies.{strategy_dir}"

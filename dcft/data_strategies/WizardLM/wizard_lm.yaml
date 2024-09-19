@@ -1,7 +1,7 @@
 name: evol_instruct
-instruction_seeder: !function WizardLM.utils.seed_instructions
+instruction_seeder: yahma/alpaca-cleaned//train//instruction
 instruction_generation: !function WizardLM.utils.instruction_generation
-instruction_filtering: !function WizardLM.utils.instruction_filtering
-annotation_seeder: !function WizardLM.utils.seed_annotations
+instruction_filtering: 
+annotation_seeder: 
 annotation_generation: !function WizardLM.utils.annotation_generation
-model_pair_filtering: !function WizardLM.utils.model_pair_filtering
+model_pair_filtering: 

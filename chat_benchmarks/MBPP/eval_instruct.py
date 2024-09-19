@@ -63,6 +63,7 @@ def convert_for_evaluation(example):
     example["generation"] = generation
     return example
 
+
 def eval_instruct(model, **kwargs):
     temp_dir_obj = tempfile.TemporaryDirectory()
     temp_dir = temp_dir_obj.name
@@ -106,6 +107,7 @@ def eval_instruct(model, **kwargs):
         print("Save {} processed examples into {} over!".format(len(generated_examples), temp_dir))
     results = {"temp_dir_obj": temp_dir_obj}
     return results
+
 
 def evaluate(results):
     temp_dir_obj = results["temp_dir_obj"]

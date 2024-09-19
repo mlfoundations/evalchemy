@@ -1,6 +1,0 @@
-openai
-transformers
-fire
-datasets
-tiktoken
-huggingface_hub[cli]

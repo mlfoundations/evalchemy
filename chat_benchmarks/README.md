@@ -5,7 +5,7 @@ We adopt a lot from the amazing LM-Eval-Harness [https://github.com/EleutherAI/l
 Evaluation is as simple as 
 
 ```bash
-python -m eval.eval --tasks alpaca_eval --model hf —-model_args “pretrained=meta-llamaMeta-Llama-3-8B-Instruct" --batch_size auto --output_path logs
+python -m eval.eval --model hf  --tasks HumanEval --model_args 'pretrained=meta-llama/Meta-Llama-3-8B-Instruct' --batch_size auto --output_path logs
 ```
 
 The "auto" batch-size significantly improves speed. The output will be placed in the logs file. 

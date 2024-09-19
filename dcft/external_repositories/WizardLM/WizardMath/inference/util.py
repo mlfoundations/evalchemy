@@ -1,12 +1,14 @@
 import pprint
 from grader import math_equal
 
+
 def last_boxed_only(sample):
     q, a = sample
     a = last_boxed_only_string(a)
     if a == None:
         return None
     return (q, a)
+
 
 def last_boxed_only_string(string):
     idx = string.rfind("\\boxed")
@@ -27,13 +29,14 @@ def last_boxed_only_string(string):
                 right_brace_idx = i
                 break
         i += 1
-    
+
     if right_brace_idx == None:
         retval = None
     else:
-        retval = string[idx:right_brace_idx + 1]
-    
+        retval = string[idx : right_brace_idx + 1]
+
     return retval
+
 
 def only_until_first_boxed_from_tokens(string, tokens):
     idx = string.find("\\boxed")
@@ -41,15 +44,14 @@ def only_until_first_boxed_from_tokens(string, tokens):
         idx = string.find("\\fbox")
         if idx < 0:
             return None
-    
+
     cum_length = 0
     for i, t in enumerate(tokens):
         cum_length += len(t)
         if cum_length >= idx:
             break
-    
-    return tokens[:i]
 
+    return tokens[:i]
 
 
 def clean_numbers(sample):
@@ -60,6 +62,7 @@ def clean_numbers(sample):
         new_sample.append(_clean_numbers(s))
 
     return tuple(new_sample)
+
 
 def _clean_numbers(string):
     """
@@ -76,7 +79,7 @@ def _clean_numbers(string):
     new_string = ""
     for i, c in enumerate(string):
         # isdigit() doesnt work here because of weird unicode chars.
-        if c in {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'}:
+        if c in {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"}:
             num_prev_digits += 1
         else:
             if num_prev_digits > 3:
@@ -92,6 +95,7 @@ def _clean_numbers(string):
         new_string = new_string[:-num_prev_digits] + "{0:,}".format(int(string_number))
 
     return new_string
+
 
 def fix_fracs(string):
     substrs = string.split("\\frac")
@@ -124,6 +128,7 @@ def fix_fracs(string):
     string = new_str
     return string
 
+
 def fix_a_slash_b(string):
     if len(string.split("/")) != 2:
         return string
@@ -138,6 +143,7 @@ def fix_a_slash_b(string):
     except AssertionError:
         return string
 
+
 def remove_right_units(string):
     # "\\text{ " only ever occurs (at least in the val set) when describing units
     if "\\text{ " in string:
@@ -146,6 +152,7 @@ def remove_right_units(string):
         return splits[0]
     else:
         return string
+
 
 def fix_sqrt(string):
     if "\\sqrt" not in string:
@@ -237,16 +244,17 @@ def is_equiv(str1, str2, verbose=False):
     try:
         ss1 = strip_string(str1)
         ss2 = strip_string(str2)
-        #pdb.set_trace()
+        # pdb.set_trace()
         if verbose:
             print(ss1, ss2)
-        #return ss1 == ss2
-        res = math_equal(ss1,ss2) or ss1 == ss2
+        # return ss1 == ss2
+        res = math_equal(ss1, ss2) or ss1 == ss2
         return res
     except Exception:
-        #return str1 == str2
-        res = math_equal(str1,str1) or str1 == str2
+        # return str1 == str2
+        res = math_equal(str1, str1) or str1 == str2
         return res
+
 
 class NotEqual:
     def __eq__(self, other):

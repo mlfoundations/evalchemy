@@ -2,6 +2,7 @@ import sys
 
 import fire
 import torch
+
 # from peft import PeftModel
 import transformers
 import gradio as gr
@@ -28,9 +29,7 @@ def main(
     base_model: str = "/path/to/llama-7B/hf/ft/checkpoint-300",
     # lora_weights: str = "tloen/alpaca-lora-7b",
 ):
-    assert base_model, (
-        "Please specify a --base_model, e.g. --base_model='decapoda-research/llama-7b-hf'"
-    )
+    assert base_model, "Please specify a --base_model, e.g. --base_model='decapoda-research/llama-7b-hf'"
 
     tokenizer = LlamaTokenizer.from_pretrained(base_model)
     if device == "cuda":
@@ -94,19 +93,13 @@ def main(
     gr.Interface(
         fn=evaluate,
         inputs=[
-            gr.components.Textbox(
-                lines=2, label="Instruction", placeholder="Tell me about alpacas."
-            ),
+            gr.components.Textbox(lines=2, label="Instruction", placeholder="Tell me about alpacas."),
             gr.components.Textbox(lines=2, label="Input", placeholder="none"),
             gr.components.Slider(minimum=0, maximum=1, value=0.1, label="Temperature"),
             gr.components.Slider(minimum=0, maximum=1, value=0.75, label="Top p"),
-            gr.components.Slider(
-                minimum=0, maximum=100, step=1, value=40, label="Top k"
-            ),
+            gr.components.Slider(minimum=0, maximum=100, step=1, value=40, label="Top k"),
             gr.components.Slider(minimum=1, maximum=4, step=1, value=4, label="Beams"),
-            gr.components.Slider(
-                minimum=1, maximum=2000, step=1, value=128, label="Max tokens"
-            ),
+            gr.components.Slider(minimum=1, maximum=2000, step=1, value=128, label="Max tokens"),
         ],
         outputs=[
             gr.inputs.Textbox(

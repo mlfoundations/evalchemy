@@ -6,9 +6,8 @@ The #Created Prompt# must be reasonable and must be understood and responded by 
 '#Given Prompt#', '#Created Prompt#', 'given prompt' and 'created prompt' are not allowed to appear in #Created Prompt#\r\n"
 
 
-
 def createBreadthPrompt(instruction):
-	prompt = base_instruction
-	prompt += "#Given Prompt#: \r\n {} \r\n".format(instruction)
-	prompt += "#Created Prompt#:\r\n"
-	return prompt
+    prompt = base_instruction
+    prompt += "#Given Prompt#: \r\n {} \r\n".format(instruction)
+    prompt += "#Created Prompt#:\r\n"
+    return prompt

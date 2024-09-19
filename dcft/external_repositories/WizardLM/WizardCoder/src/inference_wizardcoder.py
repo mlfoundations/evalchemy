@@ -19,17 +19,18 @@ try:
 except:
     pass
 
+
 def evaluate(
-        batch_data,
-        tokenizer,
-        model,
-        input=None,
-        temperature=1,
-        top_p=0.9,
-        top_k=40,
-        num_beams=1,
-        max_new_tokens=2048,
-        **kwargs,
+    batch_data,
+    tokenizer,
+    model,
+    input=None,
+    temperature=1,
+    top_p=0.9,
+    top_k=40,
+    num_beams=1,
+    max_new_tokens=2048,
+    **kwargs,
 ):
     prompts = generate_prompt(batch_data, input)
     inputs = tokenizer(prompts, return_tensors="pt", max_length=256, truncation=True, padding=True)
@@ -68,12 +69,10 @@ def generate_prompt(instruction, input=None):
 def main(
     load_8bit: bool = False,
     base_model: str = "Model_Path",
-    input_data_path = "Input.jsonl",
-    output_data_path = "Output.jsonl",
+    input_data_path="Input.jsonl",
+    output_data_path="Output.jsonl",
 ):
-    assert base_model, (
-        "Please specify a --base_model, e.g. --base_model='bigcode/starcoder'"
-    )
+    assert base_model, "Please specify a --base_model, e.g. --base_model='bigcode/starcoder'"
 
     tokenizer = AutoTokenizer.from_pretrained(base_model)
     if device == "cuda":
@@ -99,8 +98,8 @@ def main(
     if torch.__version__ >= "2" and sys.platform != "win32":
         model = torch.compile(model)
 
-    input_data = jsonlines.open(input_data_path, mode='r')
-    output_data = jsonlines.open(output_data_path, mode='w')
+    input_data = jsonlines.open(input_data_path, mode="r")
+    output_data = jsonlines.open(output_data_path, mode="w")
 
     for num, line in enumerate(input_data):
         one_data = line
@@ -109,11 +108,7 @@ def main(
         print(instruction)
         _output = evaluate(instruction, tokenizer, model)
         final_output = _output[0].split("### Response:")[1].strip()
-        new_data = {
-            "id": id,
-            "instruction": instruction,
-            "wizardcoder": final_output
-        }
+        new_data = {"id": id, "instruction": instruction, "wizardcoder": final_output}
         output_data.write(new_data)
 
 

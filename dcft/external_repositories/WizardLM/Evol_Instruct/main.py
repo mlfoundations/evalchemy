@@ -7,7 +7,7 @@ from breadth import createBreadthPrompt
 from datasets import load_dataset
 from tqdm import tqdm
 
-fr = load_dataset("yahma/alpaca-cleaned")['train']
+fr = load_dataset("yahma/alpaca-cleaned")["train"]
 
 all_objs = fr.to_dict()
 keys = all_objs.keys()
@@ -15,27 +15,22 @@ all_objs = [dict(zip(keys, values)) for values in zip(*all_objs.values())]
 evol_objs = []
 
 for cur_obj in tqdm(all_objs):
-	
-	instruction = cur_obj['instruction'].strip() + '\r\n'+ cur_obj['input'].strip()
 
-	evol_prompts = []
-	evol_prompts.append(createConstraintsPrompt(instruction))
-	evol_prompts.append(createDeepenPrompt(instruction))
-	evol_prompts.append(createConcretizingPrompt(instruction))
-	evol_prompts.append(createReasoningPrompt(instruction))
-	evol_prompts.append(createBreadthPrompt(instruction))
+    instruction = cur_obj["instruction"].strip() + "\r\n" + cur_obj["input"].strip()
 
-	selected_evol_prompt = random.choice(evol_prompts)
+    evol_prompts = []
+    evol_prompts.append(createConstraintsPrompt(instruction))
+    evol_prompts.append(createDeepenPrompt(instruction))
+    evol_prompts.append(createConcretizingPrompt(instruction))
+    evol_prompts.append(createReasoningPrompt(instruction))
+    evol_prompts.append(createBreadthPrompt(instruction))
 
+    selected_evol_prompt = random.choice(evol_prompts)
 
-	evol_instruction = call_chatgpt(selected_evol_prompt)
-	answer = call_chatgpt(evol_instruction)
+    evol_instruction = call_chatgpt(selected_evol_prompt)
+    answer = call_chatgpt(evol_instruction)
 
-	evol_objs.append({"instruction":evol_instruction,"output":answer})
+    evol_objs.append({"instruction": evol_instruction, "output": answer})
 
-	with open('alpaca_data_evol.json', 'w') as f:	
-		json.dump(evol_objs, f, indent=4)
-
-
-
-
+    with open("alpaca_data_evol.json", "w") as f:
+        json.dump(evol_objs, f, indent=4)

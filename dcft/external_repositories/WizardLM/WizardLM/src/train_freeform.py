@@ -30,12 +30,8 @@ DEFAULT_EOS_TOKEN = "</s>"
 DEFAULT_BOS_TOKEN = "</s>"
 DEFAULT_UNK_TOKEN = "</s>"
 PROMPT_DICT = {
-    "prompt_input": (
-        "{instruction}\n\n### Response:"
-    ),
-    "prompt_no_input": (
-        "{instruction}\n\n### Response:"
-    ),
+    "prompt_input": ("{instruction}\n\n### Response:"),
+    "prompt_no_input": ("{instruction}\n\n### Response:"),
 }
 
 
@@ -147,7 +143,6 @@ class SupervisedDataset(Dataset):
         ]
         targets = [f"{example['output']}{tokenizer.eos_token}" for example in list_data_dict]
 
-
         logging.warning("Tokenizing inputs... This may take some time...")
         data_dict = preprocess(sources, targets, tokenizer)
 
@@ -159,6 +154,7 @@ class SupervisedDataset(Dataset):
 
     def __getitem__(self, i) -> Dict[str, torch.Tensor]:
         return dict(input_ids=self.input_ids[i], labels=self.labels[i])
+
 
 class SupervisedComplexDataset(Dataset):
     """Dataset for supervised fine-tuning."""
@@ -166,24 +162,21 @@ class SupervisedComplexDataset(Dataset):
     def __init__(self, data_path: str, tokenizer: transformers.PreTrainedTokenizer):
         super(SupervisedComplexDataset, self).__init__()
         logging.warning("Loading data...")
-        #list_data_dict = utils.jload(data_path)
+        # list_data_dict = utils.jload(data_path)
 
         list_data_dict = []
 
         with open(data_path) as f:
-            for line in f:    
+            for line in f:
                 cur_obj = json.loads(line)
                 cur_obj = json.loads(cur_obj)
                 list_data_dict.append(cur_obj)
 
         logging.warning("Formatting inputs...")
         prompt_input, prompt_no_input = PROMPT_DICT["prompt_input"], PROMPT_DICT["prompt_no_input"]
-        sources = [
-            (example['instruction'].strip()+'\n\n') for example in list_data_dict
-        ]
+        sources = [(example["instruction"].strip() + "\n\n") for example in list_data_dict]
         targets = [f"{example['output']}{tokenizer.eos_token}" for example in list_data_dict]
 
-       
         logging.warning("Tokenizing inputs... This may take some time...")
         data_dict = preprocess(sources, targets, tokenizer)
 
@@ -195,6 +188,7 @@ class SupervisedComplexDataset(Dataset):
 
     def __getitem__(self, i) -> Dict[str, torch.Tensor]:
         return dict(input_ids=self.input_ids[i], labels=self.labels[i])
+
 
 @dataclass
 class DataCollatorForSupervisedDataset(object):
@@ -217,7 +211,7 @@ class DataCollatorForSupervisedDataset(object):
 
 def make_supervised_data_module(tokenizer: transformers.PreTrainedTokenizer, data_args) -> Dict:
     """Make dataset and collator for supervised fine-tuning."""
-    if data_args.complex_data == 'complex':
+    if data_args.complex_data == "complex":
         train_dataset = SupervisedComplexDataset(tokenizer=tokenizer, data_path=data_args.data_path)
     else:
         train_dataset = SupervisedDataset(tokenizer=tokenizer, data_path=data_args.data_path)
@@ -228,7 +222,7 @@ def make_supervised_data_module(tokenizer: transformers.PreTrainedTokenizer, dat
 def train():
     parser = transformers.HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
-        
+
     model = transformers.AutoModelForCausalLM.from_pretrained(
         model_args.model_name_or_path,
         cache_dir=training_args.cache_dir,
@@ -257,7 +251,7 @@ def train():
         )
 
     data_module = make_supervised_data_module(tokenizer=tokenizer, data_args=data_args)
-    #Tell Trainer not to attempt DataParallel
+    # Tell Trainer not to attempt DataParallel
     model.is_parallelizable = True
     model.model_parallel = True
 

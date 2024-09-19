@@ -100,11 +100,7 @@ class Conversation:
             ret = self.system
             for i, (role, message) in enumerate(self.messages):
                 if message:
-                    ret += (
-                        role
-                        + ": "
-                        + message.replace("\r\n", "\n").replace("\n\n", "\n")
-                    )
+                    ret += role + ": " + message.replace("\r\n", "\n").replace("\n\n", "\n")
                     ret += "\n\n"
                 else:
                     ret += role + ":"
@@ -131,7 +127,7 @@ class Conversation:
                 if message:
                     ret += role + ": " + message + self.sep
                 else:
-                    ret += role + ": " # must be end with a space
+                    ret += role + ": "  # must be end with a space
             return ret
         else:
             raise ValueError(f"Invalid style: {self.sep_style}")

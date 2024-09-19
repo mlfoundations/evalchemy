@@ -1,6 +1,6 @@
-
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any
+
 
 class HuggingFaceUploader(ABC):
     """
@@ -15,7 +15,7 @@ class HuggingFaceUploader(ABC):
             config (Dict[str, Any]): Configuration for HuggingFace uploading.
         """
         self.config = config
-    
+
     @abstractmethod
     def upload(self, dataset: List[Dict[str, Any]]) -> None:
         """
@@ -25,4 +25,3 @@ class HuggingFaceUploader(ABC):
             dataset (List[Dict[str, Any]]): Dataset to upload.
         """
         pass
-

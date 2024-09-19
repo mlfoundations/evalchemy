@@ -9,26 +9,32 @@ base_instruction = "I want you act as a Prompt Rewriter.\r\n \
 
 
 def createConstraintsPrompt(instruction):
-	prompt = base_instruction.format("Please add one more constraints/requirements into #The Given Prompt#'")
-	prompt += "#The Given Prompt#: \r\n {} \r\n".format(instruction)
-	prompt += "#Rewritten Prompt#:\r\n"
-	return prompt
+    prompt = base_instruction.format("Please add one more constraints/requirements into #The Given Prompt#'")
+    prompt += "#The Given Prompt#: \r\n {} \r\n".format(instruction)
+    prompt += "#Rewritten Prompt#:\r\n"
+    return prompt
+
 
 def createDeepenPrompt(instruction):
-	prompt = base_instruction.format("If #The Given Prompt# contains inquiries about certain issues, the depth and breadth of the inquiry can be increased.")
-	prompt += "#The Given Prompt#: \r\n {} \r\n".format(instruction)
-	prompt += "#Rewritten Prompt#:\r\n"
-	return prompt
+    prompt = base_instruction.format(
+        "If #The Given Prompt# contains inquiries about certain issues, the depth and breadth of the inquiry can be increased."
+    )
+    prompt += "#The Given Prompt#: \r\n {} \r\n".format(instruction)
+    prompt += "#Rewritten Prompt#:\r\n"
+    return prompt
+
 
 def createConcretizingPrompt(instruction):
-	prompt = base_instruction.format("Please replace general concepts with more specific concepts.")
-	prompt += "#The Given Prompt#: \r\n {} \r\n".format(instruction)
-	prompt += "#Rewritten Prompt#:\r\n"
-	return prompt
+    prompt = base_instruction.format("Please replace general concepts with more specific concepts.")
+    prompt += "#The Given Prompt#: \r\n {} \r\n".format(instruction)
+    prompt += "#Rewritten Prompt#:\r\n"
+    return prompt
 
 
 def createReasoningPrompt(instruction):
-	prompt = base_instruction.format("If #The Given Prompt# can be solved with just a few simple thinking processes, you can rewrite it to explicitly request multiple-step reasoning.")
-	prompt += "#The Given Prompt#: \r\n {} \r\n".format(instruction)
-	prompt += "#Rewritten Prompt#:\r\n"
-	return prompt
+    prompt = base_instruction.format(
+        "If #The Given Prompt# can be solved with just a few simple thinking processes, you can rewrite it to explicitly request multiple-step reasoning."
+    )
+    prompt += "#The Given Prompt#: \r\n {} \r\n".format(instruction)
+    prompt += "#Rewritten Prompt#:\r\n"
+    return prompt

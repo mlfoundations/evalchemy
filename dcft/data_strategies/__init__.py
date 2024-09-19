@@ -8,7 +8,14 @@ from datasets import Dataset
 from typing import Dict, Any, List, Optional
 
 from dcft.data_strategies.huggingface_utils import HuggingFaceUploader
-from dcft.data_strategies.dataset_generation import InstructionGenerator, InstructionFilter, AnnotationGenerator, ModelPairFilter, AnnotationSeeder, InstructionSeeder
+from dcft.data_strategies.dataset_generation import (
+    InstructionGenerator,
+    InstructionFilter,
+    AnnotationGenerator,
+    ModelPairFilter,
+    AnnotationSeeder,
+    InstructionSeeder,
+)
 from dcft.data_strategies.dataset_utils import DatasetMixer, DatasetShuffler, DatasetCache, DatasetSaver
 
 from lm_eval.utils import eval_logger
@@ -35,7 +42,7 @@ class SyntheticDataFramework:
         dataset_shuffler: Optional[DatasetShuffler] = None,
         dataset_cache: Optional[DatasetCache] = None,
         dataset_saver: Optional[DatasetSaver] = None,
-        huggingface_uploader: Optional[HuggingFaceUploader] = None
+        huggingface_uploader: Optional[HuggingFaceUploader] = None,
     ):
         """
         Initialize the framework with optional components.
@@ -55,7 +62,7 @@ class SyntheticDataFramework:
         self.huggingface_uploader = huggingface_uploader
 
     @staticmethod
-    def from_config(config_path: str) -> 'SyntheticDataFramework':
+    def from_config(config_path: str) -> "SyntheticDataFramework":
         """
         Create and return a SyntheticDataFramework instance from a configuration file.
 
@@ -76,6 +83,7 @@ class SyntheticDataFramework:
         Args:
             config_path (str): Path to the YAML configuration file.
         """
+
         def function_constructor(loader, node):
             value = loader.construct_scalar(node)
             try:
@@ -83,8 +91,8 @@ class SyntheticDataFramework:
                 args = args.strip()
             except ValueError:
                 func_name, args = value, ""
-            
-            strategy_dir, func_name = func_name.rsplit('.', 1)
+
+            strategy_dir, func_name = func_name.rsplit(".", 1)
             utils_module = self._import_utils_module(strategy_dir)
 
             func = getattr(utils_module, func_name)
@@ -94,18 +102,17 @@ class SyntheticDataFramework:
         yaml.add_constructor("!function", function_constructor, Loader=yaml.SafeLoader)
 
         # Load the YAML file with the custom constructor
-        with open(yaml_path, 'r') as config_file:
+        with open(yaml_path, "r") as config_file:
             self.config = yaml.safe_load(config_file)
 
-        self.name = self.config['name']
-        
-        self.instruction_generator = InstructionGenerator(self.config['instruction_generation'])
-        self.instruction_filter = InstructionFilter(self.config['instruction_filtering'])
-        self.annotation_generator = AnnotationGenerator(self.config['annotation_generation'])
-        self.model_pair_filter = ModelPairFilter(self.config['model_pair_filtering'])
-        self.annotation_seeder = AnnotationSeeder(self.config['annotation_seeder'])
-        self.instruction_seeder = InstructionSeeder(self.config['instruction_seeder'])
+        self.name = self.config["name"]
 
+        self.instruction_generator = InstructionGenerator(self.config["instruction_generation"])
+        self.instruction_filter = InstructionFilter(self.config["instruction_filtering"])
+        self.annotation_generator = AnnotationGenerator(self.config["annotation_generation"])
+        self.model_pair_filter = ModelPairFilter(self.config["model_pair_filtering"])
+        self.annotation_seeder = AnnotationSeeder(self.config["annotation_seeder"])
+        self.instruction_seeder = InstructionSeeder(self.config["instruction_seeder"])
 
     def generate_dataset(self) -> None:
         """
@@ -125,15 +132,14 @@ class SyntheticDataFramework:
         eval_logger.info("Filtering Paris")
         filtered_pairs = self.model_pair_filter.filter(annotations)
         self._upload_to_huggingface(filtered_pairs)
-    
+
     def _upload_to_huggingface(self, data_pairs):
         df = pd.DataFrame(data_pairs)
-    
+
         # Convert pandas DataFrame to Hugging Face Dataset
         dataset = Dataset.from_pandas(df)
-        
-        dataset.push_to_hub(f"EtashGuha/{self.name}")
 
+        dataset.push_to_hub(f"EtashGuha/{self.name}")
 
     def _import_utils_module(self, strategy_dir: str):
         module_name = f"dcft.data_strategies.{strategy_dir}"
@@ -157,7 +163,7 @@ class SyntheticDataManager:
             strategy_path = os.path.join(self.strategies_dir, strategy_dir)
             if os.path.isdir(strategy_path) and strategy_dir != "__pycache__":
                 for file in os.listdir(strategy_path):
-                    if file.endswith('.yaml'):
+                    if file.endswith(".yaml"):
                         config_path = os.path.join(strategy_path, file)
                         framework = SyntheticDataFramework.from_config(config_path)
                         if framework.name in frameworks:
@@ -179,11 +185,12 @@ class SyntheticDataManager:
         else:
             print(f"Framework '{framework_name}' not found.")
 
+
 # Example usage
 if __name__ == "__main__":
     manager = SyntheticDataManager()
     print("Available frameworks:", manager.list_frameworks())
-    
+
     # Run a specific framework
     framework_name = "example_framework"
     manager.run_framework(framework_name)

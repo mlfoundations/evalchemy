@@ -1,6 +1,7 @@
 from typing import List, Dict, Any, Callable
-from datasets import load_dataset 
-import re 
+from datasets import load_dataset
+import re
+
 
 class InstructionGenerator:
     """
@@ -19,10 +20,9 @@ class InstructionGenerator:
         elif isinstance(generate_info, str):
             dataset_name, split_name, instruction_name = generate_info.split("\\")
             dataset = load_dataset(dataset_name)
-            
+
             instructions = list(dataset[split_name].map(lambda x: [instruction_name]))
             self.generate = lambda: instructions
-
 
 
 class InstructionSeeder:
@@ -48,7 +48,6 @@ class InstructionSeeder:
             seeds = dataset[split_name][seed_name]
             self.generate = lambda: seeds
 
-        
 
 class AnnotationSeeder:
     """
@@ -67,6 +66,7 @@ class AnnotationSeeder:
         else:
             self.generate = generate_info
 
+
 class InstructionFilter:
     """
     Class for filtering instructions.
@@ -84,6 +84,7 @@ class InstructionFilter:
         else:
             self.filter = filter_info
 
+
 class AnnotationGenerator:
     """
     Class for generating annotations.
@@ -97,6 +98,7 @@ class AnnotationGenerator:
             generate_info (Callable[[List[str]], List[Dict[str, Any]]]): Function for annotation generation.
         """
         self.generate = generate_info
+
 
 class ModelPairFilter:
     """

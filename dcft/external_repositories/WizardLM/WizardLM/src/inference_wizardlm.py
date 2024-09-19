@@ -21,15 +21,16 @@ try:
 except:
     pass
 
+
 def evaluate(
-        batch_data,
-        input=None,
-        temperature=1,
-        top_p=0.9,
-        top_k=40,
-        num_beams=1,
-        max_new_tokens=2048,
-        **kwargs,
+    batch_data,
+    input=None,
+    temperature=1,
+    top_p=0.9,
+    top_k=40,
+    num_beams=1,
+    max_new_tokens=2048,
+    **kwargs,
 ):
     prompts = generate_prompt(batch_data, input)
     inputs = tokenizer(prompts, return_tensors="pt", max_length=1024, truncation=True, padding=True)
@@ -64,12 +65,10 @@ def generate_prompt(instruction, input=None):
 def main(
     load_8bit: bool = False,
     base_model: str = "Model_Path",
-    input_data_path = "Input.jsonl",
-    output_data_path = "Output.jsonl",
+    input_data_path="Input.jsonl",
+    output_data_path="Output.jsonl",
 ):
-    assert base_model, (
-        "Please specify a --base_model, e.g. --base_model='decapoda-research/llama-7b-hf'"
-    )
+    assert base_model, "Please specify a --base_model, e.g. --base_model='decapoda-research/llama-7b-hf'"
 
     tokenizer = LlamaTokenizer.from_pretrained(base_model)
     if device == "cuda":
@@ -97,8 +96,8 @@ def main(
     if torch.__version__ >= "2" and sys.platform != "win32":
         model = torch.compile(model)
 
-    input_data = open(input_data_path, mode='r', encoding='utf-8')
-    output_data = open(output_data_path, mode='w', encoding='utf-8')
+    input_data = open(input_data_path, mode="r", encoding="utf-8")
+    output_data = open(output_data_path, mode="w", encoding="utf-8")
 
     for num, line in enumerate(input_data.readlines()):
         one_data = json.loads(line)
@@ -106,12 +105,8 @@ def main(
         instruction = one_data["Instruction"]
         _output = evaluate(instruction)
         final_output = _output[0].split("### Response:")[1].strip()
-        new_data = {
-            "id": id,
-            "instruction": instruction,
-            "wizardlm": final_output
-        }
-        output_data.write(json.dumps(new_data) + '\n')
+        new_data = {"id": id, "instruction": instruction, "wizardlm": final_output}
+        output_data.write(json.dumps(new_data) + "\n")
 
 
 if __name__ == "__main__":

@@ -156,20 +156,21 @@ class DataCollatorForSupervisedDataset(object):
             attention_mask=input_ids.ne(self.tokenizer.pad_token_id),
         )
 
+
 def train_tokenize_function(examples, tokenizer):
     prompt_input, prompt_no_input = PROMPT_DICT["prompt_input"], PROMPT_DICT["prompt_no_input"]
-    if 'input' in examples:
+    if "input" in examples:
         sources = [
-            prompt_input.format_map(dict(instruction=instruction, input=input)) if input != "" \
-            else prompt_no_input.format_map(dict(instruction=instruction)) \
-            for instruction, input in zip(examples['instruction'], examples['input']) 
+            (
+                prompt_input.format_map(dict(instruction=instruction, input=input))
+                if input != ""
+                else prompt_no_input.format_map(dict(instruction=instruction))
+            )
+            for instruction, input in zip(examples["instruction"], examples["input"])
         ]
     else:
-        sources = [
-            prompt_no_input.format_map(dict(instruction=instruction)) \
-            for instruction in examples['instruction']
-        ]
-    targets = [f"{output}{tokenizer.eos_token}" for output in examples['output']]
+        sources = [prompt_no_input.format_map(dict(instruction=instruction)) for instruction in examples["instruction"]]
+    targets = [f"{output}{tokenizer.eos_token}" for output in examples["output"]]
     data_dict = preprocess(sources, targets, tokenizer)
     return data_dict
 
@@ -177,7 +178,7 @@ def train_tokenize_function(examples, tokenizer):
 def train():
     parser = transformers.HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
-        
+
     model = transformers.AutoModelForCausalLM.from_pretrained(
         model_args.model_name_or_path,
         cache_dir=training_args.cache_dir,
@@ -206,8 +207,10 @@ def train():
             }
         )
 
-    raw_train_datasets = load_dataset('json', data_files=data_args.data_path, split="train", cache_dir=training_args.cache_dir)
-    if training_args.local_rank > 0: 
+    raw_train_datasets = load_dataset(
+        "json", data_files=data_args.data_path, split="train", cache_dir=training_args.cache_dir
+    )
+    if training_args.local_rank > 0:
         torch.distributed.barrier()
 
     train_dataset = raw_train_datasets.map(
@@ -216,23 +219,23 @@ def train():
         batch_size=3000,
         num_proc=32,
         remove_columns=raw_train_datasets.column_names,
-        load_from_cache_file=True, # not args.overwrite_cache
+        load_from_cache_file=True,  # not args.overwrite_cache
         desc="Running tokenizer on train dataset",
-        fn_kwargs={"tokenizer": tokenizer}
+        fn_kwargs={"tokenizer": tokenizer},
     )
 
     if training_args.local_rank == 0:
         torch.distributed.barrier()
-    
+
     if training_args.local_rank == 0:
         print(len(train_dataset))
         for index in random.sample(range(len(train_dataset)), 3):
             print(f"Sample {index} of the training set: {train_dataset[index]}.")
-    
+
     data_collator = DataCollatorForSupervisedDataset(tokenizer=tokenizer)
     data_module = dict(train_dataset=train_dataset, eval_dataset=None, data_collator=data_collator)
 
-    #Tell Trainer not to attempt DataParallel
+    # Tell Trainer not to attempt DataParallel
     model.is_parallelizable = True
     model.model_parallel = True
 

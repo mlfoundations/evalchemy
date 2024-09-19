@@ -23,7 +23,10 @@ from train import smart_tokenizer_and_embedding_resize
 
 @torch.inference_mode()
 def make_diff(
-    path_raw: str, path_tuned: str, path_diff: str, device="cuda",  # "cuda" or "cpu"
+    path_raw: str,
+    path_tuned: str,
+    path_diff: str,
+    device="cuda",  # "cuda" or "cpu"
 ):
     """Make the weight diff.
 
@@ -45,13 +48,9 @@ def make_diff(
         low_cpu_mem_usage=True,
     )
 
-    tokenizer_tuned: transformers.PreTrainedTokenizer = transformers.AutoTokenizer.from_pretrained(
-        path_tuned
-    )
+    tokenizer_tuned: transformers.PreTrainedTokenizer = transformers.AutoTokenizer.from_pretrained(path_tuned)
 
-    tokenizer_raw: transformers.PreTrainedTokenizer = transformers.AutoTokenizer.from_pretrained(
-        path_raw
-    )
+    tokenizer_raw: transformers.PreTrainedTokenizer = transformers.AutoTokenizer.from_pretrained(path_raw)
     if tokenizer_raw.pad_token is None:
         smart_tokenizer_and_embedding_resize(
             special_tokens_dict=dict(pad_token="[PAD]"),
@@ -111,18 +110,14 @@ def recover(
         low_cpu_mem_usage=True,
     )
 
-    tokenizer_raw: transformers.PreTrainedTokenizer = transformers.AutoTokenizer.from_pretrained(
-        path_raw
-    )
+    tokenizer_raw: transformers.PreTrainedTokenizer = transformers.AutoTokenizer.from_pretrained(path_raw)
     if tokenizer_raw.pad_token is None:
         smart_tokenizer_and_embedding_resize(
             special_tokens_dict=dict(pad_token="[PAD]"),
             model=model_raw,
             tokenizer=tokenizer_raw,
         )
-    tokenizer_recovered: transformers.PreTrainedTokenizer = transformers.AutoTokenizer.from_pretrained(
-        path_diff
-    )
+    tokenizer_recovered: transformers.PreTrainedTokenizer = transformers.AutoTokenizer.from_pretrained(path_diff)
 
     state_dict_recovered = model_recovered.state_dict()
     state_dict_raw = model_raw.state_dict()

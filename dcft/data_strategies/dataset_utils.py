@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any
 
+
 class DatasetMixer(ABC):
     """
     Abstract base class for mixing datasets.
@@ -19,6 +20,7 @@ class DatasetMixer(ABC):
             List[Dict[str, Any]]: Mixed dataset.
         """
         pass
+
 
 class DatasetShuffler(ABC):
     """
@@ -39,6 +41,7 @@ class DatasetShuffler(ABC):
         """
         pass
 
+
 class DatasetCache(ABC):
     """
     Abstract base class for caching datasets.
@@ -52,7 +55,7 @@ class DatasetCache(ABC):
             config (Dict[str, Any]): Configuration for dataset caching.
         """
         self.config = config
-    
+
     @abstractmethod
     def cache(self, dataset: List[Dict[str, Any]]) -> None:
         """
@@ -62,6 +65,7 @@ class DatasetCache(ABC):
             dataset (List[Dict[str, Any]]): Dataset to cache.
         """
         pass
+
 
 class DatasetSaver(ABC):
     """
@@ -76,7 +80,7 @@ class DatasetSaver(ABC):
             config (Dict[str, Any]): Configuration for dataset saving.
         """
         self.config = config
-    
+
     @abstractmethod
     def save(self, dataset: List[Dict[str, Any]]) -> None:
         """

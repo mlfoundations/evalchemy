@@ -24,6 +24,7 @@ from transformers import Trainer
 from transformers.trainer_pt_utils import LabelSmoother
 
 from conversation import SeparatorStyle, Conversation
+
 # from fastchat.model.model_adapter import get_conversation_template
 
 import utils
@@ -140,7 +141,7 @@ def preprocess(
     conv = Conversation(
         name="vicuna_v1.1",
         system="A chat between a curious user and an artificial intelligence assistant. "
-               "The assistant gives helpful, detailed, and polite answers to the user's questions.",
+        "The assistant gives helpful, detailed, and polite answers to the user's questions.",
         roles=["USER", "ASSISTANT"],
         messages=[],
         offset=0,
@@ -163,7 +164,7 @@ def preprocess(
             assert role == conv.roles[j % 2], f"{i}"
             conv.append_message(role, sentence["value"])
         conversations.append(conv.get_prompt())
-        #print("$$"+conv.get_prompt().strip()+"$$")
+        # print("$$"+conv.get_prompt().strip()+"$$")
     input_ids = tokenizer(
         conversations,
         return_tensors="pt",
@@ -193,7 +194,7 @@ def preprocess(
             round_len = len(tokenizer(rou).input_ids)
             instruction_len = len(tokenizer(parts[0]).input_ids) - 2
 
-            target[cur_len: cur_len + instruction_len] = IGNORE_TOKEN_ID
+            target[cur_len : cur_len + instruction_len] = IGNORE_TOKEN_ID
 
             cur_len += round_len
         target[cur_len:] = IGNORE_TOKEN_ID
@@ -206,10 +207,7 @@ def preprocess(
         if cur_len < tokenizer.model_max_length:
             if cur_len != total_len:
                 target[:] = IGNORE_TOKEN_ID
-                rank0_print(
-                    f"WARNING: tokenization mismatch: {cur_len} vs. {total_len}."
-                    f" (ignored)"
-                )
+                rank0_print(f"WARNING: tokenization mismatch: {cur_len} vs. {total_len}." f" (ignored)")
     return dict(
         input_ids=input_ids,
         labels=targets,
@@ -236,11 +234,7 @@ class SupervisedDataset(Dataset):
         return len(self.input_ids)
 
     def __getitem__(self, i) -> Dict[str, torch.Tensor]:
-        return dict(
-            input_ids=self.input_ids[i],
-            labels=self.labels[i],
-            attention_mask=self.attention_mask[i]
-        )
+        return dict(input_ids=self.input_ids[i], labels=self.labels[i], attention_mask=self.attention_mask[i])
 
 
 def make_supervised_data_module(tokenizer: transformers.PreTrainedTokenizer, data_args) -> Dict:
@@ -248,13 +242,13 @@ def make_supervised_data_module(tokenizer: transformers.PreTrainedTokenizer, dat
 
     train_dataset = SupervisedDataset(tokenizer=tokenizer, data_path=data_args.data_path)
     # data_collator = DataCollatorForSupervisedDataset(tokenizer=tokenizer)
-    return dict(train_dataset=train_dataset, eval_dataset=None)#), data_collator=data_collator)
+    return dict(train_dataset=train_dataset, eval_dataset=None)  # ), data_collator=data_collator)
 
 
 def train():
     parser = transformers.HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
-        
+
     model = transformers.AutoModelForCausalLM.from_pretrained(
         model_args.model_name_or_path,
         cache_dir=training_args.cache_dir,
@@ -283,7 +277,7 @@ def train():
         )
 
     data_module = make_supervised_data_module(tokenizer=tokenizer, data_args=data_args)
-    #Tell Trainer not to attempt DataParallel
+    # Tell Trainer not to attempt DataParallel
     model.is_parallelizable = True
     model.model_parallel = True
 
@@ -297,5 +291,3 @@ def train():
 
 if __name__ == "__main__":
     train()
-
-

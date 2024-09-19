@@ -7,7 +7,7 @@ import time
 from typing import Union
 import random
 import concurrent.futures
-from typing import  Union
+from typing import Union
 
 import numpy as np
 import torch
@@ -223,9 +223,7 @@ def cli_evaluate(args: Union[argparse.Namespace, None] = None) -> None:
             fewshot_as_multiturn=fewshot_as_multiturn,
         )
 
-    results = evaluate(
-        lm, task_manager=task_manager, task_list=task_list, verbosity=verbosity
-    )
+    results = evaluate(lm, task_manager=task_manager, task_list=task_list, verbosity=verbosity)
 
     results = {"results": results}
     if lm.rank == 0:

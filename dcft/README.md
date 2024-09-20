@@ -53,3 +53,25 @@ BTW, if you need to add an external repository for code that is being publicly m
     # If you want to contribute back to the original repository
     git subtree push --prefix=dcft/external_repositores/WizardLM https://github.com/original/repo.git contribution-branch
 ```
+
+
+## Dataset Mixing
+Say you want to create a mix of multiple datasets. You need only create a YAML file with multiple datasets defined. 
+
+```yaml
+name: mixed_dataset
+dataset_mix:
+  -
+    name: evol_instruct
+  -
+    name: shp
+    instruction_seeder: stanfordnlp/SHP//train//history
+    instruction_generation: !function WizardLM.utils.instruction_generation
+    instruction_filtering: 
+    annotation_seeder: 
+    annotation_generation: !function WizardLM.utils.annotation_generation
+    model_pair_filtering: 
+
+```
+
+We can define new datasets if we want. We can also refer to datasets defined in different yaml files already. For example, evol_instruct references the dataset created in dcft/data_strategies/Mixed/mixed.yaml.

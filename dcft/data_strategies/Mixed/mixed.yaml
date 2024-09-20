@@ -4,9 +4,7 @@ dataset_mix:
     name: evol_instruct
   -
     name: shp
-    instruction_seeder: stanfordnlp/SHP//train//history
-    instruction_generation: !function WizardLM.utils.instruction_generation
-    instruction_filtering: 
-    annotation_seeder: 
-    annotation_generation: !function WizardLM.utils.annotation_generation
-    model_pair_filtering: 
+    functions:
+      - stanfordnlp/SHP//train//history
+      - !function WizardLM.utils.instruction_generation
+      - !function WizardLM.utils.annotation_generation

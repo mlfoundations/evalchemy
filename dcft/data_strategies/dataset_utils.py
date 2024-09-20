@@ -1,20 +1,12 @@
 import yaml
 import importlib
-from typing import List, Dict, Any, Optional, Tuple
+from typing import List, Dict, Any, Optional, Tuple, Callable
 from datasets import Dataset, concatenate_datasets
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from dcft.data_strategies.dataset_generation import (
-    InstructionGenerator,
-    InstructionFilter,
-    AnnotationGenerator,
-    ModelPairFilter,
-    AnnotationSeeder,
-    InstructionSeeder,
-)
 from lm_eval.utils import eval_logger
 import pandas as pd
-
+from datasets import load_dataset
 
 class SafeLoaderIgnoreUnknown(yaml.SafeLoader):
     def ignore_unknown(self, node: Any) -> None:
@@ -76,20 +68,11 @@ def _get_empty_def(file_path: str, subdir: List[str]) -> bool:
 class SyntheticDataFramework:
     def __init__(
         self,
-        config: Optional[Dict[str, Any]] = None,
+        functions: List[Callable] = None,
         name: Optional[str] = None,
-        instruction_generator: Optional[InstructionGenerator] = None,
-        instruction_filter: Optional[InstructionFilter] = None,
-        annotation_generator: Optional[AnnotationGenerator] = None,
-        model_pair_filter: Optional[ModelPairFilter] = None,
     ):
         self.name = name
-        self.config = config
-        self.instruction_generator = instruction_generator
-        self.instruction_filter = instruction_filter
-        self.annotation_generator = annotation_generator
-        self.model_pair_filter = model_pair_filter
-        self.generated_dataset: Optional[Dataset] = None
+        self.functions = functions
 
     @staticmethod
     def from_config(config_path: str, sub_dir: Optional[Tuple[str, ...]] = None) -> "SyntheticDataFramework":
@@ -121,27 +104,25 @@ class SyntheticDataFramework:
                 self.config = self.config[key]
 
         self.name = self.config["name"]
-        self.instruction_generator = InstructionGenerator(self.config["instruction_generation"])
-        self.instruction_filter = InstructionFilter(self.config["instruction_filtering"])
-        self.annotation_generator = AnnotationGenerator(self.config["annotation_generation"])
-        self.model_pair_filter = ModelPairFilter(self.config["model_pair_filtering"])
-        self.annotation_seeder = AnnotationSeeder(self.config["annotation_seeder"])
-        self.instruction_seeder = InstructionSeeder(self.config["instruction_seeder"])
-
+        self.functions = self.config['functions']
+        
     def generate_dataset(self) -> None:
         if not self.config:
             raise ValueError("Configuration not loaded. Use from_config() to create an instance.")
 
         eval_logger.info("Seeding Instructions")
-        instruction_seeds = self.instruction_seeder.generate()
-        eval_logger.info("Generating Instructions")
-        instructions = self.instruction_generator.generate(instruction_seeds)
-        eval_logger.info("Filtering Instructions")
-        filtered_instructions = self.instruction_filter.filter(instructions)
-        eval_logger.info("Annotating Generations")
-        annotations = self.annotation_generator.generate(filtered_instructions)
-        eval_logger.info("Filtering Paris")
-        filtered_pairs = self.model_pair_filter.filter(annotations)
+        if isinstance(self.functions[0], str):
+            split_string = self.functions[0].split("//")
+            dataset_name, split_name, seed_name = split_string[0], split_string[1], split_string[2]
+            dataset = load_dataset(dataset_name)
+            output = dataset[split_name][seed_name]
+        elif isinstance(self.functions[0], Callable):
+            output = self.functions[0]()
+
+        for function in self.functions[1:]:
+            output = function(output)
+
+        filtered_pairs = output
 
         df = pd.DataFrame(filtered_pairs)
 

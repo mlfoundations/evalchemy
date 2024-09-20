@@ -20,9 +20,10 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 class BatchWatcher:
     def __init__(self, batch_objects_file, check_interval=60):
         self.client = AsyncOpenAI()
-        with open(batch_objects_file, 'r') as f:
+        with open(batch_objects_file, "r") as f:
             self.batch_objects = json.load(f)
-        self.batch_ids = [obj['id'] for obj in self.batch_objects]
+        self.batch_ids = [obj["id"] for obj in self.batch_objects]
+        self.batches = []
         self.check_interval = check_interval
 
     async def check_batch_status(self, batch_id):
@@ -31,38 +32,37 @@ class BatchWatcher:
         return batch_id, batch.status
 
     async def watch(self):
-        completed_batches = set()
+        completed_batches = {}
         while len(completed_batches) < len(self.batch_ids):
-            tasks = []
+            status_tasks = []
             for batch_id in self.batch_ids:
                 if batch_id not in completed_batches:
-                    tasks.append(self.check_batch_status(batch_id))
-            
-            results = await asyncio.gather(*tasks)
-            
-            for batch_id, status in results:
-                if status in ["completed", "failed", "expired", "cancelled"]:
-                    logging.info(f"Batch {batch_id} processing finished with status: {status}")
-                    completed_batches.add(batch_id)
+                    status_tasks.append(self.check_batch_status(batch_id))
+
+            batches = await asyncio.gather(*status_tasks)
+
+            for batch_id, batch in batches:
+                if batch.status in ["completed", "failed", "expired", "cancelled"]:
+                    logging.info(f"Batch {batch_id} processing finished with status: {batch.status}")
+                    completed_batches[batch_id] = batch
 
             if len(completed_batches) < len(self.batch_ids):
                 logging.info(f"Remaining batches processing {len(self.batch_ids) - len(completed_batches)}/{len(self.batch_ids)}")
                 logging.info(f"Sleeping for {self.check_interval} seconds...")
                 await asyncio.sleep(self.check_interval)
 
-        return [await self.client.batches.retrieve(batch_id) for batch_id in self.batch_ids]
+        self.batches = completed_batches.values()
 
-    async def download_batch_result(self, batch_id):
-        batch = await self.client.batches.retrieve(batch_id)
+    async def download_batch_result(self, batch):
         if batch.status == "completed" and batch.output_file_id:
             file_content = await self.client.files.content(batch.output_file_id)
             return file_content.text.splitlines()
         return []
 
     async def download_results(self, output_path):
-        tasks = [self.download_batch_result(batch_id) for batch_id in self.batch_ids]
+        tasks = [self.download_batch_result(batch) for batch in self.batches]
         results = await asyncio.gather(*tasks)
-        
+
         all_results = [item for sublist in results for item in sublist]  # Flatten the list of lists
 
         with open(output_path, "w") as f:
@@ -79,6 +79,7 @@ class BatchWatcher:
             logging.info(f"Batch errors downloaded and saved to: {error_path}")
         else:
             logging.info(f"No error file available for batch {batch_id}.")
+
 
     async def plot_completion_data(self):
         completion_times = []
@@ -120,46 +121,47 @@ class BatchWatcher:
         plt.savefig('cumulative_completed_jobs.png')  # Save the cumulative plot
         plt.close()  # Close the plot
 
+
 async def watch_and_download(args):
     watcher = BatchWatcher(args.batch_objects_file)
-    final_batches = await watcher.watch()
+    await watcher.watch()
     logging.info(f"All batches completed")
 
-    if all(batch.status == "completed" for batch in final_batches):
-        await watcher.download_results(args.output_file)
+    await watcher.download_results(args.output_file)
+    logging.info(f"Downloading results")
 
-        # Restore data object
-        data = get_dataclass_from_path(args.dataset)
-        n = len(data.user_prompts)
+    # Restore data object
+    data = get_dataclass_from_path(args.dataset)
+    n = len(data.user_prompts)
 
-        # Process batch results
-        outputs = {}
-        with open(args.output_file, "r") as f:
-            for line in f:
-                l = json.loads(line)
-                outputs[int(l["custom_id"])] = l["response"]["body"]["choices"][0]["message"]["content"]
-        logging.info(f"Number of outputs: {len(outputs)}")
-        data.annotations = [outputs.get(i, {}) for i in range(n)]
+    # Process batch results
+    outputs = {}
+    with open(args.output_file, "r") as f:
+        for line in f:
+            l = json.loads(line)
+            outputs[int(l["custom_id"])] = l["response"]["body"]["choices"][0]["message"]["content"]
+    logging.info(f"Number of outputs: {len(outputs)}")
+    data.annotations = [outputs.get(i, {}) for i in range(n)]
 
-        # Save updated data
-        save_name = f"{args.dataset.replace('/', '_')}_{args.annotator}"
-        save_dir_path = os.path.join(args.save_dir, save_name)
-        os.makedirs(save_dir_path, exist_ok=True)
-        save_path = os.path.join(save_dir_path, "reannotated.json")
-        save_out = [
-            {
-                "system_prompt": data.system_prompts[idx],
-                "user_prompt": data.user_prompts[idx],
-                "annotation_original": data.annotations_original[idx],
-                "annotation": data.annotations[idx],
-            }
-            for idx in range(len(data.annotations))
-        ]
-        with open(save_path, "w") as f:
-            json.dump(save_out, f, indent=4)
-        logging.info(f"Updated data saved to {save_path}")
+    # Save updated data
+    save_name = f"{args.dataset.replace('/', '_')}_{args.annotator}"
+    save_dir_path = os.path.join(args.save_dir, save_name)
+    os.makedirs(save_dir_path, exist_ok=True)
+    save_path = os.path.join(save_dir_path, "reannotated.json")
+    save_out = [
+        {
+            "system_prompt": data.system_prompts[idx],
+            "user_prompt": data.user_prompts[idx],
+            "annotation_original": data.annotations_original[idx],
+            "annotation": data.annotations[idx],
+        }
+        for idx in range(len(data.annotations))
+    ]
+    with open(save_path, "w") as f:
+        json.dump(save_out, f, indent=4)
+    logging.info(f"Updated data saved to {save_path}")
 
-    for batch in final_batches:
+    for batch in watcher.batches:
         if batch.error_file_id:
             await watcher.download_errors(f"{args.error_file}.{batch.id}", batch.id)
 

@@ -21,7 +21,7 @@ class InstructionGenerator:
             dataset_name, split_name, instruction_name = generate_info.split("\\")
             dataset = load_dataset(dataset_name)
 
-            instructions = list(dataset[split_name].map(lambda x: [instruction_name]))
+            instructions = dataset[split_name][instruction_name]
             self.generate = lambda: instructions
 
 

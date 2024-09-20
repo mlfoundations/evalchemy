@@ -11,6 +11,9 @@ from openai import AsyncOpenAI
 from dcft.dataset.hf import get_dataclass_from_path
 from dcft.dataset.reannotate import regenerate_dataset
 
+import pandas as pd
+import matplotlib.pyplot as plt
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 
@@ -24,7 +27,7 @@ class BatchWatcher:
 
     async def check_batch_status(self, batch_id):
         batch = await self.client.batches.retrieve(batch_id)
-        logging.info(f"Batch {batch_id} status: {batch.status} request_counts: {batch.request_counts}")
+        logging.info(f"Batch {batch_id} status: {batch.status} requests: {batch.request_counts.completed}/{batch.request_counts.failed}/{batch.request_counts.total} completed/failed/total")
         return batch_id, batch.status
 
     async def watch(self):
@@ -43,6 +46,7 @@ class BatchWatcher:
                     completed_batches.add(batch_id)
 
             if len(completed_batches) < len(self.batch_ids):
+                logging.info(f"Remaining batches processing {len(self.batch_ids) - len(completed_batches)}/{len(self.batch_ids)}")
                 logging.info(f"Sleeping for {self.check_interval} seconds...")
                 await asyncio.sleep(self.check_interval)
 
@@ -75,6 +79,46 @@ class BatchWatcher:
             logging.info(f"Batch errors downloaded and saved to: {error_path}")
         else:
             logging.info(f"No error file available for batch {batch_id}.")
+
+    async def plot_completion_data(self):
+        completion_times = []
+        completion_dates = []
+
+        for batch_id in self.batch_ids:
+            batch = await self.client.batches.retrieve(batch_id)
+            if batch.status == "completed":
+                duration = (batch.completed_at - batch.created_at) / 60  # Convert to minutes
+                completion_times.append(duration)
+                completion_dates.append(batch.completed_at)
+
+        # Create a DataFrame for plotting
+        df = pd.DataFrame({
+            'Completion Time (min)': completion_times,  # Update label to minutes
+            'Completion Date': pd.to_datetime(completion_dates, unit='s')
+        })
+
+        # Histogram of completion durations
+        plt.figure(figsize=(12, 6))
+        plt.hist(df['Completion Time (min)'], bins=20, color='blue', alpha=0.7)
+        plt.title('Histogram of Completion Durations')
+        plt.xlabel('Duration (minutes)')  # Update label to minutes
+        plt.ylabel('Frequency')
+        plt.grid(axis='y')
+        plt.savefig('completion_durations_histogram.png')  # Save the histogram
+        plt.close()  # Close the plot
+
+        # Cumulative plot of completed jobs over time
+        df.sort_values('Completion Date', inplace=True)
+        df['Cumulative Completed'] = range(1, len(df) + 1)
+
+        plt.figure(figsize=(12, 6))
+        plt.plot(df['Completion Date'], df['Cumulative Completed'], marker='o', color='green')
+        plt.title('Cumulative Completed Jobs Over Time')
+        plt.xlabel('Completion Date')
+        plt.ylabel('Cumulative Completed Jobs')
+        plt.grid()
+        plt.savefig('cumulative_completed_jobs.png')  # Save the cumulative plot
+        plt.close()  # Close the plot
 
 async def watch_and_download(args):
     watcher = BatchWatcher(args.batch_objects_file)
@@ -120,6 +164,11 @@ async def watch_and_download(args):
             await watcher.download_errors(f"{args.error_file}.{batch.id}", batch.id)
 
 
+async def watch_and_plot(args):
+    watcher = BatchWatcher(args.batch_objects_file)
+    await watcher.plot_completion_data()  # Add this line
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Watch batch requests using their IDs and download results or errors.")
     parser.add_argument("--batch_objects_file", type=str, required=True, help="Path to the batch_objects.json file")
@@ -140,7 +189,11 @@ if __name__ == "__main__":
         "--save_dir", type=str, default="datasets/reannotated", help="Directory to save processed results"
     )
     parser.add_argument("--annotator", type=str, default="gpt-4o-2024-08-06", help="Name of the annotator")
+    parser.add_argument("--graph", action='store_true', help="Plot completion data")
 
     args = parser.parse_args()
 
-    asyncio.run(watch_and_download(args))
+    if args.graph:
+        asyncio.run(watch_and_plot(args))
+    else:
+        asyncio.run(watch_and_download(args))

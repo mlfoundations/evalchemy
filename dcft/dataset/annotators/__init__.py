@@ -31,7 +31,8 @@ class AnnotatorConfig:
             self.batch = args.batch
             # max size allowed 50k and 100MB files
             # batches often hang for a long time just before completing
-            self.max_batch_api_chunk_size = 100 
+            self.max_batch_api_chunk_size = 100
+
 
 def is_gpt_annotator(annotator_name):
     return ANNOTATOR_MAP[annotator_name] is GPTAnnotator

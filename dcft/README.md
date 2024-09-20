@@ -13,7 +13,7 @@ For example, this will generate the EvolInstruct dataset and upload it to Huggin
 
 ## How to add support for new datasets
 
-1. Create a new folder for yaml files
+1. Create a new folder for yaml files in `dcft/data_strategies`
 2. Create a yaml file with your dataset generation details
 
 An example
@@ -27,9 +27,9 @@ annotation_generation: !function WizardLM.utils.annotation_generation
 model_pair_filtering: 
 ```
 
-If you leave instruction_filtering, annotation_seeding, model_pair_filtering or instruction seeder empty, it will just pass on the data from the last step (the steps of data generation go in this order).
+If you leave `instruction_filtering`, `annotation_seeder`, `model_pair_filtering` or `instruction_seeder` empty, it will just pass on the data from the last step (the steps of data generation go in this order).
 
-For instruction_seeder and instruction_generator, adding a string in the form of "[hf_dataset_name]//[split_name]//[column_name]" will load all of the data from that HF repository.
+For `instruction_seeder` and `instruction_generator`, adding a string in the form of "[hf_dataset_name]//[split_name]//[column_name]" will load all of the data from that HF repository.
 
 If you need more control, use !function and it will call the function from that utils file. 
 

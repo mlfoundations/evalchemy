@@ -1,13 +1,7 @@
 name: mix_banana
 dataset_mix:
   -
-    name: evol_instruct_a
-    instruction_seeder: yahma/alpaca-cleaned//train//instruction
-    instruction_generation: !function WizardLM.utils.instruction_generation
-    instruction_filtering: 
-    annotation_seeder: 
-    annotation_generation: !function WizardLM.utils.annotation_generation
-    model_pair_filtering: 
+    name: evol_instruct
   -
     name: shp
     instruction_seeder: stanfordnlp/SHP//train//history

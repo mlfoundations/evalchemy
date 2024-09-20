@@ -1,7 +1,6 @@
-from abc import ABC, abstractmethod
 import yaml
 import importlib
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional, Tuple
 from datasets import Dataset, concatenate_datasets
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -13,51 +12,68 @@ from dcft.data_strategies.dataset_generation import (
     AnnotationSeeder,
     InstructionSeeder,
 )
-from typing import Dict, Any, List, Optional
 from lm_eval.utils import eval_logger
 import pandas as pd
 
+
 class SafeLoaderIgnoreUnknown(yaml.SafeLoader):
-    def ignore_unknown(self, node):
+    def ignore_unknown(self, node: Any) -> None:
         return None
 
-def check_dataset_mix_in_yaml(file_path):
-    # Add a constructor that ignores unknown tags
+
+def check_dataset_mix_in_yaml(file_path: str) -> bool:
     SafeLoaderIgnoreUnknown.add_constructor(None, SafeLoaderIgnoreUnknown.ignore_unknown)
 
     try:
-        with open(file_path, 'r') as f:
+        with open(file_path, "r") as f:
             config = yaml.load(f, Loader=SafeLoaderIgnoreUnknown)
-        return 'dataset_mix' in config if isinstance(config, dict) else False
+        return "dataset_mix" in config if isinstance(config, dict) else False
     except yaml.YAMLError as e:
         print(f"Error parsing YAML file {file_path}: {e}")
         return False
     except IOError as e:
         print(f"Error opening file {file_path}: {e}")
         return False
-    
 
-def _get_len_subcomponents(file_path):
+
+def _get_len_subcomponents(file_path: str) -> int:
     SafeLoaderIgnoreUnknown.add_constructor(None, SafeLoaderIgnoreUnknown.ignore_unknown)
 
-    with open(file_path, 'r') as f:
+    with open(file_path, "r") as f:
         config = yaml.load(f, Loader=SafeLoaderIgnoreUnknown)
-    
-    return len(config['dataset_mix'])
 
-def _get_name(file_path):
+    return len(config["dataset_mix"])
+
+
+def _get_name(file_path: str, sub_dir: Optional[List[str]] = None) -> str:
     SafeLoaderIgnoreUnknown.add_constructor(None, SafeLoaderIgnoreUnknown.ignore_unknown)
 
-    with open(file_path, 'r') as f:
+    with open(file_path, "r") as f:
         config = yaml.load(f, Loader=SafeLoaderIgnoreUnknown)
-    
-    return config['name']
+
+    if sub_dir is not None:
+        for key in sub_dir:
+            config = config[key]
+
+    return config["name"]
+
+
+def _get_empty_def(file_path: str, subdir: List[str]) -> bool:
+    SafeLoaderIgnoreUnknown.add_constructor(None, SafeLoaderIgnoreUnknown.ignore_unknown)
+
+    with open(file_path, "r") as f:
+        config = yaml.load(f, Loader=SafeLoaderIgnoreUnknown)
+
+    for key in subdir:
+        config = config[key]
+
+    if len(config.keys()) == 1:
+        return True
+    else:
+        return False
+
 
 class SyntheticDataFramework:
-    """
-    Main class for orchestrating the synthetic data generation process.
-    """
-
     def __init__(
         self,
         config: Optional[Dict[str, Any]] = None,
@@ -67,45 +83,22 @@ class SyntheticDataFramework:
         annotation_generator: Optional[AnnotationGenerator] = None,
         model_pair_filter: Optional[ModelPairFilter] = None,
     ):
-        """
-        Initialize the framework with optional components.
-
-        All parameters default to None if not provided.
-        """
         self.name = name
         self.config = config
         self.instruction_generator = instruction_generator
         self.instruction_filter = instruction_filter
         self.annotation_generator = annotation_generator
         self.model_pair_filter = model_pair_filter
-        self.generated_dataset = None
+        self.generated_dataset: Optional[Dataset] = None
 
     @staticmethod
-    def from_config(config_path: str, sub_dir: Optional[tuple] = None) -> "SyntheticDataFramework":
-        """
-        Create and return a SyntheticDataFramework instance from a configuration file.
-
-        Args:
-            config_path (str): Path to the YAML configuration file.
-            sub_dir Optional(str): Directory in yaml where config is located
-
-        Returns:
-            SyntheticDataFramework: An instance of the class with initialized components.
-        """
+    def from_config(config_path: str, sub_dir: Optional[Tuple[str, ...]] = None) -> "SyntheticDataFramework":
         framework = SyntheticDataFramework()
         framework._load_config(config_path, sub_dir)
         return framework
 
-    def _load_config(self, yaml_path: str, sub_dir: Optional[tuple] = None) -> Dict[str, Any]:
-        """
-        Load the configuration and initialize components.
-
-        Args:
-            config_path (str): Path to the YAML configuration file.
-            sub_dir Optional(str): Directory in yaml where config is located
-        """
-
-        def function_constructor(loader, node):
+    def _load_config(self, yaml_path: str, sub_dir: Optional[Tuple[str, ...]] = None) -> None:
+        def function_constructor(loader: yaml.SafeLoader, node: yaml.Node) -> Any:
             value = loader.construct_scalar(node)
             try:
                 func_name, args = value.split(":", 1)
@@ -119,10 +112,8 @@ class SyntheticDataFramework:
             func = getattr(utils_module, func_name)
             return func
 
-        # Add the custom constructor for the !function tag
         yaml.add_constructor("!function", function_constructor, Loader=yaml.SafeLoader)
 
-        # Load the YAML file with the custom constructor
         with open(yaml_path, "r") as config_file:
             self.config = yaml.safe_load(config_file)
         if sub_dir is not None:
@@ -138,9 +129,6 @@ class SyntheticDataFramework:
         self.instruction_seeder = InstructionSeeder(self.config["instruction_seeder"])
 
     def generate_dataset(self) -> None:
-        """
-        Execute the complete pipeline for dataset generation.
-        """
         if not self.config:
             raise ValueError("Configuration not loaded. Use from_config() to create an instance.")
 
@@ -157,27 +145,25 @@ class SyntheticDataFramework:
 
         df = pd.DataFrame(filtered_pairs)
 
-        # Convert pandas DataFrame to Hugging Face Dataset
         self.generated_dataset = Dataset.from_pandas(df)
 
-    def _import_utils_module(self, strategy_dir: str):
+    def _import_utils_module(self, strategy_dir: str) -> Any:
         module_name = f"dcft.data_strategies.{strategy_dir}"
         return importlib.import_module(module_name)
 
     def run(self) -> None:
-        """
-        Run the entire data generation process.
-        """
         self.generate_dataset()
 
 
-
 class DatasetHandler:
-    def __init__(self, sub_frameworks_lazy: List):
+    def __init__(self, sub_frameworks_lazy: List[Tuple[str, Tuple[str, int]]]):
         self.all_sub_frameworks_lazy = sub_frameworks_lazy
-        self.all_sub_frameworks = None
+        self.all_sub_frameworks: Optional[Dict[str, SyntheticDataFramework]] = None
         self.max_workers = os.cpu_count()
         self.shuffle_seed = 42
+        self.name: Optional[str] = None
+        self.generated_dataset: Optional[Dataset] = None
+        self.all_loaded_frameworks: Dict[str, SyntheticDataFramework] = {}
 
     @staticmethod
     def from_config(config_path: str) -> "DatasetHandler":
@@ -192,14 +178,12 @@ class DatasetHandler:
     def mix(self, datasets: List[Dataset]) -> Dataset:
         print("Starting dataset mixing process...")
 
-        # Combine datasets
         combined_dataset = self._combine_datasets(datasets)
         print(f"Combined {len(datasets)} datasets, total items: {len(combined_dataset)}")
-        
-        # Shuffle
+
         shuffled_dataset = self.shuffle(combined_dataset)
         print("Dataset shuffled")
-        
+
         return shuffled_dataset
 
     def _combine_datasets(self, datasets: List[Dataset]) -> Dataset:
@@ -208,9 +192,28 @@ class DatasetHandler:
     def shuffle(self, dataset: Dataset) -> Dataset:
         return dataset.shuffle(seed=self.shuffle_seed)
 
-    def process_datasets_parallel(self, dataset_configs: List) -> List[Dataset]:
+    def process_datasets_parallel(
+        self, dataset_configs: List[Tuple[str, Tuple[str, int]]]
+    ) -> Dict[str, SyntheticDataFramework]:
+        all_frameworks = []
+        for dataset_args in dataset_configs:
+            config_path = dataset_args[0]
+            sub_dir = dataset_args[1]
+
+            is_empty = _get_empty_def(config_path, sub_dir)
+            if is_empty:
+                framework_name = _get_name(config_path, sub_dir)
+                if framework_name not in self.all_loaded_frameworks:
+                    raise ValueError(f"Framework {framework_name} not defined nor loaded in Dataset Mix.")
+                framework = self.all_loaded_frameworks[_get_name(config_path, sub_dir)]
+            else:
+                framework = SyntheticDataFramework.from_config(config_path, sub_dir)
+            all_frameworks.append(framework)
+
         with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
-            future_to_config = {executor.submit(self._load_dataset, config): config for config in dataset_configs}
+            future_to_config = {
+                executor.submit(self._load_dataset, framework): framework for framework in all_frameworks
+            }
             results = {}
             for future in as_completed(future_to_config):
                 config = future_to_config[future]
@@ -218,19 +221,18 @@ class DatasetHandler:
                     data = future.result()
                     results[data.name] = data
                 except Exception as exc:
-                    print(f"Dataset {config.get('name', 'unknown')} generated an exception: {exc}")
+                    print(f"Dataset {config.name} generated an exception: {exc}")
         return results
 
-    def _load_dataset(self, dataset_args) -> SyntheticDataFramework:
-        config_path = dataset_args[0]
-        sub_dir = dataset_args[1]
-        
-        framework = SyntheticDataFramework.from_config(config_path, sub_dir)
+    def _load_dataset(self, framework: SyntheticDataFramework) -> SyntheticDataFramework:
         framework.generate_dataset()
-        
         return framework
-    
+
     def run(self) -> None:
         all_frameworks = self.process_datasets_parallel(self.all_sub_frameworks_lazy)
-        shuffled_datasets = [framework.generated_dataset for framework in all_frameworks.values()]
+        shuffled_datasets = [
+            framework.generated_dataset
+            for framework in all_frameworks.values()
+            if framework.generated_dataset is not None
+        ]
         self.generated_dataset = self.mix(shuffled_datasets)

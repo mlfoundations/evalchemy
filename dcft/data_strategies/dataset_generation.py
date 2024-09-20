@@ -1,6 +1,5 @@
 from typing import List, Dict, Any, Callable
 from datasets import load_dataset
-import re
 
 
 class InstructionGenerator:

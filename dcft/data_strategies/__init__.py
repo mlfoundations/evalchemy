@@ -1,16 +1,13 @@
 import os
-
-import yaml
 import sys
-import pandas as pd
-from datasets import Dataset
-from typing import Dict, Any, List, Optional
+from typing import Dict, List
 
 from dcft.data_strategies.dataset_utils import DatasetHandler, SyntheticDataFramework, check_dataset_mix_in_yaml
 
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
+
 
 class SyntheticDataManager:
     def __init__(self):
@@ -29,7 +26,7 @@ class SyntheticDataManager:
                             framework = DatasetHandler.from_config(config_path)
                         else:
                             framework = SyntheticDataFramework.from_config(config_path)
-                        
+
                         if framework.name in frameworks:
                             raise ValueError(f"Invalid name: {framework.name} is duplicated")
                         frameworks[framework.name] = framework
@@ -43,19 +40,14 @@ class SyntheticDataManager:
 
     def run_framework(self, framework_name: str) -> None:
         framework = self.get_framework(framework_name)
+
+        if isinstance(framework, DatasetHandler):
+            framework.all_loaded_frameworks = self.frameworks
+
         if framework:
             print(f"Running framework: {framework_name}")
             framework.run()
         else:
             print(f"Framework '{framework_name}' not found.")
-        
+
         framework.generated_dataset.push_to_hub(f"EtashGuha/{framework.name}")
-
-# Example usage
-if __name__ == "__main__":
-    manager = SyntheticDataManager()
-    print("Available frameworks:", manager.list_frameworks())
-
-    # Run a specific framework
-    framework_name = "example_framework"
-    manager.run_framework(framework_name)

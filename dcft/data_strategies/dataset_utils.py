@@ -2,10 +2,19 @@ from abc import ABC, abstractmethod
 from typing import List, Dict, Any
 
 
-class DatasetMixer(ABC):
+class DatasetHandler(ABC):
     """
-    Abstract base class for mixing datasets.
+    Abstract base class for handling datasets, including mixing, shuffling, caching, and saving.
     """
+
+    def __init__(self, config: Dict[str, Any]):
+        """
+        Initialize the dataset handler with a configuration.
+
+        Args:
+            config (Dict[str, Any]): Configuration for dataset handling.
+        """
+        self.config = config
 
     @staticmethod
     @abstractmethod
@@ -21,12 +30,6 @@ class DatasetMixer(ABC):
         """
         pass
 
-
-class DatasetShuffler(ABC):
-    """
-    Abstract base class for shuffling datasets.
-    """
-
     @staticmethod
     @abstractmethod
     def shuffle(dataset: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -41,21 +44,6 @@ class DatasetShuffler(ABC):
         """
         pass
 
-
-class DatasetCache(ABC):
-    """
-    Abstract base class for caching datasets.
-    """
-
-    def __init__(self, config: Dict[str, Any]):
-        """
-        Initialize the dataset cache with a configuration.
-
-        Args:
-            config (Dict[str, Any]): Configuration for dataset caching.
-        """
-        self.config = config
-
     @abstractmethod
     def cache(self, dataset: List[Dict[str, Any]]) -> None:
         """
@@ -65,21 +53,6 @@ class DatasetCache(ABC):
             dataset (List[Dict[str, Any]]): Dataset to cache.
         """
         pass
-
-
-class DatasetSaver(ABC):
-    """
-    Abstract base class for saving datasets.
-    """
-
-    def __init__(self, config: Dict[str, Any]):
-        """
-        Initialize the dataset saver with a configuration.
-
-        Args:
-            config (Dict[str, Any]): Configuration for dataset saving.
-        """
-        self.config = config
 
     @abstractmethod
     def save(self, dataset: List[Dict[str, Any]]) -> None:

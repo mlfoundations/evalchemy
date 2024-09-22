@@ -4,11 +4,13 @@ import time
 from functools import wraps
 from typing import List
 import openai
+
 if openai.__version__ == "0.28.0":
     OPENAI_RATE_LIMIT_ERROR = openai.error.RateLimitError
     OPENAI_API_ERROR = openai.error.APIError
 else:
     from openai import OpenAI
+
     OPENAI_RATE_LIMIT_ERROR = openai.RateLimitError
     OPENAI_API_ERROR = openai.APIError
 
@@ -33,22 +35,20 @@ import json
 from together import Together
 
 
- 
-
 def apply_template(chat_history, model_name, args):
-    model_inputs = [] 
-    conv = None 
+    model_inputs = []
+    conv = None
     for chats in tqdm(chat_history, desc="Applying template", disable=True):
-        if args.engine not in ["vllm", "hf"]: 
-            model_inputs.append("n/a") # will be handled by another ways.
-            continue 
+        if args.engine not in ["vllm", "hf"]:
+            model_inputs.append("n/a")  # will be handled by another ways.
+            continue
         else:
             if conv is None or isinstance(conv, HF_Conversation) == False:
                 conv = map_to_conv(model_name)
             else:
                 conv.clear()
         for chat_id, chat in enumerate(chats):
-            conv.append_message(conv.roles[chat_id%2], chat)
+            conv.append_message(conv.roles[chat_id % 2], chat)
         conv.append_message(conv.roles[1], None)
         model_inputs.append(conv.get_prompt())
     return model_inputs
@@ -79,7 +79,11 @@ def load_eval_data(args, data_name=None, model_name=None):
         dataset = load_dataset("re-align/just-eval-instruct", split="test")
         metadata = {"dataset": [], "source_id": []}
     elif data_name == "mt-bench":
-        dataset = load_dataset("json", data_files="https://huggingface.co/spaces/lmsys/mt-bench/raw/main/data/mt_bench/question.jsonl", split="train")
+        dataset = load_dataset(
+            "json",
+            data_files="https://huggingface.co/spaces/lmsys/mt-bench/raw/main/data/mt_bench/question.jsonl",
+            split="train",
+        )
         metadata = {"question_id": [], "category": []}
         if args.mt_turn == 2:
             with open(args.mt_turn1_result, "r") as f:
@@ -106,9 +110,7 @@ def load_eval_data(args, data_name=None, model_name=None):
             if args.mt_turn == 1:
                 chat_history.append([item["turns"][0]])
             elif args.mt_turn == 2:
-                chat_history.append([item["turns"][0],
-                                     id_to_turn1_result[item["question_id"]],
-                                     item["turns"][1]])
+                chat_history.append([item["turns"][0], id_to_turn1_result[item["question_id"]], item["turns"][1]])
             else:
                 raise ValueError(f"mt_turn {args.mt_turn} not supported; must be 1 or 2")
         else:
@@ -119,7 +121,6 @@ def load_eval_data(args, data_name=None, model_name=None):
     print("Start applying template")
     model_inputs = apply_template(chat_history, model_name, args)
     return id_strs, chat_history, model_inputs, metadata
-
 
 
 def clear_output(output, model_name):
@@ -145,12 +146,12 @@ def save_outputs(args, id_strs, outputs, chat_history, metadata, model_inputs, f
             output_item["output"] = [clear_output(o, args.model_name) for o in outputs[ind]]
             output_item["generator"] = args.model_name
             output_item["configs"] = {
-                    "engine": args.engine,
-                    "repetition_penalty": args.repetition_penalty,
-                    "temperature": args.temperature,
-                    "top_p": args.top_p,
-                    "max_tokens": args.max_tokens,
-                }
+                "engine": args.engine,
+                "repetition_penalty": args.repetition_penalty,
+                "temperature": args.temperature,
+                "top_p": args.top_p,
+                "max_tokens": args.max_tokens,
+            }
             output_item["dataset"] = args.data_name
             for key in metadata:
                 output_item[key] = metadata[key][ind]
@@ -159,7 +160,9 @@ def save_outputs(args, id_strs, outputs, chat_history, metadata, model_inputs, f
         for ind in range(len(outputs)):
             output_item = {}
             output_item["instruction"] = chat_history[ind][0]
-            output_item["output"] = [clear_output(outputs[ind][x].rstrip(), args.model_name) for x in range(len(outputs[ind]))]
+            output_item["output"] = [
+                clear_output(outputs[ind][x].rstrip(), args.model_name) for x in range(len(outputs[ind]))
+            ]
             output_item["generator"] = args.model_name
             output_item["dataset"] = metadata["dataset"][ind]
             output_item["model_input"] = model_inputs[ind]
@@ -199,19 +202,20 @@ def save_outputs(args, id_strs, outputs, chat_history, metadata, model_inputs, f
 
 def retry_handler(retry_limit=10):
     """
-        This is an error handler for requests to OpenAI API.
-        If will retry for the request for `retry_limit` times if the error is not a rate limit error.
-        Otherwise, it will wait for the time specified in the error message and constantly retry.
-        You can add specific processing logic for different types of errors here.
+    This is an error handler for requests to OpenAI API.
+    If will retry for the request for `retry_limit` times if the error is not a rate limit error.
+    Otherwise, it will wait for the time specified in the error message and constantly retry.
+    You can add specific processing logic for different types of errors here.
 
-        Args:
-            retry_limit (int, optional): The number of times to retry. Defaults to 3.
+    Args:
+        retry_limit (int, optional): The number of times to retry. Defaults to 3.
 
-        Usage:
-            @retry_handler(retry_limit=3)
-            def call_openai_api():
-                pass
+    Usage:
+        @retry_handler(retry_limit=3)
+        def call_openai_api():
+            pass
     """
+
     def decorate(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -221,18 +225,18 @@ def retry_handler(retry_limit=10):
                 try:
                     sys.stdout.flush()
                     if flag_cohere_retry:
-                        kwargs['shorten_msg_times'] = retried
+                        kwargs["shorten_msg_times"] = retried
                     return func(*args, **kwargs)
                 except Exception as e:
                     # if rate limit error, wait 2 seconds and retry
                     if isinstance(e, OPENAI_RATE_LIMIT_ERROR):
-                        words = str(e).split(' ')
+                        words = str(e).split(" ")
                         try:
-                            time_to_wait = int(words[words.index('after') + 1])
+                            time_to_wait = int(words[words.index("after") + 1])
                         except ValueError:
                             time_to_wait = 5
                         # print("Rate limit error, waiting for {} seconds for another try..".format(time_to_wait))
-                        time.sleep(time_to_wait) # wait 30 seconds
+                        time.sleep(time_to_wait)  # wait 30 seconds
                         # print("Finished waiting for {} seconds. Start another try".format(time_to_wait))
                     elif isinstance(e, OPENAI_API_ERROR):
                         # this is because the prompt contains content that is filtered by OpenAI API
@@ -245,64 +249,74 @@ def retry_handler(retry_limit=10):
                             print(f"Retrying for the {retried + 1} time..")
                         else:
                             err_msg = str(e)
-                            if '504 Gateway Time-out' in err_msg:
-                                print ('Yi issue!')
-                                return ['']
+                            if "504 Gateway Time-out" in err_msg:
+                                print("Yi issue!")
+                                return [""]
                             else:
-                                raise e # to prevent infinite loop
+                                raise e  # to prevent infinite loop
                         retried += 1
                     else:
                         err_msg = str(e)
-                        print(e.__class__.__name__+":", err_msg)
+                        print(e.__class__.__name__ + ":", err_msg)
                         if retried < retry_limit:
-                            if 'cohere' in e.__class__.__name__.lower() and 'prompt exceeds context length' in err_msg:
-                                print ('cohere prompt length issue!')
+                            if "cohere" in e.__class__.__name__.lower() and "prompt exceeds context length" in err_msg:
+                                print("cohere prompt length issue!")
                                 flag_cohere_retry = True
-                                return [''] # return empty strings for prompt longer than context window size, comment out this line to truncate prompt until it fits
-                            if 'blocked' in err_msg:
-                                print ('blocked output issue!')
-                                return ['Error: this query is blocked by APIs.']
+                                return [
+                                    ""
+                                ]  # return empty strings for prompt longer than context window size, comment out this line to truncate prompt until it fits
+                            if "blocked" in err_msg:
+                                print("blocked output issue!")
+                                return ["Error: this query is blocked by APIs."]
                             if "`inputs` tokens + `max_new_tokens` must be <=" in err_msg:
-                                print ('Exceeding max tokens issue! (in together.ai)')
-                                return ['']
-                                #raise e
+                                print("Exceeding max tokens issue! (in together.ai)")
+                                return [""]
+                                # raise e
                             print(f"Retrying for the {retried + 1} time..")
-                            #if 'output blocked by content filtering policy' in err_msg.lower():
+                            # if 'output blocked by content filtering policy' in err_msg.lower():
                             #    raise e
                         else:
                             # finally failed
-                            if 'cohere' in e.__class__.__name__.lower() and 'blocked output' in err_msg:
-                                print ('cohere blocked output issue!')
-                                return [''] # return empty strings for prompt longer than context window size, comment out this line to truncate prompt until it fits
-                            if 'The read operation timed out' in err_msg:
-                                print ('reka time out issue!')
-                                return ['']
-                            if 'Something wrong happened during your request! Please retry.If the error persists, contact our support team' in err_msg:
-                                print ('reka error!')
-                                return ['']
-                            if '504 Gateway Time-out' in err_msg:
-                                print ('Yi issue!')
-                                return [''] 
+                            if "cohere" in e.__class__.__name__.lower() and "blocked output" in err_msg:
+                                print("cohere blocked output issue!")
+                                return [
+                                    ""
+                                ]  # return empty strings for prompt longer than context window size, comment out this line to truncate prompt until it fits
+                            if "The read operation timed out" in err_msg:
+                                print("reka time out issue!")
+                                return [""]
+                            if (
+                                "Something wrong happened during your request! Please retry.If the error persists, contact our support team"
+                                in err_msg
+                            ):
+                                print("reka error!")
+                                return [""]
+                            if "504 Gateway Time-out" in err_msg:
+                                print("Yi issue!")
+                                return [""]
                             print("Retry limit reached. Saving the error message and returning.")
                             print(kwargs["prompt"])
                             raise e
                         retried += 1
+
         return wrapper
+
     return decorate
 
+
 def openai_chat_request(
-    model: str=None,
-    engine: str=None,
-    temperature: float=0,
-    max_tokens: int=512,
-    top_p: float=1.0,
-    frequency_penalty: float=0,
-    presence_penalty: float=0,
-    prompt: str=None,
-    n: int=1,
-    messages: List[dict]=None,
-    stop: List[str]=None,
-    json_mode: bool=False,
+    model: str = None,
+    engine: str = None,
+    temperature: float = 0,
+    max_tokens: int = 512,
+    top_p: float = 1.0,
+    frequency_penalty: float = 0,
+    presence_penalty: float = 0,
+    prompt: str = None,
+    n: int = 1,
+    messages: List[dict] = None,
+    stop: List[str] = None,
+    json_mode: bool = False,
     **kwargs,
 ) -> List[str]:
     """
@@ -324,13 +338,15 @@ def openai_chat_request(
     # Call openai api to generate aspects
     assert prompt is not None or messages is not None, "Either prompt or messages should be provided."
     if messages is None:
-        messages = [{"role":"system","content":"You are a helpful AI assistant."},
-                    {"role":"user","content": prompt}]
-    
+        messages = [
+            {"role": "system", "content": "You are a helpful AI assistant."},
+            {"role": "user", "content": prompt},
+        ]
+
     if openai.__version__ == "0.28.0":
         response = openai.ChatCompletion.create(
             model=model,
-            response_format = {"type": "json_object"} if json_mode else None,
+            response_format={"type": "json_object"} if json_mode else None,
             engine=engine,
             messages=messages,
             temperature=temperature,
@@ -343,25 +359,29 @@ def openai_chat_request(
             **kwargs,
         )
         contents = []
-        for choice in response['choices']:
+        for choice in response["choices"]:
             # Check if the response is valid
-            if choice['finish_reason'] not in ['stop', 'length']:
+            if choice["finish_reason"] not in ["stop", "length"]:
                 raise ValueError(f"OpenAI Finish Reason Error: {choice['finish_reason']}")
-            contents.append(choice['message']['content'])
+            contents.append(choice["message"]["content"])
     else:
-        nvidia_mode = False 
+        nvidia_mode = False
         # for version > 1.0
         if "deepseek" in model:
-            assert os.environ.get("DEEPSEEK_API_KEY") is not None, "Please set DEEPSEEK_API_KEY in the environment variables."
+            assert (
+                os.environ.get("DEEPSEEK_API_KEY") is not None
+            ), "Please set DEEPSEEK_API_KEY in the environment variables."
             client = OpenAI(api_key=os.environ.get("DEEPSEEK_API_KEY"), base_url="https://api.deepseek.com/v1")
         elif "yi-" in model:
             assert os.environ.get("YI_API_KEY") is not None, "Please set YI_API_KEY in the environment variables."
             client = OpenAI(api_key=os.environ.get("YI_API_KEY"), base_url="https://api.lingyiwanwu.com/v1")
-        elif model.endswith("@nvidia"):             
-            assert os.environ.get("NVIDIA_API_KEY") is not None, "Please set NVIDIA_API_KEY in the environment variables."
+        elif model.endswith("@nvidia"):
+            assert (
+                os.environ.get("NVIDIA_API_KEY") is not None
+            ), "Please set NVIDIA_API_KEY in the environment variables."
             client = OpenAI(api_key=os.environ.get("NVIDIA_API_KEY"), base_url="https://integrate.api.nvidia.com/v1")
             model = model.replace("@nvidia", "")
-            nvidia_mode = True 
+            nvidia_mode = True
             # print(model, client.api_key, client.base_url)
         else:
             client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
@@ -373,7 +393,7 @@ def openai_chat_request(
             if messages[0]["role"] == "system":
                 messages = messages[1:]
             response = client.chat.completions.create(
-                model=model, 
+                model=model,
                 messages=messages,
                 temperature=0.001 if temperature == 0 else temperature,
                 max_tokens=max_tokens,
@@ -382,11 +402,11 @@ def openai_chat_request(
                 # stop=stop,
                 **kwargs,
             )
-        else: 
+        else:
             # print(f"Requesting chat completion from OpenAI API with model {model}")
             response = client.chat.completions.create(
-                model=model, 
-                response_format = {"type": "json_object"} if json_mode else None,
+                model=model,
+                response_format={"type": "json_object"} if json_mode else None,
                 messages=messages,
                 temperature=temperature,
                 max_tokens=max_tokens,
@@ -401,25 +421,26 @@ def openai_chat_request(
         contents = []
         for choice in response.choices:
             # Check if the response is valid
-            if choice.finish_reason not in ['stop', 'length']:
-                if 'content_filter' in choice.finish_reason:
+            if choice.finish_reason not in ["stop", "length"]:
+                if "content_filter" in choice.finish_reason:
                     contents.append("Error: content filtered due to OpenAI policy. ")
                 else:
                     raise ValueError(f"OpenAI Finish Reason Error: {choice.finish_reason}")
             contents.append(choice.message.content.strip())
     return contents
 
+
 def together_chat_request(
-    model: str=None,
-    engine: str=None,
-    temperature: float=0,
-    max_tokens: int=4096,
-    top_p: float=1.0,
-    repetition_penalty: float=0,
-    prompt: str=None,
-    n: int=1,
-    messages: List[dict]=None,
-    stop: List[str]=None,
+    model: str = None,
+    engine: str = None,
+    temperature: float = 0,
+    max_tokens: int = 4096,
+    top_p: float = 1.0,
+    repetition_penalty: float = 0,
+    prompt: str = None,
+    n: int = 1,
+    messages: List[dict] = None,
+    stop: List[str] = None,
     **kwargs,
 ) -> List[str]:
     """
@@ -440,10 +461,10 @@ def together_chat_request(
     # Call openai api to generate aspects
     assert prompt is not None or messages is not None, "Either prompt or messages should be provided."
     if messages is None:
-        messages = [{"role":"user","content": prompt}]
+        messages = [{"role": "user", "content": prompt}]
     client = Together(api_key=os.environ.get("TOGETHER_API_KEY"))
     if "gemma-2" in model:
-        max_chars = 6000*4
+        max_chars = 6000 * 4
         # num_tokens = len(messages[0]["content"])/4 # estimate the number of tokens by dividing the length of the prompt by 4
         if len(messages[0]["content"]) > max_chars:
             print("Truncating prompt to 6000 tokens")
@@ -458,7 +479,7 @@ def together_chat_request(
         n=n,
         repetition_penalty=repetition_penalty,
         stop=stop,
-        **kwargs
+        **kwargs,
     )
     # print(response.choices[0].message.content)
     contents = []
@@ -468,10 +489,10 @@ def together_chat_request(
 
 
 def google_chat_request(
-    model: str=None,
-    generation_config: dict=None,
-    prompt: str=None,
-    messages: List[dict]=None,
+    model: str = None,
+    generation_config: dict = None,
+    prompt: str = None,
+    messages: List[dict] = None,
 ) -> List[str]:
     """
     Request the evaluation prompt from the Google API in chat format.
@@ -485,31 +506,32 @@ def google_chat_request(
     """
     assert prompt is not None or messages is not None, "Either prompt or messages should be provided."
     if messages is None:
-        messages = [{"role":"user","parts": ["You are an AI assistant that helps people find information."]},
-                    {"role":"model", "parts": ["Understood."]},
-                {"role":"user","parts": [prompt]}]
+        messages = [
+            {"role": "user", "parts": ["You are an AI assistant that helps people find information."]},
+            {"role": "model", "parts": ["Understood."]},
+            {"role": "user", "parts": [prompt]},
+        ]
 
-    api_key = os.getenv('GOOGLE_API_KEY')
+    api_key = os.getenv("GOOGLE_API_KEY")
     genai.configure(api_key=api_key)
     google_model = genai.GenerativeModel(model)
-
 
     response = google_model.generate_content(
         messages,
         generation_config=genai.GenerationConfig(
-            max_output_tokens=generation_config['max_output_tokens'],
-            temperature=generation_config['temperature'],
-            stop_sequences=generation_config['stop_sequences'],
-            top_p=generation_config['top_p']
+            max_output_tokens=generation_config["max_output_tokens"],
+            temperature=generation_config["temperature"],
+            stop_sequences=generation_config["stop_sequences"],
+            top_p=generation_config["top_p"],
         ),
-        request_options={"timeout": 600}
+        request_options={"timeout": 600},
     )
     if len(response.candidates) == 0:
-        output = ''
+        output = ""
     else:
         candidate = response.candidates[0]
         if candidate.finish_reason != 1 and candidate.finish_reason != 2:
-            output = ''
+            output = ""
         else:
             output = candidate.content.parts[0].text
     contents = [output]
@@ -517,14 +539,14 @@ def google_chat_request(
 
 
 def cohere_chat_request(
-    model: str=None,
-    system_msg: str=None,
-    temperature: float=0,
-    max_tokens: int=512,
-    top_p: float=1.0,
-    prompt: str=None,
-    shorten_msg_times: int=0,
-    messages: List[dict]=None,
+    model: str = None,
+    system_msg: str = None,
+    temperature: float = 0,
+    max_tokens: int = 512,
+    top_p: float = 1.0,
+    prompt: str = None,
+    shorten_msg_times: int = 0,
+    messages: List[dict] = None,
     **kwargs,
 ) -> List[str]:
     """
@@ -542,45 +564,46 @@ def cohere_chat_request(
     # Call openai api to generate aspects
     assert prompt is not None or messages is not None, "Either prompt or messages should be provided."
     if messages is None:
-        messages = [{"role":"User","message": prompt}]
-    api_key = os.getenv('COHERE_API_KEY')
+        messages = [{"role": "User", "message": prompt}]
+    api_key = os.getenv("COHERE_API_KEY")
     co = cohere.Client(api_key)
-    assert messages[-1]['role'] == 'User', messages[-1]['role']
+    assert messages[-1]["role"] == "User", messages[-1]["role"]
     chat_history = messages[:-1]
-    message = messages[-1]['message']
+    message = messages[-1]["message"]
     for _ in range(shorten_msg_times):
         if len(chat_history) > 0:
             if _ == shorten_msg_times - 1:
-                print ('removing past context')
+                print("removing past context")
             chat_history = chat_history[2:]
         else:
             msg_len = len(message)
             msg_len = msg_len // 2
             if _ == shorten_msg_times - 1:
-                print (f'shorten msg len to {msg_len}')
+                print(f"shorten msg len to {msg_len}")
             message = message[msg_len:]
     if len(chat_history) == 0:
         chat_history = None
     response = co.chat(
-         message=message,
-         preamble=system_msg,
-         chat_history=chat_history,
-         model=model,
-         temperature=temperature,
-         p=top_p,
-         max_tokens=max_tokens,
-         prompt_truncation='AUTO')
+        message=message,
+        preamble=system_msg,
+        chat_history=chat_history,
+        model=model,
+        temperature=temperature,
+        p=top_p,
+        max_tokens=max_tokens,
+        prompt_truncation="AUTO",
+    )
     return [response.text]
 
 
 def mistral_chat_request(
-    model: str=None,
-    engine: str=None,
-    temperature: float=0,
-    max_tokens: int=512,
-    top_p: float=1.0,
-    prompt: str=None,
-    messages: List[dict]=None,
+    model: str = None,
+    engine: str = None,
+    temperature: float = 0,
+    max_tokens: int = 512,
+    top_p: float = 1.0,
+    prompt: str = None,
+    messages: List[dict] = None,
     **kwargs,
 ) -> List[str]:
     """
@@ -598,8 +621,10 @@ def mistral_chat_request(
     """
     assert prompt is not None or messages is not None, "Either prompt or messages should be provided."
     if messages is None:
-        messages = [{"role":"system","content":"You are an AI assistant that helps people find information."},
-                {"role":"user","content": prompt}]
+        messages = [
+            {"role": "system", "content": "You are an AI assistant that helps people find information."},
+            {"role": "user", "content": prompt},
+        ]
     api_key = os.getenv("MISTRAL_API_KEY")
     client = MistralClient(api_key=api_key)
     response = client.chat(
@@ -607,7 +632,7 @@ def mistral_chat_request(
         temperature=temperature,
         top_p=top_p,
         max_tokens=max_tokens,
-        messages=[ChatMessage(role=message['role'], content=message['content']) for message in messages],
+        messages=[ChatMessage(role=message["role"], content=message["content"]) for message in messages],
     )
 
     contents = []
@@ -615,17 +640,18 @@ def mistral_chat_request(
         contents.append(choice.message.content)
     return contents
 
+
 def anthropic_chat_request(
-    model: str=None,
-    engine: str=None,
-    temperature: float=0,
-    max_tokens: int=512,
-    top_p: float=1.0,
-    prompt: str=None,
-    system_msg: str=None,
-    messages: List[dict]=None,
-    stop: List[str]=None,
-    json_mode: bool=False,
+    model: str = None,
+    engine: str = None,
+    temperature: float = 0,
+    max_tokens: int = 512,
+    top_p: float = 1.0,
+    prompt: str = None,
+    system_msg: str = None,
+    messages: List[dict] = None,
+    stop: List[str] = None,
+    json_mode: bool = False,
     **kwargs,
 ) -> List[str]:
     """
@@ -645,14 +671,12 @@ def anthropic_chat_request(
     """
     assert prompt is not None or messages is not None, "Either prompt or messages should be provided."
     if messages is None and prompt is not None:
-        messages = [
-            {"role":"user", "content": prompt}
-        ] 
+        messages = [{"role": "user", "content": prompt}]
     if system_msg is None:
         system_msg = ""
     prefill = "{"
     if json_mode:
-        messages.append({"role":"assistant", "content": prefill})
+        messages.append({"role": "assistant", "content": prefill})
     api_key = os.getenv("ANTHROPIC_API_KEY")
     client = Anthropic(api_key=api_key)
     response = client.messages.create(
@@ -665,19 +689,19 @@ def anthropic_chat_request(
         top_p=top_p,
     )
 
-    contents = [prefill+response.content[0].text]
+    contents = [prefill + response.content[0].text]
     return contents
 
 
 def reka_chat_request(
-    model: str=None,
-    engine: str=None,
-    temperature: float=0,
-    max_tokens: int=512,
-    top_p: float=1.0,
-    prompt: str=None,
-    messages: List[dict]=None,
-    stop: List[str]=None,
+    model: str = None,
+    engine: str = None,
+    temperature: float = 0,
+    max_tokens: int = 512,
+    top_p: float = 1.0,
+    prompt: str = None,
+    messages: List[dict] = None,
+    stop: List[str] = None,
     **kwargs,
 ) -> List[str]:
     """
@@ -696,7 +720,7 @@ def reka_chat_request(
     """
     assert prompt is not None or messages is not None, "Either prompt or messages should be provided."
     if messages is None:
-        messages = [{"role":"user","content": prompt}]
+        messages = [{"role": "user", "content": prompt}]
     api_key = os.getenv("REKA_API_KEY")
     client = Reka(api_key=api_key)
     response = client.chat.create(
@@ -710,19 +734,20 @@ def reka_chat_request(
     contents = [response.responses[0].message.content]
     return contents
 
+
 def yi_chat_request(
-    model: str=None,
-    engine: str=None,
-    temperature: float=0,
-    max_tokens: int=512,
-    top_p: float=1.0,
-    frequency_penalty: float=0,
-    presence_penalty: float=0,
-    prompt: str=None,
-    n: int=1,
-    messages: List[dict]=None,
-    stop: List[str]=None,
-    json_mode: bool=False,
+    model: str = None,
+    engine: str = None,
+    temperature: float = 0,
+    max_tokens: int = 512,
+    top_p: float = 1.0,
+    frequency_penalty: float = 0,
+    presence_penalty: float = 0,
+    prompt: str = None,
+    n: int = 1,
+    messages: List[dict] = None,
+    stop: List[str] = None,
+    json_mode: bool = False,
     **kwargs,
 ) -> List[str]:
     """
@@ -745,14 +770,16 @@ def yi_chat_request(
     API_BASE = "https://api.lingyiwanwu.com/v1"
     assert prompt is not None or messages is not None, "Either prompt or messages should be provided."
     if messages is None:
-        messages = [{"role":"system","content":"You are a helpful AI assistant."},
-                    {"role":"user","content": prompt}]
+        messages = [
+            {"role": "system", "content": "You are a helpful AI assistant."},
+            {"role": "user", "content": prompt},
+        ]
 
     client = OpenAI(base_url=API_BASE, api_key=os.environ.get("YI_API_KEY"))
     # print(f"Requesting chat completion from OpenAI API with model {model}")
     response = client.chat.completions.create(
         model=model,
-        response_format = {"type": "json_object"} if json_mode else None,
+        response_format={"type": "json_object"} if json_mode else None,
         messages=messages,
         temperature=temperature,
         max_tokens=max_tokens,
@@ -767,8 +794,8 @@ def yi_chat_request(
     contents = []
     for choice in response.choices:
         # Check if the response is valid
-        if choice.finish_reason not in ['stop', 'length']:
-            if 'content_filter' in choice.finish_reason:
+        if choice.finish_reason not in ["stop", "length"]:
+            if "content_filter" in choice.finish_reason:
                 contents.append("Error: content filtered due to OpenAI policy. ")
             else:
                 raise ValueError(f"OpenAI Finish Reason Error: {choice.finish_reason}")

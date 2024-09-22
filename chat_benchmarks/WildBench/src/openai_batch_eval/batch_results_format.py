@@ -1,20 +1,20 @@
-import json 
-import sys 
+import json
+import sys
 import jsonlines
 
-submit_file = sys.argv[1] # a jsonl file
-result_file = sys.argv[2] # a jsonl file
+submit_file = sys.argv[1]  # a jsonl file
+result_file = sys.argv[2]  # a jsonl file
 
-MODE = "pairwise" # or "score"
+MODE = "pairwise"  # or "score"
 
 if "score" in result_file:
     MODE = "score"
- 
+
 # submit_file = "evaluation/results_v2.0522/eval=gpt-4-turbo-2024-04-09/ref=gpt-4-turbo-2024-04-09/claude-3-opus-20240229.batch-submit.jsonl"
 # result_file = "evaluation/results_v2.0522/eval=gpt-4-turbo-2024-04-09/ref=gpt-4-turbo-2024-04-09/claude-3-opus-20240229.batch_results.jsonl"
 # result_file = sys.argv[1]
 
-# load jsonl file from submit_file 
+# load jsonl file from submit_file
 submit_data = []
 custom_id_to_submission = {}
 with jsonlines.open(submit_file, "r") as f:
@@ -30,7 +30,6 @@ with jsonlines.open(result_file, "r") as f:
         results.append(line)
 
 # assert len(submit_data) == len(results)
-
 
 
 # print(json.dumps(results[0], indent=2))
@@ -54,9 +53,9 @@ for item in results:
             "batch_req_id": item["id"],
             "usage": item["response"]["body"]["usage"],
             "error": item["error"],
-        }
+        },
     }
-    prompt = submission["body"]["messages"][0]["content"] 
+    prompt = submission["body"]["messages"][0]["content"]
     if MODE == "pairwise":
         assert len(custom_id_splits) == 3
         model_A = custom_id_splits[1].replace("A:", "")
@@ -69,7 +68,7 @@ for item in results:
         winner = "tie"
         if choice == "A=B":
             winner = "tie"
-            extent = 0 
+            extent = 0
         elif choice == "A+":
             winner = model_A
             extent = 1
@@ -85,13 +84,15 @@ for item in results:
         else:
             print(f"Error: choice {choice} not recognized.")
             continue
-        results_item.update({
-            "model_A": model_A,
-            "model_B": model_B,
-            "winner": winner,
-            "extent": extent,
-        })
-        
+        results_item.update(
+            {
+                "model_A": model_A,
+                "model_B": model_B,
+                "winner": winner,
+                "extent": extent,
+            }
+        )
+
         model_A_output = prompt.split("<|begin_of_response_A|>\n")[1].split("<|end_of_response_A|>\n")[0]
         model_B_output = prompt.split("<|begin_of_response_B|>")[1].split("<|end_of_response_B|>\n")[0]
         results_item["model_outputs"] = {
@@ -104,18 +105,16 @@ for item in results:
         if "score" not in eval_output_parsed:
             print(eval_output_parsed)
             continue
-        score  = eval_output_parsed["score"]
-        results_item.update({
-            "model_test": model_test,
-            "score": score,
-        })
+        score = eval_output_parsed["score"]
+        results_item.update(
+            {
+                "model_test": model_test,
+                "score": score,
+            }
+        )
         model_output = prompt.split("<|begin_of_response|>\n")[1].split("<|end_of_response|>\n")[0]
         results_item["model_output"] = model_output.strip()
 
-    
-    
-    
-    
     results_json.append(results_item)
 
 # write to a json file

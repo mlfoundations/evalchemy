@@ -1,7 +1,7 @@
 import argparse
 import os
 import json
-import openai 
+import openai
 import random
 from pathlib import Path
 from itertools import combinations
@@ -9,10 +9,11 @@ from string import Template
 from tqdm import tqdm
 from threading import get_ident
 from concurrent.futures import ThreadPoolExecutor
+
 # from eval_utils import (
-    # retry_handler, 
-    # openai_chat_request,
-    # anthropic_chat_request,
+# retry_handler,
+# openai_chat_request,
+# anthropic_chat_request,
 # )
 from unified_utils import (
     retry_handler,
@@ -20,34 +21,35 @@ from unified_utils import (
     anthropic_chat_request,
 )
 from datasets import load_dataset, get_dataset_config_names
-import tiktoken 
-import re 
+import tiktoken
+import re
 
 HF_BENCH_PATH = "allenai/WildBench"
 HF_BENCH_CONFIG = "v2"
 HF_RESULTS_PATH = "allenai/WildBench-V2-Model-Outputs"
- 
 
-print(f"Loading the benchmark data from {HF_BENCH_PATH} and the results from {HF_RESULTS_PATH}") 
 
-encoding = None 
+print(f"Loading the benchmark data from {HF_BENCH_PATH} and the results from {HF_RESULTS_PATH}")
+
+encoding = None
+
 
 def get_args():
-    parser = argparse.ArgumentParser()  
+    parser = argparse.ArgumentParser()
     parser.add_argument("--action", type=str, default="trial", required=True)
     parser.add_argument("--mode", type=str, default="pairwise", required=True)
     parser.add_argument("--eval_template", type=str, default="", required=True)
-    parser.add_argument("--target_model_name", type=str, required=False) 
+    parser.add_argument("--target_model_name", type=str, required=False)
     parser.add_argument("--data_name", type=str, default=None)
     parser.add_argument("--ref_model_name", type=str, required=False)
     parser.add_argument("--eval_output_file", type=str, required=True)
     parser.add_argument("--start_idx", type=int, default=0)
-    parser.add_argument("--end_idx", type=int, default=-1)  
+    parser.add_argument("--end_idx", type=int, default=-1)
     parser.add_argument("--save_interval", type=int, default=1)
-    
-    # Prompt configs 
+
+    # Prompt configs
     parser.add_argument("--max_words_to_eval", type=int, default=1000)
-    
+
     # OpenAI Configs
     parser.add_argument("--api_key", type=str, default=None)
     parser.add_argument("--model", type=str, default="gpt-4-1106-preview")
@@ -56,19 +58,19 @@ def get_args():
     parser.add_argument("--max_tokens", type=int, default=1024)
     parser.add_argument("--overwrite", action="store_true")
     parser.add_argument("--batch_mode", action="store_true")
-    
+
     parser.add_argument("--seed", type=int, default=42)
 
     parser.add_argument("--local_result_file", type=str, default=None)
-    
-    args = parser.parse_args() 
-    if args.api_key is not None:
-        openai.api_key = args.api_key 
-     
-    return args
-        
 
-def extract_values_from_json(json_string, keys = ["score", "strengths", "weaknesses", "choice"], allow_no_quotes = False):
+    args = parser.parse_args()
+    if args.api_key is not None:
+        openai.api_key = args.api_key
+
+    return args
+
+
+def extract_values_from_json(json_string, keys=["score", "strengths", "weaknesses", "choice"], allow_no_quotes=False):
     extracted_values = {}
     for key in keys:
         if key not in json_string:
@@ -92,16 +94,17 @@ def extract_values_from_json(json_string, keys = ["score", "strengths", "weaknes
                 extracted_values[key] = match.group(1)
             else:
                 # to allow no quotes on the keys
-                pattern = f'{key}\\s*:\\s*([^,\\s]*)'
+                pattern = f"{key}\\s*:\\s*([^,\\s]*)"
                 match = re.search(pattern, json_string)
                 if match:
                     extracted_values[key] = match.group(1)
     return extracted_values
 
-def parse_result(result_str, mode="json", eval_mode="score"): 
+
+def parse_result(result_str, mode="json", eval_mode="score"):
     assert eval_mode in ["score", "pairwise"]
-    result_str = result_str.strip() 
-    try: 
+    result_str = result_str.strip()
+    try:
         # result_str = result_str.replace(".\n", ". ")
         # result_str = result_str.replace(".\n\n", ". ")
         # result_str = result_str.replace("\n", " ")
@@ -117,17 +120,18 @@ def parse_result(result_str, mode="json", eval_mode="score"):
         # exit()
     return parsed_result
 
+
 def compute_cost(gpt_model_name, prompt, result):
     global encoding
     if encoding is None:
         if gpt_model_name.startswith("gpt"):
             encoding = tiktoken.encoding_for_model(gpt_model_name)
         else:
-            encoding = tiktoken.encoding_for_model("gpt-4-1106-preview") # default to gpt-4-1106-preview
-    if gpt_model_name.startswith("gpt-4-"): # gpt-4-turbo series 
+            encoding = tiktoken.encoding_for_model("gpt-4-1106-preview")  # default to gpt-4-1106-preview
+    if gpt_model_name.startswith("gpt-4-"):  # gpt-4-turbo series
         price_per_input_token = 0.01 / 1000
         price_per_output_token = 0.03 / 1000
-    elif gpt_model_name.startswith("gpt-4o"): # gpt-4-turbo series 
+    elif gpt_model_name.startswith("gpt-4o"):  # gpt-4-turbo series
         price_per_input_token = 0.005 / 1000
         price_per_output_token = 0.015 / 1000
     elif gpt_model_name in ["gpt-3.5-turbo-0125"]:
@@ -148,17 +152,20 @@ def compute_cost(gpt_model_name, prompt, result):
     else:
         # raise Exception(f"Unknown model: {gpt_model_name}")
         # print(f"Unknown model: {gpt_model_name}")
-        pass 
+        pass
         price_per_input_token = 0.0
         price_per_output_token = 0.0
-    
+
     price_item = {
-                # compute openai token number
-                "in_tokens": len(encoding.encode(prompt)),
-                "out_tokens": len(encoding.encode(result)),
+        # compute openai token number
+        "in_tokens": len(encoding.encode(prompt)),
+        "out_tokens": len(encoding.encode(result)),
     }
-    price_item["cost"] = price_item["in_tokens"] * price_per_input_token + price_item["out_tokens"] * price_per_output_token
+    price_item["cost"] = (
+        price_item["in_tokens"] * price_per_input_token + price_item["out_tokens"] * price_per_output_token
+    )
     return price_item
+
 
 def batch_eval_generate(results, args):
     json_lines = []
@@ -173,22 +180,26 @@ def batch_eval_generate(results, args):
         elif args.mode == "score":
             model_test = item["generator"]
             batch_item["custom_id"] = f"{sid}||{model_test}"
-        
-        
+
         batch_item["method"] = "POST"
         batch_item["url"] = "/v1/chat/completions"
-        batch_item["body"] = {"model": args.model, "temperature": args.temperature, "max_tokens": args.max_tokens, "response_format": {"type": "json_object"}}
+        batch_item["body"] = {
+            "model": args.model,
+            "temperature": args.temperature,
+            "max_tokens": args.max_tokens,
+            "response_format": {"type": "json_object"},
+        }
         batch_item["body"]["messages"] = [{"role": "user", "content": item["prompt"]}]
         json_lines.append(batch_item)
     return json_lines
-    
 
-def run_eval(results, args): 
-    # try to load the existing results from args.eval_output_file 
+
+def run_eval(results, args):
+    # try to load the existing results from args.eval_output_file
     if os.path.exists(args.eval_output_file) and not args.overwrite:
-        cnt = 0 
+        cnt = 0
         with open(args.eval_output_file, "r") as f:
-            existing_results = json.load(f) 
+            existing_results = json.load(f)
         for i in range(len(existing_results)):
             e = existing_results[i]
             t = results[i]
@@ -196,55 +207,55 @@ def run_eval(results, args):
                 continue
             # if e["prompt"] == t["prompt"] and e["result"] != "N/A":
             #     results[i]["result"] = e["result"]
-            #     cnt += 1 
+            #     cnt += 1
             if "result" in e:
                 t["result"] = e["result"]
-                if "parsed_result" in e: 
+                if "parsed_result" in e:
                     t["parsed_result"] = e["parsed_result"]
-                    cnt += 1 
+                    cnt += 1
             if "error" in e:
                 t["error"] = e["error"]
-            
 
             if args.mode == "pairwise" and "winner" in e:
                 t["winner"] = e["winner"]
-                  
-            
+
         print(f"loading {cnt} results from {args.eval_output_file}")
-     
-    # TODO: add support for using other APIs as judge 
+
+    # TODO: add support for using other APIs as judge
     openai_args = {
         "prompt": "TODO",
         "temperature": args.temperature,
         "max_tokens": args.max_tokens,
         "json_mode": True,
-        "stop": []
+        "stop": [],
     }
     if args.model:
-        openai_args['model'] = args.model
+        openai_args["model"] = args.model
     if args.engine:
-        openai_args['engine'] = args.engine
+        openai_args["engine"] = args.engine
 
     @retry_handler(retry_limit=10)
     def api(ind, item, **kwargs):
-        model = kwargs['model']
-        if model.startswith('claude'):
+        model = kwargs["model"]
+        if model.startswith("claude"):
             result = anthropic_chat_request(**kwargs)
         else:
             result = openai_chat_request(**kwargs)
-        result = result[0]  
+        result = result[0]
         return result
-    
+
     # results = results[args.start_idx:args.end_idx] # for debug
-    #import pdb; pdb.set_trace()
+    # import pdb; pdb.set_trace()
     for ind, item in tqdm(enumerate(results), total=len(results), desc=f"Evaluating: {args.eval_output_file} "):
         computed = False
-        if item["result"] != "N/A" and item.get("error", "N/A") == "N/A" and "parsed_result" in item:  
-            results[ind]["parsed_result"] = parse_result(results[ind]["result"], eval_mode=args.mode) # redo the parsing 
+        if item["result"] != "N/A" and item.get("error", "N/A") == "N/A" and "parsed_result" in item:
+            results[ind]["parsed_result"] = parse_result(
+                results[ind]["result"], eval_mode=args.mode
+            )  # redo the parsing
             results[ind]["parsed"] = True if results[ind]["parsed_result"] is not None else False
-            computed = True  
+            computed = True
             continue
-            
+
         openai_args["prompt"] = item["prompt"]
         # if True:
         try:
@@ -263,12 +274,12 @@ def run_eval(results, args):
             #     # elif r["choice"] == "tie":
             #     #     results[ind]["winner"] = "tie"
             #     # else:
-            #     #     results[ind]["winner"] = r["choice"] 
+            #     #     results[ind]["winner"] = r["choice"]
             #     pass  # Note that we will do the parsing later.
             # elif args.mode == "checklist":
-            #     results[ind]["score"] = float(r["score"]) 
+            #     results[ind]["score"] = float(r["score"])
             # elif args.mode == "score":
-            #     pass 
+            #     pass
             # if not args.model.startswith('claude'):
             # results[ind]["price"] = compute_cost(args.model, item["prompt"], results[ind]["result"])
             # else:
@@ -280,50 +291,52 @@ def run_eval(results, args):
             results[ind]["result"] = result
             results[ind]["parsed_result"] = {"choice": "N/A"}
             # results[ind]["price"] = {"cost": 0, "in_tokens": 0, "out_tokens": 0}
-            pass 
-        
-        # print("Done!") 
-        if ind % args.save_interval == 0 or ind == len(results)-1:
+            pass
+
+        # print("Done!")
+        if ind % args.save_interval == 0 or ind == len(results) - 1:
             with open(args.eval_output_file, "w") as f:
-                json.dump(results, f, indent=2) 
+                json.dump(results, f, indent=2)
     with open(args.eval_output_file, "w") as f:
         json.dump(results, f, indent=2)
-    return results 
+    return results
+
 
 def shorten(text, K=-1):
     if K > 0 and len(text.split(" ")) > K:
-        text = " ".join(text.split(" ")[:K]) + "... (truncated)" 
+        text = " ".join(text.split(" ")[:K]) + "... (truncated)"
     return text
- 
-    
-def placeholder_generation(args, candidates, references, histories, last_queries, checklists): 
-    
+
+
+def placeholder_generation(args, candidates, references, histories, last_queries, checklists):
+
     with open(args.eval_template) as f:
-        eval_template = f.read() 
+        eval_template = f.read()
         print(f"Loaded the eval_template from {args.eval_template}")
-    
+
     results = []
-    
 
     assert len(candidates) == len(references)
-            
+
     L = len(candidates)
     if args.end_idx < 0 or args.end_idx > L:
         args.end_idx = L
- 
+
     print(f"# examples in candidates: {len(candidates)}; We take {args.end_idx-args.start_idx} for evaluation.")
-    candidates = candidates[args.start_idx:args.end_idx]
-    references = references[args.start_idx:args.end_idx]
-    histories = histories[args.start_idx:args.end_idx]
-    last_queries = last_queries[args.start_idx:args.end_idx]
-    checklists = checklists[args.start_idx:args.end_idx] 
-    
+    candidates = candidates[args.start_idx : args.end_idx]
+    references = references[args.start_idx : args.end_idx]
+    histories = histories[args.start_idx : args.end_idx]
+    last_queries = last_queries[args.start_idx : args.end_idx]
+    checklists = checklists[args.start_idx : args.end_idx]
+
     results = []
-    for item, ref_item, history, last_query, checklist in zip(candidates, references, histories, last_queries, checklists):
+    for item, ref_item, history, last_query, checklist in zip(
+        candidates, references, histories, last_queries, checklists
+    ):
         # print(item, ref_item, history, last_query, checklist)
         o = item["output"][0] if type(item["output"]) == list else item["output"]
-        
-        # random decide which is A and which is B 
+
+        # random decide which is A and which is B
         d = {}
         d["session_id"] = item["session_id"]
         d["history"] = history
@@ -333,13 +346,13 @@ def placeholder_generation(args, candidates, references, histories, last_queries
         d["generator"] = item["generator"]
         if args.mode == "pairwise":
             r = ref_item["output"][0] if type(ref_item["output"]) == list else ref_item["output"]
-            d["ref_output"] =  r 
-            # d["ref_generator"] = args.ref_model_name 
+            d["ref_output"] = r
+            # d["ref_generator"] = args.ref_model_name
             d["ref_generator"] = ref_item["generator"]
         d["eval_config"] = {"mode": args.mode, "gpt": args.model, "max_words": args.max_words_to_eval}
-        
+
         ## Prompt composition for pairwise evaluation
-        if args.mode == "pairwise": 
+        if args.mode == "pairwise":
             if random.random() < 0.5:
                 A = o
                 B = r
@@ -347,7 +360,7 @@ def placeholder_generation(args, candidates, references, histories, last_queries
             else:
                 A = r
                 B = o
-                d["assignment"] = {"A": d["ref_generator"], "B": d["generator"]} 
+                d["assignment"] = {"A": d["ref_generator"], "B": d["generator"]}
             prompt = eval_template
             prompt = prompt.replace("{$history}", shorten(history, args.max_words_to_eval))
             prompt = prompt.replace("{$user_query}", shorten(last_query, args.max_words_to_eval))
@@ -371,7 +384,7 @@ def placeholder_generation(args, candidates, references, histories, last_queries
             elif B.strip() == "":
                 d["result"] = json.dumps({"reason": "The response B is empty.", "choice": "A++"})
             else:
-                d["result"] = "N/A" 
+                d["result"] = "N/A"
             results.append(d)
 
         elif args.mode == "score":
@@ -386,12 +399,15 @@ def placeholder_generation(args, candidates, references, histories, last_queries
             d_copy = d.copy()
             d_copy["prompt"] = prompt
             if o.strip() == "":
-                d_copy["result"] = json.dumps({"strengths": "N/A", "weaknesses": "The model output is empty.", "score": "1"})
+                d_copy["result"] = json.dumps(
+                    {"strengths": "N/A", "weaknesses": "The model output is empty.", "score": "1"}
+                )
             else:
-                d_copy["result"] = "N/A" 
-            results.append(d_copy) 
+                d_copy["result"] = "N/A"
+            results.append(d_copy)
 
-    return results 
+    return results
+
 
 def compose_eval_item(b, t, r, histories, last_queries, checklists):
     if r is not None:
@@ -400,7 +416,7 @@ def compose_eval_item(b, t, r, histories, last_queries, checklists):
         assert b["session_id"] == t["session_id"]
     history = ""
     checklist = b["checklist"]
-    if len(b["conversation_input"]) > 0: 
+    if len(b["conversation_input"]) > 0:
         for x in b["conversation_input"][:-1]:
             if x["role"] == "user":
                 history += "USER: " + x["content"] + "\n\n"
@@ -411,27 +427,32 @@ def compose_eval_item(b, t, r, histories, last_queries, checklists):
     last_queries.append(last_query)
     checklists.append(checklist)
 
+
 def main():
-    args = get_args() 
+    args = get_args()
     random.seed(args.seed)
     print(args)
-    # assert the api key is ready 
+    # assert the api key is ready
     if args.model.startswith("claude"):
-        assert os.environ.get("ANTHROPIC_API_KEY") is not None, "Please set the ANTHROPIC_API_KEY in the environment variables."
+        assert (
+            os.environ.get("ANTHROPIC_API_KEY") is not None
+        ), "Please set the ANTHROPIC_API_KEY in the environment variables."
     elif args.model.startswith("gpt"):
-        assert os.environ.get("OPENAI_API_KEY") is not None, "Please set the OPENAI_API_KEY in the environment variables."
+        assert (
+            os.environ.get("OPENAI_API_KEY") is not None
+        ), "Please set the OPENAI_API_KEY in the environment variables."
 
     if args.action.startswith("trial"):
         results = placeholder_generation(args)
         print(f"We have {len(results)} examples to evaluate!")
         with open(args.eval_output_file, "w") as f:
-            json.dump(results, f, indent=2) 
-    elif args.action.startswith("eval"):  
+            json.dump(results, f, indent=2)
+    elif args.action.startswith("eval"):
         if args.mode not in ["pairwise", "score"]:
             raise Exception("Not implemented yet!")
 
         bench_data = load_dataset(HF_BENCH_PATH, HF_BENCH_CONFIG, split="test")
-        
+
         if args.local_result_file is not None:
             with open(args.local_result_file, "r") as f:
                 target_model_data = json.load(f)
@@ -460,7 +481,7 @@ def main():
         print(f"len(target_model_data)={len(target_model_data)}")
         print(f"len(ref_model_data)={len(ref_model_data)}")
         candidates = list(target_model_data)
-        references = list(ref_model_data)    
+        references = list(ref_model_data)
         results = placeholder_generation(args, candidates, references, histories, last_queries, checklists)
         if args.batch_mode:
             print("Batch mode is enabled!")
@@ -469,12 +490,11 @@ def main():
                 for line in json_lines:
                     f.write(json.dumps(line) + "\n")
         else:
-            results = run_eval(results, args) 
-     
+            results = run_eval(results, args)
+
     else:
         print("Not implemented yet!")
 
-if __name__ == "__main__": 
+
+if __name__ == "__main__":
     main()
-    
- 

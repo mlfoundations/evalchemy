@@ -1,7 +1,8 @@
-import os 
-import sys 
-from openai import OpenAI 
-client = OpenAI() 
+import os
+import sys
+from openai import OpenAI
+
+client = OpenAI()
 
 existing_batches = client.batches.list(limit=100)
 for batch in existing_batches:

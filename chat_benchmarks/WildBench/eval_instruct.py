@@ -1,8 +1,16 @@
 import sys
-sys.path.insert(0, 'eval/chat_benchmarks/WildBench/src')
+
+sys.path.insert(0, "eval/chat_benchmarks/WildBench/src")
 from src.unified_infer import sanitize_args
 from src.unified_utils import load_eval_data, save_outputs
-from src.eval import compose_eval_item, batch_eval_generate, placeholder_generation, HF_BENCH_PATH, HF_BENCH_CONFIG, HF_RESULTS_PATH
+from src.eval import (
+    compose_eval_item,
+    batch_eval_generate,
+    placeholder_generation,
+    HF_BENCH_PATH,
+    HF_BENCH_CONFIG,
+    HF_RESULTS_PATH,
+)
 import os
 import tempfile
 from lm_eval.api.instance import Instance
@@ -10,21 +18,22 @@ from lm_eval.api.model import LM
 from typing import Dict, List, Any, Optional, Iterator
 from dataclasses import dataclass
 import sys
-import json 
+import json
 from datasets import load_dataset
 import time
 from openai import OpenAI
-import json 
-import sys 
+import json
+import sys
 import jsonlines
 from typing import Dict, List, Tuple, Optional, Any
-import json 
-import sys 
+import json
+import sys
 import jsonlines
 import copy
 
+
 def format_eval_file(submit_file, eval_file) -> str:
-    mode = 'score'
+    mode = "score"
     # Load submit data
     custom_id_to_submission: Dict[str, Dict[str, Any]] = {}
     with jsonlines.open(submit_file, "r") as f:
@@ -40,46 +49,51 @@ def format_eval_file(submit_file, eval_file) -> str:
             custom_id_splits: List[str] = custom_id.split("||")
             session_id: str = custom_id_splits[0]
             eval_output_parsed: Dict[str, Any] = json.loads(item["response"]["choices"][0]["message"]["content"])
-            
+
             results_item: Dict[str, Any] = {
                 "session_id": session_id,
                 "parsed_result": eval_output_parsed,
             }
-            
-            prompt: str = submission["body"]["messages"][0]["content"] 
-            
+
+            prompt: str = submission["body"]["messages"][0]["content"]
+
             if mode == "pairwise":
                 process_pairwise(results_item, custom_id_splits, eval_output_parsed, prompt)
             elif mode == "score":
                 process_score(results_item, custom_id_splits, eval_output_parsed, prompt)
-            
+
             results_json.append(results_item)
 
     # Write output file
     output_file: str = eval_file.replace("batch_results.jsonl", "scores.json")
     with open(output_file, "w") as f:
         json.dump(results_json, f, indent=2)
-    
+
     print(f"Output file written to {output_file}")
     return output_file
 
-def process_pairwise(results_item: Dict[str, Any], custom_id_splits: List[str], eval_output_parsed: Dict[str, Any], prompt: str) -> None:
+
+def process_pairwise(
+    results_item: Dict[str, Any], custom_id_splits: List[str], eval_output_parsed: Dict[str, Any], prompt: str
+) -> None:
     model_A: str = custom_id_splits[1].replace("A:", "")
     model_B: str = custom_id_splits[2].replace("B:", "")
-    
+
     if "choice" not in eval_output_parsed:
         return
-    
+
     choice: str = eval_output_parsed["choice"]
     winner, extent = get_winner_and_extent(choice, model_A, model_B)
-    
-    results_item.update({
-        "model_A": model_A,
-        "model_B": model_B,
-        "winner": winner,
-        "extent": extent,
-    })
-    
+
+    results_item.update(
+        {
+            "model_A": model_A,
+            "model_B": model_B,
+            "winner": winner,
+            "extent": extent,
+        }
+    )
+
     model_A_output: str = prompt.split("<|begin_of_response_A|>\n")[1].split("<|end_of_response_A|>\n")[0]
     model_B_output: str = prompt.split("<|begin_of_response_B|>")[1].split("<|end_of_response_B|>\n")[0]
     results_item["model_outputs"] = {
@@ -87,19 +101,25 @@ def process_pairwise(results_item: Dict[str, Any], custom_id_splits: List[str], 
         model_B: model_B_output.strip(),
     }
 
-def process_score(results_item: Dict[str, Any], custom_id_splits: List[str], eval_output_parsed: Dict[str, Any], prompt: str) -> None:
+
+def process_score(
+    results_item: Dict[str, Any], custom_id_splits: List[str], eval_output_parsed: Dict[str, Any], prompt: str
+) -> None:
     model_test: str = custom_id_splits[1]
     if "score" not in eval_output_parsed:
         return
-    
+
     score: float = eval_output_parsed["score"]
-    results_item.update({
-        "model_test": model_test,
-        "score": score,
-    })
-    
+    results_item.update(
+        {
+            "model_test": model_test,
+            "score": score,
+        }
+    )
+
     model_output: str = prompt.split("<|begin_of_response|>\n")[1].split("<|end_of_response|>\n")[0]
     results_item["model_output"] = model_output.strip()
+
 
 def get_winner_and_extent(choice: str, model_A: str, model_B: str) -> Tuple[Optional[str], Optional[int]]:
     if choice == "A=B":
@@ -115,7 +135,8 @@ def get_winner_and_extent(choice: str, model_A: str, model_B: str) -> Tuple[Opti
     else:
         print(f"Error: choice {choice} not recognized.")
         return None, None
-    
+
+
 def process_file(eval_file, client):
     # Read the input file
     with open(eval_file, "r") as file:
@@ -125,11 +146,11 @@ def process_file(eval_file, client):
     for line in lines:
         payload = json.loads(line)
         # Send the request using the payload directly
-        payload['body']['max_tokens'] = 4096
-        response = client.chat.completions.create(**(payload['body']))
-        
+        payload["body"]["max_tokens"] = 4096
+        response = client.chat.completions.create(**(payload["body"]))
+
         res = copy.deepcopy(payload)
-        res['response'] = json.loads(response.json())
+        res["response"] = json.loads(response.json())
         results.append(res)
 
     # Save results
@@ -139,6 +160,7 @@ def process_file(eval_file, client):
             file.write(json.dumps(result) + "\n")
 
     print(f"Processing complete. Results saved to {output_file}")
+
 
 @dataclass
 class Config:
@@ -172,6 +194,7 @@ class Config:
     mt_turn: int = -1
     mt_turn1_result: Optional[str] = None
 
+
 def eval_instruct(model: LM) -> Dict[str, str]:
     # Data loading
     args = Config()
@@ -189,10 +212,10 @@ def eval_instruct(model: LM) -> Dict[str, str]:
     if args.end_index < 0 or args.end_index > len(model_inputs):
         args.end_index = len(model_inputs)
 
-    model_inputs = model_inputs[args.start_index:args.end_index]
-    id_strs = id_strs[args.start_index:args.end_index]
-    chat_history = chat_history[args.start_index:args.end_index]
-    metadata = {key: metadata[key][args.start_index:args.end_index] for key in metadata}
+    model_inputs = model_inputs[args.start_index : args.end_index]
+    id_strs = id_strs[args.start_index : args.end_index]
+    chat_history = chat_history[args.start_index : args.end_index]
+    metadata = {key: metadata[key][args.start_index : args.end_index] for key in metadata}
     print("loading dataset ... done!")
     all_instances: List[Instance] = [
         Instance(
@@ -206,22 +229,24 @@ def eval_instruct(model: LM) -> Dict[str, str]:
                 },
             ),
             idx,
-        ) for idx, inputs in enumerate(model_inputs)
+        )
+        for idx, inputs in enumerate(model_inputs)
     ]
 
     outputs: List[str] = model.generate_until(all_instances)
     outputs = [[output] for output in outputs]
     save_outputs(args, id_strs, outputs, chat_history, metadata, model_inputs, filepath)
 
-    results: Dict[str, str] = {'filepath': filepath, 'temp_dir_obj': temp_dir_obj}
+    results: Dict[str, str] = {"filepath": filepath, "temp_dir_obj": temp_dir_obj}
     return results
 
+
 def evaluate(results: Dict[str, str]) -> Dict[str, Any]:
-    
-    gpt_eval_name="gpt-4o-2024-05-13"
+
+    gpt_eval_name = "gpt-4o-2024-05-13"
     args = get_args()
-    temp_dir_obj = results['temp_dir_obj']
-    eval_folder = results['temp_dir_obj'].name
+    temp_dir_obj = results["temp_dir_obj"]
+    eval_folder = results["temp_dir_obj"].name
     eval_file = f"{eval_folder}/batch-submit.jsonl"
 
     if os.path.exists(eval_file):
@@ -229,11 +254,11 @@ def evaluate(results: Dict[str, str]) -> Dict[str, Any]:
         return
 
     bench_data = load_dataset(HF_BENCH_PATH, HF_BENCH_CONFIG, split="test")
-    
-    with open(results['filepath'], "r") as f:
+
+    with open(results["filepath"], "r") as f:
         target_model_data = json.load(f)
         print(f"Loaded the local results from {results['filepath']}")
-    
+
     print("No reference model is needed for checklist evaluation.")
     ref_model_data = [None] * len(target_model_data)
     histories = []
@@ -241,14 +266,14 @@ def evaluate(results: Dict[str, str]) -> Dict[str, Any]:
     checklists = []
     for b, t, r in zip(bench_data, target_model_data, ref_model_data):
         compose_eval_item(b, t, r, histories, last_queries, checklists)
-    
+
     print(f"len(target_model_data)={len(target_model_data)}")
     print(f"len(ref_model_data)={len(ref_model_data)}")
     candidates = list(target_model_data)
-    references = list(ref_model_data)    
+    references = list(ref_model_data)
 
     results = placeholder_generation(args, candidates, references, histories, last_queries, checklists)
-    
+
     print("Batch mode is enabled!")
     json_lines = batch_eval_generate(results, args)
     with open(eval_file, "w") as f:
@@ -259,26 +284,26 @@ def evaluate(results: Dict[str, str]) -> Dict[str, Any]:
     submit_file = f"{eval_folder}/results.jsonl"
     output_file = format_eval_file(submit_file, eval_file)
     task_group_new = {
-    "Information seeking": "Information/Advice seeking",
-    "Creative Writing": "Creative Tasks",
-    "Coding & Debugging": "Coding & Debugging",
-    "Reasoning": "Planning & Reasoning",
-    "Editing": "Creative Tasks",
-    "Math": "Math & Data Analysis",
-    "Planning": "Planning & Reasoning",
-    "Brainstorming": "Creative Tasks",
-    "Role playing": "Creative Tasks",
-    "Advice seeking": "Information/Advice seeking",
-    "Data Analysis": "Math & Data Analysis",
-    "Others": "Creative Tasks"
+        "Information seeking": "Information/Advice seeking",
+        "Creative Writing": "Creative Tasks",
+        "Coding & Debugging": "Coding & Debugging",
+        "Reasoning": "Planning & Reasoning",
+        "Editing": "Creative Tasks",
+        "Math": "Math & Data Analysis",
+        "Planning": "Planning & Reasoning",
+        "Brainstorming": "Creative Tasks",
+        "Role playing": "Creative Tasks",
+        "Advice seeking": "Information/Advice seeking",
+        "Data Analysis": "Math & Data Analysis",
+        "Others": "Creative Tasks",
     }
 
-    with open(output_file, 'r') as f:
+    with open(output_file, "r") as f:
         eval_result = json.load(f)
     task_mapping = {}
     wb_data = load_dataset("allenai/WildBench", "v2", split="test")
     for item in wb_data:
-        
+
         tags = [item["primary_tag"]] + item["secondary_tags"]
         task_mapping[item["id"]] = []
         for tag in tags:
@@ -286,8 +311,7 @@ def evaluate(results: Dict[str, str]) -> Dict[str, Any]:
 
         # deduplicate
         task_mapping[item["id"]] = list(set(task_mapping[item["id"]]))
-        
-    
+
     win_much_counts = []
     win_counts = []
     tie_counts = []
@@ -298,7 +322,7 @@ def evaluate(results: Dict[str, str]) -> Dict[str, Any]:
     task_cat_results = {}
     task_cat_results = {}
     for item in eval_result:
-        if 'score' not in item:
+        if "score" not in item:
             print(item)
         scores.append(float(item["score"]))
         model_output = item["model_output"]
@@ -307,27 +331,29 @@ def evaluate(results: Dict[str, str]) -> Dict[str, Any]:
         model_output_len = len(model_output)
         if model_output_len == 0:
             continue
-        lengths.append(model_output_len)    
+        lengths.append(model_output_len)
         task_tags = task_mapping[item["session_id"]]
         for tag in task_tags:
             if tag not in task_cat_results:
                 task_cat_results[tag] = []
             task_cat_results[tag].append(float(item["score"]))
-    test_model_id = item["model_test"] 
+    test_model_id = item["model_test"]
     task_cat_score = {}
     for tag in task_cat_results:
         task_cat_score[tag] = sum(task_cat_results[tag]) / len(task_cat_results[tag])
-        # adjust 
-        task_cat_score[tag] = (task_cat_score[tag] - 5) * 2 
-    weights_by_task = { 
+        # adjust
+        task_cat_score[tag] = (task_cat_score[tag] - 5) * 2
+    weights_by_task = {
         "Creative Tasks": 0.5,
         "Planning & Reasoning": 1.25,
         "Math & Data Analysis": 1,
         "Information/Advice seeking": 0.75,
-        "Coding & Debugging": 1.25
+        "Coding & Debugging": 1.25,
     }
     # task_macro_score = sum(task_cat_score.values()) / len(task_cat_score)
-    task_macro_score = sum([task_cat_score[tag] * weights_by_task[tag] for tag in task_cat_score]) / sum(weights_by_task.values())
+    task_macro_score = sum([task_cat_score[tag] * weights_by_task[tag] for tag in task_cat_score]) / sum(
+        weights_by_task.values()
+    )
     temp_dir_obj.cleanup()
     return {
         "score": sum(scores) / len(scores),
@@ -336,8 +362,9 @@ def evaluate(results: Dict[str, str]) -> Dict[str, Any]:
         "adjusted_task_macro_score": task_macro_score,
         "task_categorized_scores": task_cat_score,
         "total": len(eval_result),
-        "avg_len": sum(lengths) / len(lengths), 
+        "avg_len": sum(lengths) / len(lengths),
     }
+
 
 @dataclass
 class EvaluationConfig:
@@ -371,13 +398,13 @@ class EvaluationConfig:
     mt_turn: int = -1
     mt_turn1_result: Optional[str] = None
 
+
 def get_args():
     # Create an instance of the configuration
     config = EvaluationConfig()
 
     return config
 
-   
 
 def changed_load_eval_data(args, data_name=None, model_name=None):
     if data_name is None:
@@ -405,7 +432,11 @@ def changed_load_eval_data(args, data_name=None, model_name=None):
         dataset = load_dataset("re-align/just-eval-instruct", split="test")
         metadata = {"dataset": [], "source_id": []}
     elif data_name == "mt-bench":
-        dataset = load_dataset("json", data_files="https://huggingface.co/spaces/lmsys/mt-bench/raw/main/data/mt_bench/question.jsonl", split="train")
+        dataset = load_dataset(
+            "json",
+            data_files="https://huggingface.co/spaces/lmsys/mt-bench/raw/main/data/mt_bench/question.jsonl",
+            split="train",
+        )
         metadata = {"question_id": [], "category": []}
         if args.mt_turn == 2:
             with open(args.mt_turn1_result, "r") as f:
@@ -422,9 +453,9 @@ def changed_load_eval_data(args, data_name=None, model_name=None):
         extracted_chats.append(item["conversation_input"])
         chat_history.append(extracted_chats)
         id_strs.append(item["session_id"])
-        
+
         for key in metadata:
             assert key in item, f"Key {key} not found in metadata"
             metadata[key].append(item[key])
     print("Start applying template")
-    return id_strs, chat_history, extracted_chats, metadata 
+    return id_strs, chat_history, extracted_chats, metadata

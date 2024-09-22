@@ -1,6 +1,6 @@
-import json 
+import json
 from datasets import load_dataset, Dataset
-import os 
+import os
 import sys
 
 
@@ -8,6 +8,7 @@ DATA_NAME = "wild_bench_v2"
 HF_RESULTS_PATH = "allenai/WildBench-V2-Model-Outputs"
 
 print(f"Uploading to {HF_RESULTS_PATH} with data name {DATA_NAME}.")
+
 
 def load_and_upload(model_name):
     filepath = f"result_dirs/{DATA_NAME}/{model_name}.json"
@@ -30,6 +31,7 @@ def load_and_upload(model_name):
         commit_message=f"Add {model_name} results.",
     )
     print(f"Uploaded {model_name} results.")
+
 
 # load_and_upload(sys.argv[1])
 
@@ -61,13 +63,11 @@ else:
         # "tulu-2-dpo-70b",
         # "Yi-1.5-34B-Chat",
         # "Yi-1.5-9B-Chat",
-        # "Yi-1.5-6B-Chat",        
+        # "Yi-1.5-6B-Chat",
     ]
 
     for model_name in json_files:
         load_and_upload(model_name)
-
-
 
 
 """ 

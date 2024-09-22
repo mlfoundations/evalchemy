@@ -1,7 +1,8 @@
-import os 
-import sys 
-from openai import OpenAI 
-client = OpenAI() 
+import os
+import sys
+from openai import OpenAI
+
+client = OpenAI()
 
 existing_batches = client.batches.list(limit=100)
 submitted_batches = set()
@@ -25,11 +26,11 @@ else:
     print("Please provide either 'score' or 'pairwise' as the argument")
     sys.exit()
 
-# list all files 
+# list all files
 files = os.listdir(folder)
 for file in files:
     if file.endswith(".batch-submit.jsonl"):
-        description = folder+"/"+file.replace(".batch-submit.jsonl", "")
+        description = folder + "/" + file.replace(".batch-submit.jsonl", "")
         # # if description in submitted_batches:
         result_filepath = f"{folder}/{file.replace('.batch-submit.jsonl', '.batch_results.jsonl')}"
         # print(result_filepath)

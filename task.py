@@ -17,6 +17,26 @@ def import_eval_instructs():
         if os.path.isdir(item_path) and not item.startswith("__"):
             eval_instruct_path = os.path.join(item_path, "eval_instruct.py")
             if os.path.exists(eval_instruct_path):
+                sys.path.insert(0, item_path)
+                spec = importlib.util.spec_from_file_location(
+                    f"eval.chat_benchmarks.{item}.eval_instruct", eval_instruct_path
+                )
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+                sys.path.pop(0)
+                if hasattr(module, "eval_instruct"):
+                    # Dynamically create a Task subclass
+                    task_class = type(
+                        f"{item}Task",
+                        (Task,),
+                        {
+                            "eval_instruct": staticmethod(module.eval_instruct),
+                            "evaluate": staticmethod(module.evaluate),
+                        },
+                    )
+                    tasks[item] = task_class()
+                else:
+                    print(f"Warning: eval_instruct function not found in {item}")
                 try:
                     sys.path.insert(0, item_path)
                     spec = importlib.util.spec_from_file_location(

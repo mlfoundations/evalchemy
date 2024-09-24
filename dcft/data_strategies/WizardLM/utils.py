@@ -3,7 +3,7 @@ from typing import List, Dict, Any
 import random
 import datasets
 from tqdm import tqdm
-
+from datasets import Dataset
 from dcft.external_repositories.WizardLM.Evol_Instruct.openai_access import call_chatgpt
 from dcft.external_repositories.WizardLM.Evol_Instruct.depth import (
     createConstraintsPrompt,

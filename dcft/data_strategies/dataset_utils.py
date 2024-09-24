@@ -7,15 +7,26 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from lm_eval.utils import eval_logger
 import pandas as pd
 from datasets import load_dataset
+import ray
+import yaml
+from pydantic import ValidationError
 
+from engine.operators import (
+    Operator,
+    OperatorConfig,
+    OperatorSpecificConfig,
+    create_operator
+)
+from engine.operators.sharding import ShardOperatorConfig, ShardDatasetOperator,  MergeOperatorConfig, MergeShardsOperator
+from engine.operators.registry import get_config_class
+from collections import deque
 class SafeLoaderIgnoreUnknown(yaml.SafeLoader):
     def ignore_unknown(self, node: Any) -> None:
         return None
-
+    
+SafeLoaderIgnoreUnknown.add_constructor(None, SafeLoaderIgnoreUnknown.ignore_unknown)
 
 def check_dataset_mix_in_yaml(file_path: str) -> bool:
-    SafeLoaderIgnoreUnknown.add_constructor(None, SafeLoaderIgnoreUnknown.ignore_unknown)
-
     try:
         with open(file_path, "r") as f:
             config = yaml.load(f, Loader=SafeLoaderIgnoreUnknown)
@@ -29,8 +40,6 @@ def check_dataset_mix_in_yaml(file_path: str) -> bool:
 
 
 def _get_len_subcomponents(file_path: str) -> int:
-    SafeLoaderIgnoreUnknown.add_constructor(None, SafeLoaderIgnoreUnknown.ignore_unknown)
-
     with open(file_path, "r") as f:
         config = yaml.load(f, Loader=SafeLoaderIgnoreUnknown)
 
@@ -38,7 +47,6 @@ def _get_len_subcomponents(file_path: str) -> int:
 
 
 def _get_name(file_path: str, sub_dir: Optional[List[str]] = None) -> str:
-    SafeLoaderIgnoreUnknown.add_constructor(None, SafeLoaderIgnoreUnknown.ignore_unknown)
 
     with open(file_path, "r") as f:
         config = yaml.load(f, Loader=SafeLoaderIgnoreUnknown)
@@ -77,53 +85,87 @@ class SyntheticDataFramework:
     @staticmethod
     def from_config(config_path: str, sub_dir: Optional[Tuple[str, ...]] = None) -> "SyntheticDataFramework":
         framework = SyntheticDataFramework()
-        framework._load_config(config_path, sub_dir)
+        framework.parse_dag(config_path, sub_dir)
         return framework
+        
+    def parse_dag(self, config_path: str, sub_dir: Optional[Tuple[str, ...]] = None) -> List[Operator]:
+        with open(config_path, "r") as f:
+            config = yaml.safe_load(f)
 
-    def _load_config(self, yaml_path: str, sub_dir: Optional[Tuple[str, ...]] = None) -> None:
-        def function_constructor(loader: yaml.SafeLoader, node: yaml.Node) -> Any:
-            value = loader.construct_scalar(node)
-            try:
-                func_name, args = value.split(":", 1)
-                args = args.strip()
-            except ValueError:
-                func_name, args = value, ""
-
-            strategy_dir, func_name = func_name.rsplit(".", 1)
-            utils_module = self._import_utils_module(strategy_dir)
-
-            func = getattr(utils_module, func_name)
-            return func
-
-        yaml.add_constructor("!function", function_constructor, Loader=yaml.SafeLoader)
-
-        with open(yaml_path, "r") as config_file:
-            self.config = yaml.safe_load(config_file)
         if sub_dir is not None:
             for key in sub_dir:
-                self.config = self.config[key]
-
-        self.name = self.config["name"]
-        self.functions = self.config['functions']
+                config = config[key]
         
+        self.name = config["name"]
+        operators = []
+
+        seen_ids = set()
+        for op in config["operators"]:
+            op_id = op["id"]
+            if op_id in seen_ids:
+                raise ValueError(f"Duplicate operator ID found: {op_id}")
+            seen_ids.add(op_id)
+
+            try:
+                specific_config = self.parse_specific_config(op['config'])
+                operator_config = OperatorConfig(id=op_id, input_ids=op.get("input_ids", []), config=specific_config)
+                operator = create_operator(operator_config)
+                operators.append(operator)
+
+            except ValidationError as e:
+                raise ValueError(f"Invalid configuration for operator {op_id}: {str(e)}")
+
+        # Create a graph representation
+        graph = {op.id: set(op.input_ids) for op in operators}
+
+        # Topological sort
+        sorted_operators = []
+        no_incoming = deque([op.id for op in operators if not graph[op.id]])
+
+        while no_incoming:
+            node = no_incoming.popleft()
+            sorted_operators.append(node)
+
+            for neighbor in list(graph.keys()):
+                if node in graph[neighbor]:
+                    graph[neighbor].remove(node)
+                    if not graph[neighbor]:
+                        no_incoming.append(neighbor)
+
+        if len(sorted_operators) != len(operators):
+            raise ValueError("The graph contains a cycle")
+
+        # Create a mapping of operator IDs to Operator objects
+        op_map = {op.id: op for op in operators}
+
+        # Return the sorted list of Operator objects
+        self.linearized_dag_functions = [op_map[op_id] for op_id in sorted_operators]
+
+    def parse_specific_config(self, config: dict) -> OperatorSpecificConfig:
+        config_type = config.get("type")
+        config_class = get_config_class(config_type)
+        if config_class is None:
+            raise ValueError(f"Unknown config type: {config_type}")
+        return config_class(**config)
+    
     def generate_dataset(self) -> None:
-        if not self.config:
-            raise ValueError("Configuration not loaded. Use from_config() to create an instance.")
+        ray.init()
+        datas = {}
+        try:
+            for operator in self.linearized_dag_functions:
+                input_datas = {input_id: datas[input_id] for input_id in operator.input_ids}
+                datas[operator.id] = operator.execute(input_datas)
 
-        eval_logger.info("Seeding Instructions")
-        if isinstance(self.functions[0], str):
-            split_string = self.functions[0].split("//")
-            dataset_name, split_name, seed_name = split_string[0], split_string[1], split_string[2]
-            dataset = load_dataset(dataset_name)
-            output = dataset[split_name][seed_name]
-        elif isinstance(self.functions[0], Callable):
-            output = self.functions[0]()
-
-        for function in self.functions[1:]:
-            output = function(output)
-
-        filtered_pairs = output
-
+            # Wait for all tasks to complete and retrieve results
+            waitables = [data_shard for data in datas.values() for data_shard in data]
+            ray.wait(waitables, num_returns=len(waitables))
+            filtered_pairs = [ray.get(shard) for shard in waitables]
+            eval_logger.info("Execution completed. Results.")
+            breakpoint()
+        finally:
+            # Shut down Ray
+            ray.shutdown()
+        
         df = pd.DataFrame(filtered_pairs)
 
         self.generated_dataset = Dataset.from_pandas(df)

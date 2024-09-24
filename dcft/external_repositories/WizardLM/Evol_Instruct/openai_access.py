@@ -70,7 +70,7 @@ def get_oai_completion(prompt, max_retries=3):
     while retry_count < max_retries:
         try:
             response = client.chat.completions.create(
-                model="gpt-4-turbo-preview",  # Updated model name
+                model="gpt-4o-mini",  # Updated model name
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant."},
                     {"role": "user", "content": prompt},

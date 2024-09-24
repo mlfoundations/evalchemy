@@ -32,3 +32,9 @@ Unidecode
 beautifulsoup4
 zstandard
 llm-foundry
+ray
+pyarrow
+zstandard
+boto3
+fasttext
+datasets==2.10.1

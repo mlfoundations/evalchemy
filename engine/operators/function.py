@@ -21,6 +21,8 @@ class FunctionOperator(Operator):
         super().__init__(id, input_ids, config)
         self.function = self._load_function(config.function)
         self.function_config = config.function_config
+        self.num_shards = config.num_shards
+        self.sharded = config.sharded
 
     def _load_function(self, function_path: str) -> Callable[[Dataset], Dataset]:
         module_name, function_name = function_path.rsplit(".", 1)
@@ -33,9 +35,9 @@ class FunctionOperator(Operator):
         for input in inputs.values():
             input_shards.extend(input)
         # Sharding stage
-        if self.config.sharded and len(input_shards) == 1:
+        if self.sharded and len(input_shards) == 1:
             shards_to_process = self.shard_dataset.remote(self, input_shards[0])
-        elif not self.config.sharded and len(input_shards) > 1:
+        elif not self.sharded and len(input_shards) > 1:
             shards_to_process = [self.merge_shards.remote(self, input_shards)]
         else:
             shards_to_process = input_shards
@@ -54,14 +56,13 @@ class FunctionOperator(Operator):
     def shard_dataset(self, dataset: Dataset) -> ray.ObjectRefGenerator:
         # TODO: implement
         total_size = len(dataset)
-        breakpoint()
-        split_size = total_size // self.function_config.num_shards
-        remainder = total_size % self.function_config.num_shards
+        split_size = total_size // self.num_shards
+        remainder = total_size % self.num_shards
 
         # Create the splits
         splits = []
         start = 0
-        for i in range(self.function_config.num_shards):
+        for i in range(self.num_shards):
             end = start + split_size + (1 if i < remainder else 0)
             split = dataset.select(range(start, end))
             start = end
@@ -69,12 +70,14 @@ class FunctionOperator(Operator):
         # TODO: does Ray wrap this as a Ref of list or list of Refs?
 
     @ray.remote
-    def merge_shards(self, shards: List[Dataset]) -> Dataset:
-        return concatenate_datasets(shards)
+    def merge_shards(self, shards: DatasetRef) -> Dataset:
+        breakpoint()
+        return concatenate_datasets([ray.get(shard) for shard in shards])
 
     @ray.remote
     def process_shard(self, dataset: Dataset) -> Dataset:
-        raise NotImplementedError("Subclasses must implement process_shard method")
+        logging.info(f"Processing shard with function: {self.function.__name__}")
+        return self.function(dataset, **self.function_config)
 
 
 register_operator(FunctionOperatorConfig, FunctionOperator)

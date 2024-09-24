@@ -152,7 +152,7 @@ class SyntheticDataFramework:
             breakpoint()
     
     def generate_dataset(self) -> None:
-        ray.init()
+        ray.init(num_cpus=os.cpu_count())
         datas = {}
         try:
             for operator in self.linearized_dag_functions:

@@ -8,7 +8,7 @@ operators:
       columns: 
         - instruction
         - output
-      num_truncate: 3
+      num_truncate: 5
 
   - id: instruction_generation
     config:
@@ -24,7 +24,6 @@ operators:
   - id: dedup_evol_instructions
     config:
       type: function
-      sharded: true
       function: data_strategies.WizardLM.utils.dedup
       function_config:
         input_column: evol_instruction

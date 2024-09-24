@@ -10,7 +10,7 @@ class FunctionOperatorConfig(OperatorSpecificConfig):
     function: str
     function_config: Dict[str, Any] = Field(default_factory=dict)
     sharded: bool = False
-    num_shards: int = 20 
+    num_shards: int = 3
 
 class HFSourceOperatorConfig(OperatorSpecificConfig):
     type: Literal["hf_source"] = "hf_source"

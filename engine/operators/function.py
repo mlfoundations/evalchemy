@@ -54,6 +54,7 @@ class FunctionOperator(Operator):
     def shard_dataset(self, dataset: Dataset) -> ray.ObjectRefGenerator:
         # TODO: implement
         total_size = len(dataset)
+        breakpoint()
         split_size = total_size // self.function_config.num_shards
         remainder = total_size % self.function_config.num_shards
 

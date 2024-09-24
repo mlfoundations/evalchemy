@@ -14,9 +14,9 @@ from dcft.external_repositories.WizardLM.Evol_Instruct.depth import (
 from dcft.external_repositories.WizardLM.Evol_Instruct.breadth import createBreadthPrompt
 
 
-def instruction_generation(inputs: List[str]) -> List[str]:
-    inputs = inputs[:3]
+def instruction_generation(dataset: Dataset, input_column: str, output_column:str) -> Dataset:
     evol_instructions: List[str] = []
+    inputs = dataset[input_column]
     for instruction in tqdm(inputs):
         evol_prompts: List[str] = []
         evol_prompts.append(createConstraintsPrompt(instruction))
@@ -30,11 +30,17 @@ def instruction_generation(inputs: List[str]) -> List[str]:
         evol_instruction: str = call_chatgpt(selected_evol_prompt)
         evol_instructions.append(evol_instruction)
 
+    dataset = dataset.add_column(output_column, evol_instructions)
     return evol_instructions
 
 
-def annotation_generation(instructions: List[str]) -> List[Dict[str, str]]:
-    pairs: List[Dict[str, str]] = []
-    for instruction in tqdm(instructions):
-        pairs.append({"instruction": instruction, "output": call_chatgpt(instruction)})
-    return pairs
+def annotate(dataset: Dataset, input_column: str, output_column:str) -> Dataset:
+    inputs = dataset[input_column]
+    annotations = []
+    for input in tqdm(inputs):
+        annotations.append(call_chatgpt(input))
+    dataset = dataset.add_column(output_column, annotations)
+    return dataset
+
+def dedup(dataset: Dataset, input_column: str) -> Dataset:
+    return dataset.unique(input_column)

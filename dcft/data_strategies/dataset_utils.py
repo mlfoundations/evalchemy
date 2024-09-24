@@ -146,7 +146,10 @@ class SyntheticDataFramework:
         config_class = get_config_class(config_type)
         if config_class is None:
             raise ValueError(f"Unknown config type: {config_type}")
-        return config_class(**config)
+        try:
+            return config_class(**config)
+        except:
+            breakpoint()
     
     def generate_dataset(self) -> None:
         ray.init()

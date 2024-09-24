@@ -21,7 +21,7 @@ class HFSourceOperatorConfig(OperatorSpecificConfig):
 class HFSourceOperator(Operator):
     def __init__(self, id: str, input_ids: List[str], config: HFSourceOperatorConfig):
         super().__init__(id, input_ids, config)
-        self.dataset_name = config.dataset
+        self.dataset = config.dataset
         self.split = config.split
         self.columns = config.columns
         self.num_truncate = config.num_truncate
@@ -31,12 +31,12 @@ class HFSourceOperator(Operator):
         return [ray.put(dataset)]
 
     def load_dataset(self) -> Dataset:
-        dataset = load_dataset(self.dataset_name, split=self.split)
+        dataset = load_dataset(self.dataset, split=self.split)
         if self.columns:
             dataset = dataset.select_columns(self.columns)
         if self.num_truncate is not None:
             dataset = dataset.select(range(min(len(dataset), self.num_truncate)))
-        eval_logger.info(f"\nDataset loaded from {self.dataset_name}:")
+        eval_logger.info(f"\nDataset loaded from {self.dataset}:")
         eval_logger.info(dataset)
         return dataset
 

@@ -216,7 +216,6 @@ def eval_instruct(model: LM) -> Dict[str, str]:
     filepath: str = os.path.join(temp_dir, "output.json")
     if args.end_index < 0 or args.end_index > len(model_inputs):
         args.end_index = len(model_inputs)
-    args.end_index = 3
     model_inputs = model_inputs[args.start_index : args.end_index]
     id_strs = id_strs[args.start_index : args.end_index]
     chat_history = chat_history[args.start_index : args.end_index]
@@ -385,13 +384,13 @@ class EvaluationConfig:
     ref_model_name: Optional[str] = None
     batch_mode: bool = True
     start_idx: int = 0
-    end_idx: int = 3
+    end_idx: int = -1
     temperature: float = 0.0
     repetition_penalty: float = 1.0
     max_tokens: int = 7500
     max_model_len: Optional[int] = None
     start_index: int = 0
-    end_index: int = 3
+    end_index: int = -1
     filepath: str = "auto"
     overwrite: bool = False
     no_repeat_ngram_size: int = 0

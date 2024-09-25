@@ -2,13 +2,13 @@
 
 For predefined datasets, this is very simple 
 ```bash
-    python -m dcft.main  --framework <name of framework>
+    python -m dcft.main  --framework <name of framework> --hf-account <name of HF account>
 ```
 
-For example, this will generate the EvolInstruct dataset and upload it to HuggingFace
+For example, this will generate the EvolInstruct dataset and upload it to HuggingFace at the account specified
 
 ```bash
-    python -m dcft.main  --framework evol_instruct
+    python -m dcft.main  --framework evol_instruct --hf-account EtashGuha
 ```
 
 ## How to add support for new datasets

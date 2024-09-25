@@ -3,7 +3,7 @@ from dcft.data_strategies.__init__ import SyntheticDataManager
 import argparse
 
 
-def main(list_frameworks: bool = False, framework: Optional[str] = None) -> None:
+def main(list_frameworks: bool = False, framework: Optional[str] = None, hf_account: Optional[str] = None) -> None:
     manager = SyntheticDataManager()
 
     if list_frameworks:
@@ -20,10 +20,11 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Synthetic Data Generation Framework Manager")
     parser.add_argument("--list", action="store_true", help="List all available frameworks")
     parser.add_argument("--framework", type=str, metavar="FRAMEWORK", help="Run a specific framework")
+    parser.add_argument("--hf-account", type=str, help="HuggingFace account to upload dataset to")
 
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = parse_args()
-    main(list_frameworks=args.list, framework=args.framework)
+    main(list_frameworks=args.list, framework=args.framework, hf_account=args.hf_account)

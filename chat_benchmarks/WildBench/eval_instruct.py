@@ -1,35 +1,93 @@
+import os
+import tempfile
+from typing import Dict, List, Tuple, Optional, Any
+from dataclasses import dataclass
+import json
 import sys
+import jsonlines
+import copy
 
 sys.path.insert(0, "eval/chat_benchmarks/WildBench/src")
 from src.unified_infer import sanitize_args
-from src.unified_utils import load_eval_data, save_outputs
+from src.unified_utils import save_outputs
 from src.eval import (
     compose_eval_item,
     batch_eval_generate,
     placeholder_generation,
     HF_BENCH_PATH,
     HF_BENCH_CONFIG,
-    HF_RESULTS_PATH,
 )
-import os
-import tempfile
+
+from datasets import load_dataset
+from openai import OpenAI
 from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
-from typing import Dict, List, Any, Optional, Iterator
-from dataclasses import dataclass
-import sys
-import json
-from datasets import load_dataset
-import time
-from openai import OpenAI
-import json
-import sys
-import jsonlines
-from typing import Dict, List, Tuple, Optional, Any
-import json
-import sys
-import jsonlines
-import copy
+
+
+@dataclass
+class EvaluationConfig:
+    seed: int = 42
+    model: str = "gpt-4o-2024-05-13"
+    action: str = "eval"
+    mode: str = "score"
+    max_words_to_eval: int = -1
+    eval_template: str = "eval/chat_benchmarks/WildBench/evaluation/eval_template.score.v2.md"
+    target_model_name: str = ""
+    eval_output_file: str = ""
+    local_result_file: Optional[str] = None
+    ref_model_name: Optional[str] = None
+    batch_mode: bool = True
+    start_idx: int = 0
+    end_idx: int = -1
+    temperature: float = 0.0
+    repetition_penalty: float = 1.0
+    max_tokens: int = 7500
+    max_model_len: Optional[int] = None
+    start_index: int = 0
+    end_index: int = -1
+    filepath: str = "auto"
+    overwrite: bool = False
+    no_repeat_ngram_size: int = 0
+    hf_bf16: bool = False
+    hf_gptq: bool = False
+    gpu_memory_utilization: float = 0.9
+    use_hf_conv_template: bool = False
+    use_imend_stop: bool = False
+    mt_turn: int = -1
+    mt_turn1_result: Optional[str] = None
+
+
+@dataclass
+class Config:
+    engine: str = "vllm"
+    output_folder: str = "./result_dirs/wild_bench/"
+    download_dir: Optional[str] = None
+    model_name: Optional[str] = "llama-3-instruct"
+    model_pretty_name: Optional[str] = "lmevalharness"
+    tokenizer_name: str = "auto"
+    tensor_parallel_size: int = 1
+    dtype: str = "auto"
+    tokenizer_mode: str = "auto"
+    data_name: str = "wild_bench"
+    batch_size: int = 1
+    num_outputs: int = 1
+    top_p: float = 1.0
+    temperature: float = 0.0
+    repetition_penalty: float = 1.0
+    max_tokens: int = 7500
+    max_model_len: Optional[int] = None
+    start_index: int = 0
+    end_index: int = -1
+    filepath: str = "auto"
+    overwrite: bool = False
+    no_repeat_ngram_size: int = 0
+    hf_bf16: bool = False
+    hf_gptq: bool = False
+    gpu_memory_utilization: float = 0.9
+    use_hf_conv_template: bool = False
+    use_imend_stop: bool = False
+    mt_turn: int = -1
+    mt_turn1_result: Optional[str] = None
 
 
 def format_eval_file(submit_file, eval_file) -> str:
@@ -51,8 +109,6 @@ def format_eval_file(submit_file, eval_file) -> str:
             try:
                 eval_output_parsed: Dict[str, Any] = json.loads(item["response"]["choices"][0]["message"]["content"])
             except Exception as e:
-                # print(f"Error parsing eval_output.")
-                # eval_output_parsed = eval_output
                 continue
 
             results_item: Dict[str, Any] = {
@@ -76,35 +132,6 @@ def format_eval_file(submit_file, eval_file) -> str:
 
     print(f"Output file written to {output_file}")
     return output_file
-
-
-def process_pairwise(
-    results_item: Dict[str, Any], custom_id_splits: List[str], eval_output_parsed: Dict[str, Any], prompt: str
-) -> None:
-    model_A: str = custom_id_splits[1].replace("A:", "")
-    model_B: str = custom_id_splits[2].replace("B:", "")
-
-    if "choice" not in eval_output_parsed:
-        return
-
-    choice: str = eval_output_parsed["choice"]
-    winner, extent = get_winner_and_extent(choice, model_A, model_B)
-
-    results_item.update(
-        {
-            "model_A": model_A,
-            "model_B": model_B,
-            "winner": winner,
-            "extent": extent,
-        }
-    )
-
-    model_A_output: str = prompt.split("<|begin_of_response_A|>\n")[1].split("<|end_of_response_A|>\n")[0]
-    model_B_output: str = prompt.split("<|begin_of_response_B|>")[1].split("<|end_of_response_B|>\n")[0]
-    results_item["model_outputs"] = {
-        model_A: model_A_output.strip(),
-        model_B: model_B_output.strip(),
-    }
 
 
 def process_score(
@@ -167,39 +194,6 @@ def process_file(eval_file, client):
     print(f"Processing complete. Results saved to {output_file}")
 
 
-@dataclass
-class Config:
-    engine: str = "vllm"
-    output_folder: str = "./result_dirs/wild_bench/"
-    download_dir: Optional[str] = None
-    model_name: Optional[str] = "llama-3-instruct"
-    model_pretty_name: Optional[str] = "lmevalharness"
-    tokenizer_name: str = "auto"
-    tensor_parallel_size: int = 1
-    dtype: str = "auto"
-    tokenizer_mode: str = "auto"
-    data_name: str = "wild_bench"
-    batch_size: int = 1
-    num_outputs: int = 1
-    top_p: float = 1.0
-    temperature: float = 0.0
-    repetition_penalty: float = 1.0
-    max_tokens: int = 7500
-    max_model_len: Optional[int] = None
-    start_index: int = 0
-    end_index: int = -1
-    filepath: str = "auto"
-    overwrite: bool = False
-    no_repeat_ngram_size: int = 0
-    hf_bf16: bool = False
-    hf_gptq: bool = False
-    gpu_memory_utilization: float = 0.9
-    use_hf_conv_template: bool = False
-    use_imend_stop: bool = False
-    mt_turn: int = -1
-    mt_turn1_result: Optional[str] = None
-
-
 def eval_instruct(model: LM) -> Dict[str, str]:
     # Data loading
     args = Config()
@@ -248,14 +242,10 @@ def eval_instruct(model: LM) -> Dict[str, str]:
 def evaluate(results: Dict[str, str]) -> Dict[str, Any]:
 
     gpt_eval_name = "gpt-4o-2024-05-13"
-    args = get_args()
+    args = EvaluationConfig()
     temp_dir_obj = results["temp_dir_obj"]
     eval_folder = results["temp_dir_obj"].name
     eval_file = f"{eval_folder}/batch-submit.jsonl"
-
-    if os.path.exists(eval_file):
-        print(f"File {eval_file} exists, skip generation")
-        return
 
     bench_data = load_dataset(HF_BENCH_PATH, HF_BENCH_CONFIG, split="test")
 
@@ -316,11 +306,6 @@ def evaluate(results: Dict[str, str]) -> Dict[str, Any]:
         # deduplicate
         task_mapping[item["id"]] = list(set(task_mapping[item["id"]]))
 
-    win_much_counts = []
-    win_counts = []
-    tie_counts = []
-    lose_counts = []
-    lose_much_counts = []
     lengths = []
     scores = []
     task_cat_results = {}
@@ -341,7 +326,6 @@ def evaluate(results: Dict[str, str]) -> Dict[str, Any]:
             if tag not in task_cat_results:
                 task_cat_results[tag] = []
             task_cat_results[tag].append(float(item["score"]))
-    test_model_id = item["model_test"]
     task_cat_score = {}
     for tag in task_cat_results:
         task_cat_score[tag] = sum(task_cat_results[tag]) / len(task_cat_results[tag])
@@ -368,46 +352,6 @@ def evaluate(results: Dict[str, str]) -> Dict[str, Any]:
         "total": len(eval_result),
         "avg_len": sum(lengths) / len(lengths),
     }
-
-
-@dataclass
-class EvaluationConfig:
-    seed: int = 42
-    model: str = "gpt-4o-2024-05-13"
-    action: str = "eval"
-    mode: str = "score"
-    max_words_to_eval: int = -1
-    eval_template: str = "eval/chat_benchmarks/WildBench/evaluation/eval_template.score.v2.md"
-    target_model_name: str = ""
-    eval_output_file: str = ""
-    local_result_file: Optional[str] = None
-    ref_model_name: Optional[str] = None
-    batch_mode: bool = True
-    start_idx: int = 0
-    end_idx: int = -1
-    temperature: float = 0.0
-    repetition_penalty: float = 1.0
-    max_tokens: int = 7500
-    max_model_len: Optional[int] = None
-    start_index: int = 0
-    end_index: int = -1
-    filepath: str = "auto"
-    overwrite: bool = False
-    no_repeat_ngram_size: int = 0
-    hf_bf16: bool = False
-    hf_gptq: bool = False
-    gpu_memory_utilization: float = 0.9
-    use_hf_conv_template: bool = False
-    use_imend_stop: bool = False
-    mt_turn: int = -1
-    mt_turn1_result: Optional[str] = None
-
-
-def get_args():
-    # Create an instance of the configuration
-    config = EvaluationConfig()
-
-    return config
 
 
 def changed_load_eval_data(args, data_name=None, model_name=None):

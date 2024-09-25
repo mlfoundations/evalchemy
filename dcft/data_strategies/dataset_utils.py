@@ -16,14 +16,45 @@ from engine.operators.operator import create_operator, Operator, ManyShardRefs
 
 
 class SyntheticDataFramework:
+    """
+    A framework for creating and managing synthetic data generation processes.
+
+    This class provides methods to parse a DAG (Directed Acyclic Graph) configuration,
+    create operators based on the configuration, and execute the data generation process.
+    """
 
     @staticmethod
     def from_config(config_path: str, sub_dir: Optional[Tuple[str, ...]] = None) -> "SyntheticDataFramework":
+        """
+        Create a SyntheticDataFramework instance from a configuration file.
+
+        Args:
+            config_path (str): Path to the configuration file.
+            sub_dir (Optional[Tuple[str, ...]]): Subdirectory within the config to use.
+
+        Returns:
+            SyntheticDataFramework: An instance of the framework.
+        """
+
         framework = SyntheticDataFramework()
         framework.parse_dag(config_path, sub_dir)
         return framework
 
     def parse_dag(self, config_path: str, sub_dir: Optional[Tuple[str, ...]] = None) -> List[Operator]:
+        """
+        Takes the configuration file and loads the individual operators into a single data generation pipeline using a Directed Acyclic Graph Structure
+
+        Args:
+            config_path (str): Path to the configuration file.
+            sub_dir (Optional[Tuple[str, ...]]): Subdirectory within the config to use.
+
+        Returns:
+            List[Operator]: A list of created operators in topological graph order.
+
+        Raises:
+            ValueError: If there are duplicate operator IDs or invalid configurations.
+        """
+
         with open(config_path, "r") as f:
             config = yaml.safe_load(f)
 
@@ -77,6 +108,19 @@ class SyntheticDataFramework:
         self.linearized_dag_functions = [op_map[op_id] for op_id in sorted_operators]
 
     def parse_specific_config(self, config: dict) -> OperatorSpecificConfig:
+        """
+        Parse the specific configuration for an operator.
+
+        Args:
+            config (dict): The configuration dictionary for the operator.
+
+        Returns:
+            OperatorSpecificConfig: The parsed configuration object.
+
+        Raises:
+            ValueError: If the config type is unknown.
+        """
+
         config_type = config.get("type")
         config_class = get_config_class(config_type)
         if config_class is None:
@@ -84,6 +128,13 @@ class SyntheticDataFramework:
         return config_class(**config)
 
     def get_waitables(self) -> ManyShardRefs:
+        """
+        Execute the operators in the DAG and return a promise of the list of shards at the end of the data generation process.
+
+        Returns:
+            ManyShardRefs: References to the output shards of the data generation process.
+        """
+
         datas = {}
 
         for idx, operator in enumerate(self.linearized_dag_functions):
@@ -95,6 +146,12 @@ class SyntheticDataFramework:
         return waitables
 
     def run(self) -> None:
+        """
+        Run the entire data generation process.
+
+        This method initializes Ray, executes the DAG, and processes the results.
+        """
+
         ray.init(num_cpus=os.cpu_count())
         waitables = self.get_waitables()
         ray.wait(waitables, num_returns=len(waitables))
@@ -105,7 +162,22 @@ class SyntheticDataFramework:
 
 
 class DatasetHandler:
+    """
+    A class for handling multiple datasets and performing operations on them.
+
+    This class can load multiple SyntheticDataFramework instances, process them in parallel,
+    and mix the resulting datasets.
+    """
+
     def __init__(self, sub_frameworks_lazy: List[Tuple[str, Tuple[str, int]]]):
+        """
+        Initialize the DatasetHandler.
+
+        Args:
+            sub_frameworks_lazy (List[Tuple[str, Tuple[str, int]]]): A list of tuples containing
+                the config path and subdirectory for each sub-framework which will be loaded lazily.
+        """
+
         self.all_sub_frameworks_lazy = sub_frameworks_lazy
         self.max_workers = os.cpu_count()
         self.shuffle_seed = 42
@@ -113,6 +185,15 @@ class DatasetHandler:
 
     @staticmethod
     def from_config(config_path: str) -> "DatasetHandler":
+        """
+        Create a DatasetHandler instance from a configuration file.
+
+        Args:
+            config_path (str): Path to the configuration file.
+
+        Returns:
+            DatasetHandler: An instance of the DatasetHandler.
+        """
         num_components = _get_len_subcomponents(config_path)
         all_sub_frameworks_lazy = []
         for index in range(num_components):
@@ -122,6 +203,15 @@ class DatasetHandler:
         return dataset_handler
 
     def mix(self, datasets: List[Dataset]) -> Dataset:
+        """
+        Mix multiple datasets into a single, shuffled dataset.
+
+        Args:
+            datasets (List[Dataset]): A list of datasets to mix.
+
+        Returns:
+            Dataset: The mixed and shuffled dataset.
+        """
         print("Starting dataset mixing process...")
 
         combined_dataset = concatenate_datasets(datasets)
@@ -133,6 +223,18 @@ class DatasetHandler:
         return shuffled_dataset
 
     def process_datasets_parallel(self, dataset_configs: List[Tuple[str, Tuple[str, int]]]) -> Dict[str, Dataset]:
+        """
+        Process multiple datasets in parallel using Ray. If an individual dataset is defined in another yaml file, it will fetch that definition.
+
+        Args:
+            dataset_configs (List[Tuple[str, Tuple[str, int]]]): A list of Synthetic Dataset Framework configurations.
+
+        Returns:
+            Dict[str, Dataset]: A dictionary mapping dataset names to processed datasets.
+
+        Raises:
+            ValueError: If a required framework is not defined or loaded.
+        """
         all_frameworks = []
         for dataset_args in dataset_configs:
             config_path = dataset_args[0]
@@ -160,6 +262,11 @@ class DatasetHandler:
         return results
 
     def run(self) -> None:
+        """
+        Run the entire dataset processing pipeline.
+
+        This method processes all datasets in parallel, mixes them, and stores the result.
+        """
         all_datasets = self.process_datasets_parallel(self.all_sub_frameworks_lazy)
         for name in all_datasets.keys():
             all_datasets[name] = all_datasets[name].add_column("_subdataset_name", [name] * len(all_datasets[name]))

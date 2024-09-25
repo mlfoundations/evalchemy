@@ -2,7 +2,8 @@ import os
 import sys
 from typing import Dict, List
 
-from dcft.data_strategies.dataset_utils import DatasetHandler, SyntheticDataFramework, check_dataset_mix_in_yaml
+from dcft.data_strategies.dataset_utils import DatasetHandler, SyntheticDataFramework
+from dcft.data_strategies.yaml_utils import check_dataset_mix_in_yaml
 
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if parent_dir not in sys.path:

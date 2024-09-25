@@ -1,10 +1,17 @@
 from typing import Literal, Optional, Dict, Any, List
-from dataclasses import dataclass
-from pydantic import BaseModel, DirectoryPath, Field, HttpUrl
+from pydantic import BaseModel, Field
 
 class OperatorSpecificConfig(BaseModel):
     type: str
     
+class OperatorConfig(BaseModel):
+    id: str
+    input_ids: List[str] = Field(default_factory=list)
+    config: OperatorSpecificConfig
+    
+    class Config:
+        extra = "forbid"
+
 class FunctionOperatorConfig(OperatorSpecificConfig):
     type: Literal["function"] = "function"
     function: str

@@ -41,3 +41,26 @@ operators:
     input_ids:
       - dedup_evol_instructions
 
+  - id: rename_prompt
+    config:
+      type: function
+      sharded: true
+      function: data_strategies.WizardLM.utils.force_rename_column
+      function_config:
+        old_name: evol_instruction
+        new_name: prompt
+    input_ids:
+      - annotate
+  
+  - id: remove_other_columns
+    config:
+      type: function
+      sharded: true
+      function: data_strategies.WizardLM.utils.remove_other_columns
+      function_config:
+        columns_to_keep:
+            - prompt
+            - completion
+    input_ids:
+      - rename_prompt
+

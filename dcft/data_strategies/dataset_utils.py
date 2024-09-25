@@ -1,93 +1,29 @@
 import yaml
-import importlib
-from typing import List, Dict, Any, Optional, Tuple, Callable
-from datasets import Dataset, concatenate_datasets
+from collections import deque
+from typing import List, Dict, Optional, Tuple
 import os
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from lm_eval.utils import eval_logger
-import pandas as pd
-from datasets import load_dataset
-import ray
-import yaml
 from pydantic import ValidationError
 
-from engine.operators import (
-    Operator,
-    OperatorConfig,
-    OperatorSpecificConfig,
-    create_operator
-)
-from engine.operators.sharding import ShardOperatorConfig, ShardDatasetOperator,  MergeOperatorConfig, MergeShardsOperator
+
+import ray
+from lm_eval.utils import eval_logger
+from datasets import Dataset, concatenate_datasets
+
+
+from dcft.data_strategies.yaml_utils import _get_empty_def, _get_name, _get_len_subcomponents
+from engine.operators.configs import OperatorConfig, OperatorSpecificConfig
+from engine.operators.operator import create_operator, Operator, ManyShardRefs
 from engine.operators.registry import get_config_class
-from collections import deque
-class SafeLoaderIgnoreUnknown(yaml.SafeLoader):
-    def ignore_unknown(self, node: Any) -> None:
-        return None
-    
-SafeLoaderIgnoreUnknown.add_constructor(None, SafeLoaderIgnoreUnknown.ignore_unknown)
-
-def check_dataset_mix_in_yaml(file_path: str) -> bool:
-    try:
-        with open(file_path, "r") as f:
-            config = yaml.load(f, Loader=SafeLoaderIgnoreUnknown)
-        return "dataset_mix" in config if isinstance(config, dict) else False
-    except yaml.YAMLError as e:
-        print(f"Error parsing YAML file {file_path}: {e}")
-        return False
-    except IOError as e:
-        print(f"Error opening file {file_path}: {e}")
-        return False
-
-
-def _get_len_subcomponents(file_path: str) -> int:
-    with open(file_path, "r") as f:
-        config = yaml.load(f, Loader=SafeLoaderIgnoreUnknown)
-
-    return len(config["dataset_mix"])
-
-
-def _get_name(file_path: str, sub_dir: Optional[List[str]] = None) -> str:
-
-    with open(file_path, "r") as f:
-        config = yaml.load(f, Loader=SafeLoaderIgnoreUnknown)
-
-    if sub_dir is not None:
-        for key in sub_dir:
-            config = config[key]
-
-    return config["name"]
-
-
-def _get_empty_def(file_path: str, subdir: List[str]) -> bool:
-    SafeLoaderIgnoreUnknown.add_constructor(None, SafeLoaderIgnoreUnknown.ignore_unknown)
-
-    with open(file_path, "r") as f:
-        config = yaml.load(f, Loader=SafeLoaderIgnoreUnknown)
-
-    for key in subdir:
-        config = config[key]
-
-    if len(config.keys()) == 1:
-        return True
-    else:
-        return False
 
 
 class SyntheticDataFramework:
-    def __init__(
-        self,
-        functions: List[Callable] = None,
-        name: Optional[str] = None,
-    ):
-        self.name = name
-        self.functions = functions
 
     @staticmethod
     def from_config(config_path: str, sub_dir: Optional[Tuple[str, ...]] = None) -> "SyntheticDataFramework":
         framework = SyntheticDataFramework()
         framework.parse_dag(config_path, sub_dir)
         return framework
-        
+
     def parse_dag(self, config_path: str, sub_dir: Optional[Tuple[str, ...]] = None) -> List[Operator]:
         with open(config_path, "r") as f:
             config = yaml.safe_load(f)
@@ -95,7 +31,7 @@ class SyntheticDataFramework:
         if sub_dir is not None:
             for key in sub_dir:
                 config = config[key]
-        
+
         self.name = config["name"]
         operators = []
 
@@ -107,7 +43,7 @@ class SyntheticDataFramework:
             seen_ids.add(op_id)
 
             try:
-                specific_config = self.parse_specific_config(op['config'])
+                specific_config = self.parse_specific_config(op["config"])
                 operator_config = OperatorConfig(id=op_id, input_ids=op.get("input_ids", []), config=specific_config)
                 operator = create_operator(operator_config)
                 operators.append(operator)
@@ -133,7 +69,7 @@ class SyntheticDataFramework:
                         no_incoming.append(neighbor)
 
         if len(sorted_operators) != len(operators):
-            raise ValueError("The graph contains a cycle")
+            raise ValueError("The graph contains a cycle or input_ids not matching")
 
         # Create a mapping of operator IDs to Operator objects
         op_map = {op.id: op for op in operators}
@@ -146,49 +82,34 @@ class SyntheticDataFramework:
         config_class = get_config_class(config_type)
         if config_class is None:
             raise ValueError(f"Unknown config type: {config_type}")
-        try:
-            return config_class(**config)
-        except:
-            breakpoint()
-    
-    def generate_dataset(self) -> None:
-        ray.init(num_cpus=os.cpu_count())
+        return config_class(**config)
+
+    def get_waitables(self) -> ManyShardRefs:
         datas = {}
-        try:
-            for operator in self.linearized_dag_functions:
-                input_datas = {input_id: datas[input_id] for input_id in operator.input_ids}
-                datas[operator.id] = operator.execute(input_datas)
 
-            # Wait for all tasks to complete and retrieve results
-            waitables = [data_shard for data in datas.values() for data_shard in data]
-            ray.wait(waitables, num_returns=len(waitables))
-            filtered_pairs = [ray.get(shard) for shard in waitables]
-            eval_logger.info("Execution completed. Results.")
-            breakpoint()
-        finally:
-            # Shut down Ray
-            ray.shutdown()
-        
-        df = pd.DataFrame(filtered_pairs)
-
-        self.generated_dataset = Dataset.from_pandas(df)
-
-    def _import_utils_module(self, strategy_dir: str) -> Any:
-        module_name = f"dcft.data_strategies.{strategy_dir}"
-        return importlib.import_module(module_name)
+        for idx, operator in enumerate(self.linearized_dag_functions):
+            input_datas = {input_id: datas[input_id] for input_id in operator.input_ids}
+            curr_op_output = operator.execute(input_datas)
+            datas[operator.id] = curr_op_output
+            if idx == len(self.linearized_dag_functions) - 1:
+                waitables = curr_op_output
+        return waitables
 
     def run(self) -> None:
-        self.generate_dataset()
+        ray.init(num_cpus=os.cpu_count())
+        waitables = self.get_waitables()
+        ray.wait(waitables, num_returns=len(waitables))
+        filtered_pairs = concatenate_datasets([ray.get(shard) for shard in waitables])
+        eval_logger.info("Execution completed. Results.")
+        self.generated_dataset = filtered_pairs
+        ray.shutdown()
 
 
 class DatasetHandler:
     def __init__(self, sub_frameworks_lazy: List[Tuple[str, Tuple[str, int]]]):
         self.all_sub_frameworks_lazy = sub_frameworks_lazy
-        self.all_sub_frameworks: Optional[Dict[str, SyntheticDataFramework]] = None
         self.max_workers = os.cpu_count()
         self.shuffle_seed = 42
-        self.name: Optional[str] = None
-        self.generated_dataset: Optional[Dataset] = None
         self.all_loaded_frameworks: Dict[str, SyntheticDataFramework] = {}
 
     @staticmethod
@@ -204,23 +125,15 @@ class DatasetHandler:
     def mix(self, datasets: List[Dataset]) -> Dataset:
         print("Starting dataset mixing process...")
 
-        combined_dataset = self._combine_datasets(datasets)
+        combined_dataset = concatenate_datasets(datasets)
         print(f"Combined {len(datasets)} datasets, total items: {len(combined_dataset)}")
 
-        shuffled_dataset = self.shuffle(combined_dataset)
+        shuffled_dataset = combined_dataset.shuffle(seed=self.shuffle_seed)
         print("Dataset shuffled")
 
         return shuffled_dataset
 
-    def _combine_datasets(self, datasets: List[Dataset]) -> Dataset:
-        return concatenate_datasets(datasets)
-
-    def shuffle(self, dataset: Dataset) -> Dataset:
-        return dataset.shuffle(seed=self.shuffle_seed)
-
-    def process_datasets_parallel(
-        self, dataset_configs: List[Tuple[str, Tuple[str, int]]]
-    ) -> Dict[str, SyntheticDataFramework]:
+    def process_datasets_parallel(self, dataset_configs: List[Tuple[str, Tuple[str, int]]]) -> Dict[str, Dataset]:
         all_frameworks = []
         for dataset_args in dataset_configs:
             config_path = dataset_args[0]
@@ -236,29 +149,20 @@ class DatasetHandler:
                 framework = SyntheticDataFramework.from_config(config_path, sub_dir)
             all_frameworks.append(framework)
 
-        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
-            future_to_config = {
-                executor.submit(self._load_dataset, framework): framework for framework in all_frameworks
-            }
-            results = {}
-            for future in as_completed(future_to_config):
-                config = future_to_config[future]
-                try:
-                    data = future.result()
-                    results[data.name] = data
-                except Exception as exc:
-                    print(f"Dataset {config.name} generated an exception: {exc}")
+        ray.init(num_cpus=os.cpu_count())
+        results = {}
+        for framework in all_frameworks:
+            results[framework.name] = framework.get_waitables()
+        all_waitables = [waitable for waitables in results.values() for waitable in waitables]
+        ray.wait(all_waitables, num_returns=len(all_waitables))
+        for framework in all_frameworks:
+            results[framework.name] = concatenate_datasets([ray.get(shard) for shard in results[framework.name]])
+        ray.shutdown()
         return results
 
-    def _load_dataset(self, framework: SyntheticDataFramework) -> SyntheticDataFramework:
-        framework.generate_dataset()
-        return framework
-
     def run(self) -> None:
-        all_frameworks = self.process_datasets_parallel(self.all_sub_frameworks_lazy)
-        shuffled_datasets = [
-            framework.generated_dataset
-            for framework in all_frameworks.values()
-            if framework.generated_dataset is not None
-        ]
+        all_datasets = self.process_datasets_parallel(self.all_sub_frameworks_lazy)
+        for name in all_datasets.keys():
+            all_datasets[name] = all_datasets[name].add_column("_subdataset_name", [name] * len(all_datasets[name]))
+        shuffled_datasets = [dataset for dataset in all_datasets.values()]
         self.generated_dataset = self.mix(shuffled_datasets)

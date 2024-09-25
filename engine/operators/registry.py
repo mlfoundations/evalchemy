@@ -1,10 +1,9 @@
 from typing import Dict, Type
-
-from engine.operators.operator import Operator, OperatorSpecificConfig
+from engine.operators.operator import Operator
+from engine.operators.configs import OperatorSpecificConfig
 
 OPERATOR_MAP: Dict[Type[OperatorSpecificConfig], Type[Operator]] = {}
 CONFIG_TYPE_MAP: Dict[str, Type[OperatorSpecificConfig]] = {}
-
 
 def register_operator(config_class: Type[OperatorSpecificConfig], operator_class: Type[Operator]):
     OPERATOR_MAP[config_class] = operator_class

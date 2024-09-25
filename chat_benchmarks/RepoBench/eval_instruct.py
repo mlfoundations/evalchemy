@@ -1,100 +1,159 @@
-import torch
-import os
 import json
-
+import os
 import tempfile
-from archive_data.utils import load_data, construct_trainable_data, get_first_line_not_comment
 from tqdm import tqdm
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from typing import Dict, List
+
+from archive_data.utils import load_data, construct_trainable_data, get_first_line_not_comment
+from data.utils import construct_prompt
+from datasets import load_dataset
 from evaluation.metrics import exact_match_score, edit_similarity_score, codebleu_score
+from lm_eval.api.instance import Instance
+from lm_eval.models.huggingface import HFLM
 
 
-def eval_instruct(model):
+def eval_instruct(model: HFLM) -> Dict[str, tempfile.TemporaryDirectory]:
+    """
+    Evaluates the given model on all RepoBench v1.1 subsets and programming languages (python and java).
 
-    prefix_token = "<fim_prefix>"
-    suffix_token = "<fim_suffix><fim_middle>"
+    Args:
+        model (HF): The model to evaluate.
 
-    
+    Returns:
+        Dict[str, Any]: A dictionary containing the results, including a temporary directory object where the outputs are saved.
+    """
+    max_token_nums = 2000
+
     # Create the save directory
     results = {}
     temp_dir_obj = tempfile.TemporaryDirectory()
     temp_dir = temp_dir_obj.name
-    
-    # res_dir: str = "./results"
-    # save_dir = f"{res_dir}/{model_name.split('/')[-1]}-{language}"
-    # os.makedirs(save_dir, exist_ok=True)
 
     for lang in ["python", "java"]:
-        for setting in ["cross_file_first", "cross_file_random", "in_file"]:
+        datasets = load_dataset(f'tianyang/repobench_{lang}_v1.1', verification_mode="no_checks")
+        for subset, dataset in datasets.items():
+            generated_examples = []
+            all_instances = []
 
-            problem_file = os.path.join(f"eval/chat_benchmarks/RepoBench/data/{model.tokenizer_name}-{lang}", f"{setting}.jsonl")
-            dataset = load_data(split="test", task="completion", language=lang, length='2k', settings=setting)
+            for idx, example in enumerate(tqdm(dataset, desc="Generating", total=len(dataset))):
+                prompt = construct_prompt(example, tokenizer=model.tokenizer, max_token_nums=max_token_nums, language=lang)
+
+                all_instances.append(
+                    Instance(
+                        "generate_until",
+                        example,
+                        (
+                            prompt,
+                            {"max_new_tokens": 64, "temperature": 0.2, "top_p": 0.95, "do_sample": True},
+                        ),
+                        idx,
+                    )
+                )
+
+            outputs = model.generate_until(all_instances)
+
+            generated_examples = []
+            for idx, example in enumerate(tqdm(dataset, desc="Generating", total=len(dataset))):
+                example["idx"] = idx
+                example["gpt_completion"] = get_first_line_not_comment(outputs[idx], language=lang)
+                example["label"] = example['next_line']
+                generated_examples.append(example)
+            print("Generate all over!!!")
+
+            with open(f"{temp_dir}/repobench_{subset}_{lang}.jsonl", "w", encoding="utf-8") as fw:
+                for ex in generated_examples:
+                    fw.write(json.dumps(ex) + "\n")
+                print("Save {} processed examples into {} over!".format(len(generated_examples), temp_dir))
+
+    results["temp_dir_obj"] = temp_dir_obj
+    return results
+
+
+def eval_instruct_legacy(model: HFLM) -> Dict[str, tempfile.TemporaryDirectory]:
+    """
+    Evaluates the given model on all RepoBench v0 subsets and programming languages (python and java).
+    To dowload repobench v0 dataset, follow these steps:
+        gdown --id '1HvFFnOybTKEJCrEypWh4ftmW6DZBaiK_' --output ./archive_data/test.zip
+        unzip ./archive_data/test.zip -d ./archive_data/
+        rm ./archive_data/test.zip
+
+    Args:
+        model (HF): The model to evaluate.
+
+    Returns:
+        Dict[str, Any]: A dictionary containing the results, including a temporary directory object where the outputs are saved.
+    """
+    prefix_token = "<fim_prefix>"
+    suffix_token = "<fim_suffix><fim_middle>"
+
+    # Create the save directory
+    results = {}
+    temp_dir_obj = tempfile.TemporaryDirectory()
+    temp_dir = temp_dir_obj.name
+
+    for lang in ["python", "java"]:
+        for subset in ["cross_file_first", "cross_file_random", "in_file"]:
+
+            dataset = load_data(split="test", task="completion", language=lang, length="2k", setting=subset)
 
             examples = construct_trainable_data(dataset, language=lang)
             print("Read {} examples for evaluation over.".format(len(examples)))
 
             generated_examples = []
             all_instances = []
-            examples = examples[:1]
             for idx, example in enumerate(tqdm(examples, desc="Generating", total=len(examples))):
 
                 prompt = example["data"]
                 label = example["label"]
 
-                if "star" in model.tokenizer_name: # starcoder
+                if "star" in model._model.config._name_or_path:  # starcoder
                     prompt = prefix_token + prompt + suffix_token
-                
-                # tokenize, get prompt length
+
                 tokenizer = model.tokenizer
-                prompt_length = len(tokenizer.tokenize(prompt)) 
+                # input_prompt = tokenizer(prompt, return_tensors="pt", padding=True)
+                # if len(input_prompt) > 2048 - 64: # context is too long
+                # continue
 
-                input_prompt = tokenizer(prompt, return_tensors="pt", padding=True).to("cuda")
-                if len(input_prompt) > 2048 - 64: # context is too long
-                    continue
+                all_instances.append(
+                    Instance(
+                        "generate_until",
+                        example,
+                        (
+                            prompt,
+                            {"max_new_tokens": 64, "temperature": 0.2, "top_p": 0.95, "do_sample": True},
+                        ),
+                        idx,
+                    )
+                )
 
-                import pdb; pdb.set_trace()
-                all_instances.append(input_prompt)
+            outputs = model.generate_until(all_instances)
 
-                outputs = model.generate_until(
-                    **input_prompt,
-                    max_new_tokens=64, 
-                    temperature=0.2, 
-                    top_p=0.95, 
-                    do_sample=True)[0]
-                
-                result = tokenizer.decode(outputs[input_prompt["input_ids"][0].shape[-1]:], skip_special_tokens=True)
-                result = get_first_line_not_comment(result, language=lang)
-                
-                ex = {"idx": idx, "pred": result, "gt": label, "prompt_length": prompt_length}
-                
-                temp_file_path = os.path.join(temp_dir, f"generated_{lang}_{setting}.jsonl")
-                with open(temp_file_path, "w", encoding="utf-8") as fw:
+            generated_examples = []
+            for idx, example in enumerate(tqdm(examples, desc="Generating")):
+                example["idx"] = idx
+                example["gpt_completion"] = get_first_line_not_comment(outputs[idx], language=lang)
+                generated_examples.append(example)
+            print("Generate all over!!!")
+
+            with open(f"{temp_dir}/repobench_{subset}_{lang}.jsonl", "w", encoding="utf-8") as fw:
+                for ex in generated_examples:
                     fw.write(json.dumps(ex) + "\n")
+                print("Save {} processed examples into {} over!".format(len(generated_examples), temp_dir))
 
-            print("Saved all examples into temporary file over!")
-
-    print("Generate all over!!!")
     results["temp_dir_obj"] = temp_dir_obj
-    import pdb; pdb.set_trace()
     return results
 
-# def evaluate(results):
-#     temp_dir_obj = results["temp_dir_obj"]
-#     temp_dir = temp_dir_obj.name
 
-#     result = evaluate_functional_correctness(
-#         input_file=f"{temp_dir}/repobench.jsonl",
-#         tmp_dir=temp_dir,
-#         problem_file=os.path.join("eval/chat_benchmarks/RepoBench/data", f"repobench_test.jsonl"),
-#         language="python",
-#         is_mbpp=True,
-#     )
+def evaluate(results: Dict[str, tempfile.TemporaryDirectory]) -> List[str]:
+    """
+    Evaluates the results from the generated outputs.
 
-#     temp_dir_obj.cleanup()
-#     return result
+    Args:
+        results (Dict[str, Any]): A dictionary containing the temporary directory where the generated outputs are saved.
 
-
-def evaluate(results):
+    Returns:
+        List[str]: A list of evaluation results, including metrics like exact match (EM) and edit similarity (ES) scores.
+    """
 
     temp_dir_obj = results["temp_dir_obj"]
     temp_dir = temp_dir_obj.name
@@ -102,11 +161,12 @@ def evaluate(results):
     total_data_points = 0
     total_em_model, total_es_model, total_cb_model = 0, 0, 0
 
+    results = []
     for lang in ["python", "java"]:
-        for setting in ["cross_file_first", "cross_file_random", "in_file"]:
+        for subset in ["cross_file_first", "cross_file_random", "in_file"]:
 
-            filepath = os.path.join(temp_dir, f"generated_{lang}_{setting}.jsonl")
-            seen_indices = set()  # Track seen indices for the current setting
+            filepath = os.path.join(temp_dir, f"repobench_{subset}_{lang}.jsonl")
+            seen_indices = set()  # Track seen indices for the current subset
 
             # check if the file exists
             if not os.path.exists(filepath):
@@ -114,64 +174,42 @@ def evaluate(results):
                 continue
 
             with open(filepath, "r") as f:
-                
                 data = []
                 for line in f:
                     entry = json.loads(line.strip())
-                    idx = entry["idx"]
+                    data.append(entry)
 
-                    # Skip duplicate indices based on the chosen policy (here, keeping the former)
-                    if idx not in seen_indices:
-                        seen_indices.add(idx)
-                        data.append(entry)
-                
-                data_points = len(data)
-
-                if data_points == 0:
+                if len(data) == 0:
                     continue
 
-                ground_truth = [d["gt"] for d in data]
-                generated = [d["pred"] for d in data]
+                ground_truth = [d["label"] for d in data]
+                generated = [d["gpt_completion"] for d in data]
 
                 em_model = round(exact_match_score(ground_truth, generated) * 100, 2)
                 es_model = round(edit_similarity_score(ground_truth, generated), 2)
-                # cb_model = round(codebleu_score(generated, ground_truth, language) * 100, 2)
 
                 # accumulate the data points and the metrics
-                total_data_points += data_points
-                total_em_model += em_model * data_points
-                total_es_model += es_model * data_points
-                # total_cb_model += cb_model * data_points
+                total_data_points += len(data)
+                total_em_model += em_model * len(data)
+                total_es_model += es_model * len(data)
 
-                # print(f"Level: {level} with {data_points} data points")
+                print(f"Language: {lang}, Subset: {subset} with {len(data)} data points")
+                results.append(f"Language: {lang}, Subset: {subset} with {len(data)} data points")
                 print(f"EM: {em_model}, ES: {es_model}")
+
                 print("-" * 30)
 
         # calculate the weighted averages
         if total_data_points > 0:
             avg_em_model = round(total_em_model / total_data_points, 2)
             avg_es_model = round(total_es_model / total_data_points, 2)
-            # avg_cb_model = round(total_cb_model / total_data_points, 2)
 
             print("Weighted Averages:")
+            results.append(f"Weighted Averages: Language: {lang}, EM: {avg_em_model}, ES: {avg_es_model}\n")
             print(f"Language: {lang}, EM: {avg_em_model}, ES: {avg_es_model}\n")
 
         else:
             print("No data points were found for evaluation.")
-        
-    import pdb; pdb.set_trace()
+
     temp_dir_obj.cleanup()
-    return result
-
-       
-if __name__ == '__main__':
-    model_name = 'Salesforce/codegen-350M-mono'
-    tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True,)
-    tokenizer.padding_side = "left"
-    tokenizer.pad_token_id = tokenizer.eos_token_id
-
-    model = AutoModelForCausalLM.from_pretrained(model_name, trust_remote_code=True,cache_dir="/work/08134/negin/ls6/repobench/cache").cuda()
-    model.generation_config.pad_token_id = tokenizer.pad_token_id
-
-    res = eval_instruct(model)
-    evaluate(res)
+    return results

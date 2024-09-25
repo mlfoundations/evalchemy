@@ -3,9 +3,10 @@ import json
 from evaluation.metrics import exact_match_score, edit_similarity_score, codebleu_score
 import fire
 
+
 def eval(
     path="results/deepseek-coder-1.3b-base-python",
-    language="python" # to calculate codebleu, we need to specify the language
+    language="python",  # to calculate codebleu, we need to specify the language
 ):
 
     total_data_points = 0
@@ -21,7 +22,7 @@ def eval(
             continue
 
         with open(filepath, "r") as f:
-            
+
             data = []
             for line in f:
                 entry = json.loads(line.strip())
@@ -31,7 +32,7 @@ def eval(
                 if idx not in seen_indices:
                     seen_indices.add(idx)
                     data.append(entry)
-            
+
             data_points = len(data)
 
             if data_points == 0:
@@ -65,6 +66,7 @@ def eval(
 
     else:
         print("No data points were found for evaluation.")
-        
+
+
 if __name__ == "__main__":
     fire.Fire(eval)

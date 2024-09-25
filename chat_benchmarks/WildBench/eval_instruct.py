@@ -26,6 +26,13 @@ from lm_eval.api.model import LM
 
 @dataclass
 class EvaluationConfig:
+    """
+    Configuration class for evaluation settings.
+
+    Contains various parameters for model evaluation, including seed, model name,
+    evaluation mode, output file paths, and model-specific settings.
+    """
+
     seed: int = 42
     model: str = "gpt-4o-2024-05-13"
     action: str = "eval"
@@ -59,6 +66,13 @@ class EvaluationConfig:
 
 @dataclass
 class Config:
+    """
+    Configuration class for model and data processing settings.
+
+    Includes parameters for engine selection, output folder, model specifications,
+    data processing, and various model generation settings.
+    """
+
     engine: str = "vllm"
     output_folder: str = "./result_dirs/wild_bench/"
     download_dir: Optional[str] = None
@@ -91,6 +105,19 @@ class Config:
 
 
 def format_eval_file(submit_file, eval_file) -> str:
+    """
+    Format evaluation results from a submission file into a structured output file.
+
+    Args:
+        submit_file (str): Path to the submission file containing raw evaluation data.
+        eval_file (str): Path to the evaluation file used to generate the output filename.
+
+    Returns:
+        str: Path to the formatted output file.
+
+    This function processes the submission file, extracts relevant information,
+    and writes a formatted JSON output file with evaluation scores and metadata.
+    """
     mode = "score"
     # Load submit data
     custom_id_to_submission: Dict[str, Dict[str, Any]] = {}
@@ -137,6 +164,18 @@ def format_eval_file(submit_file, eval_file) -> str:
 def process_score(
     results_item: Dict[str, Any], custom_id_splits: List[str], eval_output_parsed: Dict[str, Any], prompt: str
 ) -> None:
+    """
+    Process and update the results item with score information.
+
+    Args:
+        results_item (Dict[str, Any]): Dictionary to store the processed results.
+        custom_id_splits (List[str]): List of custom ID components.
+        eval_output_parsed (Dict[str, Any]): Parsed evaluation output.
+        prompt (str): The original prompt used for evaluation.
+
+    This function extracts the score from the evaluation output and updates the
+    results item with the score and model output information.
+    """
     model_test: str = custom_id_splits[1]
     if "score" not in eval_output_parsed:
         return
@@ -153,23 +192,17 @@ def process_score(
     results_item["model_output"] = model_output.strip()
 
 
-def get_winner_and_extent(choice: str, model_A: str, model_B: str) -> Tuple[Optional[str], Optional[int]]:
-    if choice == "A=B":
-        return "tie", 0
-    elif choice == "A+":
-        return model_A, 1
-    elif choice == "A++":
-        return model_A, 2
-    elif choice == "B+":
-        return model_B, 1
-    elif choice == "B++":
-        return model_B, 2
-    else:
-        print(f"Error: choice {choice} not recognized.")
-        return None, None
-
-
 def process_file(eval_file, client):
+    """
+    Process an evaluation file using the OpenAI API client.
+
+    Args:
+        eval_file (str): Path to the evaluation file to be processed.
+        client (OpenAI): An instance of the OpenAI API client.
+
+    This function reads the evaluation file, sends requests to the OpenAI API for each item,
+    and saves the results to a new output file.
+    """
     # Read the input file
     with open(eval_file, "r") as file:
         lines = file.readlines()
@@ -195,6 +228,19 @@ def process_file(eval_file, client):
 
 
 def eval_instruct(model: LM) -> Dict[str, str]:
+    """
+    Perform instruction-based evaluation on a given language model.
+
+    Args:
+        model (LM): The language model to be evaluated.
+
+    Returns:
+        Dict[str, str]: A dictionary containing the evaluation results and file paths.
+
+    This function loads evaluation data, applies the model to generate responses,
+    and saves the outputs for further processing.
+    """
+
     # Data loading
     args = Config()
     args = sanitize_args(args)
@@ -240,7 +286,18 @@ def eval_instruct(model: LM) -> Dict[str, str]:
 
 
 def evaluate(results: Dict[str, str]) -> Dict[str, Any]:
+    """
+    Evaluate the results of a model's performance on various tasks.
 
+    Args:
+        results (Dict[str, str]): A dictionary containing file paths and temporary directory information.
+
+    Returns:
+        Dict[str, Any]: A dictionary containing various evaluation metrics and scores.
+
+    This function processes the evaluation results, calculates scores for different task categories,
+    and returns a comprehensive evaluation summary.
+    """
     gpt_eval_name = "gpt-4o-2024-05-13"
     args = EvaluationConfig()
     temp_dir_obj = results["temp_dir_obj"]
@@ -355,6 +412,24 @@ def evaluate(results: Dict[str, str]) -> Dict[str, Any]:
 
 
 def changed_load_eval_data(args, data_name=None, model_name=None):
+    """
+    Load evaluation data based on the specified configuration and dataset name.
+
+    Args:
+        args (Config): Configuration object containing data loading parameters.
+        data_name (Optional[str]): Name of the dataset to load. If None, uses args.data_name.
+        model_name (Optional[str]): Name of the model. If None, uses args.model_name.
+
+    Returns:
+        Tuple[List[str], List[Any], List[str], Dict[str, List[Any]]]: A tuple containing:
+            - id_strs: List of session IDs
+            - chat_history: List of chat histories
+            - extracted_chats: List of extracted chat inputs
+            - metadata: Dictionary of additional metadata for each item
+
+    This function loads the specified dataset, extracts relevant information,
+    and prepares the data for evaluation.
+    """
     if data_name is None:
         data_name = args.data_name
     if model_name is None:

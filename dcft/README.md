@@ -19,19 +19,73 @@ For example, this will generate the EvolInstruct dataset and upload it to Huggin
 An example
 ```yaml
 name: evol_instruct
-instruction_seeder: yahma/alpaca-cleaned//train//instruction
-instruction_generation: !function WizardLM.utils.instruction_generation
-instruction_filtering: 
-annotation_seeder: 
-annotation_generation: !function WizardLM.utils.annotation_generation
-model_pair_filtering: 
+operators:
+  - id: load_alpaca
+    config:
+      type: hf_source
+      dataset: yahma/alpaca-cleaned
+      split: train
+      columns: 
+        - instruction
+        - output
+      num_truncate: 5
+
+  - id: instruction_generation
+    config:
+      type: function
+      sharded: true
+      function: data_strategies.WizardLM.utils.instruction_generation
+      function_config:
+        input_column: instruction
+        output_column: evol_instruction
+    input_ids:
+      - load_alpaca
+    
+  - id: dedup_evol_instructions
+    config:
+      type: function
+      function: data_strategies.WizardLM.utils.dedup
+      function_config:
+        input_column: evol_instruction
+    input_ids:
+      - instruction_generation
+
+  - id: annotate
+    config:
+      type: function
+      sharded: true
+      function: data_strategies.WizardLM.utils.annotate
+      function_config:
+        input_column: evol_instruction
+        output_column: completion
+    input_ids:
+      - dedup_evol_instructions
+
+  - id: rename_prompt
+    config:
+      type: function
+      sharded: true
+      function: data_strategies.WizardLM.utils.force_rename_column
+      function_config:
+        old_name: evol_instruction
+        new_name: prompt
+    input_ids:
+      - annotate
+  
+  - id: remove_other_columns
+    config:
+      type: function
+      sharded: true
+      function: data_strategies.WizardLM.utils.remove_other_columns
+      function_config:
+        columns_to_keep:
+            - prompt
+            - completion
+    input_ids:
+      - rename_prompt
 ```
 
-If you leave `instruction_filtering`, `annotation_seeder`, `model_pair_filtering` or `instruction_seeder` empty, it will just pass on the data from the last step (the steps of data generation go in this order).
-
-For `instruction_seeder` and `instruction_generator`, adding a string in the form of "[hf_dataset_name]//[split_name]//[column_name]" will load all of the data from that HF repository.
-
-If you need more control, use !function and it will call the function from that utils file. 
+You need only specify the name of the dataset and the individual operators which constitute the data generation process. If an individual function can operate on only a smaller shard of the dataset, please specify "sharded=True". We provide an HFSourceOperator that has custom code to load a HF dataset. 
 
 3. Run the command above with your new task name. 
 
@@ -59,19 +113,76 @@ BTW, if you need to add an external repository for code that is being publicly m
 Say you want to create a mix of multiple datasets. You need only create a YAML file with multiple datasets defined. 
 
 ```yaml
-name: mixed_dataset
+name: mix_banana_ray
 dataset_mix:
   -
     name: evol_instruct
   -
     name: shp
-    instruction_seeder: stanfordnlp/SHP//train//history
-    instruction_generation: !function WizardLM.utils.instruction_generation
-    instruction_filtering: 
-    annotation_seeder: 
-    annotation_generation: !function WizardLM.utils.annotation_generation
-    model_pair_filtering: 
+    operators:
+      - id: load_shp
+        config:
+          type: hf_source
+          dataset: stanfordnlp/SHP
+          split: train
+          columns: 
+            - history
+            - human_ref_A
+          num_truncate: 5
 
+      - id: instruction_generation
+        config:
+          type: function
+          sharded: true
+          function: data_strategies.WizardLM.utils.instruction_generation
+          function_config:
+            input_column: history
+            output_column: evol_instruction
+        input_ids:
+          - load_shp
+        
+      - id: dedup_evol_instructions
+        config:
+          type: function
+          function: data_strategies.WizardLM.utils.dedup
+          function_config:
+            input_column: evol_instruction
+        input_ids:
+          - instruction_generation
+
+      - id: annotate
+        config:
+          type: function
+          sharded: true
+          function: data_strategies.WizardLM.utils.annotate
+          function_config:
+            input_column: evol_instruction
+            output_column: completion
+        input_ids:
+          - dedup_evol_instructions
+
+      - id: rename_prompt
+        config:
+          type: function
+          sharded: true
+          function: data_strategies.WizardLM.utils.force_rename_column
+          function_config:
+            old_name: evol_instruction
+            new_name: prompt
+        input_ids:
+          - annotate
+
+      - id: remove_other_columns
+        config:
+          type: function
+          sharded: true
+          function: data_strategies.WizardLM.utils.remove_other_columns
+          function_config:
+            columns_to_keep:
+                - prompt
+                - completion
+        input_ids:
+          - rename_prompt
 ```
 
-We can define new datasets if we want. We can also refer to datasets defined in different yaml files already. For example, evol_instruct references the dataset created in dcft/data_strategies/Mixed/mixed.yaml.
+We can define new datasets if we want. We can also refer to datasets defined in different yaml files already. For example, evol_instruct references the dataset created in dcft/data_strategies/WizardLM/wizard_lm.yaml.

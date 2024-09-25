@@ -11,9 +11,8 @@ from datasets import Dataset, concatenate_datasets
 
 
 from dcft.data_strategies.yaml_utils import _get_empty_def, _get_name, _get_len_subcomponents
-from engine.operators.configs import OperatorConfig, OperatorSpecificConfig
+from engine.operators.configs import OperatorConfig, OperatorSpecificConfig, get_config_class
 from engine.operators.operator import create_operator, Operator, ManyShardRefs
-from engine.operators.registry import get_config_class
 
 
 class SyntheticDataFramework:

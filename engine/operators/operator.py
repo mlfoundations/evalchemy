@@ -1,15 +1,13 @@
 from abc import ABC, abstractmethod
 
-from typing import Dict, List, TypeAlias, Callable
+from typing import Dict, List, TypeAlias, Callable, Type
 import importlib
 import logging
 import ray
 from lm_eval.utils import eval_logger
-from datasets import Dataset, concatenate_datasets
+from datasets import Dataset, concatenate_datasets, load_dataset
 
-
-from engine.operators.registry import register_operator
-from engine.operators.configs import OperatorSpecificConfig, OperatorConfig, FunctionOperatorConfig, HFSourceOperatorConfig
+from engine.operators.configs import OperatorSpecificConfig, OperatorConfig, FunctionOperatorConfig, HFSourceOperatorConfig, CONFIG_TYPE_MAP
 
 ShardRef: TypeAlias = ray.ObjectRef
 ManyShardRefs: TypeAlias = List[ShardRef]
@@ -38,8 +36,6 @@ class Operator(ABC):
         pass
 
 def create_operator(config: OperatorConfig) -> Operator:
-    from engine.operators.registry import get_operator_class
-
     operator_class = get_operator_class(type(config.config))
     if operator_class is None:
         raise ValueError(f"Unknown operator type: {type(config.config)}")
@@ -131,6 +127,16 @@ class HFSourceOperator(Operator):
         eval_logger.info(dataset)
         return dataset
 
+
+def register_operator(config_class: Type[OperatorSpecificConfig], operator_class: Type[Operator]):
+    OPERATOR_MAP[config_class] = operator_class
+    CONFIG_TYPE_MAP[config_class.model_fields["type"].default] = config_class
+
+
+def get_operator_class(config_class: Type[OperatorSpecificConfig]) -> Type[Operator]:
+    return OPERATOR_MAP.get(config_class)
+
+OPERATOR_MAP: Dict[Type[OperatorSpecificConfig], Type[Operator]] = {}
 
 register_operator(HFSourceOperatorConfig, HFSourceOperator)
 register_operator(FunctionOperatorConfig, FunctionOperator)

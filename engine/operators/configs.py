@@ -1,4 +1,4 @@
-from typing import Literal, Optional, Dict, Any, List
+from typing import Literal, Optional, Dict, Any, List, Type
 from pydantic import BaseModel, Field
 
 class OperatorSpecificConfig(BaseModel):
@@ -25,3 +25,9 @@ class HFSourceOperatorConfig(OperatorSpecificConfig):
     split: str
     columns: Optional[List[str]] = None
     num_truncate: Optional[int] = None
+
+CONFIG_TYPE_MAP: Dict[str, Type[OperatorSpecificConfig]] = {}
+
+
+def get_config_class(config_type: str) -> Type[OperatorSpecificConfig]:
+    return CONFIG_TYPE_MAP.get(config_type)

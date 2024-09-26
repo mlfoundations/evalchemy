@@ -30,13 +30,15 @@ def eval_instruct(model: HFLM) -> Dict[str, tempfile.TemporaryDirectory]:
     temp_dir = temp_dir_obj.name
 
     for lang in ["python", "java"]:
-        datasets = load_dataset(f'tianyang/repobench_{lang}_v1.1', verification_mode="no_checks")
+        datasets = load_dataset(f"tianyang/repobench_{lang}_v1.1", verification_mode="no_checks")
         for subset, dataset in datasets.items():
             generated_examples = []
             all_instances = []
 
             for idx, example in enumerate(tqdm(dataset, desc="Generating", total=len(dataset))):
-                prompt = construct_prompt(example, tokenizer=model.tokenizer, max_token_nums=max_token_nums, language=lang)
+                prompt = construct_prompt(
+                    example, tokenizer=model.tokenizer, max_token_nums=max_token_nums, language=lang
+                )
 
                 all_instances.append(
                     Instance(
@@ -56,7 +58,7 @@ def eval_instruct(model: HFLM) -> Dict[str, tempfile.TemporaryDirectory]:
             for idx, example in enumerate(tqdm(dataset, desc="Generating", total=len(dataset))):
                 example["idx"] = idx
                 example["gpt_completion"] = get_first_line_not_comment(outputs[idx], language=lang)
-                example["label"] = example['next_line']
+                example["label"] = example["next_line"]
                 generated_examples.append(example)
             print("Generate all over!!!")
 
@@ -110,9 +112,6 @@ def eval_instruct_legacy(model: HFLM) -> Dict[str, tempfile.TemporaryDirectory]:
                     prompt = prefix_token + prompt + suffix_token
 
                 tokenizer = model.tokenizer
-                # input_prompt = tokenizer(prompt, return_tensors="pt", padding=True)
-                # if len(input_prompt) > 2048 - 64: # context is too long
-                # continue
 
                 all_instances.append(
                     Instance(

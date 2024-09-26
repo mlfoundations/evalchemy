@@ -115,4 +115,5 @@ def remove_other_columns(dataset: Dataset, columns_to_keep: List[str]) -> Datase
     all_columns = dataset.column_names
     columns_to_remove = [col for col in all_columns if col not in columns_to_keep]
     cleaned_dataset = dataset.remove_columns(columns_to_remove)
+    print("hsdf")
     return cleaned_dataset

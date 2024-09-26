@@ -1,11 +1,14 @@
 from abc import ABC, abstractmethod
-
+import fsspec
+import os
 from typing import Dict, List, TypeAlias, Callable, Type
 import importlib
 import logging
+from functools import partial
+
 import ray
 from lm_eval.utils import eval_logger
-from datasets import Dataset, concatenate_datasets, load_dataset
+from datasets import Dataset, concatenate_datasets, load_dataset, load_from_disk
 
 from engine.operators.configs import (
     OperatorSpecificConfig,
@@ -34,6 +37,7 @@ class Operator(ABC):
         self._id = id
         self._input_ids = input_ids
         self._config = config
+        self.cache_dir = None
 
     @property
     def id(self) -> str:
@@ -50,10 +54,14 @@ class Operator(ABC):
         """Get the specific configuration for the operator."""
         return self._config
 
-    @abstractmethod
     def execute(self, inputs: DatasetRefs) -> ManyShardRefs:
+        self.outputs = self.compute(inputs)
+        return self.outputs
+
+    @abstractmethod
+    def compute(self, inputs: DatasetRefs) -> ManyShardRefs:
         """
-        Execute the operator on the given inputs.
+        compute the operator on the given inputs.
 
         Args:
             inputs (DatasetRefs): Dictionary of inputs mapping identifiers to a list of shard references (known as a dataset)
@@ -62,6 +70,21 @@ class Operator(ABC):
             ManyShardRefs: List of processedoutput shard references for each input shard
         """
         pass
+
+    def cleanup(self, fs: fsspec.AbstractFileSystem, overwrite_cache: bool = False, cache_dir: str = None):
+        if not fs.exists(cache_dir) and cache_dir is None:
+            raise ValueError(f"Cache Directory of {self._id} not set")
+
+        if fs.exists(cache_dir) and not overwrite_cache:
+            return
+
+        if not fs.exists(cache_dir):
+            fs.mkdir(cache_dir, create_parents=True)
+
+        items_to_save = [ray.get(output) for output in self.outputs]
+        custom_open = partial(fs.open)
+        for idx, item in enumerate(items_to_save):
+            item.save_to_disk(f"{cache_dir}/{idx}.hf", storage_options={"open": custom_open})
 
 
 def create_operator(config: OperatorConfig) -> Operator:
@@ -81,6 +104,25 @@ def create_operator(config: OperatorConfig) -> Operator:
     if operator_class is None:
         raise ValueError(f"Unknown operator type: {type(config.config)}")
     return operator_class(config.id, config.input_ids, config.config)
+
+
+class LoadFromCacheOperator(Operator):
+    def __init__(self, id: str, input_ids: List[str], cache_dir: str):
+        super().__init__(id, input_ids, None)
+        self.cache_dir = cache_dir
+
+    def compute(self, _: DatasetRefs) -> ManyShardRefs:
+        # Get all .hf files in the cache directory
+        dataset_files = [f for f in os.listdir(self.cache_dir) if f.endswith(".hf")]
+
+        # Load datasets and create a list with ray.put
+        datasets = []
+        for file in dataset_files:
+            file_path = os.path.join(self.cache_dir, file)
+            dataset = load_from_disk(file_path)
+            datasets.append(ray.put(dataset))
+
+        return datasets
 
 
 class FunctionOperator(Operator):
@@ -123,7 +165,7 @@ class FunctionOperator(Operator):
         module = importlib.import_module(module_name)
         return getattr(module, function_name)
 
-    def execute(self, inputs: DatasetRefs) -> ManyShardRefs:
+    def compute(self, inputs: DatasetRefs) -> ManyShardRefs:
         """
         Execute the function operator on the input datasets.
 
@@ -151,6 +193,8 @@ class FunctionOperator(Operator):
         for shard in shards_to_process:
             processed_dataset = self.process_shard.remote(self, shard)
             outputs.append(processed_dataset)
+
+        self.outputs = outputs
         return outputs
 
     @ray.remote
@@ -232,7 +276,7 @@ class HFSourceOperator(Operator):
         self.columns = config.columns
         self.num_truncate = config.num_truncate
 
-    def execute(self, _: DatasetRefs) -> ManyShardRefs:
+    def compute(self, _: DatasetRefs) -> ManyShardRefs:
         """
         Execute the HF source operator to load the dataset.
 
@@ -243,7 +287,8 @@ class HFSourceOperator(Operator):
             ManyShardRefs: List containing a single reference to the loaded dataset.
         """
         dataset = self.load_dataset()
-        return [ray.put(dataset)]
+        self.outputs = [ray.put(dataset)]
+        return self.outputs
 
     def load_dataset(self) -> Dataset:
         """

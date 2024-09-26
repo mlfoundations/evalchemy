@@ -1,6 +1,7 @@
 import os
 import sys
 from typing import Dict, List
+import fsspec
 
 from dcft.data_strategies.dataset_utils import DatasetHandler, SyntheticDataFramework
 from dcft.data_strategies.yaml_utils import check_dataset_mix_in_yaml
@@ -18,12 +19,16 @@ class SyntheticDataManager:
     synthetic data generation frameworks based on YAML configurations.
     """
 
-    def __init__(self):
+    def __init__(self, hf_account: str, cache_dir: str, fs_type: str = "file", overwrite_cache: bool = False) -> None:
         """
         Initialize the SyntheticDataManager.
 
         Sets up the strategies directory and loads all available frameworks.
         """
+        self.hf_account = hf_account
+        self.cache_dir = cache_dir
+        self.fs_type = fs_type
+        self.overwrite_cache = overwrite_cache
         self.strategies_dir = os.path.dirname(os.path.abspath(__file__))
         self.frameworks = self._load_frameworks()
 
@@ -48,9 +53,19 @@ class SyntheticDataManager:
                     if file.endswith(".yaml"):
                         config_path = os.path.join(strategy_path, file)
                         if check_dataset_mix_in_yaml(config_path):
-                            framework = DatasetHandler.from_config(config_path)
+                            framework = DatasetHandler.from_config(
+                                config_path,
+                                cache_dir=self.cache_dir,
+                                fs=fsspec.filesystem(self.fs_type),
+                                overwrite_cache=self.overwrite_cache,
+                            )
                         else:
-                            framework = SyntheticDataFramework.from_config(config_path)
+                            framework = SyntheticDataFramework.from_config(
+                                config_path,
+                                cache_dir=self.cache_dir,
+                                fs=fsspec.filesystem(self.fs_type),
+                                overwrite_cache=self.overwrite_cache,
+                            )
 
                         if framework.name in frameworks:
                             raise ValueError(f"Invalid name: {framework.name} is duplicated")
@@ -78,7 +93,7 @@ class SyntheticDataManager:
         """
         return list(self.frameworks.keys())
 
-    def run_framework(self, framework_name: str, hf_account: str) -> None:
+    def run_framework(self, framework_name: str) -> None:
         """
         Run a specific framework and push the generated dataset to Hugging Face Hub.
 
@@ -100,4 +115,4 @@ class SyntheticDataManager:
         else:
             print(f"Framework '{framework_name}' not found.")
 
-        framework.generated_dataset.push_to_hub(f"{hf_account}/{framework.name}")
+        framework.generated_dataset.push_to_hub(f"{self.hf_account}/{framework.name}")

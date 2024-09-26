@@ -3,7 +3,7 @@ from collections import deque
 from typing import List, Dict, Optional, Tuple
 import os
 from pydantic import ValidationError
-
+import fsspec
 
 import ray
 from lm_eval.utils import eval_logger
@@ -11,8 +11,8 @@ from datasets import Dataset, concatenate_datasets
 
 
 from dcft.data_strategies.yaml_utils import _get_empty_def, _get_name, _get_len_subcomponents
-from engine.operators.configs import OperatorConfig, OperatorSpecificConfig, get_config_class
-from engine.operators.operator import create_operator, Operator, ManyShardRefs
+from engine.operators.configs import OperatorConfig, OperatorSpecificConfig, get_config_class, hash_operator_config_list
+from engine.operators.operator import create_operator, Operator, ManyShardRefs, LoadFromCacheOperator
 
 
 class SyntheticDataFramework:
@@ -23,8 +23,17 @@ class SyntheticDataFramework:
     create operators based on the configuration, and execute the data generation process.
     """
 
+    def __init__(self) -> None:
+        self.overwrite_cache = False
+
     @staticmethod
-    def from_config(config_path: str, sub_dir: Optional[Tuple[str, ...]] = None) -> "SyntheticDataFramework":
+    def from_config(
+        config_path: str,
+        sub_dir: Optional[Tuple[str, ...]] = None,
+        cache_dir: Optional[str] = None,
+        fs: Optional[fsspec.AbstractFileSystem] = None,
+        overwrite_cache: Optional[str] = None,
+    ) -> "SyntheticDataFramework":
         """
         Create a SyntheticDataFramework instance from a configuration file.
 
@@ -37,6 +46,9 @@ class SyntheticDataFramework:
         """
 
         framework = SyntheticDataFramework()
+        framework.cache_dir = cache_dir
+        framework.fs = fs
+        framework.overwrite_cache = overwrite_cache
         framework.parse_dag(config_path, sub_dir)
         return framework
 
@@ -106,6 +118,66 @@ class SyntheticDataFramework:
 
         # Return the sorted list of Operator objects
         self.linearized_dag_functions = [op_map[op_id] for op_id in sorted_operators]
+        ancestor_configs = self.get_ancestor_configs(op_map, sorted_operators)
+        self.map_op_id_to_dag_hash = {
+            op: hash_operator_config_list(ancestor_configs[op.id]) for op in self.linearized_dag_functions
+        }
+
+        for idx in range(len(self.linearized_dag_functions)):
+            op = self.linearized_dag_functions[idx]
+            if self.fs.exists(f"{self.cache_dir}/{self.map_op_id_to_dag_hash[op]}"):
+                print(f"Found in cache for op: {op.id}")
+                self.linearized_dag_functions[idx] = LoadFromCacheOperator(
+                    op.id, op.input_ids, f"{self.cache_dir}/{self.map_op_id_to_dag_hash[op]}"
+                )
+
+    def get_ancestor_operators(
+        self, op_map: Dict[str, Operator], sorted_operators: List[Operator]
+    ) -> Dict[str, List[Operator]]:
+        # Initialize a dictionary to store the ancestor operators for each op
+        ancestor_operators = {}
+
+        def get_op_ancestors(op_id):
+            # If we've already computed this op's ancestors, return them
+            if op_id in ancestor_operators:
+                return ancestor_operators[op_id]
+
+            op = op_map[op_id]
+
+            # If this op has no parents, its ancestor list contains only itself
+            if not op.input_ids:
+                ancestor_operators[op_id] = [op]
+                return ancestor_operators[op_id]
+
+            # Get ancestors for all parents, preserving order
+            parents_ancestors = []
+            for parent_id in op.input_ids:
+                parents_ancestors.extend(get_op_ancestors(parent_id))
+
+            # Remove duplicates while preserving order
+            unique_ancestors = []
+            seen = set()
+            for ancestor in parents_ancestors:
+                if ancestor.id not in seen:
+                    unique_ancestors.append(ancestor)
+                    seen.add(ancestor.id)
+
+            # Add this op to the end of the unique ancestors
+            ancestor_operators[op_id] = unique_ancestors + [op]
+            return ancestor_operators[op_id]
+
+        # Iterate through the sorted operators and compute their ancestors
+        for op_id in sorted_operators:
+            get_op_ancestors(op_id)
+
+        return ancestor_operators
+
+    def get_ancestor_configs(
+        self, op_map: Dict[str, Operator], sorted_operators: List[Operator]
+    ) -> Dict[str, OperatorSpecificConfig]:
+        ancestor_operators = self.get_ancestor_operators(op_map, sorted_operators)
+        ancestor_configs = {op_id: [op.config for op in ops] for op_id, ops in ancestor_operators.items()}
+        return ancestor_configs
 
     def parse_specific_config(self, config: dict) -> OperatorSpecificConfig:
         """
@@ -158,6 +230,14 @@ class SyntheticDataFramework:
         filtered_pairs = concatenate_datasets([ray.get(shard) for shard in waitables])
         eval_logger.info("Execution completed. Results.")
         self.generated_dataset = filtered_pairs
+
+        for op in self.linearized_dag_functions:
+            if not isinstance(op, LoadFromCacheOperator):
+                op.cleanup(
+                    self.fs,
+                    cache_dir=f"{self.cache_dir}/{self.map_op_id_to_dag_hash[op]}",
+                    overwrite_cache=self.overwrite_cache,
+                )
         ray.shutdown()
 
 
@@ -183,8 +263,22 @@ class DatasetHandler:
         self.shuffle_seed = 42
         self.all_loaded_frameworks: Dict[str, SyntheticDataFramework] = {}
 
+    def set_cache_dir(self, cache_dir: str) -> None:
+        self.cache_dir = cache_dir
+
+    def set_overwrite_cache(self, overwrite_cache: bool) -> None:
+        self.overwrite_cache = overwrite_cache
+
+    def set_fs(self, fs: fsspec.AbstractFileSystem):
+        self.fs = fs
+
     @staticmethod
-    def from_config(config_path: str) -> "DatasetHandler":
+    def from_config(
+        config_path: str,
+        cache_dir: Optional[str] = None,
+        fs: Optional[fsspec.AbstractFileSystem] = None,
+        overwrite_cache: Optional[str] = None,
+    ) -> "DatasetHandler":
         """
         Create a DatasetHandler instance from a configuration file.
 
@@ -199,6 +293,9 @@ class DatasetHandler:
         for index in range(num_components):
             all_sub_frameworks_lazy.append((config_path, ("dataset_mix", index)))
         dataset_handler = DatasetHandler(all_sub_frameworks_lazy)
+        dataset_handler.cache_dir = cache_dir
+        dataset_handler.fs = fs
+        dataset_handler.overwrite_cache = overwrite_cache
         dataset_handler.name = _get_name(config_path)
         return dataset_handler
 
@@ -247,7 +344,13 @@ class DatasetHandler:
                     raise ValueError(f"Framework {framework_name} not defined nor loaded in Dataset Mix.")
                 framework = self.all_loaded_frameworks[_get_name(config_path, sub_dir)]
             else:
-                framework = SyntheticDataFramework.from_config(config_path, sub_dir)
+                framework = SyntheticDataFramework.from_config(
+                    config_path,
+                    sub_dir=sub_dir,
+                    cache_dir=self.cache_dir,
+                    fs=self.fs,
+                    overwrite_cache=self.overwrite_cache,
+                )
             all_frameworks.append(framework)
 
         ray.init(num_cpus=os.cpu_count())
@@ -258,6 +361,16 @@ class DatasetHandler:
         ray.wait(all_waitables, num_returns=len(all_waitables))
         for framework in all_frameworks:
             results[framework.name] = concatenate_datasets([ray.get(shard) for shard in results[framework.name]])
+
+        for framework in all_frameworks:
+            for op in framework.linearized_dag_functions:
+                if not isinstance(op, LoadFromCacheOperator):
+                    op.cleanup(
+                        self.fs,
+                        cache_dir=f"{self.cache_dir}/{framework.map_op_id_to_dag_hash[op]}",
+                        overwrite_cache=self.overwrite_cache,
+                    )
+
         ray.shutdown()
         return results
 

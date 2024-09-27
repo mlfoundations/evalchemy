@@ -9,10 +9,10 @@ from data.utils import construct_prompt
 from datasets import load_dataset
 from evaluation.metrics import exact_match_score, edit_similarity_score, codebleu_score
 from lm_eval.api.instance import Instance
-from lm_eval.models.huggingface import HFLM
+from lm_eval.model import LM
 
 
-def eval_instruct(model: HFLM) -> Dict[str, tempfile.TemporaryDirectory]:
+def eval_instruct(model: LM) -> Dict[str, tempfile.TemporaryDirectory]:
     """
     Evaluates the given model on all RepoBench v1.1 subsets and programming languages (python and java).
 

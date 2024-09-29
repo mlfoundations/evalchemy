@@ -143,3 +143,6 @@ def get_config_class(config_type: str) -> Type[OperatorSpecificConfig]:
         If the type is not found in the CONFIG_TYPE_MAP, returns None.
     """
     return CONFIG_TYPE_MAP.get(config_type)
+
+# Import operators to trigger their registration
+from engine.operators import hf_source_operator, function_operator

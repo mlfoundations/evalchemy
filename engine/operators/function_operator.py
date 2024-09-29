@@ -110,7 +110,6 @@ class FunctionOperator(Operator):
         Returns:
             ray.ObjectRefGenerator: Generator of dataset shards.
         """
-        # TODO: implement
         total_size = len(dataset)
         split_size = total_size // self.num_shards
         remainder = total_size % self.num_shards

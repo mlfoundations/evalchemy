@@ -94,7 +94,6 @@ def parse_dag(config: Dict, sub_dir: Optional[Tuple[str, ...]] = None) -> DAG:
             config = config[key]
 
     dag = DAG(name=config["name"])
-    operator_map = {}
 
     seen_ids = set()
     previous_op_id = None

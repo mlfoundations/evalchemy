@@ -50,9 +50,7 @@ class TestExecution(unittest.TestCase):
         }
         dag = parse_dag(config)
         executor = DAGExecutor(dag)
-        executor.run()
-
-        result = executor.get_generated_dataset()
+        result = executor.run()
 
         self.assertIsNotNone(result, "Generated dataset is None")
         if result is not None:

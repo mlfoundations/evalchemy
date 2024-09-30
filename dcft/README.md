@@ -8,7 +8,7 @@ For predefined datasets, this is very simple
 For example, this will generate the EvolInstruct dataset and upload it to HuggingFace at the account specified
 
 ```bash
-    python -m dcft.main  --framework evol_instruct --hf-account EtashGuha
+    python -m dcft.main  --framework evol_instruct --hf-account mlfoundations-dev
 ```
 
 ## Running Jobs Remotely
@@ -24,7 +24,7 @@ python -m dcft.main --framework <name of framework> --hf-account <name of HF acc
 For example:
 
 ```bash
-python -m dcft.main --framework evol_instruct --hf-account EtashGuha --remote
+python -m dcft.main --framework evol_instruct --hf-account mlfoundations-dev --remote
 ```
 
 When running a job remotely:

@@ -16,6 +16,7 @@ class OperatorSpecificConfig(BaseModel):
     Attributes:
         type (str): The type of the operator.
     """
+
     type: str
 
 
@@ -31,6 +32,7 @@ class OperatorConfig(BaseModel):
     Config:
         extra (str): Set to "forbid" to disallow extra attributes.
     """
+
     id: str
     input_ids: List[str] = Field(default_factory=list)
     config: OperatorSpecificConfig

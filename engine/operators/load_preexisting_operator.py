@@ -21,9 +21,11 @@ class LoadPreexistingOperatorConfig(OperatorSpecificConfig):
         type (Literal["load_preexisting"]): The type of the operator, always set to "load_preexisting".
         framework_name (str): The name of the framework to load and execute.
     """
+
     type: Literal["load_preexisting"] = "load_preexisting"
     framework_name: str
     strategies_dir: str = Field(default="dcft/data_strategies")
+
 
 class LoadPreexistingOperator(Operator):
     """
@@ -56,10 +58,13 @@ class LoadPreexistingOperator(Operator):
             ManyShardRefs: List of waitables (shards) outputted by the executed framework
         """
         from engine.executor import DAGExecutor
+
         return DAGExecutor(self.dag).get_waitables()
 
+
 def _load_frameworks(strategies_dir: str, framework_name: str):
-    from engine.dag import load_dag  
+    from engine.dag import load_dag
+
     for strategy_dir in os.listdir(strategies_dir):
         strategy_path = os.path.join(strategies_dir, strategy_dir)
         if os.path.isdir(strategy_path) and strategy_dir != "__pycache__":
@@ -70,4 +75,3 @@ def _load_frameworks(strategies_dir: str, framework_name: str):
                     if dag.name == framework_name:
                         return dag
     raise ValueError(f"Framework '{framework_name}' not found in {strategies_dir}.")
-    

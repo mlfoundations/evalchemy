@@ -24,6 +24,7 @@ class HFSourceOperatorConfig(OperatorSpecificConfig):
         columns (Optional[List[str]]): Specific columns to load from the dataset.
         num_truncate (Optional[int]): Number of samples to truncate the dataset to.
     """
+
     type: Literal["hf_source"] = "hf_source"
     dataset: str
     split: str
@@ -85,4 +86,3 @@ class HFSourceOperator(Operator):
         logging.info(f"\nDataset loaded from {self.dataset}:")
         logging.info(dataset)
         return dataset
-

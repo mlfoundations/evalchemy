@@ -26,6 +26,7 @@ class FunctionOperatorConfig(OperatorSpecificConfig):
         sharded (bool): Indicates whether the function can operate across only a shard
         num_shards (int): The number of shards if the function is sharded.
     """
+
     type: Literal["function"] = "function"
     function: str
     function_config: Dict[str, Any] = Field(default_factory=dict)

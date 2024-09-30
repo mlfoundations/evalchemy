@@ -10,6 +10,7 @@ from engine.operators.operator import ManyShardRefs
 
 logger = logging.getLogger(__name__)
 
+
 class DAGExecutor:
     def __init__(self, dag: DAG):
         self.dag = dag
@@ -41,14 +42,14 @@ class DAGExecutor:
         This method initializes Ray, executes the DAG, and processes the results.
         """
         waitables = self.get_waitables()
-        
+
         if not waitables:
             logger.error("No waitables generated. Check your DAG configuration.")
             return
 
         logger.info(f"Waiting for {len(waitables)} tasks to complete")
         ray.wait(waitables, num_returns=len(waitables))
-        
+
         logger.info(f"Done with execution.")
         try:
             results = [ray.get(shard) for shard in waitables]

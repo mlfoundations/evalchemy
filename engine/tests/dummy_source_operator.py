@@ -21,6 +21,7 @@ class DummySourceOperatorConfig(OperatorSpecificConfig):
         type (Literal["dummy_source"]): The type of the operator, always set to "dummy_source".
         num_rows (int): The number of rows in each shard. Defaults to 100.
     """
+
     type: Literal["dummy_source"] = "dummy_source"
     num_rows: int = Field(default=5, ge=1)
 
@@ -62,10 +63,13 @@ class DummySourceOperator(Operator):
         Returns:
             Dataset: A dummy dataset shard.
         """
-        return Dataset.from_dict({
-            "id": range(shard_id * self.num_rows, (shard_id + 1) * self.num_rows),
-            "output": [f"Sample text {i}" for i in range(self.num_rows)],
-        })
+        return Dataset.from_dict(
+            {
+                "id": range(shard_id * self.num_rows, (shard_id + 1) * self.num_rows),
+                "output": [f"Sample text {i}" for i in range(self.num_rows)],
+            }
+        )
+
 
 def register_dummy_operator():
     register_operator(DummySourceOperatorConfig, DummySourceOperator)

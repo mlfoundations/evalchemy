@@ -19,6 +19,7 @@ class DAGOperatorConfig(OperatorSpecificConfig):
         type (Literal["dag"]): The type of the operator, always set to "dag".
         dag (Dict): The DAG configuration to be executed.
     """
+
     type: Literal["dag"] = "dag"
     dag: Dict = Field(...)
 
@@ -41,6 +42,7 @@ class DAGOperator(Operator):
             config (DAGOperatorConfig): Specific configuration for the DAG operator.
         """
         from engine.dag import parse_dag
+
         super().__init__(id, input_ids, config)
         self.dag = parse_dag(config.dag)
 
@@ -55,6 +57,7 @@ class DAGOperator(Operator):
             ManyShardRefs: List of waitables (shards) outputted by the executed DAG
         """
         from engine.executor import DAGExecutor
+
         executor = DAGExecutor(self.dag)
         return executor.get_waitables()
 

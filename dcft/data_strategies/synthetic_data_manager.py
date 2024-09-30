@@ -82,6 +82,7 @@ class SyntheticDataManager:
                         frameworks[framework.name] = framework
         return frameworks
 
+
 class SyntheticDataFramework:
     """
     A framework for creating and managing synthetic data generation processes.

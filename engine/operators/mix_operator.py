@@ -22,6 +22,7 @@ class MixOperatorConfig(OperatorSpecificConfig):
         type (Literal["mix"]): The type of the operator, always set to "mix".
         seed (int): The seed for random shuffling (optional).
     """
+
     type: Literal["mix"] = "mix"
     seed: int = Field(default=42)
 

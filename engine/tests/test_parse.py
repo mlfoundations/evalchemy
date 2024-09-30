@@ -11,36 +11,23 @@ class TestDAG(unittest.TestCase):
         config = {
             "name": "test_dag",
             "operators": [
-                {
-                    "id": "op1",
-                    "config": {
-                        "type": "hf_source",
-                        "dataset": "dataset1",
-                        "split": "train"
-                    }
-                },
+                {"id": "op1", "config": {"type": "hf_source", "dataset": "dataset1", "split": "train"}},
                 {
                     "id": "op2",
-                    "config": {
-                        "type": "function",
-                        "function": "engine.tests.dummy_functions.dummy_function1"
-                    }
+                    "config": {"type": "function", "function": "engine.tests.dummy_functions.dummy_function1"},
                 },
                 {
                     "id": "op3",
-                    "config": {
-                        "type": "function",
-                        "function": "engine.tests.dummy_functions.dummy_function2"
-                    }
-                }
-            ]
+                    "config": {"type": "function", "function": "engine.tests.dummy_functions.dummy_function2"},
+                },
+            ],
         }
 
         dag = parse_dag(config)
 
         self.assertEqual(dag.name, "test_dag")
         self.assertEqual(len(dag.operators), 3)
-        
+
         # Check default input_ids
         self.assertEqual(dag.operators[0].input_ids, [])
         self.assertEqual(dag.operators[1].input_ids, ["op1"])
@@ -53,39 +40,26 @@ class TestDAG(unittest.TestCase):
         config = {
             "name": "test_dag_explicit",
             "operators": [
-                {
-                    "id": "op1",
-                    "config": {
-                        "type": "hf_source",
-                        "dataset": "dataset1",
-                        "split": "train"
-                    }
-                },
+                {"id": "op1", "config": {"type": "hf_source", "dataset": "dataset1", "split": "train"}},
                 {
                     "id": "op2",
                     "input_ids": ["op1"],
-                    "config": {
-                        "type": "function",
-                        "function": "engine.tests.dummy_functions.dummy_function1"
-                    }
+                    "config": {"type": "function", "function": "engine.tests.dummy_functions.dummy_function1"},
                 },
                 {
                     "id": "op3",
                     "input_ids": ["op1", "op2"],
-                    "config": {
-                        "type": "function",
-                        "function": "engine.tests.dummy_functions.dummy_function2"
-                    }
-                }
+                    "config": {"type": "function", "function": "engine.tests.dummy_functions.dummy_function2"},
+                },
             ],
-            "output_ids": ["op2", "op3"]
+            "output_ids": ["op2", "op3"],
         }
 
         dag = parse_dag(config)
 
         self.assertEqual(dag.name, "test_dag_explicit")
         self.assertEqual(len(dag.operators), 3)
-        
+
         # Check explicit input_ids
         self.assertEqual(dag.operators[0].input_ids, [])
         self.assertEqual(dag.operators[1].input_ids, ["op1"])
@@ -98,37 +72,24 @@ class TestDAG(unittest.TestCase):
         config = {
             "name": "test_dag_mixed",
             "operators": [
-                {
-                    "id": "op1",
-                    "config": {
-                        "type": "hf_source",
-                        "dataset": "dataset1",
-                        "split": "train"
-                    }
-                },
+                {"id": "op1", "config": {"type": "hf_source", "dataset": "dataset1", "split": "train"}},
                 {
                     "id": "op2",
                     "input_ids": ["op1"],
-                    "config": {
-                        "type": "function",
-                        "function": "engine.tests.dummy_functions.dummy_function1"
-                    }
+                    "config": {"type": "function", "function": "engine.tests.dummy_functions.dummy_function1"},
                 },
                 {
                     "id": "op3",
-                    "config": {
-                        "type": "function",
-                        "function": "engine.tests.dummy_functions.dummy_function2"
-                    }
-                }
-            ]
+                    "config": {"type": "function", "function": "engine.tests.dummy_functions.dummy_function2"},
+                },
+            ],
         }
 
         dag = parse_dag(config)
 
         self.assertEqual(dag.name, "test_dag_mixed")
         self.assertEqual(len(dag.operators), 3)
-        
+
         # Check mixed input_ids
         self.assertEqual(dag.operators[0].input_ids, [])
         self.assertEqual(dag.operators[1].input_ids, ["op1"])
@@ -137,5 +98,6 @@ class TestDAG(unittest.TestCase):
         # Check default output_ids
         self.assertEqual(dag.output_ids, ["op3"])
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

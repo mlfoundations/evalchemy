@@ -21,6 +21,7 @@ class DAG(BaseModel):
         operators (List[Operator]): List of operators in the DAG.
         output_ids (List[str]): List of operator IDs to be used as output.
     """
+
     name: str
     operators: List[Operator] = Field(default_factory=list)
     output_ids: List[str] = Field(default_factory=list)
@@ -74,6 +75,7 @@ class DAG(BaseModel):
             raise ValueError("The DAG contains a cycle")
 
         return sorted_ops
+
 
 def parse_dag(config: Dict, sub_dir: Optional[Tuple[str, ...]] = None) -> DAG:
     """
@@ -130,6 +132,7 @@ def parse_dag(config: Dict, sub_dir: Optional[Tuple[str, ...]] = None) -> DAG:
 
     return dag
 
+
 def parse_specific_config(config: Dict) -> OperatorSpecificConfig:
     """
     Parse the specific configuration for an operator.
@@ -149,6 +152,7 @@ def parse_specific_config(config: Dict) -> OperatorSpecificConfig:
         raise ValueError(f"Unknown operator type: {operator_type}")
     return config_class(**config)
 
+
 def parse_yaml_config(config_path: str) -> Dict:
     """
     Parse a YAML configuration file.
@@ -159,8 +163,9 @@ def parse_yaml_config(config_path: str) -> Dict:
     Returns:
         Dict: The parsed configuration as a dictionary.
     """
-    with open(config_path, 'r') as file:
+    with open(config_path, "r") as file:
         return yaml.safe_load(file)
+
 
 def load_dag(config_path: str, sub_dir: Optional[Tuple[str, ...]] = None) -> DAG:
     """

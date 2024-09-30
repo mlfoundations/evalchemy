@@ -7,12 +7,14 @@ import ray
 from datasets import Dataset, concatenate_datasets
 from engine.dag import load_dag
 from engine.executor import DAGExecutor
+from engine.operators.dag_operator import DAGOperatorConfig
 from engine.operators.load_preexisting_operator import (
     LoadPreexistingOperator,
     LoadPreexistingOperatorConfig,
 )
 from engine.operators.mix_operator import MixOperatorConfig
 from engine.operators.operator import OperatorConfig, create_operator
+from engine.tests.dummy_functions import dummy_uppercase
 from engine.tests.dummy_source_operator import register_dummy_operator
 
 
@@ -72,6 +74,53 @@ class TestOperators(unittest.TestCase):
         original_order = [f"Sample text {i}" for i in range(3)] * 2 + [f"Sample text {i}" for i in range(3)] * 2
         mixed_order = list(result["output"])
         self.assertNotEqual(original_order, mixed_order, "Order of data points is not shuffled")
+
+    def test_dag_operator(self):
+        dag_config = {
+            "name": "nested_dag",
+            "operators": [
+                {
+                    "id": "source1",
+                    "config": {
+                        "type": "dummy_source",
+                        "num_rows": 3
+                    }
+                },
+                {
+                    "id": "uppercase",
+                    "input_ids": ["source1"],
+                    "config": {
+                        "type": "function",
+                        "function": "engine.tests.dummy_functions.dummy_uppercase",
+                        "sharded": True
+                    }
+                }
+            ]
+        }
+
+        dag_operator_config = OperatorConfig(
+            id="nested_dag",
+            input_ids=[],
+            config=DAGOperatorConfig(dag=dag_config)
+        )
+
+        dag_operator = create_operator(dag_operator_config)
+        result = dag_operator.execute({})
+
+        self.assertIsInstance(result, list)
+        self.assertEqual(len(result), 2) 
+
+        # Get the actual datasets
+        datasets = ray.get(result)
+        combined_dataset = concatenate_datasets(datasets)
+
+        self.assertEqual(len(combined_dataset), 6)  
+        self.assertIn("id", combined_dataset.column_names)
+        self.assertIn("output", combined_dataset.column_names)
+
+        # Check if dummy_uppercase function was applied
+        for item in combined_dataset:
+            self.assertTrue(item['output'].isupper(), f"Input not uppercase: {item['output']}")
 
 if __name__ == "__main__":
     unittest.main()

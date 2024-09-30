@@ -5,12 +5,14 @@ from engine.operators.load_preexisting_operator import (
     LoadPreexistingOperatorConfig,
 )
 from engine.operators.mix_operator import MixOperator, MixOperatorConfig
+from engine.operators.dag_operator import DAGOperator, DAGOperatorConfig
 from engine.operators.operator import register_operator
 
 register_operator(FunctionOperatorConfig, FunctionOperator)
 register_operator(LoadPreexistingOperatorConfig, LoadPreexistingOperator)
 register_operator(MixOperatorConfig, MixOperator)
 register_operator(HFSourceOperatorConfig, HFSourceOperator)
+register_operator(DAGOperatorConfig, DAGOperator)
 
 __all__ = [
     "FunctionOperator",
@@ -21,4 +23,6 @@ __all__ = [
     "MixOperatorConfig",
     "HFSourceOperator",
     "HFSourceOperatorConfig",
+    "DAGOperator",
+    "DAGOperatorConfig",
 ]

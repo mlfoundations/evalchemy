@@ -1,6 +1,7 @@
-from typing import Dict, Any, Optional
-from dcft.data_strategies.__init__ import SyntheticDataManager
 import argparse
+from typing import Any, Dict, Optional
+
+from dcft.data_strategies.__init__ import SyntheticDataManager
 
 
 def main(list_frameworks: bool = False, framework: Optional[str] = None, hf_account: Optional[str] = None) -> None:
@@ -11,7 +12,7 @@ def main(list_frameworks: bool = False, framework: Optional[str] = None, hf_acco
         for framework in manager.list_frameworks():
             print(f"  - {framework}")
     elif framework:
-        manager.run_framework(framework)
+        manager.run_framework(framework, hf_account)
     else:
         print("No action specified. Use --list to see available frameworks or --run to run a specific framework.")
 

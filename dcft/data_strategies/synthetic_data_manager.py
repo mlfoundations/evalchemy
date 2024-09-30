@@ -1,7 +1,13 @@
 import os
-from typing import Dict, List
+from typing import Dict, List, Optional, Tuple
 
-from engine.dag import DAG, parse_dag
+import ray
+from lm_eval.utils import eval_logger
+
+from datasets import concatenate_datasets
+from engine.dag import DAG, load_dag
+from engine.executor import DAGExecutor
+from engine.operators.operator import ManyShardRefs
 
 
 class SyntheticDataManager:
@@ -30,7 +36,7 @@ class SyntheticDataManager:
         """
         return list(self.frameworks.keys())
 
-    def run_framework(self, framework_name: str, hf_account: str) -> None:
+    def run_framework(self, framework_name: str, hf_account: Optional[str] = None) -> None:
         """
         Run a specific framework and push the generated dataset to Hugging Face Hub.
 
@@ -41,15 +47,16 @@ class SyntheticDataManager:
         Note:
             If the framework is a DatasetHandler, it will be provided with all loaded frameworks.
         """
-        framework = self.get_framework(framework_name)
+        framework = self.frameworks[framework_name]
 
         if framework:
-            print(f"Running framework: {framework_name}")
             framework.run()
+            print(f"Running framework: {framework_name}")
         else:
             print(f"Framework '{framework_name}' not found.")
 
-        framework.generated_dataset.push_to_hub(f"{hf_account}/{framework.name}")
+        if hf_account:
+            framework.generated_dataset.push_to_hub(f"{hf_account}/{framework.name}")
 
     def _load_frameworks(self) -> Dict[str, DAG]:
         """
@@ -71,6 +78,55 @@ class SyntheticDataManager:
                 for file in os.listdir(strategy_path):
                     if file.endswith(".yaml"):
                         config_path = os.path.join(strategy_path, file)
-                        dag = parse_dag(config_path)
-                        frameworks[dag.name] = dag
+                        framework = SyntheticDataFramework.from_config(config_path)
+                        frameworks[framework.name] = framework
         return frameworks
+
+class SyntheticDataFramework:
+    """
+    A framework for creating and managing synthetic data generation processes.
+
+    This class provides methods to parse a DAG (Directed Acyclic Graph) configuration,
+    create operators based on the configuration, and execute ƒthe data generation process.
+    """
+
+    @staticmethod
+    def from_config(config_path: str, sub_dir: Optional[Tuple[str, ...]] = None) -> "SyntheticDataFramework":
+        """
+        Create a SyntheticDataFramework instance from a configuration file.
+
+        Args:
+            config_path (str): Path to the configuration file.
+            sub_dir (Optional[Tuple[str, ...]]): Subdirectory within the config to use.
+
+        Returns:
+            SyntheticDataFramework: An instance of the framework.
+        """
+        framework = SyntheticDataFramework()
+        dag = load_dag(config_path, sub_dir)
+        framework.executor = DAGExecutor(dag)
+        framework.name = dag.name
+        return framework
+
+    def get_waitables(self) -> ManyShardRefs:
+        """
+        Execute the operators in the DAG and return a promise of the list of shards at the end of the data generation process.
+
+        Returns:
+            ManyShardRefs: References to the output shards of the data generation process.
+        """
+        return self.executor.get_waitables()
+
+    def run(self) -> None:
+        """
+        Run the entire data generation process.
+
+        This method initializes Ray, executes the DAG, and processes the results.
+        """
+        ray.init()
+        waitables = self.get_waitables()
+        ray.wait(waitables, num_returns=len(waitables))
+        filtered_pairs = concatenate_datasets([ray.get(shard) for shard in waitables])
+        eval_logger.info("Execution completed. Results.")
+        self.generated_dataset = filtered_pairs
+        ray.shutdown()

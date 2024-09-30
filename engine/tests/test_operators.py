@@ -8,13 +8,13 @@ from datasets import Dataset, concatenate_datasets
 from engine.dag import load_dag
 from engine.executor import DAGExecutor
 from engine.operators.dag_operator import DAGOperatorConfig
+from engine.operators.function_operator import FunctionOperator, FunctionOperatorConfig
 from engine.operators.load_preexisting_operator import (
     LoadPreexistingOperator,
     LoadPreexistingOperatorConfig,
 )
-from engine.operators.mix_operator import MixOperatorConfig
 from engine.operators.operator import OperatorConfig, create_operator
-from engine.tests.dummy_functions import dummy_uppercase
+from engine.tests.dummy_functions import dummy_source_function, dummy_uppercase
 from engine.tests.dummy_source_operator import register_dummy_operator
 
 
@@ -109,6 +109,28 @@ class TestOperators(unittest.TestCase):
         # Check if dummy_uppercase function was applied
         for item in combined_dataset:
             self.assertTrue(item["output"].isupper(), f"Input not uppercase: {item['output']}")
+
+    def test_function_operator_without_dataset_input(self):
+        config = FunctionOperatorConfig(
+            type="function", function="engine.tests.dummy_functions.dummy_source_function", function_config={"n": 5}
+        )
+        operator = FunctionOperator(id="test_source_function", input_ids=[], config=config)
+
+        result = operator.execute({})
+        self.assertIsInstance(result, list)
+        self.assertEqual(len(result), 1)
+
+        dataset = ray.get(result[0])
+
+        self.assertIsInstance(dataset, Dataset)
+        self.assertEqual(len(dataset), 5)
+        self.assertIn("id", dataset.column_names)
+        self.assertIn("output", dataset.column_names)
+
+        # Check if the generated data is correct
+        for i, item in enumerate(dataset):
+            self.assertEqual(item["id"], i)
+            self.assertEqual(item["output"], f"Generated text {i}")
 
 
 if __name__ == "__main__":

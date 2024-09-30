@@ -9,7 +9,6 @@ from engine.operators.operator import (
     ManyShardRefs,
     Operator,
     OperatorSpecificConfig,
-    register_operator,
 )
 
 

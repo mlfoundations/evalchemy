@@ -7,7 +7,6 @@ from engine.operators.operator import (
     ManyShardRefs,
     Operator,
     OperatorSpecificConfig,
-    register_operator,
 )
 
 
@@ -60,7 +59,3 @@ class DAGOperator(Operator):
 
         executor = DAGExecutor(self.dag)
         return executor.get_waitables()
-
-
-# Register the operator
-register_operator(DAGOperatorConfig, DAGOperator)

@@ -21,3 +21,7 @@ def dummy_uppercase(dataset: Dataset, **kwargs) -> Dataset:
 
 def dummy_add_exclamation(dataset: Dataset, **kwargs) -> Dataset:
     return dataset.map(lambda x: {**x, "output": x["output"] + "!"})
+
+
+def dummy_source_function(n: int) -> Dataset:
+    return Dataset.from_dict({"id": range(n), "output": [f"Generated text {i}" for i in range(n)]})

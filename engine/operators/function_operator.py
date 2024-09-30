@@ -1,4 +1,5 @@
 import importlib
+import inspect
 import logging
 from typing import Any, Callable, Dict, List, Literal
 
@@ -11,7 +12,6 @@ from engine.operators.operator import (
     ManyShardRefs,
     Operator,
     OperatorSpecificConfig,
-    register_operator,
 )
 
 
@@ -88,16 +88,30 @@ class FunctionOperator(Operator):
         input_shards = []
         for input in inputs.values():
             input_shards.extend(input)
-        if self.sharded and len(input_shards) == 1:
-            shards_to_process = self.shard_dataset.remote(self, input_shards[0])
-        elif not self.sharded and len(input_shards) > 1:
-            shards_to_process = [self.merge_shards.remote(self, input_shards)]
-        else:
-            shards_to_process = input_shards
 
-        for shard in shards_to_process:
-            processed_dataset = self.process_shard.remote(self, shard)
-            outputs.append(processed_dataset)
+        sig = inspect.signature(self.function)
+        parameters = list(sig.parameters.values())
+
+        # If the function takes a Dataset as its first argument,
+        # process the shards, otherwise this means the function
+        # doesn't need a Dataset as input and is a "source"
+        # so we call it without an input dataset.
+        if parameters and parameters[0].annotation == Dataset:
+            # If it is, process shards as before
+            if self.sharded and len(input_shards) == 1:
+                shards_to_process = self.shard_dataset.remote(self, input_shards[0])
+            elif not self.sharded and len(input_shards) > 1:
+                shards_to_process = [self.merge_shards.remote(self, input_shards)]
+            else:
+                shards_to_process = input_shards
+
+            for shard in shards_to_process:
+                processed_dataset = self.process_shard_with_dataset.remote(self, shard)
+                outputs.append(processed_dataset)
+        else:
+            result = self.process_without_dataset.remote(self)
+            outputs.append(result)
+
         return outputs
 
     @ray.remote
@@ -136,15 +150,17 @@ class FunctionOperator(Operator):
         return concatenate_datasets([ray.get(shard) for shard in shards])
 
     @ray.remote
-    def process_shard(self, dataset: Dataset) -> Dataset:
+    def process_shard_with_dataset(self, dataset: Dataset) -> Dataset:
         """
-        Process a single dataset or single shard (a shard is a dataset) using the configured function.
-
-        Args:
-            dataset (Dataset): The input dataset or single shard (a shard is a dataset)
-
-        Returns:
-            Dataset: Processed dataset or shard.
+        Process a single dataset or single shard using the configured function.
         """
         logging.info(f"Processing shard with function: {self.function.__name__}")
         return self.function(dataset, **self.function_config)
+
+    @ray.remote
+    def process_without_dataset(self) -> Any:
+        """
+        Process using the configured function without passing a dataset.
+        """
+        logging.info(f"Processing with function: {self.function.__name__}")
+        return self.function(**self.function_config)

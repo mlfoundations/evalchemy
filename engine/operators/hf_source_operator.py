@@ -78,6 +78,9 @@ class HFSourceOperator(Operator):
         Returns:
             Dataset: The loaded and potentially processed dataset.
         """
+        # The keep_in_memory flag being set to True is crucial to allow us
+        # to store the Dataset, along with its actual content, in Ray's object store.
+        # Otherwise, Dataset only contains pointers to Arrow Tables written to disk.
         dataset = load_dataset(self.dataset, split=self.split, keep_in_memory=True)
         if self.columns:
             dataset = dataset.select_columns(self.columns)

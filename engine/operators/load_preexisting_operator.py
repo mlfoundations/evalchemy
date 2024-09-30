@@ -12,6 +12,7 @@ from engine.operators.operator import (
     register_operator,
 )
 
+
 class LoadPreexistingOperatorConfig(OperatorSpecificConfig):
     """
     Configuration class for load preexisting operators.
@@ -42,8 +43,7 @@ class LoadPreexistingOperator(Operator):
             config (LoadPreexistingOperatorConfig): Specific configuration for the load preexisting operator.
         """
         super().__init__(id, input_ids, config)
-        self.framework_name = config.framework_name
-        self.strategies_dir = config.strategies_dir
+        self.dag = self._load_frameworks(config.strategies_dir, config.framework_name)
 
     def execute(self, _: DatasetRefs) -> ManyShardRefs:
         """
@@ -55,23 +55,20 @@ class LoadPreexistingOperator(Operator):
         Returns:
             ManyShardRefs: List of waitables (shards) outputted by the executed framework
         """
-        return self.load_and_execute_framework.remote(self)
+        from engine.executor import DAGExecutor
+        return DAGExecutor(self.dag).get_waitables()
 
     def _load_frameworks(self, strategies_dir: str, framework_name: str):
-        from engine.dag import parse_dag  # Import here to avoid circular import
-        for file in os.listdir(strategies_dir):
-            if file.endswith(".yaml"):
-                config_path = os.path.join(strategies_dir, file)
-                dag = parse_dag(config_path)
-                if dag.name == framework_name:
-                    return dag
+        from engine.dag import load_dag  
+        for strategy_dir in os.listdir(strategies_dir):
+            strategy_path = os.path.join(strategies_dir, strategy_dir)
+            if os.path.isdir(strategy_path) and strategy_dir != "__pycache__":
+                for file in os.listdir(strategy_path):
+                    if file.endswith(".yaml"):
+                        config_path = os.path.join(strategy_path, file)
+                        dag = load_dag(config_path)
+                        if dag.name == framework_name:
+                            return dag
         raise ValueError(f"Framework '{framework_name}' not found in {strategies_dir}.")
     
-    @ray.remote
-    def load_and_execute_framework(self):
-        from engine.executor import DAGExecutor
-        dag = self._load_frameworks(self.strategies_dir, self.framework_name)
-        executor = DAGExecutor(dag)
-        return executor.execute()
-
 register_operator(LoadPreexistingOperatorConfig, LoadPreexistingOperator)

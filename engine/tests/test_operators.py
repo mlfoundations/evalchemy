@@ -2,8 +2,8 @@ import os
 import unittest
 
 import ray
-from datasets import Dataset
 
+from datasets import Dataset
 from engine.operators.load_preexisting_operator import (
     LoadPreexistingOperator,
     LoadPreexistingOperatorConfig,
@@ -36,7 +36,8 @@ class TestOperators(unittest.TestCase):
         self.assertTrue(isinstance(result[0], ray.ObjectRef))
         
         # Get the actual dataset
-        dataset = ray.get(result[0])
+        dataset = ray.get(result)
+        print(dataset)
         self.assertIsInstance(dataset, Dataset)
         self.assertEqual(list(dataset["text"]), ["Dummy", "Data", "For", "Testing"])
 

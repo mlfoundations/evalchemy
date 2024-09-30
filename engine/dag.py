@@ -92,7 +92,6 @@ def parse_dag(config: Dict, sub_dir: Optional[Tuple[str, ...]] = None) -> DAG:
     if sub_dir is not None:
         for key in sub_dir:
             config = config[key]
-
     dag = DAG(name=config["name"])
 
     seen_ids = set()

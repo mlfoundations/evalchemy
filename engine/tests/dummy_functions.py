@@ -1,5 +1,5 @@
 import logging
-
+import ray
 from datasets import Dataset
 
 
@@ -16,3 +16,7 @@ def dummy_uppercase(dataset: Dataset, **kwargs) -> Dataset:
 
 def dummy_add_exclamation(dataset: Dataset, **kwargs) -> Dataset:
     return dataset.map(lambda x: {**x, 'output': x['output'] + '!'})
+
+@ray.remote
+def dummy_dataset_function() -> Dataset:
+    return Dataset.from_dict({"text": ["Dummy", "Data", "For", "Testing"]})

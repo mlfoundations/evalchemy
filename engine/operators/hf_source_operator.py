@@ -1,7 +1,7 @@
+import logging
 from typing import List, Literal, Optional
 
 import ray
-from lm_eval.utils import eval_logger
 
 from datasets import Dataset, load_dataset
 from engine.operators.operator import (
@@ -82,8 +82,8 @@ class HFSourceOperator(Operator):
             dataset = dataset.select_columns(self.columns)
         if self.num_truncate is not None:
             dataset = dataset.select(range(min(len(dataset), self.num_truncate)))
-        eval_logger.info(f"\nDataset loaded from {self.dataset}:")
-        eval_logger.info(dataset)
+        logging.info(f"\nDataset loaded from {self.dataset}:")
+        logging.info(dataset)
         return dataset
 
 

@@ -35,7 +35,7 @@ class DAGExecutor:
         logger.info(f"Generated {len(waitables)} waitables")
         return waitables
 
-    def run(self, return_result: bool = True) -> Dataset:
+    def run(self) -> Dataset:
         """
         Run the entire data generation process.
 
@@ -52,19 +52,18 @@ class DAGExecutor:
         
         logger.info(f"Done with execution.")
         try:
-            if return_result:
-                results = [ray.get(shard) for shard in waitables]
-                logger.info(f"Retrieved {len(results)} results")
+            results = [ray.get(shard) for shard in waitables]
+            logger.info(f"Retrieved {len(results)} results")
 
-                non_empty_results = [r for r in results if r is not None and len(r) > 0]
-                if not non_empty_results:
-                    logger.error("All retrieved results are empty or None")
-                    ray.shutdown()
-                    return
+            non_empty_results = [r for r in results if r is not None and len(r) > 0]
+            if not non_empty_results:
+                logger.error("All retrieved results are empty or None")
+                ray.shutdown()
+                return
 
-                results = concatenate_datasets(non_empty_results)
-                logger.info(f"Concatenated dataset has {len(results)} rows")
-                return results
+            results = concatenate_datasets(non_empty_results)
+            logger.info(f"Concatenated dataset has {len(results)} rows")
+            return results
         except Exception as e:
             logger.error(f"Error during result processing: {str(e)}")
         finally:

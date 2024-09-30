@@ -186,3 +186,24 @@ dataset_mix:
 ```
 
 We can define new datasets if we want. We can also refer to datasets defined in different yaml files already. For example, evol_instruct references the dataset created in dcft/data_strategies/WizardLM/wizard_lm.yaml.
+
+
+## Using External Repositories
+
+We recommend using this code to clone down code from existing repositories to utilize for your codebase. We offer the following example
+```shell
+git subtree add --prefix=dcft/external_repositories/WizardLM https://github.com/original/repo.git main --squash
+
+    # Make changes in the dcft/external_repositories/WizardLM directory
+
+    # Commit changes to your main repository
+    git add dcft/external_repositories/WizardLM
+    git commit -m "Update library-name with custom changes"
+
+    # To pull updates from the original repository
+    git subtree pull --prefix=dcft/external_repositories/WizardLM https://github.com/original/repo.git main --squash
+
+    # If you want to contribute back to the original repository
+    git subtree push --prefix=dcft/external_repositories/WizardLM https://github.com/original/repo.git contribution-branch
+```
+

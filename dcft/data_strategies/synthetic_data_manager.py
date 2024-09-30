@@ -165,6 +165,8 @@ class SyntheticDataFramework:
                 ],
                 "env_vars": {
                     "HF_TOKEN": os.environ["HF_TOKEN"],
+                    "OPENAI_API_KEY": os.environ["OPENAI_API_KEY"],
+                    "HF_DATASETS_CACHE": "local:///tmp/"
                 },
             },
         )

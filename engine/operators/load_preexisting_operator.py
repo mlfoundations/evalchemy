@@ -43,7 +43,7 @@ class LoadPreexistingOperator(Operator):
             config (LoadPreexistingOperatorConfig): Specific configuration for the load preexisting operator.
         """
         super().__init__(id, input_ids, config)
-        self.dag = self._load_frameworks(config.strategies_dir, config.framework_name)
+        self.dag = _load_frameworks(config.strategies_dir, config.framework_name)
 
     def execute(self, _: DatasetRefs) -> ManyShardRefs:
         """
@@ -58,17 +58,16 @@ class LoadPreexistingOperator(Operator):
         from engine.executor import DAGExecutor
         return DAGExecutor(self.dag).get_waitables()
 
-    def _load_frameworks(self, strategies_dir: str, framework_name: str):
-        from engine.dag import load_dag  
-        for strategy_dir in os.listdir(strategies_dir):
-            strategy_path = os.path.join(strategies_dir, strategy_dir)
-            if os.path.isdir(strategy_path) and strategy_dir != "__pycache__":
-                for file in os.listdir(strategy_path):
-                    if file.endswith(".yaml"):
-                        config_path = os.path.join(strategy_path, file)
-                        dag = load_dag(config_path)
-                        if dag.name == framework_name:
-                            return dag
-        raise ValueError(f"Framework '{framework_name}' not found in {strategies_dir}.")
+def _load_frameworks(strategies_dir: str, framework_name: str):
+    from engine.dag import load_dag  
+    for strategy_dir in os.listdir(strategies_dir):
+        strategy_path = os.path.join(strategies_dir, strategy_dir)
+        if os.path.isdir(strategy_path) and strategy_dir != "__pycache__":
+            for file in os.listdir(strategy_path):
+                if file.endswith(".yaml"):
+                    config_path = os.path.join(strategy_path, file)
+                    dag = load_dag(config_path)
+                    if dag.name == framework_name:
+                        return dag
+    raise ValueError(f"Framework '{framework_name}' not found in {strategies_dir}.")
     
-register_operator(LoadPreexistingOperatorConfig, LoadPreexistingOperator)

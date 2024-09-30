@@ -31,7 +31,6 @@ class DAGExecutor:
             datas[operator.id] = curr_op_output
             if operator.id in self.dag.output_ids:
                 waitables.extend(curr_op_output)
-
         logger.info(f"Generated {len(waitables)} waitables")
         return waitables
 

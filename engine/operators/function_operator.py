@@ -147,7 +147,3 @@ class FunctionOperator(Operator):
         """
         logging.info(f"Processing shard with function: {self.function.__name__}")
         return self.function(dataset, **self.function_config)
-
-
-# Register the operator
-register_operator(FunctionOperatorConfig, FunctionOperator)

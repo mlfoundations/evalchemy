@@ -86,5 +86,3 @@ class HFSourceOperator(Operator):
         logging.info(dataset)
         return dataset
 
-
-register_operator(HFSourceOperatorConfig, HFSourceOperator)

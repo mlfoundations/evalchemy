@@ -1,6 +1,11 @@
 name: simple_test_strategy
 operators:
   - id: dummy_source
-    type: function
     config:
-      function: engine.tests.dummy_functions.dummy_dataset_function
+      type: dummy_source
+      num_rows: 5
+  - id: uppercase
+    config:
+      type: function
+      sharded: true
+      function: engine.tests.dummy_functions.dummy_uppercase

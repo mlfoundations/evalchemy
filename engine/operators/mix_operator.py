@@ -77,6 +77,3 @@ class MixOperator(Operator):
         datasets = [ray.get(shard) for shard in shards]
         combined_dataset = concatenate_datasets(datasets)
         return combined_dataset.shuffle(seed=self.seed)
-
-
-register_operator(MixOperatorConfig, MixOperator)

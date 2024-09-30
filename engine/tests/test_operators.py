@@ -1,22 +1,28 @@
 import os
 import unittest
+from collections import Counter
 
 import ray
 
-from datasets import Dataset
+from datasets import Dataset, concatenate_datasets
+from engine.dag import load_dag
+from engine.executor import DAGExecutor
 from engine.operators.load_preexisting_operator import (
     LoadPreexistingOperator,
     LoadPreexistingOperatorConfig,
 )
-from engine.operators.mix_operator import MixOperator, MixOperatorConfig
+from engine.operators.mix_operator import MixOperatorConfig
+from engine.operators.operator import OperatorConfig, create_operator
+from engine.tests.dummy_source_operator import register_dummy_operator
 
 
 class TestOperators(unittest.TestCase):
     def setUp(self):
         if not ray.is_initialized():
             ray.init(ignore_reinit_error=True)
-        self.sample_dataset = Dataset.from_dict({"text": ["Hello", "World", "Test", "Data"]})
+        register_dummy_operator()
         self.test_strategies_dir = os.path.dirname(__file__)
+        self.test_configs_dir = os.path.join(self.test_strategies_dir, "test_configs")
 
     @classmethod
     def tearDownClass(cls):
@@ -32,37 +38,40 @@ class TestOperators(unittest.TestCase):
         
         result = operator.execute({})
         self.assertIsInstance(result, list)
-        self.assertEqual(len(result), 1)
-        self.assertTrue(isinstance(result[0], ray.ObjectRef))
+        self.assertEqual(len(result), 2)  # Two shards from dummy_source
         
-        # Get the actual dataset
-        dataset = ray.get(result)
-        print(dataset)
-        self.assertIsInstance(dataset, Dataset)
-        self.assertEqual(list(dataset["text"]), ["Dummy", "Data", "For", "Testing"])
+        # Get the actual datasets
+        datasets = ray.get(result)
+        combined_dataset = concatenate_datasets(datasets)
+        
+        self.assertEqual(len(combined_dataset), 10)  # 5 rows * 2 shards
+        self.assertIn("id", combined_dataset.column_names)
+        self.assertIn("output", combined_dataset.column_names)
+        
+        # Check if dummy_uppercase function was applied
+        for item in combined_dataset:
+            self.assertTrue(item['output'].isupper(), f"Input not uppercase: {item['output']}")
 
-    def test_mix_operator(self):
-        for num_shards in [1, 2, 3]:
-            with self.subTest(num_shards=num_shards):
-                config = MixOperatorConfig(type="mix", seed=42)
-                operator = MixOperator(id="test_mix", input_ids=["input1", "input2"], config=config)
-                
-                # Create input shards
-                input_shards = [ray.put(self.sample_dataset.select(range(i, i+2))) for i in range(0, len(self.sample_dataset), 2)]
-                inputs = {"input1": input_shards[:num_shards], "input2": input_shards[num_shards:]}
-                
-                result = operator.execute(inputs)
-                self.assertIsInstance(result, list)
-                self.assertEqual(len(result), 1) 
-                
-                # Get the mixed dataset
-                mixed_dataset = ray.get(result[0])
-                self.assertIsInstance(mixed_dataset, Dataset)
-                self.assertEqual(len(mixed_dataset), len(self.sample_dataset))
-                
-                # Check if the dataset is shuffled (order should be different from the original but same elements)
-                self.assertNotEqual(list(mixed_dataset["text"]), list(self.sample_dataset["text"]))
-                self.assertEqual(set(mixed_dataset["text"]), set(self.sample_dataset["text"]))
+    def test_mix_operator_with_dummy_source(self):
+        # Load the DAG from the YAML file
+        dag = load_dag(os.path.join(self.test_configs_dir, "dummy_mix_test.yaml"))
+        
+        # Create and run the DAGExecutor
+        executor = DAGExecutor(dag)
+        result = executor.run()
+        
+        self.assertIsInstance(result, Dataset)
+        self.assertEqual(len(result), 12)  # 2 sources * 2 shards * 3 rows
+        
+        # Check if the data points are the same as expected
+        expected_outputs = set(f"Sample text {i}" for i in range(3)) | set(f"Sample text {i}" for i in range(3))
+        actual_outputs = set(result["output"])
+        self.assertEqual(expected_outputs, actual_outputs, "Data points are not as expected after mixing")
+        
+        # Check if the order is different from the original
+        original_order = [f"Sample text {i}" for i in range(3)] * 2 + [f"Sample text {i}" for i in range(3)] * 2
+        mixed_order = list(result["output"])
+        self.assertNotEqual(original_order, mixed_order, "Order of data points is not shuffled")
 
 if __name__ == "__main__":
     unittest.main()

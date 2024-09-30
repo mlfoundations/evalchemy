@@ -66,5 +66,3 @@ class DAGExecutor:
             return results
         except Exception as e:
             logger.error(f"Error during result processing: {str(e)}")
-        finally:
-            ray.shutdown()

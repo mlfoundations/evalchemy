@@ -1,8 +1,10 @@
 import os
+import time
 from typing import Dict, List, Optional, Tuple
 
 import ray
 from lm_eval.utils import eval_logger
+from ray.job_submission import JobSubmissionClient
 
 from datasets import concatenate_datasets
 from engine.dag import DAG, load_dag
@@ -36,18 +38,21 @@ class SyntheticDataManager:
         """
         return list(self.frameworks.keys())
 
-    def run_framework(self, framework_name: str, hf_account: Optional[str] = None) -> None:
+    def run_framework(self, framework_name: str, hf_account: Optional[str] = None, remote: bool = False) -> None:
         """
         Run a specific framework and push the generated dataset to Hugging Face Hub.
 
         Args:
             framework_name (str): The name of the framework to run.
             hf_account (str): The Hugging Face account name to push the dataset to.
-
+            remote (bool): Whether to run the framework on a remote Ray cluster.
         Note:
             If the framework is a DatasetHandler, it will be provided with all loaded frameworks.
         """
         framework = self.frameworks[framework_name]
+        if remote:
+            framework.run_remote(hf_account)
+            return
 
         if framework:
             framework.run()
@@ -107,6 +112,9 @@ class SyntheticDataFramework:
         dag = load_dag(config_path, sub_dir)
         framework.executor = DAGExecutor(dag)
         framework.name = dag.name
+        framework.ray_address = "http://abe691efe165e4b809c119a0bd961ae0-2123536616.us-east-1.elb.amazonaws.com:8265"
+        framework.client = JobSubmissionClient(framework.ray_address)
+
         return framework
 
     def get_waitables(self) -> ManyShardRefs:
@@ -131,3 +139,50 @@ class SyntheticDataFramework:
         eval_logger.info("Execution completed. Results.")
         self.generated_dataset = filtered_pairs
         ray.shutdown()
+
+    def run_remote(self, hf_account: str) -> None:
+        """
+        Run the entire data generation process on a remote Ray cluster.
+
+        This method initializes Ray, executes the DAG, and processes the results.
+        """
+        job_id = self.client.submit_job(
+            entrypoint=f"python -m dcft.main --framework {self.name} --hf-account {hf_account}",
+            runtime_env={
+                "working_dir": "./",
+                "pip": "./requirements.txt",
+                # Exclude potentially large files and directories
+                "excludes": [
+                    "**/.gitignore",
+                    "**/.DS_Store",
+                    "**/.gitignore",
+                    "**/.git",
+                    "**/.venv",
+                    "./datasets",
+                    "**/*.json",
+                    "**/*.jsonl",
+                    "**/*.csv",
+                ],
+                "env_vars": {
+                    "HF_TOKEN": os.environ["HF_TOKEN"],
+                },
+            },
+        )
+
+        eval_logger.info(
+            f"Submitted job with ID: {job_id}. Waiting for job to complete... "
+            f"You can press Ctrl+C to stop and still check the status with the job ID {job_id} "
+            f"at {self.ray_address}."
+        )
+        self._wait_until_status(job_id, ["SUCCEEDED", "FAILED"])
+
+    def _wait_until_status(self, job_id, status_to_wait_for, timeout_seconds=36000):
+        start = time.time()
+        while time.time() - start <= timeout_seconds:
+            status = self.client.get_job_status(job_id)
+            print(f"status: {status}")
+            if status in status_to_wait_for:
+                break
+            time.sleep(30)
+
+        eval_logger.info(f"Job {job_id} completed with status: {status}")

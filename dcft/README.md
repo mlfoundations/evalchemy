@@ -82,100 +82,106 @@ You need only specify the name of the dataset and the individual operators which
 
 BTW, if you need to add an external repository for code that is being publicly maintained, we recommend adding it 
 
-``` bash
-    git subtree add --prefix=dcft/external_repositories/WizardLM https://github.com/original/repo.git main --squash
+```bash
+git subtree add --prefix=dcft/external_repositories/WizardLM https://github.com/original/repo.git main --squash
 
-    # Make changes in the dcft/external_repositores/WizardLM directory
+# Make changes in the dcft/external_repositores/WizardLM directory
 
-    # Commit changes to your main repository
-    git add dcft/external_repositores/WizardLM
-    git commit -m "Update library-name with custom changes"
+# Commit changes to your main repository
+git add dcft/external_repositores/WizardLM
+git commit -m "Update library-name with custom changes"
 
-    # To pull updates from the original repository
-    git subtree pull --prefix=dcft/external_repositores/WizardLM https://github.com/original/repo.git main --squash
+# To pull updates from the original repository
+git subtree pull --prefix=dcft/external_repositores/WizardLM https://github.com/original/repo.git main --squash
 
-    # If you want to contribute back to the original repository
-    git subtree push --prefix=dcft/external_repositores/WizardLM https://github.com/original/repo.git contribution-branch
+# If you want to contribute back to the original repository
+git subtree push --prefix=dcft/external_repositores/WizardLM https://github.com/original/repo.git contribution-branch
 ```
 
 
 ## Dataset Mixing
-Say you want to create a mix of multiple datasets. You need only create a YAML file with multiple datasets defined. 
+Say you want to create a mix of multiple datasets. You need only create a YAML file that loads these datasets from preexisting frameworks or generate these datasets with a new pipeline. 
 
 ```yaml
 name: mix_banana_ray
-dataset_mix:
-  -
-    name: evol_instruct
-  -
-    name: shp
-    operators:
-      - id: load_shp
-        config:
-          type: hf_source
-          dataset: stanfordnlp/SHP
-          split: train
-          columns: 
-            - history
-            - human_ref_A
-          num_truncate: 5
+output_ids: ['mix_banana']
+operators:
+- id: mix_banana
+  input_ids: ['load_evol_instruct', 'shp_dag']
+  config:
+    type: mix
+- id: load_evol_instruct
+  input_ids: []
+  config:
+    type: load_preexisting
+    framework_name: evol_instruct
+- id: shp_dag
+  input_ids: []
+  config:
+    type: dag
+    dag:
+      name: shp_processing
+      operators:
+        - id: load_shp
+          config:
+            type: hf_source
+            dataset: stanfordnlp/SHP
+            split: train
+            columns: 
+              - history
+              - human_ref_A
+            num_truncate: 3
 
-      - id: instruction_generation
-        config:
-          type: function
-          sharded: true
-          function: data_strategies.WizardLM.utils.instruction_generation
-          function_config:
-            input_column: history
-            output_column: evol_instruction
-        input_ids:
-          - load_shp
+        - id: instruction_generation
+          config:
+            type: function
+            sharded: true
+            function: data_strategies.WizardLM.utils.instruction_generation
+            function_config:
+              input_column: history
+              output_column: evol_instruction
         
-      - id: dedup_evol_instructions
-        config:
-          type: function
-          function: data_strategies.WizardLM.utils.dedup
-          function_config:
-            input_column: evol_instruction
-        input_ids:
-          - instruction_generation
+        - id: dedup_evol_instructions
+          config:
+            type: function
+            function: data_strategies.WizardLM.utils.dedup
+            function_config:
+              input_column: evol_instruction
 
-      - id: annotate
-        config:
-          type: function
-          sharded: true
-          function: data_strategies.WizardLM.utils.annotate
-          function_config:
-            input_column: evol_instruction
-            output_column: completion
-        input_ids:
-          - dedup_evol_instructions
+        - id: annotate
+          config:
+            type: function
+            sharded: true
+            function: data_strategies.WizardLM.utils.annotate
+            function_config:
+              input_column: evol_instruction
+              output_column: completion
 
-      - id: rename_prompt
-        config:
-          type: function
-          sharded: true
-          function: data_strategies.WizardLM.utils.force_rename_column
-          function_config:
-            old_name: evol_instruction
-            new_name: prompt
-        input_ids:
-          - annotate
+        - id: rename_prompt
+          config:
+            type: function
+            sharded: true
+            function: data_strategies.WizardLM.utils.force_rename_column
+            function_config:
+              old_name: evol_instruction
+              new_name: prompt
 
-      - id: remove_other_columns
-        config:
-          type: function
-          sharded: true
-          function: data_strategies.WizardLM.utils.remove_other_columns
-          function_config:
-            columns_to_keep:
+        - id: remove_other_columns
+          config:
+            type: function
+            sharded: true
+            function: data_strategies.WizardLM.utils.remove_other_columns
+            function_config:
+              columns_to_keep:
                 - prompt
                 - completion
-        input_ids:
-          - rename_prompt
 ```
 
-We can define new datasets if we want. We can also refer to datasets defined in different yaml files already. For example, evol_instruct references the dataset created in dcft/data_strategies/WizardLM/wizard_lm.yaml.
+In the above example, we are mixing two datasets: 
+
+* The first dataset is evol_instruct, which is loaded from `dcft/data_strategies/WizardLM/wizard_lm.yaml`,
+* The second dataset is shp_processing, which is defined as a DAG, see the [Nested DAGs](#nested-dags) section for more details.
+* These two datasets are mixed together with the `mix_banana` operator to form the final dataset.
 
 
 ## Using External Repositories
@@ -184,17 +190,17 @@ We recommend using this code to clone down code from existing repositories to ut
 ```shell
 git subtree add --prefix=dcft/external_repositories/WizardLM https://github.com/original/repo.git main --squash
 
-    # Make changes in the dcft/external_repositories/WizardLM directory
+# Make changes in the dcft/external_repositories/WizardLM directory
 
-    # Commit changes to your main repository
-    git add dcft/external_repositories/WizardLM
-    git commit -m "Update library-name with custom changes"
+# Commit changes to your main repository
+git add dcft/external_repositories/WizardLM
+git commit -m "Update library-name with custom changes"
 
-    # To pull updates from the original repository
-    git subtree pull --prefix=dcft/external_repositories/WizardLM https://github.com/original/repo.git main --squash
+# To pull updates from the original repository
+git subtree pull --prefix=dcft/external_repositories/WizardLM https://github.com/original/repo.git main --squash
 
-    # If you want to contribute back to the original repository
-    git subtree push --prefix=dcft/external_repositories/WizardLM https://github.com/original/repo.git contribution-branch
+# If you want to contribute back to the original repository
+git subtree push --prefix=dcft/external_repositories/WizardLM https://github.com/original/repo.git contribution-branch
 ```
 
 ## Understanding and Configuring DAGs

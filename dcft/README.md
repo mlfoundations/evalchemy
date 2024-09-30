@@ -11,6 +11,32 @@ For example, this will generate the EvolInstruct dataset and upload it to Huggin
     python -m dcft.main  --framework evol_instruct --hf-account EtashGuha
 ```
 
+## Running Jobs Remotely
+
+You can run data generation jobs on a remote Ray cluster by adding the `--remote` flag to your command. This is useful for processing large datasets or when you need additional computational resources.
+
+To run a job remotely:
+
+```bash
+python -m dcft.main --framework <name of framework> --hf-account <name of HF account> --remote
+```
+
+For example:
+
+```bash
+python -m dcft.main --framework evol_instruct --hf-account EtashGuha --remote
+```
+
+When running a job remotely:
+
+1. The job is submitted to a Ray cluster specified by the `ray_address` in the `SyntheticDataFramework` class.
+2. The entire working directory is packaged and sent to the remote cluster, excluding large files and directories specified in the `excludes` list.
+3. The `HF_TOKEN` and `OPENAI_API_KEY` environment variables are automatically set in the remote environment based on the values in the local environment. If you want to set other environment variables, you can do so by adding them to the `env_vars` dictionary of the job being submitted by the `run_remote` method in the `SyntheticDataFramework` class.
+4. You can monitor the job's progress using the provided Ray dashboard URL.
+5. The script will wait for the job to complete and provide status updates.
+
+Note: Make sure you have the necessary environment variables (HF_TOKEN, OPENAI_API_KEY) set before running a remote job.
+
 ## How to add support for new datasets
 
 1. Create a new folder for yaml files in `dcft/data_strategies`

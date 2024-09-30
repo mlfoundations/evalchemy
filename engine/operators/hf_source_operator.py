@@ -78,7 +78,7 @@ class HFSourceOperator(Operator):
         Returns:
             Dataset: The loaded and potentially processed dataset.
         """
-        dataset = load_dataset(self.dataset, split=self.split)
+        dataset = load_dataset(self.dataset, split=self.split, keep_in_memory=True)
         if self.columns:
             dataset = dataset.select_columns(self.columns)
         if self.num_truncate is not None:

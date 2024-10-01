@@ -1,0 +1,20 @@
+name: airoboros
+operators:
+  - id: load_alpaca
+    config:
+      type: hf_source
+      dataset: yahma/alpaca-cleaned
+      split: train
+      columns: 
+        - instruction
+        - output
+      num_truncate: 5
+  - id: instruction_generation
+    config:
+      type: function
+      function: data_strategies.Airoboros.utils.generate_instructions
+    input_ids:
+      - load_alpaca
+
+
+    

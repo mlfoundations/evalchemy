@@ -15,6 +15,7 @@ import requests
 import secrets
 import sys
 import yaml
+import tempfile
 from collections import defaultdict
 from google.auth.transport import requests as google_requests  # type: ignore
 from google.oauth2 import service_account  # type: ignore
@@ -35,7 +36,6 @@ from airoboros.exceptions import (
 )
 from sentence_transformers import SentenceTransformer
 from transformers import AutoTokenizer
-from txtai.pipeline import HFOnnx
 
 # Defaults and constants.
 MAX_DOCSTORE_SIZE = 15000
@@ -49,6 +49,7 @@ OPENAI_MODELS = [
     "gpt-4-0314",
     "gpt-4-0613",
     "gpt-4",
+    "gpt-4o-mini",
     "gpt-4-32k-0314",
     "gpt-3.5-turbo",
     "gpt-3.5-turbo-0613",
@@ -943,6 +944,8 @@ class SelfInstructor:
         async for item in method_map[category](self, **kwargs):
             self.persist(item)
             preview = None
+            if running_total >= 1:
+                break 
             if category == "rp":
                 if "rp" in item:
                     running_total += 1
@@ -1000,32 +1003,17 @@ class SelfInstructor:
 
         method_map = {
             "agent": agent_generator,
-            "awareness": awareness_generator,
-            "card": card_generator,
-            "coding": coding_generator,
-            "contextual": contextual_generator,
-            "cot": cot_generator,
-            "counterfactual_contextual": counterfactual_contextual_generator,
-            "detailed_writing": detailed_writing_generator,
-            "experience": experience_generator,
-            "general": general_generator,
-            "joke": joke_generator,
-            "misconception": misconception_generator,
-            "multiple_choice": multiple_choice_generator,
-            "plan": plan_generator,
-            "orca": orca_generator,
-            "riddle": riddle_generator,
-            "roleplay": roleplay_generator,
-            "rp": rp_generator,
-            "song": song_generator,
-            "trivia": trivia_generator,
-            "wordgame": wordgame_generator,
-            "writing": writing_generator,
+            "awareness": awareness_generator
         }
 
         await self.initialize_topics()
         self.initialize_index()
 
+        breakpoint()
+        self.temp_dir =  tempfile.TemporaryDirectory() 
+        # Create a temporary file in the temporary directory
+        self.output_path  = os.path.join(self.temp_dir.name, "instructions.jsonl")
+        
         # Generate instructions for each category.
         self.outfile = open(self.output_path, "a+")
         started_at = datetime.datetime.now()

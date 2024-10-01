@@ -44,7 +44,6 @@ class SyntheticDataFramework:
         Returns:
             SyntheticDataFramework: An instance of the framework.
         """
-
         framework = SyntheticDataFramework()
         framework.cache_dir = cache_dir
         framework.fs = fs
@@ -91,6 +90,7 @@ class SyntheticDataFramework:
                 operators.append(operator)
 
             except ValidationError as e:
+                breakpoint()
                 raise ValueError(f"Invalid configuration for operator {op_id}: {str(e)}")
 
         # Create a graph representation
@@ -192,12 +192,15 @@ class SyntheticDataFramework:
         Raises:
             ValueError: If the config type is unknown.
         """
-
-        config_type = config.get("type")
-        config_class = get_config_class(config_type)
-        if config_class is None:
-            raise ValueError(f"Unknown config type: {config_type}")
-        return config_class(**config)
+        try:
+            config_type = config.get("type")
+            config_class = get_config_class(config_type)
+        
+            if config_class is None:
+                raise ValueError(f"Unknown config type: {config_type}")
+            return config_class(**config)
+        except:
+            breakpoint()
 
     def get_waitables(self) -> ManyShardRefs:
         """
@@ -208,7 +211,6 @@ class SyntheticDataFramework:
         """
 
         datas = {}
-
         for idx, operator in enumerate(self.linearized_dag_functions):
             input_datas = {input_id: datas[input_id] for input_id in operator.input_ids}
             curr_op_output = operator.execute(input_datas)

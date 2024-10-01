@@ -1,0 +1,55 @@
+#If starting a new project, please copy this config and change the `name` and set the `base_path`. 
+# You can also remove things that you do not need or just leave them blank.
+#If you are using this to generate a dataset, then configure the `datasets`, `openai`and `prompts` parameters.
+name: 'example_project_train'
+base_path: '../data/' # Where the new created datasets, interim files and everything else will be saved
+to_box: True # Should all properities of the config class be coverted to Box, box makes properties accessible with a . (e.g. config.name, instead of config['name'])
+special_tokens:
+  user: "<|user|>" # For chat like interactions we want to have a <user> and <ai> token
+  ai: "<|ai|>" # See above
+  eos: "<|eos|>" # End of stream (one question, or one answer, or one message)
+  eod: "<|eod|>" # End of document, or conversation - in other words the text that comes after this token is not related to the text before it
+  pad: "<|pad|>" # Padding 
+test:
+  dataset: "<path to your test set>" # If you have one
+train: # Training parameters
+  model: 'olm/olm-gpt2-oct-2022' # This model can be used for testing, but the performance will not be the best (we need bigger models)
+  # The models below require bigger GPUs, usually at least one A100 (80GB) or more smaller GPUs
+  #model: 'stabilityai/stablelm-base-alpha-3b'
+  #model: '<path to your lama models>/llama-hf/7B' 
+  #model: 'facebook/opt-1.3b'
+  datasets: # One or more datasets to be used for training, the csvs have to have the same columns
+   - "../data/example_project_data/prepared_generated_data_for_example_project.csv" 
+   - "../data/nhs_uk_full/prepared_generated_data_for_nhs_uk_qa.csv"
+   - "../data/nhs_uk_full/prepared_generated_data_for_nhs_uk_conversations.csv"
+   - "../data/medical_tasks_gpt4/prepared_generated_data_for_medical_tasks.csv"
+  ignore_index: -100 # This will be added as label if we want to skip something
+  max_seq_len: 512 # Should match the models max seq len, or be smaller
+  packing_type: 'partial' # one of 'partial', 'full' or 'none' - IMPORTANT, but experimental, Full/Partial will speedup the training drastically (2-3x)
+  shuffle_dataset: True # Will shuffle the dataset after loading, usually better not to do this and during data preparation make sure your dataset is in the right shape
+  hf_training_arguments:
+    output_dir: '../data/results/'
+    gradient_accumulation_steps: 16 # Aim for a BS of 128, forumla is: n_dev * batch_size * acc_steps
+    per_device_eval_batch_size: 1
+    per_device_train_batch_size: 1
+    load_best_model_at_end: False
+    learning_rate: 2.0e-5 # Use float with 'e-x' notation
+    weight_decay: 0.1
+    adam_beta1: 0.9
+    adam_beta2: 0.95
+    adam_epsilon: 1.0e-7
+    max_grad_norm: 1
+    num_train_epochs: 1
+    lr_scheduler_type: 'cosine'
+    warmup_ratio: 0.03
+    logging_strategy: 'steps'
+    logging_steps: 100
+    save_strategy: "steps"
+    save_steps: 30000
+    seed: 11
+    optim: 'adamw_hf'
+    do_eval: False
+    #bf16: True # Enable if supported by your GPUs
+    #tf32: True
+    #fsdp: "full_shard auto_wrap" # Enable for distributed training
+    #fsdp_transformer_layer_cls_to_wrap: "LlamaDecoderLayer"

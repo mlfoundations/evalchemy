@@ -16,88 +16,78 @@ from fastchat.llm_judge.common import (
     check_data,
     play_a_match_pair,
     play_a_match_single,
-    get_model_list,
-    Judge,
-    MatchPair,
-    MatchSingle,
     NEED_REF_CATS,
     temperature_config,
 )
-from fastchat.model import load_model, get_conversation_template
 from fastchat.utils import str_to_torch_dtype
 from fastchat.llm_judge.gen_judgment import make_match, make_match_all_pairs, make_match_single, make_judge_single
 
 from lm_eval.api.instance import Instance
+from lm_eval.api.model import LM
+
 
 from lm_eval.utils import eval_logger
-from typing import List, Optional
-
-
-@dataclass
-class ShowResultsConfig:
-    """Configuration for the evaluation script."""
-
-    bench_name: str = "mt_bench"
-    """Name of the benchmark."""
-
-    input_file: str = None
-    """Path to the input file."""
-
-    judge_model: str = "gpt-4"
-    """Model used for judging."""
-
-    baseline_model: str = "gpt-3.5-turbo"
-    """Baseline model for comparison."""
-
-    model_list: Optional[List[str]] = None
-    """List of models to be evaluated."""
-
-    mode: str = "single"
-    """Evaluation mode. Can be 'pairwise-baseline', 'pairwise-all', or 'single'."""
-
-
-@dataclass
-class EvaluateInstructConfig:
-    bench_name: str = "mt_bench"
-    question_begin: int = None
-    question_end: int = None
-    answer_file: str = None
-    max_new_token: int = 1024
-    num_choices: int = 1
-    num_gpus_per_model: int = 1
-    num_gpus_total: int = 1
-    max_gpu_memory: str = None
-    dtype: str = None
-    revision: str = "main"
+from typing import List, Optional, Any, Dict
 
 
 @dataclass
 class EvaluateConfig:
     bench_name: str = "mt_bench"
+    question_begin: Optional[int] = None
+    question_end: Optional[int] = None
+    answer_file: Optional[str] = None
+    max_new_token: int = 1024
+    num_choices: int = 1
+    num_gpus_per_model: int = 1
+    num_gpus_total: int = 1
+    max_gpu_memory: Optional[str] = None
+    dtype: Optional[str] = None
+    revision: str = "main"
     judge_file: str = "eval/chat_benchmarks/MTBench/fastchat/llm_judge/data/judge_prompts.jsonl"
     judge_model: str = "gpt-4"
     baseline_model: str = "gpt-3.5-turbo"
     mode: str = "single"
-    model_list: list[str] = None
+    model_list: Optional[List[str]] = None
     parallel: int = 4
-    first_n: int = None
+    first_n: Optional[int] = None
 
 
 def run_eval(
-    model,
-    model_id,
-    question_file,
-    question_begin,
-    question_end,
-    answer_file,
-    max_new_token,
-    num_choices,
-    num_gpus_per_model,
-    num_gpus_total,
-    max_gpu_memory,
-    dtype,
-    revision,
-):
+    model: Any,
+    model_id: str,
+    question_file: str,
+    question_begin: Optional[int],
+    question_end: Optional[int],
+    answer_file: str,
+    max_new_token: int,
+    num_choices: int,
+    num_gpus_per_model: int,
+    num_gpus_total: int,
+    max_gpu_memory: Optional[str],
+    dtype: Any,
+    revision: str,
+) -> None:
+    """
+    Run the evaluation process for a given model on a set of questions, saving the model answers in a temporary file.
+
+    Args:
+        model: The model to evaluate.
+        model_id: Identifier for the model.
+        question_file: Path to the file containing questions.
+        question_begin: Starting index of questions to evaluate (optional).
+        question_end: Ending index of questions to evaluate (optional).
+        answer_file: Path to save the model's answers.
+        max_new_token: Maximum number of new tokens to generate.
+        num_choices: Number of choices to generate for each question.
+        num_gpus_per_model: Number of GPUs to use per model.
+        num_gpus_total: Total number of GPUs available.
+        max_gpu_memory: Maximum GPU memory to use (optional).
+        dtype: Data type for model computations.
+        revision: Model revision to use.
+
+    Returns:
+        None
+    """
     questions = load_questions(question_file, question_begin, question_end)
     # random shuffle the questions to balance the loading
     random.shuffle(questions)
@@ -117,17 +107,35 @@ def run_eval(
 
 
 def get_model_answers(
-    model,
-    model_id,
-    questions,
-    answer_file,
-    max_new_token,
-    num_choices,
-    num_gpus_per_model,
-    max_gpu_memory,
-    dtype,
-    revision,
-):
+    model: LM,
+    model_id: str,
+    questions: List[Dict[str, Any]],
+    answer_file: str,
+    max_new_token: int,
+    num_choices: int,
+    num_gpus_per_model: int,
+    max_gpu_memory: Optional[str],
+    dtype: Any,
+    revision: str,
+) -> None:
+    """
+    Generate and save model answers for given questions.
+
+    Args:
+        model: The model to use for generating answers.
+        model_id: Identifier for the model.
+        questions: List of questions to answer.
+        answer_file: Path to save the model's answers.
+        max_new_token: Maximum number of new tokens to generate.
+        num_choices: Number of choices to generate for each question.
+        num_gpus_per_model: Number of GPUs to use per model.
+        max_gpu_memory: Maximum GPU memory to use (optional).
+        dtype: Data type for model computations.
+        revision: Model revision to use.
+
+    Returns:
+        None
+    """
     os.makedirs(os.path.dirname(answer_file), exist_ok=True)
 
     # Initialize structures to keep track of conversations and choices
@@ -185,14 +193,22 @@ def get_model_answers(
     eval_logger.info(f"Completed processing all questions. Results written to {answer_file}")
 
 
-def eval_instruct(model):
+def eval_instruct(model: Any) -> Dict[str, str]:
+    """
+    Generates the model completions on the MTBench prompts.
 
+    Args:
+        model: The model to evaluate.
+
+    Returns:
+        Dict[str, str]: A dictionary containing the model identifier.
+    """
     question_file = f"eval/chat_benchmarks/MTBench/fastchat/llm_judge/data/mt_bench/question.jsonl"
 
-    config = EvaluateInstructConfig()
+    config = EvaluateConfig()
     model_id = model.model_identifier
 
-    answer_file = f"/import/ml-sc-scratch5/etashg/dcft_private/eval/chat_benchmarks/MTBench/fastchat/llm_judge/data/mt_bench/model_answer/{model_id}.jsonl"
+    answer_file = f"eval/chat_benchmarks/MTBench/fastchat/llm_judge/data/mt_bench/model_answer/{model_id}.jsonl"
 
     eval_logger.info(f"Output to {answer_file}")
     run_eval(
@@ -215,7 +231,16 @@ def eval_instruct(model):
     return results
 
 
-def evaluate(results):
+def evaluate(results: Dict[str, str]) -> Dict[str, float]:
+    """
+    Evaluate the model's performance based on generated answers.
+
+    Args:
+        results: A dictionary containing the model identifier.
+
+    Returns:
+        Dict[str, float]: A dictionary containing evaluation scores for different turns and the average score.
+    """
     config = EvaluateConfig()
 
     question_file = f"eval/chat_benchmarks/MTBench/fastchat/llm_judge/data/mt_bench/question.jsonl"

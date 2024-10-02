@@ -4,22 +4,17 @@ import logging
 import os
 import sys
 import time
-from functools import partial
-from typing import Union
+from typing import Optional, List, Dict
 import random
-import itertools
 import concurrent.futures
-
-from collections import defaultdict
-from typing import TYPE_CHECKING, List, Optional, Union
 
 import numpy as np
 import torch
 
 from eval.task import TaskManager as InstructTaskManager
 
-from lm_eval import evaluator, utils
-from lm_eval.evaluator import request_caching_arg_to_dict
+from lm_eval import utils
+from lm_eval.api.model import LM
 from lm_eval.loggers import EvaluationTracker, WandbLogger
 from lm_eval.utils import handle_non_serializable, make_table, simple_parse_args_string, sanitize_model_name
 from lm_eval.__main__ import setup_parser, parse_eval_args
@@ -27,38 +22,33 @@ import lm_eval.api.metrics
 import lm_eval.api.registry
 import lm_eval.api.task
 import lm_eval.models
-from lm_eval.caching.cache import delete_cache
-from lm_eval.evaluator_utils import (
-    consolidate_group_results,
-    consolidate_results,
-    get_sample_size,
-    get_subtask_list,
-    get_task_list,
-    prepare_print_tasks,
-    print_writeout,
-    run_task_tests,
-)
 from lm_eval.loggers.utils import add_env_info, add_tokenizer_info, get_git_commit_hash
-from lm_eval.tasks import (
-    TaskManager,
-    get_task_dict,
-)
 from lm_eval.utils import (
     eval_logger,
     handle_non_serializable,
-    hash_string,
-    positional_deprecated,
     simple_parse_args_string,
 )
 
 
 def evaluate(
-    lm: "LM",
-    task_manager,
-    output_path,
-    task_list,
+    lm: LM,
+    task_manager: InstructTaskManager,
+    task_list: List[str],
     verbosity: str = "INFO",
-):
+) -> Dict[str, Dict]:
+    """
+    Evaluate the language model on the given tasks.
+
+    Args:
+        lm (LM): The language model to evaluate.
+        task_manager (InstructTaskManager): The task manager containing evaluation instructions.
+        task_list (List[str]): List of task names to evaluate.
+        verbosity (str, optional): Logging verbosity level. Defaults to "INFO".
+
+    Returns:
+        Dict[str, Dict]: A dictionary containing evaluation results for each task.
+    """
+
     eval_logger.setLevel(getattr(logging, f"{verbosity}"))
 
     eval_instruct_results = [
@@ -80,7 +70,17 @@ def evaluate(
     return results
 
 
-def cli_evaluate(args: Union[argparse.Namespace, None] = None) -> None:
+def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
+    """
+    Command-line interface for evaluating language models on specified tasks.
+
+    Args:
+        args (Optional[argparse.Namespace], optional): Parsed command-line arguments.
+            If None, arguments will be parsed from sys.argv. Defaults to None.
+
+    Returns:
+        None
+    """
     if not args:
         # we allow for args to be passed externally, else we parse them ourselves
         parser = setup_parser()
@@ -147,25 +147,16 @@ def cli_evaluate(args: Union[argparse.Namespace, None] = None) -> None:
 
     task_manager = InstructTaskManager()
 
-    eval_instruct_tasks = task_manager.get_list_eval_instructs(task_list)
-    evaluate_tasks = task_manager.get_list_evaluates(task_list)
-
     eval_logger.info(f"Selected Tasks: {[task for task in task_list if task in task_manager.tasks]}")
-
-    request_caching_args = request_caching_arg_to_dict(cache_requests=args.cache_requests)
 
     model = args.model
     model_args = args.model_args
-    num_fewshot = (args.num_fewshot,)
     batch_size = args.batch_size
     max_batch_size = args.max_batch_size
     device = args.device
     use_cache = args.use_cache
     limit = args.limit
     bootstrap_iters = 100000
-    check_integrity = args.check_integrity
-    write_out = args.write_out
-    log_samples = args.log_samples
     evaluation_tracker = evaluation_tracker
     system_instruction = args.system_instruction
     apply_chat_template = args.apply_chat_template
@@ -173,7 +164,6 @@ def cli_evaluate(args: Union[argparse.Namespace, None] = None) -> None:
     gen_kwargs = args.gen_kwargs
     task_manager = task_manager
     verbosity = args.verbosity
-    predict_only = args.predict_only
     random_seed = args.seed[0]
     numpy_random_seed = args.seed[1]
     torch_random_seed = args.seed[2]
@@ -258,9 +248,7 @@ def cli_evaluate(args: Union[argparse.Namespace, None] = None) -> None:
             fewshot_as_multiturn=fewshot_as_multiturn,
         )
 
-    results = evaluate(
-        lm, task_manager=task_manager, output_path=args.output_path, task_list=task_list, verbosity=verbosity
-    )
+    results = evaluate(lm, task_manager=task_manager, task_list=task_list, verbosity=verbosity)
 
     results = {"results": results}
     if lm.rank == 0:

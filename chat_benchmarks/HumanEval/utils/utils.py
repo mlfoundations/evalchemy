@@ -1,6 +1,6 @@
 import re
 
-languge_settings = {
+language_settings = {
     "python": {
         "full_name": "Python",
         "indent": 4,
@@ -51,7 +51,7 @@ def extract_generation_code(example: str, lang_code: str, verbose: bool = False)
     task_id = example["task_id"]
     output = example.get("output", example.get("gpt_completion"))
     question = example["prompt"].strip()
-    setting = languge_settings[lang_code]
+    setting = language_settings[lang_code]
     lang = setting["full_name"]
     indent = setting["indent"]
 

@@ -5,41 +5,60 @@ import torch
 import tempfile
 from pathlib import Path
 from tqdm import tqdm
+from typing import Dict, List, Any, Tuple
 from lm_eval.api.instance import Instance
+from lm_eval.api.model import LM
 
-data_abs_dir = Path(__file__).parent / "data"
-
-from utils.utils import extract_generation_code, languge_settings
+from utils.utils import extract_generation_code, language_settings
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from human_eval.evaluation import evaluate_functional_correctness
 
 
-def build_deepseekcoder_instruction(languge: str, question: str):
+def build_deepseekcoder_instruction(language: str, question: str) -> str:
+    """
+    Build an instruction for the DeepSeekCoder model.
+
+    Args:
+        language (str): The programming language.
+        question (str): The question or prompt.
+
+    Returns:
+        str: The formatted instruction.
+    """
     return """
 Please continue to complete the function. You are not allowed to modify the given code and do the completion only. Please return all completed function in a codeblock. Here is the given code to do completion:
 ```{}
 {}
 ```
 """.strip().format(
-        languge.lower(), question.strip()
+        language.lower(), question.strip()
     )
 
 
-def eval_instruct(model):
-    results = {}
+def eval_instruct(model: LM) -> Dict[str, Any]:
+    """
+    Evaluate the model on HumanEval tasks.
+
+    Args:
+        model (LM): The language model to evaluate.
+
+    Returns:
+        Dict[str, Any]: Results of the evaluation, including generated examples and temporary directory.
+    """
+    results: Dict[str, Any] = {}
     temp_dir_obj = tempfile.TemporaryDirectory()
     temp_dir = temp_dir_obj.name
 
     for lang in ["python", "sh"]:
-        problem_file = os.path.join(data_abs_dir, f"humaneval-{lang}.jsonl")
+        problem_file = os.path.join("eval/chat_benchmarks/HumanEval/data", f"humaneval-{lang}.jsonl")
 
         examples = [json.loads(x) for x in open(problem_file) if x.strip()]
         print("Read {} examples for evaluation over.".format(len(examples)))
 
-        generated_examples = []
-        all_instances = []
+        generated_examples: List[Dict[str, Any]] = []
+        all_instances: List[Instance] = []
         for idx, example in enumerate(tqdm(examples, desc="Generating")):
-            prompt = build_deepseekcoder_instruction(languge_settings[lang]["full_name"], example["prompt"])
+            prompt = build_deepseekcoder_instruction(language_settings[lang]["full_name"], example["prompt"])
             inputs = model.apply_chat_template([{"role": "user", "content": prompt}])
             all_instances.append(
                 Instance(
@@ -75,13 +94,22 @@ def eval_instruct(model):
     return results
 
 
-def evaluate(results):
+def evaluate(results: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Evaluate the generated results.
+
+    Args:
+        results (Dict[str, Any]): The results from eval_instruct, including generated examples and temporary directory.
+
+    Returns:
+        Dict[str, Any]: Evaluation results for each language.
+    """
     temp_dir_obj = results["temp_dir_obj"]
     temp_dir = temp_dir_obj.name
 
-    evaluation_results = {}
+    evaluation_results: Dict[str, Any] = {}
     for lang in ["python", "sh"]:
-        problem_file = os.path.join(data_abs_dir, f"humaneval-{lang}.jsonl")
+        problem_file = os.path.join("eval/chat_benchmarks/HumanEval/data", f"humaneval-{lang}.jsonl")
         temp_file_path = os.path.join(temp_dir, f"generated_{lang}.jsonl")
 
         result = evaluate_functional_correctness(
@@ -95,16 +123,3 @@ def evaluate(results):
         evaluation_results[lang] = result
     temp_dir_obj.cleanup()
     return evaluation_results
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--model", type=str, help="model name or path")
-    parser.add_argument("--output_path", type=str, help="output path of your generation")
-    parser.add_argument("--language", type=str, help="langauge")
-    parser.add_argument("--temp_dir", type=str, help="temp dir for evaluation", default="tmp")
-    args = parser.parse_args()
-
-    os.environ["TOKENIZERS_PARALLELISM"] = "false"
-    generate_main(args)
-    pass

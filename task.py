@@ -1,14 +1,22 @@
 from abc import ABC, abstractmethod
-
+from typing import Dict, List, Callable, Any
 import os
 import importlib.util
 import sys
+
+from lm_eval.api.model import LM
 
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_dir)
 
 
-def import_eval_instructs():
+def import_eval_instructs() -> Dict[str, "Task"]:
+    """
+    Dynamically import evaluation instructions from chat_benchmarks directory.
+
+    Returns:
+        Dict[str, Task]: A dictionary mapping task names to Task instances.
+    """
     current_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "chat_benchmarks")
     tasks = {}
 
@@ -47,23 +55,69 @@ def import_eval_instructs():
 
 
 class TaskManager:
-    def __init__(self):
-        self.tasks = import_eval_instructs()
+    """Manages the collection of evaluation tasks."""
 
-    def get_list_eval_instructs(self, task_list):
+    def __init__(self):
+        self.tasks: Dict[str, Task] = import_eval_instructs()
+
+    def get_list_eval_instructs(self, task_list: List[str]) -> List[Callable[[LM], Dict[str, Any]]]:
+        """
+        Get a list of eval_instruct methods for the specified tasks.
+
+        Args:
+            task_list (List[str]): List of task names.
+
+        Returns:
+            List[Callable[[LM], Dict[str, Any]]]: List of eval_instruct methods.
+        """
         return [self.tasks[task].eval_instruct for task in task_list]
 
-    def get_list_evaluates(self, task_list):
+    def get_list_evaluates(self, task_list: List[str]) -> List[Callable[[Dict[str, Any]], Dict[str, Any]]]:
+        """
+        Get a list of evaluate methods for the specified tasks.
+
+        Args:
+            task_list (List[str]): List of task names.
+
+        Returns:
+            List[Callable[[Dict[str, Any]], Dict[str, Any]]]: List of evaluate methods.
+        """
         return [self.tasks[task].evaluate for task in task_list]
 
 
 class Task(ABC):
+    """Abstract base class for evaluation tasks."""
+
     @abstractmethod
-    def eval_instruct(self, model, tokenizer, output_path):
+    def eval_instruct(self, model: LM) -> Dict[str, Any]:
+        """
+        Abstract method for evaluation instruction.
+
+        Args:
+            model (LM): The language model to be evaluated.
+
+        Returns:
+            Dict[str, Any]: A dictionary containing the evaluation results.
+
+        Raises:
+            NotImplementedError: If not implemented by subclass.
+        """
         raise NotImplementedError("Subclasses must implement eval_instruct method")
 
     @abstractmethod
-    def evaluate(self, output_path):
+    def evaluate(self, results: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Abstract method for evaluation.
+
+        Args:
+            results (Dict[str, Any]): The results to be evaluated.
+
+        Returns:
+            Dict[str, Any]: A dictionary containing the evaluation metrics.
+
+        Raises:
+            NotImplementedError: If not implemented by subclass.
+        """
         raise NotImplementedError("Subclasses must implement evaluate method")
 
 

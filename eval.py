@@ -4,11 +4,11 @@ import logging
 import os
 import sys
 import time
-from typing import Union
+from typing import Optional, List, Dict
 import random
 import concurrent.futures
-
 from typing import Union
+
 
 import numpy as np
 import torch
@@ -16,6 +16,7 @@ import torch
 from eval.task import TaskManager as InstructTaskManager
 
 from lm_eval import utils
+from lm_eval.api.model import LM
 from lm_eval.loggers import EvaluationTracker, WandbLogger
 from lm_eval.utils import handle_non_serializable, make_table, simple_parse_args_string, sanitize_model_name
 from lm_eval.__main__ import setup_parser, parse_eval_args
@@ -34,10 +35,23 @@ from lm_eval.utils import (
 
 def evaluate(
     lm: LM,
-    task_manager,
-    task_list,
+    task_manager: InstructTaskManager,
+    task_list: List[str],
     verbosity: str = "INFO",
-):
+) -> Dict[str, Dict]:
+    """
+    Evaluate the language model on the given tasks.
+
+    Args:
+        lm (LM): The language model to evaluate.
+        task_manager (InstructTaskManager): The task manager containing evaluation instructions.
+        task_list (List[str]): List of task names to evaluate.
+        verbosity (str, optional): Logging verbosity level. Defaults to "INFO".
+
+    Returns:
+        Dict[str, Dict]: A dictionary containing evaluation results for each task.
+    """
+
     eval_logger.setLevel(getattr(logging, f"{verbosity}"))
 
     eval_instruct_results = [
@@ -59,7 +73,17 @@ def evaluate(
     return results
 
 
-def cli_evaluate(args: Union[argparse.Namespace, None] = None) -> None:
+def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
+    """
+    Command-line interface for evaluating language models on specified tasks.
+
+    Args:
+        args (Optional[argparse.Namespace], optional): Parsed command-line arguments.
+            If None, arguments will be parsed from sys.argv. Defaults to None.
+
+    Returns:
+        None
+    """
     if not args:
         # we allow for args to be passed externally, else we parse them ourselves
         parser = setup_parser()

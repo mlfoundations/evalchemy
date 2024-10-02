@@ -4,17 +4,49 @@ import pandas as pd
 import time
 from tqdm import tqdm
 import os
-from datasets import Dataset
+from datasets import Dataset, concatenate_datasets
 import json
 from lm_eval.utils import eval_logger
 import yaml
 import random
 from dcft.external_repositories.OpenGPT.opengpt import parsers, teachers
+from dcft.external_repositories.OpenGPT.opengpt.config import Config
 import hashlib
+import re 
+import yaml
+import os
+
 
 def get_health_az_links(_: Dataset) -> Dataset:
     url = 'https://www.nhs.uk/conditions/'
-    response = requests.get(url)
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Referer': 'https://www.google.com/',
+        'DNT': '1',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
+    }
+    
+    session = requests.Session()
+    
+    max_retries = 5
+    for attempt in range(max_retries):
+        try:
+            response = session.get(url, headers=headers, timeout=10)
+            response.raise_for_status()
+            break
+        except requests.RequestException as e:
+            print(f"Attempt {attempt + 1} failed: {e}")
+            if attempt < max_retries - 1:
+                wait_time = random.uniform(1, 5)
+                print(f"Waiting for {wait_time:.2f} seconds before retrying...")
+                time.sleep(wait_time)
+            else:
+                print("Max retries reached. Unable to fetch the webpage.")
+                return Dataset.from_dict({'links': []})
+    
     soup = BeautifulSoup(response.content, 'html.parser')
     
     selectors = [
@@ -24,11 +56,14 @@ def get_health_az_links(_: Dataset) -> Dataset:
         '.nhsuk-list--letter a'
     ]
     
+    all_datasets = []
+
     for selector in selectors:
         links = soup.select(selector)
         print(f"Selector '{selector}' found {len(links)} links")
-        return Dataset.from_dict({'links': [(link.text.strip(), f"https://www.nhs.uk{link['href']}") for link in links]})
+        all_datasets.append(Dataset.from_dict({'links': [(link.text.strip(), f"https://www.nhs.uk{link['href']}") for link in links]}))
     
+    return concatenate_datasets(all_datasets)
     raise Exception("No links found on the page. The page structure might have changed.")
 
 def get_topic_description(topic_url):
@@ -46,33 +81,45 @@ def get_topic_description(topic_url):
         for selector in selectors:
             description = soup.select_one(selector)
             if description:
-                return {'Topic': topic, 'text': description.text.strip()}
+                return {'topic': topic, 'text': description.text.strip()}
         
-        return {'Topic': topic, 'text': "Description not found"}
+        return {'topic': topic, 'text': "Description not found"}
     except Exception as e:
-        return {'Topic': topic, 'text': f"Error: {str(e)}"}
+        return {'topic': topic, 'text': f"Error: {str(e)}"}
 
 def create_health_az_table(dataset: Dataset) -> Dataset:
     health_topics = dataset['links']
-    
     data = []
     for topic_url in health_topics:
         data.append(get_topic_description(topic_url))
-        
     topics = [item['topic'] for item in data]
     descriptions = [item['text'] for item in data]
 
     
     dataset = dataset.add_column('Topic', topics)
     dataset = dataset.add_column('text', descriptions)
-
+    if len(dataset) == 0:
+        breakpoint()
+    print(f"Length here: {len(dataset)}")
     return dataset
 
 def add_annotations(dataset: Dataset, config_path: str) -> Dataset:
-    config = yaml.safe_load(open(config_path).read())
+    config = Config(config_path)
     dataset_name = "temp"
-    raw_data_columns = ['id', 'raw_output', 'prompt_hash']
-    prompt_db = json.load(open(config.path.prompt_db, 'rb'))
+    prompt_db = json.load(open(config.static_paths.prompt_db, 'rb'))
+    raw_data_columns = ['id', 'raw_output', 'dataset', 'language', 'run', 'prompt_hash', 'prompt_text_hash', 'context']
+    raw_data = pd.DataFrame(None, columns=raw_data_columns)
+    prepared_data = None
+    raw_data_path = os.path.join(config.base_path, config.name, f"raw_generated_data_for_{config.name}.csv")
+    prepared_data_path = os.path.join(config.base_path, config.name, f"prepared_generated_data_for_{config.name}.csv")
+    if os.path.exists(raw_data_path) and os.path.exists(prepared_data_path):
+        raw_data = pd.read_csv(raw_data_path)
+        prepared_data = pd.read_csv(prepared_data_path)
+        eval_logger.warning(f"Loading an existing openai generated dataset found at: \n{raw_data_path}\n and\n{prepared_data_path}\n" + 
+                        f"There are already {len(raw_data)} rows in the that dataset, the generation will continue from where last left off. " + 
+                        f"The script will also do all examples that were not done in the previous run.\n" + 
+                        "***Take care that if prompt_config['random_prompt'] is set to true, it can produce unwanted results.\n\n")
+
     cnt = 0
     for prompt_config in config.prompts:
         prompts = [prompt for prompt in prompt_db if prompt['hash'] in prompt_config['hashes']] # There must be one
@@ -85,9 +132,11 @@ def add_annotations(dataset: Dataset, config_path: str) -> Dataset:
             for language in prompt_config.get('languages', ['English']):
                 parameters['language'] = language
                 eval_logger.warning(f"\nStarting prompts: {prompt_config['hashes']}\nRun: {run}\nLanguage: {language}")
-                
-                    
-                for row_ind, row in tqdm(dataset, total=len(dataset)):
+    
+                total_rows = len(dataset)
+
+                # Iterate through the rows of the 'train' split with tqdm and enumerate for row indexing
+                for row_ind, row in tqdm(enumerate(dataset), total=total_rows, desc="Processing rows"):
                     # Set the context from the current row
                     parameters['context'] = row['text']
                     for col in extra_data_columns:
@@ -122,6 +171,10 @@ def add_annotations(dataset: Dataset, config_path: str) -> Dataset:
                                         new_data = pd.DataFrame([[len(raw_data), openai_output, dataset_name, language, run, prompt['hash'], h, parameters['context']]], 
                                                                 columns=raw_data_columns)
                                         raw_data = pd.concat([raw_data, new_data], ignore_index=True)
+                                    if len(raw_data) % config.data_generation_checkpoint_every == 0:
+                                        eval_logger.warning("Checkpointing the generated dataset.")
+                                        raw_data.to_csv(raw_data_path, index=False)
+                                        prepared_data.to_csv(prepared_data_path, index=False)
                                 except Exception as e:
                                     eval_logger.exception(e)
                                     eval_logger.warning(f"Skipping example at position: {row_ind} for dataset: {dataset_name}\n")

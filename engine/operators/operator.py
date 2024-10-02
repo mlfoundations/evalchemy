@@ -247,8 +247,6 @@ class FunctionOperator(Operator):
         """
         logging.info(f"Processing shard with function: {self.function.__name__}")
         return self.function(dataset, **self.function_config)
-
-
 class HFSourceOperator(Operator):
     """
     Operator that loads a dataset from Hugging Face's datasets library.

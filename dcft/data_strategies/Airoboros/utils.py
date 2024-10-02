@@ -9,7 +9,7 @@ def generate_instructions(_: Dataset) -> Dataset:
         random.seed(secrets.randbelow(1000000000))
         setup_dict = {'config_path': 'dcft/external_repositories/airoboros/mini.yaml', 'debug': False}
         self_instructor = SelfInstructor(**setup_dict)
-        self_instructor.run()
+        asyncio.run(self_instructor.run())
         temp_dir = self_instructor.temp_dir
         data = []
         breakpoint()

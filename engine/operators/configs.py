@@ -56,7 +56,7 @@ class FunctionOperatorConfig(OperatorSpecificConfig):
     function: str
     function_config: Dict[str, Any] = Field(default_factory=dict)
     sharded: bool = False
-    num_shards: int = 3
+    num_shards: int = 30
 
 
 class HFSourceOperatorConfig(OperatorSpecificConfig):
@@ -171,8 +171,6 @@ def hash_function_with_imports_and_calls(func):
 
         # Add sources of called functions
         for call in calls:
-            if call is "call_chatgpt":
-                breakpoint()
             func_source = get_function_source(call, tree)
             if func_source:
                 content += "\n" + func_source

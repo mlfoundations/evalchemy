@@ -29,9 +29,9 @@ operators:
     config:
       type: function
       sharded: True
-      function: data_strategies.OpenGPT.utils.create_health_az_table
+      function: data_strategies.OpenGPT.utils.add_annotations
       function_config:
-        config_path: external_repositories/OpenGPT/OpenGPT/configs/openhermes_regneration.yaml
+        config_path: "dcft/external_repositories/OpenGPT/configs/openhermes_regneration.yaml"
     input_ids:
       - create_health_az_table
 
@@ -44,4 +44,4 @@ operators:
         instruction_column: "prompt"
         completion_column: "completion"
     input_ids:
-      - parse_outputs
+      - add_annotations

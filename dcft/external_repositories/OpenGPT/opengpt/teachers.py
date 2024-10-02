@@ -1,7 +1,9 @@
-import openai
+from openai import OpenAI
+
+client = OpenAI()
 
 def ask_openai(prompt, config):
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model = config.teacher.model,
         messages = [
             {"role": "user", "content": prompt},
@@ -9,7 +11,7 @@ def ask_openai(prompt, config):
     )
 
     message = None
-    if response['choices'][0]['finish_reason'] == 'stop':
-        message = response['choices'][0]['message']['content']
+    if response.choices[0].finish_reason == 'stop':
+        message = response.choices[0].message.content
 
     return message

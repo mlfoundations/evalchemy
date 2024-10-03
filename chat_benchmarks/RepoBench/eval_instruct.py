@@ -195,7 +195,8 @@ def evaluate(results: Dict[str, tempfile.TemporaryDirectory]) -> Dict[str, str]:
 
                 print(f"Language: {lang}, Subset: {subset} with {len(data)} data points")
                 print(f"EM: {em_model}, ES: {es_model}")
-                evaluation_results[f"{lang}_{subset}"] = f"EM: {em_model}, ES: {es_model}"
+                evaluation_results[f"{lang}_{subset}_EM"] = em_model
+                evaluation_results[f"{lang}_{subset}_ES"] = es_model
                 print("-" * 30)
 
         # calculate the weighted averages
@@ -205,8 +206,8 @@ def evaluate(results: Dict[str, tempfile.TemporaryDirectory]) -> Dict[str, str]:
 
             print("Weighted Averages:")
             print(f"Language: {lang}, EM: {avg_em_model}, ES: {avg_es_model}\n")
-            evaluation_results[f"{lang}_weighted_avg"] = f"EM: {em_model}, ES: {es_model}"
-
+            evaluation_results[f"{lang}_weighted_avg_EM"] = avg_em_model
+            evaluation_results[f"{lang}_weighted_avg_EM"] = avg_es_model
         else:
             print("No data points were found for evaluation.")
 

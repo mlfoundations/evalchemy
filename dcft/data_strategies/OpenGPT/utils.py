@@ -200,9 +200,8 @@ def parse_data(dataset: Dataset, instruction_column: str, completion_column: str
     def func(example):
         all_results = extract_prompt_completion(example['text'])
         
-        example[instruction_column] = all_results[0]
-        example[completion_column] = all_results[1]
+        example[instruction_column] = all_results[0][0]
+        example[completion_column] = all_results[1][0]
         return example
-
     dataset = dataset.map(func)
     return dataset

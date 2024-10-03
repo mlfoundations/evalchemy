@@ -207,7 +207,7 @@ def evaluate(results: Dict[str, tempfile.TemporaryDirectory]) -> Dict[str, str]:
             print("Weighted Averages:")
             print(f"Language: {lang}, EM: {avg_em_model}, ES: {avg_es_model}\n")
             evaluation_results[f"{lang}_weighted_avg_EM"] = avg_em_model
-            evaluation_results[f"{lang}_weighted_avg_EM"] = avg_es_model
+            evaluation_results[f"{lang}_weighted_avg_ES"] = avg_es_model
         else:
             print("No data points were found for evaluation.")
 

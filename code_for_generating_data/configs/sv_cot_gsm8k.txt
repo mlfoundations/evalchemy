@@ -1,0 +1,160 @@
+You are an AI assistant to help me solve math problem.
+I first give you an original question with an unknown variable x, You help me determine the value of x.
+Follow the given examples and answer the question.
+
+Question: Randy has 60 mango trees on his farm. He also has x less than half as many coconut trees as mango trees. Randy has 85 trees in all on his farm. What is the value of unknown variable x?
+A: Let's think step by step.
+To solve this problem, we need to set up an equation based on the given information and then solve for the unknown variable x.
+Let's break down the information given:
+Randy has 60 mango trees.
+Randy has x less than half as many coconut trees as mango trees.
+Randy has 85 trees in total.
+We can set up the equation as follows:
+Number of mango trees + Number of coconut trees = Total number of trees
+60 + (60/2 - x) = 85
+Let's simplify and solve for x:
+60 + 30 - x = 85
+90 - x = 85
+To isolate x, we subtract 90 from both sides of the equation:
+90 - x - 90 = 85 - 90
+-x = -5
+Finally, we multiply both sides of the equation by -1 to solve for x:
+x = 5
+The value of x is 5.
+
+Question: Joy can read 8 pages of a book in 20 minutes. It will take her 5 hours to read x pages. What is the value of unknown variable x?
+A: Let's think step by step.
+To solve this problem, we need to determine the value of x, which represents the number of pages Joy will read in 5 hours.
+We know that Joy can read 8 pages in 20 minutes. Let's find out how many pages she can read in 1 minute:
+8 pages / 20 minutes = 0.4 pages per minute
+Now, let's calculate how many pages Joy can read in 5 hours:
+5 hours = 5 * 60 = 300 minutes
+0.4 pages per minute * 300 minutes = 120 pages
+Therefore, the value of the unknown variable x is 120. Joy will read 120 pages in 5 hours.
+The value of x is 120.
+
+Question: In a truck, there are 26 pink hard hats, 15 green hard hats, and 24 yellow hard hats. If Carl takes away 4 pink hard hats, and John takes away x pink hard hats and twice as many green hard hats as the number of pink hard hats that he removed, The total number of hard hats that remained in the truck is 43. What is the value of unknown variable x?
+A: Let's think step by step.
+To solve this problem, we need to set up an equation based on the given information and then solve for the unknown variable x.
+Let's break down the information given:
+Number of pink hard hats: 26 - 4 (Carl takes away 4 pink hard hats)
+Number of green hard hats: 15
+Number of yellow hard hats: 24
+Total number of hard hats: 43
+We can set up the equation as follows:
+Number of pink hard hats - (x + 2x) + Number of green hard hats + Number of yellow hard hats = Total number of hard hats
+26 - 4 - (x + 2x) + 15 + 24 = 43
+Let's simplify and solve for x:
+22 - 3x + 15 + 24 = 43
+61 - 3x = 43
+To isolate x, we subtract 61 from both sides of the equation:
+61 - 3x - 61 = 43 - 61
+-3x = -18
+Finally, we divide both sides of the equation by -3 to solve for x:
+x = -18 / -3
+x = 6
+The value of x is 6.
+
+Question: Each bird eats 12 beetles per day, each snake eats 3 birds per day, and each jaguar eats 5 snakes per day. If there are x jaguars in a forest, 1080 beetles are eaten each day. What is the value of unknown variable x?
+A: Let's think step by step.
+To solve this problem, we need to determine the value of x, which represents the number of jaguars in the forest.
+Let's break down the information given:
+Number of beetles eaten by each bird per day: 12
+Number of birds eaten by each snake per day: 3
+Number of snakes eaten by each jaguar per day: 5
+Total number of beetles eaten per day: 1080
+We can set up the equation as follows:
+Number of beetles eaten by each bird per day * Number of birds eaten by each snake per day * Number of snakes eaten by each jaguar per day * Number of jaguars = Total number of beetles eaten per day
+12 * 3 * 5 * x = 1080
+Let's simplify and solve for x:
+12 * 3 * 5 * x = 1080
+180x = 1080
+To isolate x, we divide both sides of the equation by 180:
+180x / 180 = 1080 / 180
+x = 6
+The value of x is 6.
+
+Question: Mr. Sam shared a certain amount of money between his two sons, Ken and Tony. If Ken got x, and Tony got twice as much as Ken, the money was shared 5250. What is the value of unknown variable x?
+A: Let's think step by step.
+To solve this problem, we need to determine the value of x, which represents the amount of money Ken received from Mr. Sam.
+We know that Tony received twice as much money as Ken. Therefore, Tony received 2x.
+The total amount of money shared between Ken and Tony is 5250.
+We can set up the equation as follows:
+Amount of money Ken received + Amount of money Tony received = Total amount of money shared
+x + 2x = 5250
+Let's simplify and solve for x:
+3x = 5250
+To isolate x, we divide both sides of the equation by 3:
+3x / 3 = 5250 / 3
+x = 1750
+The value of x is 1750.
+
+Question: It's Ava's birthday party. Her parents bought a unicorn piñata for $13 and filled it with all of her favorite treats. They bought 4 bags of Reese's for $9 per bag, 3 bags of Snickers for $5 per bag, and 5 bags of Skittles for x per bag. The unicorn piñata and the treats cost 99 altogether. What is the value of unknown variable x?
+A: Let's think step by step.
+To solve this problem, we need to determine the value of x, which represents the cost of each bag of Skittles.
+Let's break down the information given:
+Cost of the unicorn piñata: $13
+Number of bags of Reese's: 4
+Cost per bag of Reese's: $9
+Number of bags of Snickers: 3
+Cost per bag of Snickers: $5
+Number of bags of Skittles: 5
+Cost per bag of Skittles: x
+Total cost of the unicorn piñata and treats: $99
+We can set up the equation as follows:
+Cost of the unicorn piñata + (Number of bags of Reese's * Cost per bag of Reese's) + (Number of bags of Snickers * Cost per bag of Snickers) + (Number of bags of Skittles * Cost per bag of Skittles) = Total cost of the unicorn piñata and treats
+$13 + (4 * $9) + (3 * $5) + (5 * x) = $99
+Let's simplify and solve for x:
+$13 + $36 + $15 + 5x = $99
+$64 + 5x = $99
+To isolate x, we subtract $64 from both sides of the equation:
+$64 - $64 + 5x = $99 - $64
+5x = $35
+To solve for x, we divide both sides of the equation by 5:
+x = $35 / 5
+x = $7
+The value of x is $7.
+
+Question: Liza bought x kilograms of butter to make cookies. She used one-half of it for chocolate chip cookies, one-fifth of it for peanut butter cookies, and one-third of the remaining butter for sugar cookies. There are 2 kilograms of butter left after making those three kinds of cookies. What is the value of unknown variable x?
+A: Let's think step by step.
+To solve this problem, we need to determine the value of x, which represents the initial amount of butter Liza bought in kilograms.
+Let's break down the information given:
+Amount of butter used for chocolate chip cookies: 1/2x
+Amount of butter used for peanut butter cookies: 1/5x
+Amount of butter used for sugar cookies: 1/3 * (x - (1/2x + 1/5x))
+Amount of butter left: 2 kilograms
+We can set up the equation as follows:
+Amount of butter used for chocolate chip cookies + Amount of butter used for peanut butter cookies + Amount of butter used for sugar cookies + Amount of butter left = Initial amount of butter
+1/2x + 1/5x + 1/3 * (x - (1/2x + 1/5x)) + 2 = x
+Let's simplify and solve for x:
+(5/10)x + (2/10)x + (1/3)(x - (7/10)x) + 2 = x
+(7/10)x + (1/3)(3/10)x + 2 = x
+(7/10)x + (1/10)x + 2 = x
+(8/10)x + 2 = x
+To isolate x, we subtract (8/10)x from both sides of the equation:
+(8/10)x - (8/10)x + 2 = x - (8/10)x
+2 = (2/10)x
+To solve for x, we multiply both sides of the equation by 10/2:
+2 * (10/2) = (2/10)x * (10/2)
+10 = x
+The value of x is 10.
+
+Question: Carly collected x starfish with 5 arms each and one seastar with 14 arms. The animals she collected have 49 arms in total. What is the value of unknown variable x?
+A: Let's think step by step.
+To solve this problem, we need to determine the value of x, which represents the number of starfish with 5 arms that Carly collected.
+Let's break down the information given:
+Number of starfish with 5 arms: x
+Number of seastars with 14 arms: 1
+Total number of arms: 49
+We can set up the equation as follows:
+Number of starfish with 5 arms * Number of arms per starfish + Number of seastars with 14 arms * Number of arms per seastar = Total number of arms
+x * 5 + 1 * 14 = 49
+Let's simplify and solve for x:
+5x + 14 = 49
+To isolate x, we subtract 14 from both sides of the equation:
+5x + 14 - 14 = 49 - 14
+5x = 35
+To solve for x, we divide both sides of the equation by 5:
+x = 35 / 5
+x = 7
+The value of x is 7.

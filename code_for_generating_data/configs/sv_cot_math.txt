@@ -1,0 +1,139 @@
+You are an AI assistant to help me solve math problem.
+I first give you an original question with an unknown variable $X$, You help me determine the value of $X$.
+Follow the given examples and answer the question.
+
+Question: On a map, a 12-centimeter length represents $X$ kilometers.  A 17-centimeter length represents 102 kilometers. What is the value of unknown variable $X$?
+A: Let's think step by step.
+To solve this problem, we need to determine the value of X, which represents the number of kilometers represented by a 12-centimeter length on the map.
+We know that a 17-centimeter length represents 102 kilometers. Let's find out the ratio of kilometers to centimeters:
+102 kilometers / 17 centimeters = 6 kilometers per centimeter
+Now, we can calculate the value of X:
+12 centimeters * 6 kilometers per centimeter = 72 kilometers
+Therefore, the value of the unknown variable X is 72 kilometers.
+The value of X is 72.
+
+Question: If the sum of the squares of nonnegative real numbers $a,b,$ and $c$ is $39$, and $ab + bc + ca = X$, the sum of $a$, $b$, and $c$ is 9. What is the value of unknown variable $X$?
+A: Let's think step by step.
+We know that the sum of the squares of the three nonnegative real numbers is 39:
+a^2 + b^2 + c^2 = 39
+We also know that the sum of the three numbers is 9:
+a + b + c = 9
+To find the value of X, which represents the value of ab + bc + ca, we can use the following identity:
+(a + b + c)^2 = a^2 + b^2 + c^2 + 2(ab + bc + ca)
+Substituting the given values:
+9^2 = 39 + 2X
+81 = 39 + 2X
+2X = 81 - 39
+2X = 42
+X = 42 / 2
+X = 21
+The value of X is 21.
+
+Question: The mean of $5,8$ and $17$ is equal to the mean of $X$ and $y$. The value of $y$ is 8. What is the value of unknown variable $X$?
+A: Let's think step by step.
+We are given that the mean of 5, 8, and 17 is equal to the mean of X and y. We know that y is equal to 8. Let's denote the mean of X and 8 as M.
+The mean of 5, 8, and 17 is given by:
+(5 + 8 + 17) / 3 = 30 / 3 = 10
+We are told that this mean is equal to the mean of X and 8, so we can set up the equation:
+M = (X + 8) / 2
+Since M is equal to 10, we can substitute it into the equation:
+10 = (X + 8) / 2
+To solve for X, we can multiply both sides of the equation by 2:
+20 = X + 8
+Subtracting 8 from both sides gives us:
+X = 20 - 8
+X = 12
+The value of X is 12.
+
+Question: A taxi ride costs \\$1.50$ plus $\\$0.25$ per mile traveled.  How much, in dollars, a $X$ mile taxi ride costs 2.75. What is the value of unknown variable $X$?
+A: Let's think step by step.
+We are given that a taxi ride costs $1.50 plus $0.25 per mile traveled. Let's denote the cost of a taxi ride as C and the number of miles traveled as X.
+According to the given information, the cost C can be calculated using the formula:
+C = $1.50 + $0.25X
+We are also given that the cost of a taxi ride is $2.75. We can set up the equation:
+$2.75 = $1.50 + $0.25X
+To solve for X, we can subtract $1.50 from both sides of the equation:
+$2.75 - $1.50 = $0.25X
+Simplifying the left side gives us:
+$1.25 = $0.25X
+To isolate X, we can divide both sides of the equation by $0.25:
+$1.25 / $0.25 = X
+Simplifying the left side gives us:
+5 = X
+The value of X is 5.
+
+Question: There are 6 ways to put 5 balls in $X$ boxes if the balls are not distinguishable but the boxes are. What is the value of unknown variable $X$?
+A: Let's think step by step.
+We are given that there are 6 ways to put 5 balls in X boxes, where the balls are not distinguishable but the boxes are.
+To solve for X, we need to find the number of ways to distribute the balls among the boxes.
+This problem can be solved using a combinatorial approach, specifically using stars and bars.
+Since the balls are not distinguishable, we can think of them as stars. We need to distribute these stars among the X boxes, which can be represented by bars.
+To distribute 5 stars among X boxes, we need X-1 bars to separate the boxes.
+So, we have a total of 5 stars and X-1 bars, which gives us a total of 5 + (X-1) = X + 4 objects.
+We need to select the positions of the stars among the X + 4 objects, which can be done in (X + 4 choose 5) ways.
+Given that there are 6 ways to put the balls in the boxes, we can equate it to the calculated number of ways:
+(X + 4 choose 5) = 6
+To find the value of X, we can try different values until we find a combination that satisfies the equation.
+By testing different values, we find that X = 2 satisfies the equation:
+(2 + 4 choose 5) = 6
+(6 choose 5) = 6
+6 = 6
+The value of X is 2.
+
+Question: If $x - y = X$ and $x + y = 6$, The value of $y$ is -3. What is the value of unknown variable $X$?
+A: Let's think step by step.
+We are given that x - y = X and x + y = 6. We also know that y is equal to -3.
+We need to find the value of X, which represents the difference between x and y.
+To solve this, we can add the two given equations together:
+(x - y) + (x + y) = X + 6
+Simplifying the left side gives us:
+2x = X + 6
+To isolate X, we can subtract 6 from both sides of the equation:
+2x - 6 = X
+Since we know that y is equal to -3, we can substitute it into the equation x + y = 6:
+x + (-3) = 6
+Simplifying gives us:
+x - 3 = 6
+To solve for x, we can add 3 to both sides of the equation:
+x = 6 + 3
+x = 9
+Now we can substitute the value of x into the equation 2x - 6 = X:
+2(9) - 6 = X
+18 - 6 = X
+12 = X
+The value of X is 12.
+
+Question: The sum of the first $X$ odd positive integers is 100. What is the value of unknown variable $X$?
+A: Let's think step by step.
+We are given that the sum of the first X odd positive integers is 100.
+The sum of the first X odd positive integers can be calculated using the formula:
+Sum = X^2
+We need to find the value of X that makes the sum equal to 100.
+Setting up the equation:
+X^2 = 100
+To solve for X, we can take the square root of both sides of the equation:
+sqrt(X^2) = sqrt(100)
+Simplifying gives us:
+X = 10
+The value of X is 10.
+
+Question: The sum of two numbers is $X$. Their difference is $4$. The larger of the two numbers is 17. What is the value of unknown variable $X$?
+A: Let's think step by step.
+We are given that the sum of two numbers is X and their difference is 4. We also know that the larger of the two numbers is 17.
+Let's denote the two numbers as A and B, where A is the larger number.
+From the given information, we can set up two equations:
+A + B = X (equation 1)
+A - B = 4 (equation 2)
+We know that A is equal to 17, so we can substitute it into equation 2:
+17 - B = 4
+To solve for B, we can subtract 17 from both sides of the equation:
+-B = 4 - 17
+-B = -13
+Multiplying both sides by -1 gives us:
+B = 13
+Now we can substitute the value of B into equation 1 to find X:
+A + 13 = X
+Substituting A = 17, we get:
+17 + 13 = X
+30 = X
+The value of X is 30.

@@ -1,0 +1,26 @@
+You are an AI assistant to help me rewrite question into a declarative statement when its answer is provided.
+Follow the given examples and rewrite the question.
+
+Question: How many cars are in the parking lot? The answer is 5.
+Result: There are 5 cars in the parking lot.
+
+Question: How many trees did the grove workers plant today? The answer is 6.
+Result: The grove workers planted 6 trees today.
+
+Question: If they ate 35, how many pieces do they have left in total? The answer is 39.
+Result: They have 39 pieces left in total if they ate 35.
+
+Question: How many lollipops did Jason give to Denny? The answer is 8.
+Result: Jason gave 8 lollipops to Denny.
+
+Question: How many toys does he have now? The answer is 9.
+Result: He now has 9 toys.
+
+Question: How many computers are now in the server room? The answer is 29.
+Result: There are 29 computers now in the server room.
+
+Question: How many golf balls did he have at the end of wednesday? The answer is 33.
+Result: He had 33 golf balls at the end of Wednesday.
+
+Question: How much money does she have left? The answer is 8.
+Result: She has 8 money left.

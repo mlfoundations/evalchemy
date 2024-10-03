@@ -1,0 +1,26 @@
+You are an AI assistant to help me rewrite question into a declarative statement when its answer is provided.
+Follow the given examples and rewrite the question.
+
+Question: what is the largest possible value of $|x|+|y|$? The answer is \sqrt{2}.
+Result: The largest possible value of $|x| + |y|$ is \sqrt{2}.
+
+Question: How far has he hopped after five hops? The answer is \frac{211}{243}}.
+Result: He has hopped \frac{211}{243} after five hops.
+
+Question: What is the area of the region defined by the equation $x^2+y^2 - 7 = 4y-14x+3$? The answer is 63\pi.
+Result: The area of the region defined by the equation $x^2+y^2 - 7 = 4y-14x+3$ is 63\pi.
+
+Question: what is the value of $a+d$? The answer is 0.
+Result: The value of $a+d$ is 0.
+
+Question: What is the smallest number of homework assignments necessary to earn a total of 25 homework points? The answer is 75.
+Result: The smallest number of homework assignments necessary to earn a total of 25 homework points is 75.
+
+Question: What is the value of $n/p?$? The answer is 8.
+Result: The value of $n/p$ is 8.
+
+Question: Expand $(2z^2 + 5z - 6)(3z^3 - 2z + 1)$. The answer is 6z^5+15z^4-22z^3-8z^2+17z-6}.
+Result: The expansion of $(2z^2 + 5z - 6)(3z^3 - 2z + 1)$ is $6z^5 + 15z^4 - 22z^3 - 8z^2 + 17z - 6$.
+
+Question: Find the mean of all solutions for $x$ when $x^3 + 3x^2 - 10x = 0$. The answer is -1.
+Result: The mean of all solutions for $x$ when $x^3 + 3x^2 - 10x = 0$ is -1.

@@ -1,0 +1,98 @@
+You are an AI assistant to help me solve math problem.
+I first give you an original question with an unknown variable x, then I give you the answer to this original question.
+You help me determine the value of x.
+Follow the given examples and answer the question.
+
+Question: Randy has 60 mango trees on his farm. He also has x less than half as many coconut trees as mango trees. How many trees does Randy have in all on his farm?
+If we know the answer to the above question is 85, what is the value of unknown variable x?
+A: Let's think step by step.
+We know that Randy has 60 mango trees on his farm.
+We also know that he has x less than half as many coconut trees as mango trees. Let's use C to represent the number of coconut trees.
+So we can write: C = (1/2)*60 - x = 30 - x
+The total number of trees on Randy's farm is the sum of the number of mango trees and coconut trees: 60 + (30 - x) = 90 - x.
+We are given that the total number of trees on Randy's farm is 85, so we can write: 90 - x = 85
+Solving for x, we get: x = 5.
+The value of x is 5.
+
+Question: Joy can read 8 pages of a book in 20 minutes. How many hours will it take her to read x pages?
+If we know the answer to the above question is 5, what is the value of unknown variable x?
+A: Let's think step by step.
+We know that Joy can read 8 pages of a book in 20 minutes, or 8/20 pages per minute.
+To find out how many minutes it will take her to read x pages, we can use the formula:
+time = (number of pages) / (pages per minute)
+Substituting 8/20 for "pages per minute", we get:
+time = x / (8/20) = (20/8) * x = 2.5x
+We are given that the time it takes Joy to read x pages is 5 hours, or 300 minutes, so we can write: 2.5x = 300
+Solving for x, we get: x = 120.
+The value of x is 120.
+
+Question: In a truck, there are 26 pink hard hats, 15 green hard hats, and 24 yellow hard hats. If Carl takes away 4 pink hard hats, and John takes away x pink hard hats and twice as many green hard hats as the number of pink hard hats that he removed, then calculate the total number of hard hats that remained in the truck.
+If we know the answer to the above question is 43, what is the value of unknown variable x?
+A: Let's think step by step.
+We start with a total of 26 + 15 + 24 = 65 hard hats in the truck.
+Carl takes away 4 pink hard hats, leaving 26 - 4 = 22 pink hard hats.
+John takes away x pink hard hats and twice as many green hard hats as the number of pink hard hats he removed, which means he takes away 2x green hard hats.
+After John takes away the hard hats, the number of pink hard hats remaining is 22 - x, the number of green hard hats remaining is 15 - 2x, and the number of yellow hard hats remaining is still 24.
+The total number of hard hats remaining in the truck is the sum of the remaining pink, green, and yellow hard hats: (22 - x) + (15 - 2x) + 24 = 61 - 3x.
+We are given that the total number of hard hats remaining in the truck is 43, so we can write: 61 - 3x = 43.
+Solving for x, we get: x = 6.
+The value of x is 6.
+
+Question: Each bird eats 12 beetles per day, each snake eats 3 birds per day, and each jaguar eats 5 snakes per day. If there are x jaguars in a forest, how many beetles are eaten each day?
+If we know the answer to the above question is 1080, what is the value of unknown variable x?
+A: Let's think step by step.
+We know that each bird eats 12 beetles per day.
+We also know that each snake eats 3 birds per day, which means each snake eats 3 * 12 = 36 beetles per day.
+Similarly, each jaguar eats 5 snakes per day, which means each jaguar eats 5 * 36 = 180 beetles per day.
+If there are x jaguars in the forest, then the total number of beetles eaten per day is x * 180.
+We are given that the total number of beetles eaten per day is 1080, so we can write: x * 180 = 1080.
+Dividing both sides by 180, we get: x = 6.
+The value of x is 6.
+
+Question: Mr. Sam shared a certain amount of money between his two sons, Ken and Tony. If Ken got x, and Tony got twice as much as Ken, how much was the money shared?
+If we know the answer to the above question is 5250, what is the value of unknown variable x?
+A: Let's think step by step.
+We know that Tony got twice as much as Ken, which means Tony got 2x.
+The total amount of money shared is the sum of what Ken and Tony got: x + 2x = 3x.
+We are given that the total amount of money shared is 5250, so we can write: 3x = 5250.
+Dividing both sides by 3, we get: x = 1750.
+The value of x is 1750.
+
+Question: It's Ava's birthday party. Her parents bought a unicorn piñata for $13 and filled it with all of her favorite treats. They bought 4 bags of Reese's for $9 per bag, 3 bags of Snickers for $5 per bag, and 5 bags of Skittles for x per bag. How much did the unicorn piñata and the treats cost altogether?
+If we know the answer to the above question is 99, what is the value of unknown variable x?
+A: Let's think step by step.
+The unicorn piñata cost $13.
+The cost of the Reese's is 4 * $9 = $36.
+The cost of the Snickers is 3 * $5 = $15.
+Let's find the cost of the Skittles. We know that there are 5 bags of Skittles, and each bag costs x. So the total cost of the Skittles is 5x.
+The total cost of everything is the sum of the cost of the piñata and the cost of the treats: $13 + $36 + $15 + 5x.
+We are given that the total cost is $99, so we can write: $13 + $36 + $15 + 5x = $99.
+Simplifying the left side, we get: $64 + 5x = $99.
+Subtracting $64 from both sides, we get: 5x = $35.
+Dividing both sides by 5, we get: x = $7.
+The value of x is $7.
+
+Question: Liza bought x kilograms of butter to make cookies. She used one-half of it for chocolate chip cookies, one-fifth of it for peanut butter cookies, and one-third of the remaining butter for sugar cookies. How many kilograms of butter are left after making those three kinds of cookies?
+If we know the answer to the above question is 2, what is the value of unknown variable x?
+A: Let's think step by step.
+Liza bought x kilograms of butter.
+She used one-half of it for chocolate chip cookies, which means she used (1/2)*x kilograms of butter for chocolate chip cookies.
+She used one-fifth of it for peanut butter cookies, which means she used (1/5)*x kilograms of butter for peanut butter cookies.
+The total amount of butter used for these two kinds of cookies is: (1/2)*x + (1/5)*x = (5/10)*x + (2/10)*x = (7/10)*x.
+The remaining amount of butter is: x - (7/10)*x = (3/10)x.
+She used one-third of the remaining butter for sugar cookies, which means she used (1/3)(3/10)*x = (1/10)*x kilograms of butter for sugar cookies.
+The amount of butter left after making all three kinds of cookies is: (3/10)*x - (1/10)*x = (2/10)*x = 0.2x.
+We are given that the amount of butter left is 2 kilograms, so we can write: 0.2x = 2.
+Solving for x, we get: x = 10.
+The value of x is 10.
+
+Question: Carly collected x starfish with 5 arms each and one seastar with 14 arms. How many arms do the animals she collected have in total?
+If we know the answer to the above question is 49, what is the value of unknown variable x?
+A: Let's think step by step.
+Carly collected x starfish with 5 arms each, which means the starfish have a total of 5x arms.
+She also collected one seastar with 14 arms.
+The total number of arms is the sum of the number of arms of the starfish and the seastar: 5x + 14.
+We are given that the total number of arms is 49, so we can write: 5x + 14 = 49.
+Subtracting 14 from both sides, we get: 5x = 35.
+Dividing both sides by 5, we get: x = 7.
+The value of x is 7.

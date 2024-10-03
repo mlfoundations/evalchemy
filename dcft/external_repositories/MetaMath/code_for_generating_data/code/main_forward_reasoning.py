@@ -22,7 +22,7 @@ ds_path_dict = {
 
 
 class ForwardReasoning():
-    def __init__(self, args):
+    def __init__(self, args, dataset):
         self.args = args
         self.ds_name = args.ds
         self.temperature = args.temp
@@ -39,11 +39,9 @@ class ForwardReasoning():
                                       f"{ds_path_dict[self.ds_name]}_{self.method_name}_answer_{self.get_eng()}_{self.part}.json")
         self.save_stat_file = os.path.join(PathUtils.DATA_HOME_PATH,
                                            f"{ds_path_dict[self.ds_name]}_{self.method_name}_answer_{self.get_eng()}_{self.part}_stat.json")
-        if not args.cont:
-            with open(self.json_file) as f:
-                self.examples = json.load(f)
-                self.examples = np.repeat(self.examples, self.num_repeat).tolist()
-            self.save_data()
+        self.examples = [dict(row) for row in dataset]
+
+        self.examples = np.repeat(self.examples, self.num_repeat).tolist()
 
         with open(self.save_file) as f:
             self.examples = json.load(f)
@@ -99,8 +97,7 @@ class ForwardReasoning():
             del e['pred_answer_cleaned_list']
             stat_list.append(e)
 
-        with open(self.save_stat_file, 'w', encoding='utf-8') as f:
-            json.dump(stat_list, f, ensure_ascii=False, indent=4)
+        return stat_list
 
     def evaluate(self, end_idx):
         result_stat_dict = {}
@@ -156,12 +153,12 @@ class ForwardReasoning():
                 self.logger.info(
                     "=" * 20 + f"processed: {i}/{len(self.examples)}, acc: {num_correct}/{num_examples}={100 * acc:.2f}")
 
-        self.save_ans_stat()
+        return self.save_ans_stat()
 
 
 class SCComplexCoT(ForwardReasoning):
-    def __init__(self, args):
-        super(SCComplexCoT, self).__init__(args=args)
+    def __init__(self, args, dataset):
+        super(SCComplexCoT, self).__init__(args=args, dataset=dataset)
 
     def get_method_name(self):
         return "SCComplexCoT"

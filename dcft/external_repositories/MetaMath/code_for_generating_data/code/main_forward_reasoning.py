@@ -22,7 +22,7 @@ ds_path_dict = {
 
 
 class ForwardReasoning():
-    def __init__(self, args):
+    def __init__(self, args, dataset):
         self.args = args
         self.ds_name = args.ds
         self.temperature = args.temp
@@ -39,14 +39,10 @@ class ForwardReasoning():
                                       f"{ds_path_dict[self.ds_name]}_{self.method_name}_answer_{self.get_eng()}_{self.part}.json")
         self.save_stat_file = os.path.join(PathUtils.DATA_HOME_PATH,
                                            f"{ds_path_dict[self.ds_name]}_{self.method_name}_answer_{self.get_eng()}_{self.part}_stat.json")
-        if not args.cont:
-            with open(self.json_file) as f:
-                self.examples = json.load(f)
-                self.examples = np.repeat(self.examples, self.num_repeat).tolist()
-            self.save_data()
-
-        with open(self.save_file) as f:
-            self.examples = json.load(f)
+        
+        self.examples = [dict(row) for row in dataset]
+        self.examples = np.repeat(self.examples, self.num_repeat).tolist()
+            
 
         if "GSM8K" in self.ds_name:
             self.prompt = self.get_prompt("ansaug_cot_gsm8k.txt")
@@ -160,8 +156,8 @@ class ForwardReasoning():
 
 
 class SCComplexCoT(ForwardReasoning):
-    def __init__(self, args):
-        super(SCComplexCoT, self).__init__(args=args)
+    def __init__(self, args, dataset):
+        super(SCComplexCoT, self).__init__(args=args, dataset=dataset)
 
     def get_method_name(self):
         return "SCComplexCoT"

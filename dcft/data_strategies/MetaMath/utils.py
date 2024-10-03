@@ -1,6 +1,7 @@
 from dcft.external_repositories.MetaMath.code_for_generating_data.code.main_create_backwards_question import MATH, GSM8K
 from dcft.external_repositories.MetaMath.code_for_generating_data.code.main_forward_reasoning import SCComplexCoT
-from dcft.external_repositories.MetaMath.code_for_generating_data.code 
+from dcft.external_repositories.MetaMath.code_for_generating_data.code.main_backward_reasoning import BackwardReasoning
+
 from datasets import Dataset, concatenate_datasets
 import pandas as pd
 from dataclasses import dataclass, field

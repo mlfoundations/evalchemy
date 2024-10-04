@@ -56,7 +56,7 @@ class FunctionOperatorConfig(OperatorSpecificConfig):
     function: str
     function_config: Dict[str, Any] = Field(default_factory=dict)
     sharded: bool = False
-    num_shards: int = 30
+    num_shards: int = 1
 
 
 class HFSourceOperatorConfig(OperatorSpecificConfig):

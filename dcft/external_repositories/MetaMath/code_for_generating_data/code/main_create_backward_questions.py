@@ -1,4 +1,3 @@
-import path_init
 import re
 import json
 import os
@@ -84,12 +83,13 @@ class InverseQuestions(ABC):
         print(f"has_inv_q: {num_example_has_backward_question}/{len(self.input_examples)}")
 
         self.save_data()
+        return self.output_examples
 
 
 class GSM8K(InverseQuestions):
     def __init__(self, args):
         self.ds_name = "GSM8K"
-        self.input_path = f"GSM8K/gsm8k_train"
+        self.input_path = f"gsm8k_train"
         super(GSM8K, self).__init__(args=args)
 
     def parse_examples(self):
@@ -194,7 +194,7 @@ class _MATH(InverseQuestions):
 class MATH(_MATH):
     def __init__(self, args):
         self.ds_name = "MATH"
-        self.input_path = f"MATH/MATH_train"
+        self.input_path = f"MATH_train"
         super(MATH, self).__init__(args=args)
 
 

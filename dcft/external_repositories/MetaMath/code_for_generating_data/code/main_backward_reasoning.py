@@ -27,7 +27,7 @@ string_number_dict = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six
 
 
 class BackwardReasoning():
-    def __init__(self, args):
+    def __init__(self, args, d):
         self.args = args
         self.ds_name = args.ds
         self.temperature = args.temp
@@ -122,6 +122,7 @@ class BackwardReasoning():
             return f"The value of {self.unknown_var} is"
 
     def fetch_data_from_openai(self):
+        breakpoint()
         def wrap(e):
             variable, special_token = (f"{self.unknown_var}", "") if "GSM8K" in self.ds_name else (f"${self.unknown_var}$", "### ")
             if self.method == "fobar":

@@ -1,6 +1,10 @@
-from dcft.external_repositories.MetaMath.code_for_generating_data.code.main_create_backwards_question import MATH, GSM8K
+import sys
+sys.path.append('dcft/external_repositories/MetaMath/code_for_generating_data/code')
+
+from dcft.external_repositories.MetaMath.code_for_generating_data.code.main_create_backward_questions import MATH, GSM8K
 from dcft.external_repositories.MetaMath.code_for_generating_data.code.main_forward_reasoning import SCComplexCoT
 from dcft.external_repositories.MetaMath.code_for_generating_data.code.main_backward_reasoning import BackwardReasoning
+from dcft.external_repositories.MetaMath.code_for_generating_data.code.main_rephrase_question import RephraseQuestion
 
 from datasets import Dataset, concatenate_datasets
 import pandas as pd
@@ -20,10 +24,16 @@ class Config:
     time_out: int = 30
     num_proc: int = 16
 
-def generate_backwards_questions() -> Dataset:
-    math_dataset = MATH().make_inv_question()
-    gsm8k_dataset = GSM8K().make_inv_question()
-    return concatenate_datasets([math_dataset, gsm8k_dataset])
+def generate_backwards_questions(_: Dataset) -> Dataset:
+    
+    args = Config()
+    math_dataset = MATH(args).make_inv_question()
+    gsm8k_dataset = GSM8K(args).make_inv_question()
+    mathdf = pd.DataFrame(math_dataset)
+    gsm8kdf = pd.DataFrame(gsm8k_dataset)
+    dataset = concatenate_datasets([Dataset.from_pandas(mathdf),  Dataset.from_pandas(gsm8kdf)])
+    dataset = dataset.select(list(range(30)))
+    return dataset
 
 def generate_forward_questions(dataset: Dataset) -> Dataset:
     args = Config()
@@ -36,7 +46,20 @@ def generate_forward_questions(dataset: Dataset) -> Dataset:
     df = pd.DataFrame(all_examples)
     
     # Convert pandas DataFrame to Hugging Face Dataset
-    return Dataset.from_pandas(df)
-    
+    dataset =  Dataset.from_pandas(df)
+    return dataset
+
 
 def rephrase_questions(dataset: Dataset) -> Dataset:
+    args = Config()
+    all_examples = []
+    for method in ["GSM8K", "MATH"]:
+        args.ds = method
+        method = RephraseQuestion(args, dataset)
+        all_examples.extend(method.fetch_data_from_openai())
+
+    df = pd.DataFrame(all_examples)
+    
+    dataset =  Dataset.from_pandas(df)
+    dataset = dataset.select(list(range(30)))
+    return dataset

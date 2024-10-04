@@ -52,24 +52,25 @@ class SyntheticDataManager:
                 for file in os.listdir(strategy_path):
                     if file.endswith(".yaml"):
                         config_path = os.path.join(strategy_path, file)
-                        try:
-                            if check_dataset_mix_in_yaml(config_path):
-                                framework = DatasetHandler.from_config(
-                                    config_path,
-                                    cache_dir=self.cache_dir,
-                                    fs=fsspec.filesystem(self.fs_type),
-                                    overwrite_cache=self.overwrite_cache,
-                                )
-                            else:
-                                framework = SyntheticDataFramework.from_config(
-                                    config_path,
-                                    cache_dir=self.cache_dir,
-                                    fs=fsspec.filesystem(self.fs_type),
-                                    overwrite_cache=self.overwrite_cache,
-                                )
-                        except:
-                            print(f"Could not load from {config_path}")
-                            continue
+                        
+                        if check_dataset_mix_in_yaml(config_path):
+                            framework = DatasetHandler.from_config(
+                                config_path,
+                                cache_dir=self.cache_dir,
+                                fs=fsspec.filesystem(self.fs_type),
+                                overwrite_cache=self.overwrite_cache,
+                            )
+                        else:
+                            framework = SyntheticDataFramework.from_config(
+                                config_path,
+                                cache_dir=self.cache_dir,
+                                fs=fsspec.filesystem(self.fs_type),
+                                overwrite_cache=self.overwrite_cache,
+                            )
+                        # except:
+                        #     breakpoint()
+                        #     print(f"Could not load from {config_path}")
+                        #     continue
                         if framework.name in frameworks:
                             raise ValueError(f"Invalid name: {framework.name} is duplicated")
                         frameworks[framework.name] = framework

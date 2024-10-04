@@ -18,7 +18,7 @@ ds_path_dict = {
 
 
 class RephraseQuestion():
-    def __init__(self, args):
+    def __init__(self, args, dataset):
         self.args = args
         self.ds_name = args.ds
         self.temperature = args.temp
@@ -32,14 +32,8 @@ class RephraseQuestion():
         self.save_file = os.path.join(PathUtils.DATA_HOME_PATH,
                                       f"{ds_path_dict[self.ds_name]}_rephrased_questions.json")
 
-        if not args.cont:
-            with open(self.json_file) as f:
-                self.examples = json.load(f)
-                self.examples = np.repeat(self.examples, self.num_repeat).tolist()
-            self.save_data()
-
-        with open(self.save_file) as f:
-            self.examples = json.load(f)
+        self.examples = [dict(row) for row in dataset]
+        self.examples = np.repeat(self.examples, self.num_repeat).tolist()
 
         if "GSM8K" in self.ds_name:
             self.prompt = self.get_prompt(f"rephrase_cot_gsm8k.txt")
@@ -99,6 +93,7 @@ class RephraseQuestion():
 
                 self.logger.info("=" * 40 + f"processed: {i}/{len(self.examples)}")
         self.logger.info("Finished.")
+        return self.examples
 
 
 if __name__ == "__main__":

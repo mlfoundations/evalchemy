@@ -8,7 +8,7 @@ class PathUtils(object):
     def __init__(self):
         pass
 
-    HOME_PATH = ""
+    HOME_PATH = "dcft/external_repositories/MetaMath/code_for_generating_data"
     DATA_HOME_PATH = os.path.join(HOME_PATH, "data")
     Log_HOME_PATH = os.path.join(HOME_PATH, "log")
     CONFIG_HOME_PATH = os.path.join(HOME_PATH, "configs")
@@ -16,6 +16,7 @@ class PathUtils(object):
 
     @staticmethod
     def set_path():
+        PathUtils.HOME_PATH = "dcft/external_repositories/MetaMath/code_for_generating_data"
         PathUtils.DATA_HOME_PATH = os.path.join(PathUtils.HOME_PATH, "data")
         PathUtils.Log_HOME_PATH = os.path.join(PathUtils.HOME_PATH, "log")
         PathUtils.CONFIG_HOME_PATH = os.path.join(PathUtils.HOME_PATH, "configs")

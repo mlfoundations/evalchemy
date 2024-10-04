@@ -9,6 +9,24 @@ operators:
         - instruction
         - output
       num_truncate: 5
-  - id: 
-  
-    
+  - id: generate_backwards_questions
+    config:
+      type: function
+      function: data_strategies.MetaMath.utils.generate_backwards_questions
+    input_ids:
+      - load_alpaca
+  - id: rephrase_questions
+    config:
+      type: function
+      sharded: true
+      function: data_strategies.MetaMath.utils.rephrase_questions
+    input_ids:
+      - generate_backwards_questions
+  - id: generate_forward_questions
+    config:
+      type: function
+      sharded: true
+      function: data_strategies.MetaMath.utils.generate_forward_questions
+    input_ids:
+      - generate_backwards_questions
+      - rephrase_questions

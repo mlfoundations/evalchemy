@@ -1,17 +1,18 @@
 import openai
 import time
 import os
+from openai import OpenAI
+client = OpenAI()
 
 
-openai.api_key = os.environ["APIKEY"]
 # openai.organization = ""
 
 
 def create_response(prompt_input, eng='text-davinci-002', max_tokens=1024, temperature=0.0, stop="Q", timeout=20):
-    assert eng in ('text-davinci-002', 'text-davinci-003')
-    response = openai.Completion.create(
-        engine=eng,
-        prompt=prompt_input,
+    # assert eng in ('text-davinci-002', 'text-davinci-003')
+    response = client.chat.completions.create(
+        model=eng,
+        messages=prompt_input,
         temperature=temperature,
         max_tokens=max_tokens,
         top_p=1,
@@ -26,7 +27,7 @@ def create_response(prompt_input, eng='text-davinci-002', max_tokens=1024, tempe
 def create_response_chat(prompt_input, eng='gpt-3.5-turbo',  temperature=0.0, timeout=20):
     assert eng in ["gpt-3.5-turbo", "gpt-3.5-turbo-16k", "gpt-3.5-turbo-0613", "gpt-3.5-turbo-16k-0613",
                "gpt-4", "gpt-4-0613", "gpt-4-32k", "gpt-4-32k-0613", "gpt-3.5-turbo-1106"]
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model=eng,
         messages=prompt_input,
         temperature=temperature,

@@ -27,7 +27,7 @@ string_number_dict = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six
 
 
 class BackwardReasoning():
-    def __init__(self, args, d):
+    def __init__(self, args, dataset):
         self.args = args
         self.ds_name = args.ds
         self.temperature = args.temp
@@ -39,42 +39,36 @@ class BackwardReasoning():
         self.logger = LogUtils.get_or_init_logger(f"backward_cot_{self.args.method_name}_{self.ds_name}_{self.get_eng()}{self.part}", "backward")
 
         self.inv_q_dict = {}
-        self.inv_question_path = os.path.join(PathUtils.DATA_HOME_PATH, f"{ds_path_dict[self.ds_name]}-backward-questions.json""")
-        with open(self.inv_question_path) as f:
-            inv_qs = json.load(f)
-            self.logger.info(f"number of backward question: {len(inv_qs)}")
-            for e in inv_qs:
-                if "inverse_question" in e:
-                    if e["question"] not in self.inv_q_dict:
-                        self.inv_q_dict[e["question"]] = []
-                    self.inv_q_dict[e["question"]].append((e["inverse_question"], e['inverse_question_answer']))
+        
 
-        self.save_file = os.path.join(PathUtils.DATA_HOME_PATH,
-                                      f"{ds_path_dict[self.ds_name]}_{self.args.method_name}_{self.get_eng()}-backward-answers{self.part}.json")
-        if not args.cont:
-            new_examples = []
-            self.todo_path = os.path.join(PathUtils.DATA_HOME_PATH, f"{ds_path_dict['GSM8K']}.json") if 'GSM8K' in self.ds_name else os.path.join(PathUtils.DATA_HOME_PATH, f"{ds_path_dict['MATH']}.json")
-            with open(self.todo_path) as f:
-                self.examples = json.load(f)
-                for e in self.examples:
-                    candidate_answer = e['answer']
-                    if e["question"] in self.inv_q_dict:
-                        for temp_inv_e in self.inv_q_dict[e["question"]]:
-                            new_e = copy.deepcopy(e)
-                            new_e["candidate_answer"] = candidate_answer
-                            new_e["inv_question"] = temp_inv_e[0]
-                            if temp_inv_e[1] in string_number_dict:
-                                new_e["inv_question_ans"] = str(string_number_dict[temp_inv_e[1]])
-                            else:
-                                new_e['inv_question_ans'] = temp_inv_e[1]
-                            new_e['inv_question_ans'] = answer_cleansing(new_e['inv_question_ans'], ds_name=self.ds_name)
-                            new_examples.append(new_e)
-                self.examples = np.repeat(new_examples, args.num_repeat).tolist()
+        
+        inv_qs = [dict(row) for row in dataset]
+        self.logger.info(f"number of backward question: {len(inv_qs)}")
+        for e in inv_qs:
+            if "inverse_question" in e:
+                if e["question"] not in self.inv_q_dict:
+                    self.inv_q_dict[e["question"]] = []
+                self.inv_q_dict[e["question"]].append((e["inverse_question"], e['inverse_question_answer']))
 
-            self.save_data()
-
-        with open(self.save_file) as f:
+       
+        new_examples = []
+        self.todo_path = os.path.join(PathUtils.DATA_HOME_PATH, f"{ds_path_dict['GSM8K']}.json") if 'GSM8K' in self.ds_name else os.path.join(PathUtils.DATA_HOME_PATH, f"{ds_path_dict['MATH']}.json")
+        with open(self.todo_path) as f:
             self.examples = json.load(f)
+            for e in self.examples:
+                candidate_answer = e['answer']
+                if e["question"] in self.inv_q_dict:
+                    for temp_inv_e in self.inv_q_dict[e["question"]]:
+                        new_e = copy.deepcopy(e)
+                        new_e["candidate_answer"] = candidate_answer
+                        new_e["inv_question"] = temp_inv_e[0]
+                        if temp_inv_e[1] in string_number_dict:
+                            new_e["inv_question_ans"] = str(string_number_dict[temp_inv_e[1]])
+                        else:
+                            new_e['inv_question_ans'] = temp_inv_e[1]
+                        new_e['inv_question_ans'] = answer_cleansing(new_e['inv_question_ans'], ds_name=self.ds_name)
+                        new_examples.append(new_e)
+            self.examples = np.repeat(new_examples, args.num_repeat).tolist()
 
         self.unknown_var = "x"
         if "MATH" in self.ds_name:
@@ -122,7 +116,6 @@ class BackwardReasoning():
             return f"The value of {self.unknown_var} is"
 
     def fetch_data_from_openai(self):
-        breakpoint()
         def wrap(e):
             variable, special_token = (f"{self.unknown_var}", "") if "GSM8K" in self.ds_name else (f"${self.unknown_var}$", "### ")
             if self.method == "fobar":
@@ -148,17 +141,17 @@ class BackwardReasoning():
 
             todo_list.append(example)
 
-            if (len(todo_list) >= args.batch_size) or i >= (len(self.examples) - 1):
+            if (len(todo_list) >= self.args.batch_size) or i >= (len(self.examples) - 1):
                 batch_get_api_merge(examples=todo_list, eng=self.args.eng, pre_fun=wrap, post_fun=extract,
                                     logger=self.logger, n_processes=self.args.num_proc,
                                     temperature=self.temperature, timeout=self.args.time_out, max_try=8)
-                self.save_data()
                 todo_list = []
                 num_correct, num_examples, acc = self.evaluate(i + 1)
                 self.logger.info(
                     "=" * 20 + f"processed: {i}/{len(self.examples)}, acc: {num_correct}/{num_examples}={100 * acc:.2f}")
 
-
+        return self.examples
+    
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 

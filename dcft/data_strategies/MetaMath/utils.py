@@ -79,4 +79,18 @@ def self_verify(dataset: Dataset) -> Dataset:
     dataset =  Dataset.from_pandas(df)
     dataset = dataset.select(list(range(30)))
     return dataset
-        
+
+def backwards_reason(dataset: Dataset, method_name: str) -> Dataset:
+    args = Config()
+    all_examples = []
+    for method in ["GSM8K", "MATH"]:
+        args.method_name = method_name
+        args.ds = method
+        backwards_reason = BackwardReasoning(args, dataset)
+        backwards_reason.fetch_data_from_openai()
+        all_examples.extend(backwards_reason.fetch_data_from_openai())
+
+    df = pd.DataFrame(all_examples)
+    dataset =  Dataset.from_pandas(df)
+    dataset = dataset.select(list(range(30)))
+    return dataset

@@ -229,7 +229,10 @@ class SyntheticDataFramework:
         ray.init(num_cpus=os.cpu_count())
         waitables = self.get_waitables()
         ray.wait(waitables, num_returns=len(waitables))
-        filtered_pairs = concatenate_datasets([ray.get(shard) for shard in waitables])
+        try:
+            filtered_pairs = concatenate_datasets([ray.get(shard) for shard in waitables])
+        except:
+            breakpoint()
         eval_logger.info("Execution completed. Results.")
         self.generated_dataset = filtered_pairs
 

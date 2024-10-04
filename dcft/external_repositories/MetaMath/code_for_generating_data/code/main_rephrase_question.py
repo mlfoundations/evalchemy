@@ -82,14 +82,14 @@ class RephraseQuestion():
 
             todo_list.append(example)
 
-            if len(todo_list) >= args.batch_size or i >= (len(self.examples) - 1):
+            if len(todo_list) >= self.args.batch_size or i >= (len(self.examples) - 1):
                 if len(todo_list) > 0:
                     batch_get_api_merge(examples=todo_list, eng=self.args.eng, pre_fun=wrap, post_fun=extract,
                                         logger=self.logger, n_processes=self.args.num_proc,
                                         temperature=self.temperature, timeout=self.args.time_out, max_try=8)
                     todo_list = []
 
-                self.save_data()
+                # self.save_data()÷÷÷÷
 
                 self.logger.info("=" * 40 + f"processed: {i}/{len(self.examples)}")
         self.logger.info("Finished.")

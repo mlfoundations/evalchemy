@@ -1,1 +1,0 @@
-python main_create_backward_questions.py

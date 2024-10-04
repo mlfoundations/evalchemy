@@ -7,6 +7,8 @@ import time
 from typing import Optional, List, Dict
 import random
 import concurrent.futures
+from typing import Union
+
 
 import numpy as np
 import torch
@@ -16,12 +18,13 @@ from eval.task import TaskManager as InstructTaskManager
 from lm_eval import utils
 from lm_eval.api.model import LM
 from lm_eval.loggers import EvaluationTracker, WandbLogger
-from lm_eval.utils import handle_non_serializable, simple_parse_args_string
+from lm_eval.utils import handle_non_serializable, make_table, simple_parse_args_string, sanitize_model_name
 from lm_eval.__main__ import setup_parser, parse_eval_args
 import lm_eval.api.metrics
 import lm_eval.api.registry
 import lm_eval.api.task
 import lm_eval.models
+from lm_eval.api.model import LM
 from lm_eval.loggers.utils import add_env_info, add_tokenizer_info, get_git_commit_hash
 from lm_eval.utils import (
     eval_logger,
@@ -236,6 +239,8 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
             )
         eval_logger.info("Using pre-initialized model")
         lm = model
+
+    lm.model_identifier = sanitize_model_name(f"model_{model}_model_args_{model_args}")
 
     if evaluation_tracker is not None:
         evaluation_tracker.general_config_tracker.log_experiment_args(

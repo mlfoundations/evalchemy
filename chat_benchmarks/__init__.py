@@ -1,2 +1,0 @@
-from eval.chat_benchmarks.HumanEval.eval_instruct import eval_instruct as human_eval_instruct
-from eval.chat_benchmarks.MBPP.eval_instruct import eval_instruct as human_eval_instruct

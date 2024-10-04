@@ -95,8 +95,7 @@ class ForwardReasoning():
             del e['pred_answer_cleaned_list']
             stat_list.append(e)
 
-        with open(self.save_stat_file, 'w', encoding='utf-8') as f:
-            json.dump(stat_list, f, ensure_ascii=False, indent=4)
+        return stat_list
 
     def evaluate(self, end_idx):
         result_stat_dict = {}
@@ -146,13 +145,13 @@ class ForwardReasoning():
                                         temperature=self.temperature, timeout=self.args.time_out, max_try=0)
                     todo_list = []
 
-                self.save_data()
+                # self.save_data()
 
                 num_correct, num_examples, acc = self.evaluate(i + 1)
                 self.logger.info(
                     "=" * 20 + f"processed: {i}/{len(self.examples)}, acc: {num_correct}/{num_examples}={100 * acc:.2f}")
 
-        self.save_ans_stat()
+        return self.save_ans_stat()
 
 
 class SCComplexCoT(ForwardReasoning):

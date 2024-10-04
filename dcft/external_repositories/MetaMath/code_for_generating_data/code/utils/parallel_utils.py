@@ -10,7 +10,6 @@ def get_answer_from_chat_model(prompt, logger=None, eng='gpt-3.5-turbo', tempera
     if eng in ["gpt-3.5-turbo", "gpt-3.5-turbo-16k", "gpt-3.5-turbo-0613", "gpt-3.5-turbo-16k-0613",
                "gpt-4", "gpt-4-0613", "gpt-4-32k", "gpt-4-32k-0613", "gpt-3.5-turbo-1106", "gpt-4o-mini"
                ]:
-        breakpoint()
         is_success = False
         num_exception = 0
         [q, prompt] = prompt.split("======")
@@ -22,7 +21,7 @@ def get_answer_from_chat_model(prompt, logger=None, eng='gpt-3.5-turbo', tempera
                             {"role": "system", "content": "Follow the given examples and answer the question."},
                             {"role": "user", "content": prompt},
                         ], eng, temperature, timeout)
-                return response['choices'][0]['message']["content"].strip()
+                return response.choices[0].message.content.strip()
             except Exception as e:
                 is_print_exc = num_exception % 10 == 0
                 num_exception += 1
@@ -49,9 +48,8 @@ def batch_get_chat_api(examples, eng, pre_fun, post_fun,
     prompts = [f"{_['question']}======{pre_fun(_)}" for _ in examples]
 
     idx2res = {}
-    with Pool(n_processes) as p:
-        for idx, response in tqdm(p.imap_unordered(partial(wrapper, func=get_answer_func), enumerate(prompts)), total=len(prompts)):
-            idx2res[idx] = response
+    for idx, prompt in tqdm(enumerate(prompts), total=len(prompts)):
+        idx2res[idx] = get_answer_func(prompt)
 
     for idx, e in enumerate(examples):
         post_fun(e, idx2res[idx])

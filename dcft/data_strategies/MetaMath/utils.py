@@ -5,6 +5,7 @@ from dcft.external_repositories.MetaMath.code_for_generating_data.code.main_crea
 from dcft.external_repositories.MetaMath.code_for_generating_data.code.main_forward_reasoning import SCComplexCoT
 from dcft.external_repositories.MetaMath.code_for_generating_data.code.main_backward_reasoning import BackwardReasoning
 from dcft.external_repositories.MetaMath.code_for_generating_data.code.main_rephrase_question import RephraseQuestion
+from dcft.external_repositories.MetaMath.code_for_generating_data.code.main_self_verification import SelfVerification
 
 from datasets import Dataset, concatenate_datasets
 import pandas as pd
@@ -20,7 +21,7 @@ class Config:
     method_name: str = "SCComplexCoT"
     cont: bool = False
     num_repeat: int = 10
-    batch_size: int = 20
+    batch_size: int = 3
     time_out: int = 30
     num_proc: int = 16
 
@@ -63,3 +64,19 @@ def rephrase_questions(dataset: Dataset) -> Dataset:
     dataset =  Dataset.from_pandas(df)
     dataset = dataset.select(list(range(30)))
     return dataset
+
+def self_verify(dataset: Dataset) -> Dataset:
+    args = Config()
+    all_examples = []
+    for method in ["GSM8K", "MATH"]:
+        args.ds = method
+        rephrase_cot = SelfVerification(args, dataset)
+        rephrase_cot.fetch_data_from_openai()
+        all_examples.extend(rephrase_cot.fetch_data_from_openai())
+
+    df = pd.DataFrame(all_examples)
+    
+    dataset =  Dataset.from_pandas(df)
+    dataset = dataset.select(list(range(30)))
+    return dataset
+        

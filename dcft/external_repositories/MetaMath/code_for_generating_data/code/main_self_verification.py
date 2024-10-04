@@ -18,7 +18,7 @@ ds_path_dict = {
 }
 
 class SelfVerification():
-    def __init__(self, args):
+    def __init__(self, args, dataset):
         self.args = args
         self.ds_name = args.ds
         self.temperature = args.temp
@@ -32,14 +32,8 @@ class SelfVerification():
         self.save_file = os.path.join(PathUtils.DATA_HOME_PATH,
                                       f"{ds_path_dict[self.ds_name]}_SV-backward-questions.json")
 
-        if not args.cont:
-            with open(self.json_file) as f:
-                self.examples = json.load(f)
-                self.examples = np.repeat(self.examples, self.num_repeat).tolist()
-            self.save_data()
-
-        with open(self.save_file) as f:
-            self.examples = json.load(f)
+        self.examples = [dict(row) for row in dataset]
+        self.examples = np.repeat(self.examples, self.num_repeat).tolist()
 
         if "GSM8K" in self.ds_name:
             self.prompt = self.get_prompt("sv_rewrite_question_prompt_gsm8k.txt")
@@ -96,9 +90,9 @@ class SelfVerification():
                                         temperature=self.temperature, timeout=self.args.time_out, max_try=8)
                     todo_list = []
 
-                self.save_data()
+        
                 self.logger.info("=" * 40 + f"processed: {i}/{len(self.examples)}")
-
+        return self.examples
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

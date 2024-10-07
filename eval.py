@@ -16,6 +16,8 @@ import torch
 from eval.task import TaskManager as InstructTaskManager
 
 from lm_eval import utils
+from lm_eval import evaluator as pretrain_evaluator
+from lm_eval.tasks import TaskManager as PretrainTaskManager
 from lm_eval.api.model import LM
 from lm_eval.loggers import EvaluationTracker, WandbLogger
 from lm_eval.utils import handle_non_serializable, make_table, simple_parse_args_string, sanitize_model_name
@@ -31,6 +33,27 @@ from lm_eval.utils import (
     handle_non_serializable,
     simple_parse_args_string,
 )
+
+def merge_benchmark_results(results, pretrain_results):
+    merged_results = {
+        "results": {
+            "HumanEval": results["results"]["HumanEval"],
+            "arithmetic": pretrain_results["results"]
+        }
+    }
+    
+    # Copy over metadata from pretrain_results
+    merged_results.update({
+        key: value for key, value in pretrain_results.items()
+        if key not in ["results", "config", "git_hash", "date"]
+    })
+    
+    # Add config, git_hash, and date from the main results
+    merged_results.update({
+        key: results[key] for key in ["config", "git_hash", "date"]
+    })
+    
+    return merged_results
 
 
 def evaluate(
@@ -149,8 +172,40 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
     task_list = args.tasks.split(",")
 
     task_manager = InstructTaskManager()
+    pretrain_task_manager = PretrainTaskManager(args.verbosity, include_path=args.include_path)
 
-    eval_logger.info(f"Selected Tasks: {[task for task in task_list if task in task_manager.tasks]}")
+    instruct_task_names = [task for task in task_list if task in task_manager.tasks]
+    pretrain_task_names = [task for task in task_list if task not in task_manager.tasks]
+
+    eval_logger.info(f"Selected Tasks: {[task for task in task_list]}")
+
+    if len(pretrain_task_names) > 0:
+        pretrain_results = pretrain_evaluator.simple_evaluate(
+            model=args.model,
+            model_args=args.model_args,
+            tasks=pretrain_task_names,
+            num_fewshot=args.num_fewshot,
+            batch_size=args.batch_size,
+            max_batch_size=args.max_batch_size,
+            device=args.device,
+            use_cache=args.use_cache,
+            limit=args.limit,
+            check_integrity=args.check_integrity,
+            write_out=args.write_out,
+            log_samples=args.log_samples,
+            evaluation_tracker=evaluation_tracker,
+            system_instruction=args.system_instruction,
+            apply_chat_template=args.apply_chat_template,
+            fewshot_as_multiturn=args.fewshot_as_multiturn,
+            gen_kwargs=args.gen_kwargs,
+            task_manager=pretrain_task_manager,
+            verbosity=args.verbosity,
+            predict_only=args.predict_only,
+            random_seed=args.seed[0],
+            numpy_random_seed=args.seed[1],
+            torch_random_seed=args.seed[2],
+            fewshot_random_seed=args.seed[3]
+        )
 
     model = args.model
     model_args = args.model_args
@@ -250,10 +305,11 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
             chat_template=lm.chat_template(apply_chat_template),
             fewshot_as_multiturn=fewshot_as_multiturn,
         )
-
-    results = evaluate(lm, task_manager=task_manager, task_list=task_list, verbosity=verbosity)
-
-    results = {"results": results}
+    results = {}
+    if len(instruct_task_names) > 0:
+        results['results'] = evaluate(lm, task_manager=task_manager, task_list=instruct_task_names, verbosity=verbosity)
+    
+    
     if lm.rank == 0:
         if isinstance(model, str):
             model_name = model
@@ -291,9 +347,14 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
         add_env_info(results)  # additional environment info to results
         add_tokenizer_info(results, lm)  # additional info about tokenizer
 
-    if results is not None:
+    if results is not None or pretrain_results is not None:
         if args.log_samples:
             samples = results.pop("samples")
+        if pretrain_results is not None and results is not None:
+            results['results'].update(pretrain_results['results'])
+        elif pretrain_results is not None and results is None:
+            results = pretrain_results
+        
         dumped = json.dumps(results, indent=2, default=handle_non_serializable, ensure_ascii=False)
         if args.show_config:
             print(dumped)

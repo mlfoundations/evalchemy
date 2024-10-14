@@ -30,7 +30,6 @@ def import_eval_instructs() -> Dict[str, "Task"]:
                     spec = importlib.util.spec_from_file_location(
                         f"eval.chat_benchmarks.{item}.eval_instruct", eval_instruct_path
                     )
-
                     module = importlib.util.module_from_spec(spec)
                     spec.loader.exec_module(module)
                     sys.path.pop(0)

@@ -18,7 +18,7 @@ def eval_instruct(model: LM) -> Dict[str, Any]:
         Dict[str, Any]: A dictionary containing the generations of the model
         including model outputs and model identifier.
     """
-    eval_set = datasets.load_dataset("tatsu-lab/alpaca_eval", "alpaca_eval")["eval"]
+    eval_set = datasets.load_dataset("tatsu-lab/alpaca_eval", "alpaca_eval", trust_remote_code=True)["eval"]
     outputs = []
     with torch.no_grad():
         all_instances: List[Instance] = []

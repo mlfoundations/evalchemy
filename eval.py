@@ -34,27 +34,6 @@ from lm_eval.utils import (
     simple_parse_args_string,
 )
 
-def merge_benchmark_results(results, pretrain_results):
-    merged_results = {
-        "results": {
-            "HumanEval": results["results"]["HumanEval"],
-            "arithmetic": pretrain_results["results"]
-        }
-    }
-    
-    # Copy over metadata from pretrain_results
-    merged_results.update({
-        key: value for key, value in pretrain_results.items()
-        if key not in ["results", "config", "git_hash", "date"]
-    })
-    
-    # Add config, git_hash, and date from the main results
-    merged_results.update({
-        key: results[key] for key in ["config", "git_hash", "date"]
-    })
-    
-    return merged_results
-
 
 def evaluate(
     lm: LM,
@@ -204,7 +183,7 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
             random_seed=args.seed[0],
             numpy_random_seed=args.seed[1],
             torch_random_seed=args.seed[2],
-            fewshot_random_seed=args.seed[3]
+            fewshot_random_seed=args.seed[3],
         )
 
     model = args.model
@@ -307,9 +286,8 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
         )
     results = {}
     if len(instruct_task_names) > 0:
-        results['results'] = evaluate(lm, task_manager=task_manager, task_list=instruct_task_names, verbosity=verbosity)
-    
-    
+        results["results"] = evaluate(lm, task_manager=task_manager, task_list=instruct_task_names, verbosity=verbosity)
+
     if lm.rank == 0:
         if isinstance(model, str):
             model_name = model
@@ -351,10 +329,10 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
         if args.log_samples:
             samples = results.pop("samples")
         if pretrain_results is not None and results is not None:
-            results['results'].update(pretrain_results['results'])
+            results["results"].update(pretrain_results["results"])
         elif pretrain_results is not None and results is None:
             results = pretrain_results
-        
+
         dumped = json.dumps(results, indent=2, default=handle_non_serializable, ensure_ascii=False)
         if args.show_config:
             print(dumped)

@@ -7,6 +7,7 @@ from datetime import datetime
 
 Base = declarative_base()
 
+
 class Dataset(Base):
     __tablename__ = "datasets"
 
@@ -18,6 +19,7 @@ class Dataset(Base):
     data_location = Column(Text, nullable=False)
     generation_parameters = Column(JSONB, nullable=False)
     dataset_type = Column(Text, nullable=False)
+
 
 class Model(Base):
     __tablename__ = "models"
@@ -36,6 +38,7 @@ class Model(Base):
     weights_location = Column(Text, nullable=False)
     wandb_link = Column(Text, nullable=True)
 
+
 class EvalResult(Base):
     __tablename__ = "evalresults"
 
@@ -48,6 +51,7 @@ class EvalResult(Base):
     creation_time = Column(TIMESTAMP(timezone=True), nullable=False)
     creation_location = Column(Text, nullable=False)
     completions_location = Column(Text, nullable=False)
+
 
 class EvalSetting(Base):
     __tablename__ = "evalsettings"

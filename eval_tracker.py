@@ -99,7 +99,6 @@ class DCFTEvaluationTracker:
         finally:
             session.close()
 
-
     def save_results_aggregated(
         self,
         results: dict,
@@ -173,7 +172,9 @@ class DCFTEvaluationTracker:
         else:
             eval_logger.info("Output path not provided, skipping saving results aggregated")
 
-    def get_or_create_model(self, model_name: str, user: str, creation_location: str, weights_location: str, session) -> Tuple[uuid.UUID, uuid.UUID]:
+    def get_or_create_model(
+        self, model_name: str, user: str, creation_location: str, weights_location: str, session
+    ) -> Tuple[uuid.UUID, uuid.UUID]:
         try:
             model = session.query(Model).filter_by(name=model_name).first()
             if not model:
@@ -220,9 +221,17 @@ class DCFTEvaluationTracker:
     def _prepare_config(config: Dict[str, Any]) -> Dict[str, Any]:
         return {key: str(value) if isinstance(value, torch.dtype) else value for key, value in config.items()}
 
-    def insert_eval_results(self, model_id: uuid.UUID, dataset_id: uuid.UUID, results: Dict[str, float], 
-                            config: Dict[str, Any], completions_location: str, creation_location: str, user: str,
-                            session) -> None:
+    def insert_eval_results(
+        self,
+        model_id: uuid.UUID,
+        dataset_id: uuid.UUID,
+        results: Dict[str, float],
+        config: Dict[str, Any],
+        completions_location: str,
+        creation_location: str,
+        user: str,
+        session,
+    ) -> None:
         try:
             for key, score in results.items():
                 if isinstance(score, float) or isinstance(score, int):
@@ -249,13 +258,13 @@ class DCFTEvaluationTracker:
     def update_evalresults_db(self, eval_log_dict: Dict[str, Any]) -> None:
         with self.session_scope() as session:
             try:
-                user = os.getlogin() #TODO
+                user = os.getlogin()  # TODO
                 model_id, dataset_id = self.get_or_create_model(
-                    model_name=eval_log_dict['config']['model_args'].replace('pretrained=',''),
+                    model_name=eval_log_dict["config"]["model_args"].replace("pretrained=", ""),
                     user=user,
                     creation_location="NA",
-                    weights_location=eval_log_dict['config']['model'],
-                    session=session
+                    weights_location=eval_log_dict["config"]["model"],
+                    session=session,
                 )
 
                 results = eval_log_dict["results"]
@@ -270,7 +279,7 @@ class DCFTEvaluationTracker:
                     completions_location="NA",
                     creation_location="NA",
                     user=user,
-                    session=session
+                    session=session,
                 )
             except Exception as e:
                 raise RuntimeError(f"Error in update_evalresults_db: {str(e)}")

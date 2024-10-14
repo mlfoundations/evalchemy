@@ -31,19 +31,30 @@ def evaluate(
     task_list: List[str],
     verbosity: str = "INFO",
 ) -> Dict[str, Dict]:
+    """
+    Evaluate the language model on the given tasks.
+    Args:
+        lm (LM): The language model to evaluate.
+        task_manager (InstructTaskManager): The task manager containing evaluation instructions.
+        task_list (List[str]): List of task names to evaluate.
+        verbosity (str, optional): Logging verbosity level. Defaults to "INFO".
+    Returns:
+        Dict[str, Dict]: A dictionary containing evaluation results for each task.
+    """
     eval_logger = utils.eval_logger
     eval_logger.setLevel(getattr(logging, f"{verbosity}"))
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        eval_instruct_results = list(executor.map(
-            lambda task: task(lm),
-            task_manager.get_list_eval_instructs(task_list)
-        ))
-        
-        evaluate_results = list(executor.map(
-            lambda func_args: func_args[0](func_args[1]),
-            zip(task_manager.get_list_evaluates(task_list), eval_instruct_results),
-        ))
+        eval_instruct_results = list(
+            executor.map(lambda task: task(lm), task_manager.get_list_eval_instructs(task_list))
+        )
+
+        evaluate_results = list(
+            executor.map(
+                lambda func_args: func_args[0](func_args[1]),
+                zip(task_manager.get_list_evaluates(task_list), eval_instruct_results),
+            )
+        )
 
     return {task: result for task, result in zip(task_list, evaluate_results)}
 
@@ -158,10 +169,10 @@ def process_results(results, lm, args, start_date):
         "torch_seed": args.seed[2],
         "fewshot_seed": args.seed[3],
     }
-    
+
     if isinstance(lm, lm_eval.models.huggingface.HFLM):
         config.update(lm.get_model_info())
-    
+
     results = {
         "results": results,
         "config": config,
@@ -170,7 +181,7 @@ def process_results(results, lm, args, start_date):
     }
     add_env_info(results)
     add_tokenizer_info(results, lm)
-    
+
     return results
 
 

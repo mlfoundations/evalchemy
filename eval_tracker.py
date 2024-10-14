@@ -19,6 +19,14 @@ from lm_eval.utils import (
 from lm_eval.loggers.evaluation_tracker import GeneralConfigTracker
 from eval.database.models import Dataset, Model, EvalResult, EvalSetting
 from eval.database.utils import create_db_engine, create_tables, sessionmaker
+import subprocess
+
+
+def get_git_hash():
+    try:
+        return subprocess.check_output(["git", "rev-parse", "HEAD"]).decode("ascii").strip()
+    except subprocess.CalledProcessError:
+        return None
 
 
 class DCFTEvaluationTracker:
@@ -208,7 +216,7 @@ class DCFTEvaluationTracker:
                     id=uuid.uuid4(),
                     name=name,
                     parameters=config,
-                    eval_version_hash="NA",
+                    eval_version_hash=get_git_hash(),
                 )
                 session.add(eval_setting)
                 session.commit()

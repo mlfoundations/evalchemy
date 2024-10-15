@@ -194,6 +194,7 @@ class DCFTEvaluationTracker:
             raise RuntimeError(f"Database error in insert_eval_results: {str(e)}")
 
     def update_evalresults_db(self, eval_log_dict: Dict[str, Any]) -> None:
+        eval_logger.info("Updating DB with eval results")
         with self.session_scope() as session:
             try:
                 user = os.getlogin()  # TODO

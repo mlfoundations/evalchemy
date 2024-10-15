@@ -38,60 +38,15 @@ class DCFTEvaluationTracker:
     def __init__(
         self,
         output_path: str = None,
-        hub_results_org: str = "",
-        hub_repo_name: str = "",
-        details_repo_name: str = "",
-        results_repo_name: str = "",
-        push_results_to_hub: bool = False,
-        push_samples_to_hub: bool = False,
-        public_repo: bool = False,
-        token: str = "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",
-        leaderboard_url: str = "",
-        point_of_contact: str = "",
-        gated: bool = False,
     ) -> None:
         """
         Creates all the necessary loggers for evaluation tracking.
 
         Args:
             output_path (str): Path to save the results. If not provided, the results won't be saved.
-            hub_results_org (str): The Hugging Face organization to push the results to. If not provided, the results will be pushed to the owner of the Hugging Face token.
-            hub_repo_name (str): The name of the Hugging Face repository to push the results to. If not provided, the results will be pushed to `lm-eval-results`.
-            details_repo_name (str): The name of the Hugging Face repository to push the details to. If not provided, the results will be pushed to `lm-eval-results`.
-            result_repo_name (str): The name of the Hugging Face repository to push the results to. If not provided, the results will not be pushed and will be found in the details_hub_repo.
-            push_results_to_hub (bool): Whether to push the results to the Hugging Face hub.
-            push_samples_to_hub (bool): Whether to push the samples to the Hugging Face hub.
-            public_repo (bool): Whether to push the results to a public or private repository.
-            token (str): Token to use when pushing to the Hugging Face hub. This token should have write access to `hub_results_org`.
-            leaderboard_url (str): URL to the leaderboard on the Hugging Face hub on the dataset card.
-            point_of_contact (str): Contact information on the Hugging Face hub dataset card.
-            gated (bool): Whether to gate the repository.
         """
         self.general_config_tracker = GeneralConfigTracker()
         self.output_path = output_path
-        self.push_results_to_hub = push_results_to_hub
-        self.push_samples_to_hub = push_samples_to_hub
-        self.public_repo = public_repo
-        self.leaderboard_url = leaderboard_url
-        self.point_of_contact = point_of_contact
-        self.api = None
-        self.gated_repo = gated
-
-        if not self.api and (self.push_results_to_hub or self.push_samples_to_hub):
-            raise ValueError(
-                "Hugging Face token is not defined, but 'push_results_to_hub' or 'push_samples_to_hub' is set to True. "
-                "Please provide a valid Hugging Face token by setting the HF_TOKEN environment variable."
-            )
-
-        ### TODO: check the repo name
-        if self.api and hub_results_org == "" and (push_results_to_hub or push_samples_to_hub):
-            hub_results_org = self.api.whoami()["name"]
-            eval_logger.warning(f"hub_results_org was not specified. Results will be pushed to '{hub_results_org}'.")
-
-        self.details_repo = f"{hub_results_org}/{details_repo_name}"
-        self.details_repo_private = f"{hub_results_org}/{details_repo_name}-private"
-        self.results_repo = f"{hub_results_org}/{results_repo_name}"
-        self.results_repo_private = f"{hub_results_org}/{results_repo_name}-private"
         self.engine, self.SessionMaker = create_db_engine()
 
     @contextmanager
@@ -145,34 +100,9 @@ class DCFTEvaluationTracker:
                 path = Path(self.output_path if self.output_path else Path.cwd())
                 path = path.joinpath(self.general_config_tracker.model_name_sanitized)
                 path.mkdir(parents=True, exist_ok=True)
-
                 self.date_id = datetime.now().isoformat().replace(":", "-")
-
                 file_results_aggregated = path.joinpath(f"results_{self.date_id}.json")
                 file_results_aggregated.open("w", encoding="utf-8").write(dumped)
-
-                if self.api and self.push_results_to_hub:
-                    repo_id = self.results_repo if self.public_repo else self.results_repo_private
-                    self.api.create_repo(
-                        repo_id=repo_id,
-                        repo_type="dataset",
-                        private=not self.public_repo,
-                        exist_ok=True,
-                    )
-                    self.api.upload_file(
-                        repo_id=repo_id,
-                        path_or_fileobj=str(path.joinpath(f"results_{self.date_id}.json")),
-                        path_in_repo=os.path.join(
-                            self.general_config_tracker.model_name,
-                            f"results_{self.date_id}.json",
-                        ),
-                        repo_type="dataset",
-                        commit_message=f"Adding aggregated results for {self.general_config_tracker.model_name}",
-                    )
-                    eval_logger.info(
-                        "Successfully pushed aggregated results to the Hugging Face Hub. "
-                        f"You can find them at: {repo_id}"
-                    )
 
             except Exception as e:
                 eval_logger.warning("Could not save results aggregated")

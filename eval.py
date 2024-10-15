@@ -116,8 +116,7 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
     # Initialize components
     task_list = args.tasks.split(",")
     task_manager = InstructTaskManager()
-    evaluation_tracker_args = simple_parse_args_string(args.hf_hub_log_args)
-    evaluation_tracker = DCFTEvaluationTracker(**evaluation_tracker_args)
+    evaluation_tracker = DCFTEvaluationTracker(args.output_path)
 
     # Model setup
     lm = initialize_model(args.model, args.model_args, args.batch_size, args.max_batch_size, args.device)
@@ -162,7 +161,6 @@ def process_results(results, lm, args, start_date):
         "device": args.device,
         "use_cache": args.use_cache,
         "limit": args.limit,
-        # "bootstrap_iters": args.bootstrap_iters,
         "gen_kwargs": args.gen_kwargs,
         "random_seed": args.seed[0],
         "numpy_seed": args.seed[1],
@@ -207,9 +205,6 @@ def log_results(results, args, evaluation_tracker, samples=None):
     if samples:
         for task_name, config in results["configs"].items():
             evaluation_tracker.save_results_samples(task_name=task_name, samples=samples[task_name])
-
-    if evaluation_tracker.push_results_to_hub or evaluation_tracker.push_samples_to_hub:
-        evaluation_tracker.recreate_metadata_card()
 
     print(
         f"{args.model} ({args.model_args}), gen_kwargs: ({args.gen_kwargs}), limit: {args.limit}, "

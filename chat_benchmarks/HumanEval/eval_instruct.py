@@ -94,7 +94,7 @@ def eval_instruct(model: LM) -> Dict[str, Any]:
     return results
 
 
-def evaluate(results: Dict[str, Any]) -> Dict[str, Any]:
+def evaluate(results: Dict[str, float]) -> Dict[str, float]:
     """
     Evaluate the generated results.
 
@@ -107,7 +107,7 @@ def evaluate(results: Dict[str, Any]) -> Dict[str, Any]:
     temp_dir_obj = results["temp_dir_obj"]
     temp_dir = temp_dir_obj.name
 
-    evaluation_results: Dict[str, Any] = {}
+    evaluation_results: Dict[str, float] = {}
     for lang in ["python", "sh"]:
         problem_file = os.path.join("eval/chat_benchmarks/HumanEval/data", f"humaneval-{lang}.jsonl")
         temp_file_path = os.path.join(temp_dir, f"generated_{lang}.jsonl")
@@ -122,4 +122,9 @@ def evaluate(results: Dict[str, Any]) -> Dict[str, Any]:
         )
         evaluation_results[lang] = result
     temp_dir_obj.cleanup()
+    
+    evaluation_results = {f"{outer_key}_{inner_key}": value 
+                    for outer_key, inner_dict in evaluation_results.items() 
+                    for inner_key, value in inner_dict.items()}
+
     return evaluation_results

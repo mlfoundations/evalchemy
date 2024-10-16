@@ -122,9 +122,11 @@ def evaluate(results: Dict[str, float]) -> Dict[str, float]:
         )
         evaluation_results[lang] = result
     temp_dir_obj.cleanup()
-    
-    evaluation_results = {f"{outer_key}_{inner_key}": value 
-                    for outer_key, inner_dict in evaluation_results.items() 
-                    for inner_key, value in inner_dict.items()}
+
+    evaluation_results = {
+        f"{outer_key}_{inner_key}": value
+        for outer_key, inner_dict in evaluation_results.items()
+        for inner_key, value in inner_dict.items()
+    }
 
     return evaluation_results

@@ -231,7 +231,16 @@ def evaluate_split(results: Dict[str, Any], split: str) -> Dict[str, float]:
         args.benchmark,
         args.version,
     )
-    with open(os.path.join(score_dir, "score.json"), "r") as f:
+    # find score file
+    score_file = [f for f in os.listdir(score_dir) if f.startswith("score") and f.endswith(".json")]
+    if "score_gpt-4o-mini.json" in score_file:
+        score_file = "score_gpt-4o-mini.json"
+    elif "score.json" in score_file:
+        score_file = "score.json"
+    else:
+        raise ValueError(f"Expected 'score_gpt-4o-mini.json' or 'score.json' in {score_dir}, but found {score_file}")
+
+    with open(os.path.join(score_dir, score_file), "r") as f:
         metrics = json.load(f)
 
     return metrics

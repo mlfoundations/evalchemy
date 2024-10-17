@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from itertools import combinations
 from scipy import stats
+from prettytable import PrettyTable
+import argparse
 
 
 def read_score_file(file_path):
@@ -29,7 +31,7 @@ def generate_csv(headers, table_data):
     return output.getvalue()
 
 
-def plot_overall_results(all_scores):
+def plot_overall_results(all_scores, source_dir):
     # Extract unique tested models and judge models
     tested_models = sorted(set(score["tested_model"] for score in all_scores))
     judge_models = sorted(set(score["judge_model"] for score in all_scores))
@@ -112,12 +114,12 @@ def plot_overall_results(all_scores):
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
 
     # Save the plot
-    plt.savefig("overall_scores_comparison.png", bbox_inches="tight")
-    print("Plot saved as 'overall_scores_comparison.png'")
+    plt.savefig(f"{source_dir}/overall_scores_comparison.png", bbox_inches="tight")
+    print(f"Plot saved as '{source_dir}/overall_scores_comparison.png'")
 
 
-def main():
-    source_dir = "eval/chat_benchmarks/MixEval/results"
+def main(args):
+    source_dir = args.source_dir
 
     all_scores = []
     score_keys = set()
@@ -127,21 +129,18 @@ def main():
         if not os.path.isdir(dir_path):
             continue
 
-        mixeval_path = os.path.join(dir_path, "mixeval")
+        mixeval_path = os.path.join(dir_path, args.benchmark)
         if not os.path.exists(mixeval_path):
             continue
 
         # Find the most recent date directory
-        date_dirs = [d for d in os.listdir(mixeval_path) if os.path.isdir(os.path.join(mixeval_path, d))]
-        if not date_dirs:
+        version_path = os.path.join(mixeval_path, args.benchmark_version)
+        if not os.path.exists(version_path):
             continue
 
-        latest_date = max(date_dirs, key=lambda d: datetime.strptime(d, "%Y-%m-%d"))
-        latest_date_path = os.path.join(mixeval_path, latest_date)
-
-        for file in os.listdir(latest_date_path):
-            if file.startswith("score_") and file.endswith(".json"):
-                file_path = os.path.join(latest_date_path, file)
+        for file in os.listdir(version_path):
+            if file.startswith("score") and file.endswith(".json"):
+                file_path = os.path.join(version_path, file)
                 judge_model = get_model_name(file)
 
                 try:
@@ -154,8 +153,14 @@ def main():
                     print(f"Error reading {file_path}. Skipping this file.")
 
     # Remove 'tested_model' and 'judge_model' from score_keys and sort them
-    score_keys.remove("tested_model")
-    score_keys.remove("judge_model")
+    try:
+        score_keys.remove("tested_model")
+    except KeyError:
+        pass
+    try:
+        score_keys.remove("judge_model")
+    except KeyError:
+        pass
     score_keys = sorted(score_keys)
 
     # Prepare the table data
@@ -182,18 +187,44 @@ def main():
     print(csv_output)
 
     # Plot overall results
-    plot_overall_results(all_scores)
+    plot_overall_results(all_scores, source_dir)
 
-    # Optionally, save to a file
-    save_option = input("Do you want to save the CSV to a file? (y/n): ").lower()
-    if save_option == "y":
-        file_name = input("Enter the file name (e.g., output.csv): ")
-        if file_name == "":
-            file_name = "output.csv"
-        with open(file_name, "w", newline="") as f:
-            f.write(csv_output)
-        print(f"CSV data saved to {file_name}")
+    # Save to a file
+    file_name = f"{source_dir}/output.csv"
+    with open(file_name, "w", newline="") as f:
+        f.write(csv_output)
+
+    # Use prettytable to print the table
+    table = PrettyTable()
+    table.field_names = headers
+    for row in table_data:
+        table.add_row(row)
+    print(table)
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--source_dir",
+        "-s",
+        type=str,
+        default="eval/chat_benchmarks/MixEval/results",
+        help="Path to the source directory",
+    )
+    parser.add_argument(
+        "--benchmark",
+        "-b",
+        type=str,
+        default="mixeval",
+        help="Benchmark to use",
+    )
+    parser.add_argument(
+        "--benchmark_version",
+        "-v",
+        type=str,
+        default="2024-06-01",
+        help="Benchmark version to use",
+    )
+    args = parser.parse_args()
+
+    main(args)

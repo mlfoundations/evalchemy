@@ -738,12 +738,17 @@ def compute_metric(args):
             ].get(k, 0) * (sd_mp_l / (sd_ff_l + sd_mp_l))
 
         score_dict[model] = tmp_score_dict_model
-        with open(os.path.join(score_dir, "score.json"), "w") as f:
+        if args.multichoice_judge == args.freeform_judge:
+            scorer = args.multichoice_judge
+        else:
+            scorer = f"m_{args.multichoice_judge}_ff_{args.freeform_judge}"
+        with open(os.path.join(score_dir, f"score_{scorer}.json"), "w") as f:
             f.write(json.dumps(tmp_score_dict_model, indent=4) + "\n")
         print_table(tmp_score_dict_model)
 
-    print(f"Saving the model scores to {os.path.join(args.model_response_dir, 'score.json')} ...")
-    with open(os.path.join(args.model_response_dir, "score.json"), "w") as f:
+    target = f"score_{scorer}.json"
+    print(f"Saving the model scores to {os.path.join(args.model_response_dir, target)} ...")
+    with open(os.path.join(args.model_response_dir, target), "w") as f:
         f.write(json.dumps(score_dict, indent=4) + "\n")
 
 

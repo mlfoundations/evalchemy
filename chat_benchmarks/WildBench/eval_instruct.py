@@ -24,6 +24,7 @@ from src.eval import (
 @dataclass
 class EvaluationConfig:
     """Configuration for model evaluation and data processing."""
+
     seed: int = 42
     model: str = "gpt-4o-2024-05-13"
     action: str = "eval"
@@ -64,6 +65,7 @@ class EvaluationConfig:
     use_imend_stop: bool = False
     mt_turn: int = -1
     mt_turn1_result: Optional[str] = None
+
 
 def format_eval_file(submit_file: str, eval_file: str) -> str:
     """
@@ -113,11 +115,9 @@ def format_eval_file(submit_file: str, eval_file: str) -> str:
     print(f"Output file written to {output_file}")
     return output_file
 
+
 def process_score(
-    results_item: Dict[str, Any],
-    custom_id_splits: List[str],
-    eval_output_parsed: Dict[str, Any],
-    prompt: str
+    results_item: Dict[str, Any], custom_id_splits: List[str], eval_output_parsed: Dict[str, Any], prompt: str
 ) -> None:
     """
     Process and update the results item with score information.
@@ -133,13 +133,16 @@ def process_score(
         return
 
     score: float = eval_output_parsed["score"]
-    results_item.update({
-        "model_test": model_test,
-        "score": score,
-    })
+    results_item.update(
+        {
+            "model_test": model_test,
+            "score": score,
+        }
+    )
 
     model_output: str = prompt.split("<|begin_of_response|>\n")[1].split("<|end_of_response|>\n")[0]
     results_item["model_output"] = model_output.strip()
+
 
 def process_file(eval_file: str, client: OpenAI) -> None:
     """
@@ -169,6 +172,7 @@ def process_file(eval_file: str, client: OpenAI) -> None:
 
     print(f"Processing complete. Results saved to {output_file}")
 
+
 def eval_instruct(model: LM) -> Dict[str, str]:
     """
     Perform instruction-based evaluation on a given language model.
@@ -186,17 +190,17 @@ def eval_instruct(model: LM) -> Dict[str, str]:
     temp_dir_obj: tempfile.TemporaryDirectory = tempfile.TemporaryDirectory()
     temp_dir: str = temp_dir_obj.name
     filepath: str = os.path.join(temp_dir, "output.json")
-    
+
     if config.end_index < 0 or config.end_index > len(model_inputs):
         config.end_index = len(model_inputs)
-    
+
     model_inputs = model_inputs[config.start_index : config.end_index]
     id_strs = id_strs[config.start_index : config.end_index]
     chat_history = chat_history[config.start_index : config.end_index]
     metadata = {key: metadata[key][config.start_index : config.end_index] for key in metadata}
-    
+
     print("Loading dataset ... done!")
-    
+
     all_instances: List[Instance] = [
         Instance(
             "generate_until",
@@ -218,6 +222,7 @@ def eval_instruct(model: LM) -> Dict[str, str]:
     save_outputs(config, id_strs, outputs, chat_history, metadata, model_inputs, filepath)
 
     return {"filepath": filepath, "temp_dir_obj": temp_dir_obj}
+
 
 def evaluate(results: Dict[str, str]) -> Dict[str, Any]:
     """
@@ -247,7 +252,7 @@ def evaluate(results: Dict[str, str]) -> Dict[str, Any]:
     histories = []
     last_queries = []
     checklists = []
-    
+
     for b, t, r in zip(bench_data, target_model_data, ref_model_data):
         compose_eval_item(b, t, r, histories, last_queries, checklists)
 
@@ -263,12 +268,12 @@ def evaluate(results: Dict[str, str]) -> Dict[str, Any]:
     with open(eval_file, "w") as f:
         for line in json_lines:
             f.write(json.dumps(line) + "\n")
-    
+
     client = OpenAI()
     process_file(eval_file, client)
     submit_file = f"{eval_folder}/results.jsonl"
     output_file = format_eval_file(submit_file, eval_file)
-    
+
     task_group_new = {
         "Information seeking": "Information/Advice seeking",
         "Creative Writing": "Creative Tasks",
@@ -286,7 +291,7 @@ def evaluate(results: Dict[str, str]) -> Dict[str, Any]:
 
     with open(output_file, "r") as f:
         eval_result = json.load(f)
-    
+
     task_mapping = {}
     wb_data = load_dataset("allenai/WildBench", "v2", split="test")
     for item in wb_data:
@@ -313,7 +318,7 @@ def evaluate(results: Dict[str, str]) -> Dict[str, Any]:
             task_cat_results.setdefault(tag, []).append(float(item["score"]))
 
     task_cat_score = {tag: (sum(scores) / len(scores) - 5) * 2 for tag, scores in task_cat_results.items()}
-    
+
     weights_by_task = {
         "Creative Tasks": 0.5,
         "Planning & Reasoning": 1.25,
@@ -321,9 +326,11 @@ def evaluate(results: Dict[str, str]) -> Dict[str, Any]:
         "Information/Advice seeking": 0.75,
         "Coding & Debugging": 1.25,
     }
-    
-    task_macro_score = sum(task_cat_score[tag] * weights_by_task[tag] for tag in task_cat_score) / sum(weights_by_task.values())
-    
+
+    task_macro_score = sum(task_cat_score[tag] * weights_by_task[tag] for tag in task_cat_score) / sum(
+        weights_by_task.values()
+    )
+
     temp_dir_obj.cleanup()
     return {
         "score": sum(scores) / len(scores),
@@ -334,6 +341,7 @@ def evaluate(results: Dict[str, str]) -> Dict[str, Any]:
         "total": len(eval_result),
         "avg_len": sum(lengths) / len(lengths),
     }
+
 
 def load_eval_data(config: EvaluationConfig) -> Tuple[List[str], List[Any], List[str], Dict[str, List[Any]]]:
     """
@@ -370,7 +378,6 @@ def load_eval_data(config: EvaluationConfig) -> Tuple[List[str], List[Any], List
         for key in metadata:
             assert key in item, f"Key {key} not found in metadata"
             metadata[key].append(item[key])
-    
+
     print("Start applying template")
     return id_strs, chat_history, extracted_chats, metadata
-

@@ -14,6 +14,8 @@ import torch
 from eval.task import TaskManager as InstructTaskManager
 from eval.eval_tracker import DCFTEvaluationTracker
 from lm_eval import utils
+from lm_eval import evaluator as pretrain_evaluator
+from lm_eval.tasks import TaskManager as PretrainTaskManager
 from lm_eval.api.model import LM
 from lm_eval.loggers import WandbLogger
 from lm_eval.utils import handle_non_serializable, make_table, simple_parse_args_string, sanitize_model_name
@@ -122,6 +124,41 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
     lm = initialize_model(args.model, args.model_args, args.batch_size, args.max_batch_size, args.device)
     lm.model_identifier = sanitize_model_name(f"model_{args.model}_model_args_{args.model_args}")
 
+    pretrain_task_manager = PretrainTaskManager(args.verbosity, include_path=args.include_path)
+
+    instruct_task_names = [task for task in task_list if task in task_manager.tasks]
+    pretrain_task_names = [task for task in task_list if task not in task_manager.tasks]
+
+    eval_logger.info(f"Selected Tasks: {[task for task in task_list]}")
+
+    if len(pretrain_task_names) > 0:
+        pretrain_results = pretrain_evaluator.simple_evaluate(
+            model=args.model,
+            model_args=args.model_args,
+            tasks=pretrain_task_names,
+            num_fewshot=args.num_fewshot,
+            batch_size=args.batch_size,
+            max_batch_size=args.max_batch_size,
+            device=args.device,
+            use_cache=args.use_cache,
+            limit=args.limit,
+            check_integrity=args.check_integrity,
+            write_out=args.write_out,
+            log_samples=args.log_samples,
+            evaluation_tracker=evaluation_tracker,
+            system_instruction=args.system_instruction,
+            apply_chat_template=args.apply_chat_template,
+            fewshot_as_multiturn=args.fewshot_as_multiturn,
+            gen_kwargs=args.gen_kwargs,
+            task_manager=pretrain_task_manager,
+            verbosity=args.verbosity,
+            predict_only=args.predict_only,
+            random_seed=args.seed[0],
+            numpy_random_seed=args.seed[1],
+            torch_random_seed=args.seed[2],
+            fewshot_random_seed=args.seed[3],
+        )
+
     # Log experiment args
     if evaluation_tracker is not None:
         evaluation_tracker.general_config_tracker.log_experiment_args(
@@ -131,6 +168,9 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
             chat_template=lm.chat_template(args.apply_chat_template),
             fewshot_as_multiturn=args.fewshot_as_multiturn,
         )
+    results = {}
+    if len(instruct_task_names) > 0:
+        results["results"] = evaluate(lm, task_manager=task_manager, task_list=instruct_task_names, verbosity=verbosity)
 
     # Setup random seeds
     seed_message = setup_random_seeds(args.seed[0], args.seed[1], args.seed[2])
@@ -145,8 +185,17 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
     if lm.rank == 0:
         results = process_results(results, lm, args, start_date)
 
+    if results is not None or pretrain_results is not None:
         if args.log_samples:
             samples = results.pop("samples")
+        if pretrain_results is not None and results is not None:
+            results["results"].update(pretrain_results["results"])
+        elif pretrain_results is not None and results is None:
+            results = pretrain_results
+
+        dumped = json.dumps(results, indent=2, default=handle_non_serializable, ensure_ascii=False)
+        if args.show_config:
+            print(dumped)
 
         # Log results
         log_results(results, args, evaluation_tracker, samples if args.log_samples else None)

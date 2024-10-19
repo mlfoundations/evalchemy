@@ -26,6 +26,15 @@ import lm_eval.api.task
 import lm_eval.models
 from lm_eval.loggers.utils import add_env_info, add_tokenizer_info, get_git_commit_hash
 
+def flatten_dict(d, parent_key='', sep='/'):
+    items = []
+    for k, v in d.items():
+        new_key = f"{parent_key}{sep}{k}" if parent_key else k
+        if isinstance(v, dict):
+            items.extend(flatten_dict(v, new_key, sep=sep).items())
+        else:
+            items.append((new_key, v))
+    return dict(items)
 
 def evaluate(
     lm: LM,
@@ -131,6 +140,7 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
 
     eval_logger.info(f"Selected Tasks: {[task for task in task_list]}")
     start_date = time.time()
+    pretrain_results = None
     if len(pretrain_task_names) > 0:
         pretrain_results = pretrain_evaluator.simple_evaluate(
             model=args.model,

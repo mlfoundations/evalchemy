@@ -1,5 +1,5 @@
 import json
-import os
+import getpass
 import re
 import time
 from dataclasses import asdict, dataclass
@@ -28,6 +28,15 @@ def get_git_hash():
     except subprocess.CalledProcessError:
         return None
 
+def flatten_dict(d, parent_key='', sep='/'):
+    items = []
+    for k, v in d.items():
+        new_key = f"{parent_key}{sep}{k}" if parent_key else k
+        if isinstance(v, dict):
+            items.extend(flatten_dict(v, new_key, sep=sep).items())
+        else:
+            items.append((new_key, v))
+    return dict(items)
 
 class DCFTEvaluationTracker:
     """
@@ -196,29 +205,28 @@ class DCFTEvaluationTracker:
     def update_evalresults_db(self, eval_log_dict: Dict[str, Any]) -> None:
         eval_logger.info("Updating DB with eval results")
         with self.session_scope() as session:
-            try:
-                user = os.getlogin()  # TODO
-                model_id, dataset_id = self.get_or_create_model(
-                    model_name=eval_log_dict["config"]["model_args"].replace("pretrained=", ""),
-                    user=user,
-                    creation_location="NA",
-                    weights_location=eval_log_dict["config"]["model"],
-                    session=session,
-                )
+            user = getpass.getuser() # TODO
+            model_id, dataset_id = self.get_or_create_model(
+                model_name=eval_log_dict["config"]["model_args"].replace("pretrained=", ""),
+                user=user,
+                creation_location="NA",
+                weights_location=eval_log_dict["config"]["model"],
+                session=session,
+            )
 
-                results = eval_log_dict["results"]
-                benchmark_name = next(iter(results))
-                updated_results = self.update_results_with_benchmark(results[benchmark_name], benchmark_name)
+            results = eval_log_dict["results"]
+            benchmark_name = next(iter(results))
+            updated_results = self.update_results_with_benchmark(flatten_dict(results[benchmark_name]), benchmark_name)
 
-                self.insert_eval_results(
-                    model_id=model_id,
-                    dataset_id=dataset_id,
-                    results=updated_results,
-                    config=eval_log_dict["config"],
-                    completions_location="NA",
-                    creation_location="NA",
-                    user=user,
-                    session=session,
-                )
-            except Exception as e:
-                raise RuntimeError(f"Error in update_evalresults_db: {str(e)}")
+            self.insert_eval_results(
+                model_id=model_id,
+                dataset_id=dataset_id,
+                results=updated_results,
+                config=eval_log_dict["config"],
+                completions_location="NA",
+                creation_location="NA",
+                user=user,
+                session=session,
+            )
+            # except Exception as e:
+            #     raise RuntimeError(f"Error in update_evalresults_db: {str(e)}")

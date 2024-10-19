@@ -130,7 +130,7 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
     pretrain_task_names = [task for task in task_list if task not in task_manager.tasks]
 
     eval_logger.info(f"Selected Tasks: {[task for task in task_list]}")
-
+    start_date = time.time()
     if len(pretrain_task_names) > 0:
         pretrain_results = pretrain_evaluator.simple_evaluate(
             model=args.model,
@@ -170,17 +170,13 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
         )
     results = {}
     if len(instruct_task_names) > 0:
-        results["results"] = evaluate(lm, task_manager=task_manager, task_list=instruct_task_names, verbosity=verbosity)
+        results["results"] = evaluate(lm, task_manager=task_manager, task_list=instruct_task_names, verbosity=args.verbosity)
 
     # Setup random seeds
     seed_message = setup_random_seeds(args.seed[0], args.seed[1], args.seed[2])
     if seed_message:
         eval_logger.info(seed_message)
-
-    # Evaluate
-    start_date = time.time()
-    results = evaluate(lm, task_manager=task_manager, task_list=task_list, verbosity=args.verbosity)
-
+    
     # Process results
     if lm.rank == 0:
         results = process_results(results, lm, args, start_date)

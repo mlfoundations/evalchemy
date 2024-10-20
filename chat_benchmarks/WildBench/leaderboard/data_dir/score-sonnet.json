@@ -1,0 +1,50 @@
+{
+  "gpt-4o-2024-05-13": {
+    "model": "gpt-4o-2024-05-13",
+    "score": 8.4697265625,
+    "adjusted_score": 6.939453125,
+    "task_macro_score": 7.032809110307719,
+    "adjusted_task_macro_score": 7.032809110307719,
+    "task_categorized_scores": {
+      "Coding & Debugging": 6.981132075471699,
+      "Creative Tasks": 6.8423772609819125,
+      "Information/Advice seeking": 6.900990099009903,
+      "Planning & Reasoning": 7.139013452914799,
+      "Math & Data Analysis": 7.158730158730158
+    },
+    "total": 1024,
+    "avg_len": 3722.4853515625
+  },
+  "gpt-4o-mini-2024-07-18": {
+    "model": "gpt-4o-mini-2024-07-18",
+    "score": 8.4208984375,
+    "adjusted_score": 6.841796875,
+    "task_macro_score": 6.900183991395785,
+    "adjusted_task_macro_score": 6.900183991395785,
+    "task_categorized_scores": {
+      "Coding & Debugging": 6.858490566037737,
+      "Creative Tasks": 6.857881136950905,
+      "Information/Advice seeking": 6.836633663366335,
+      "Planning & Reasoning": 6.980568011958148,
+      "Math & Data Analysis": 6.920634920634921
+    },
+    "total": 1024,
+    "avg_len": 3648.126953125
+  },
+  "claude-3-5-sonnet-20240620": {
+    "model": "claude-3-5-sonnet-20240620",
+    "score": 8.3798828125,
+    "adjusted_score": 6.759765625,
+    "task_macro_score": 6.848012392536951,
+    "adjusted_task_macro_score": 6.848012392536951,
+    "task_categorized_scores": {
+      "Coding & Debugging": 6.811320754716981,
+      "Creative Tasks": 6.63049095607235,
+      "Information/Advice seeking": 6.717821782178216,
+      "Planning & Reasoning": 6.902840059790734,
+      "Math & Data Analysis": 7.031746031746032
+    },
+    "total": 1024,
+    "avg_len": 2911.845703125
+  }
+}

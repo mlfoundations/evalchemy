@@ -45,29 +45,29 @@ def plot_overall_results(all_scores, source_dir):
     for score in all_scores:
         tested = score["tested_model"]
         judge = score["judge_model"]
-        overall_score = score.get("overall score (final score)")
-        if overall_score is not None:
-            data[tested][judge] = overall_score
+        overall_score = score.get("overall")
+        data[tested][judge] = overall_score
 
     # Generate all possible pairs of judge models
     judge_pairs = list(combinations(judge_models, 2))
 
     # Set up the plot grid
     n_pairs = len(judge_pairs)
-    n_cols = 2
+    n_cols = 2 if n_pairs > 2 else 1
     n_rows = (n_pairs + 1) // 2  # Round up division
     fig, axs = plt.subplots(n_rows, n_cols, figsize=(15, 7 * n_rows))
     fig.suptitle("Comparison of Overall Scores by Different Judge Models", fontsize=16)
 
     # Flatten axs if it's a 2D array
-    if n_pairs > 2:
-        axs = axs.flatten()
+    if n_pairs == 1:
+        axs = [[axs]]
 
     # Colors for tested models
     colors = plt.cm.rainbow(np.linspace(0, 1, len(tested_models)))
 
     for i, (judge1, judge2) in enumerate(judge_pairs):
-        ax = axs[i] if n_pairs > 1 else axs
+        ai, aj = divmod(i, n_cols)
+        ax = axs[ai][aj]  # Use indexing instead of conditional assignment
 
         # Collect valid data points for correlation calculation
         x_values = []
@@ -139,7 +139,7 @@ def main(args):
             continue
 
         for file in os.listdir(version_path):
-            if file.startswith("score") and file.endswith(".json"):
+            if file.startswith("score_") and file.endswith(".json"):
                 file_path = os.path.join(version_path, file)
                 judge_model = get_model_name(file)
 

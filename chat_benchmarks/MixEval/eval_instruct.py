@@ -49,9 +49,13 @@ args.update(
         "max_gpu_memory": "60GB",
         "data_path": "eval/chat_benchmarks/MixEval/mix_eval/data/",
         "output_dir": "eval/chat_benchmarks/MixEval/results/",
-        "api_parallel_num": 16,
-        "multichoice_judge": "gpt-4o-mini",
-        "freeform_judge": "gpt-4o-mini",
+        "api_parallel_num": 32,
+        # Original judges in MixEval:
+        "multichoice_judge": "gpt-3.5-turbo-0125",
+        "freeform_judge": "gpt-3.5-turbo-0125",
+        # New judges:
+        # "multichoice_judge": "gpt-4o-mini",
+        # "freeform_judge": "gpt-4o-mini",
         "verbose": False,
     }
 )
@@ -202,25 +206,6 @@ def evaluate(results: Dict[str, Any]) -> Dict[str, float]:
     Returns:
         Dict[str, float]: A dictionary containing evaluation metrics for each split.
     """
-    out_dict = {}
-    for split in results:
-        out_dict[split] = evaluate_split(results, split)
-    return out_dict
-
-
-def evaluate_split(results: Dict[str, Any], split: str) -> Dict[str, float]:
-    """
-    Evaluate the model outputs on the MixEval dataset.
-
-    Args:
-        results (Dict[str, Any]): The model outputs to evaluate.
-        split (str): The data split to evaluate on.
-
-    Returns:
-        Dict[str, float]: The evaluation metrics for the model outputs.
-    """
-    # Load the MixEval dataset
-    args.split = split
 
     # Compute metrics
     compute_metrics_p(args)
@@ -232,15 +217,34 @@ def evaluate_split(results: Dict[str, Any], split: str) -> Dict[str, float]:
         args.version,
     )
     # find score file
-    score_file = [f for f in os.listdir(score_dir) if f.startswith("score") and f.endswith(".json")]
-    if "score_gpt-4o-mini.json" in score_file:
+    result_files = [f for f in os.listdir(score_dir) if f.startswith("score") and f.endswith(".json")]
+    if "score_gpt-4o-mini.json" in result_files:
         score_file = "score_gpt-4o-mini.json"
-    elif "score.json" in score_file:
+        judge_model = "gpt-4o-mini"
+    elif "score.json" in result_files:
         score_file = "score.json"
+        judge_model = (
+            args.multichoice_judge
+            if args.mulitchoice_judge == args.freeform_judge
+            else f"mc{args.multichoice_judge}_ff{args.freeform_judge}"
+        )
     else:
-        raise ValueError(f"Expected 'score_gpt-4o-mini.json' or 'score.json' in {score_dir}, but found {score_file}")
+        raise ValueError(f"Expected 'score_gpt-4o-mini.json' or 'score.json' in {score_dir}, but found {result_files}")
 
     with open(os.path.join(score_dir, score_file), "r") as f:
         metrics = json.load(f)
 
-    return metrics
+    for result_file in result_files:
+        if result_file.startswith("judge_results_ff"):
+            with open(os.path.join(score_dir, result_file), "r") as f:
+                results_ff = json.load(f)
+        elif result_file.startswith("judge_results_mp"):
+            with open(os.path.join(score_dir, result_file), "r") as f:
+                results_mp = json.load(f)
+    return {
+        judge_model: {
+            "metrics": metrics,
+            "judge_answers": {"close_freeform": results_ff, "close_multichoice": results_mp},
+        },
+        "samples": results,
+    }

@@ -22,13 +22,6 @@ from eval.database.utils import create_db_engine, create_tables, sessionmaker
 import subprocess
 
 
-def get_git_hash():
-    try:
-        return subprocess.check_output(["git", "rev-parse", "HEAD"]).decode("ascii").strip()
-    except subprocess.CalledProcessError:
-        return None
-
-
 def flatten_dict(d, parent_key="", sep="/"):
     items = []
     for k, v in d.items():
@@ -216,7 +209,8 @@ class DCFTEvaluationTracker:
                 session=session,
             )
 
-            results = eval_log_dict["results"]
+            results_log_dict = eval_log_dict["results"]
+            results = results_log_dict["results"]
             benchmark_name = next(iter(results))
             updated_results = self.update_results_with_benchmark(flatten_dict(results[benchmark_name]), benchmark_name)
 
@@ -227,8 +221,7 @@ class DCFTEvaluationTracker:
                 config=eval_log_dict["config"],
                 completions_location="NA",
                 creation_location="NA",
+                git_hash=eval_log_dict["git_hash"],
                 user=user,
                 session=session,
             )
-            # except Exception as e:
-            #     raise RuntimeError(f"Error in update_evalresults_db: {str(e)}")

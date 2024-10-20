@@ -195,13 +195,13 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
     if lm.rank == 0:
         results = process_results(results, lm, args, start_date)
 
-    if results is not None or pretrain_results is not None:
-        if args.log_samples:
-            samples = results.pop("samples")
-        if pretrain_results is not None and results is not None:
-            results["results"].update(pretrain_results["results"])
-        elif pretrain_results is not None and results is None:
-            results = pretrain_results
+        if results is not None or pretrain_results is not None:
+            if args.log_samples:
+                samples = results.pop("samples")
+            if pretrain_results is not None and results is not None:
+                results["results"].update(pretrain_results["results"])
+            elif pretrain_results is not None and results is None:
+                results = pretrain_results
 
         dumped = json.dumps(results, indent=2, default=handle_non_serializable, ensure_ascii=False)
         if args.show_config:

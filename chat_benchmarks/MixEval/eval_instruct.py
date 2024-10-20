@@ -51,11 +51,11 @@ args.update(
         "output_dir": "eval/chat_benchmarks/MixEval/results/",
         "api_parallel_num": 32,
         # Original judges in MixEval:
-        "multichoice_judge": "gpt-3.5-turbo-0125",
-        "freeform_judge": "gpt-3.5-turbo-0125",
+        # "multichoice_judge": "gpt-3.5-turbo-0125",
+        # "freeform_judge": "gpt-3.5-turbo-0125",
         # New judges:
-        # "multichoice_judge": "gpt-4o-mini",
-        # "freeform_judge": "gpt-4o-mini",
+        "multichoice_judge": "gpt-4o-mini",
+        "freeform_judge": "gpt-4o-mini",
         "verbose": False,
     }
 )
@@ -210,26 +210,20 @@ def evaluate(results: Dict[str, Any]) -> Dict[str, float]:
     # Compute metrics
     compute_metrics_p(args)
 
-    score_dir = os.path.join(
-        args.model_response_dir,
-        args.model_name,
-        args.benchmark,
-        args.version,
-    )
+    score_dir = os.path.join(args.model_response_dir, args.model_name, args.benchmark, args.version)
     # find score file
-    result_files = [f for f in os.listdir(score_dir) if f.startswith("score") and f.endswith(".json")]
-    if "score_gpt-4o-mini.json" in result_files:
-        score_file = "score_gpt-4o-mini.json"
-        judge_model = "gpt-4o-mini"
-    elif "score.json" in result_files:
-        score_file = "score.json"
+    result_files = [f for f in os.listdir(score_dir)]
+    if any(file.startswith("score") and file.endswith(".json") for file in result_files):
         judge_model = (
             args.multichoice_judge
-            if args.mulitchoice_judge == args.freeform_judge
+            if args.multichoice_judge == args.freeform_judge
             else f"mc{args.multichoice_judge}_ff{args.freeform_judge}"
         )
+        score_file = f"score_{judge_model}.json"
+        if score_file not in result_files:
+            raise ValueError(f"Expected 'score_{judge_model}.json' in {score_dir}, but found {result_files}")
     else:
-        raise ValueError(f"Expected 'score_gpt-4o-mini.json' or 'score.json' in {score_dir}, but found {result_files}")
+        raise ValueError(f"Expected a score file in {score_dir}. Check that evaluation has been run properly.")
 
     with open(os.path.join(score_dir, score_file), "r") as f:
         metrics = json.load(f)
@@ -237,14 +231,16 @@ def evaluate(results: Dict[str, Any]) -> Dict[str, float]:
     for result_file in result_files:
         if result_file.startswith("judge_results_ff"):
             with open(os.path.join(score_dir, result_file), "r") as f:
-                results_ff = json.load(f)
+                results_ff = [json.loads(line) for line in f]
         elif result_file.startswith("judge_results_mp"):
             with open(os.path.join(score_dir, result_file), "r") as f:
-                results_mp = json.load(f)
+                results_mp = [json.loads(line) for line in f]
     return {
         judge_model: {
             "metrics": metrics,
+        },
+        "samples": {
+            "model_answers": results,
             "judge_answers": {"close_freeform": results_ff, "close_multichoice": results_mp},
         },
-        "samples": results,
     }

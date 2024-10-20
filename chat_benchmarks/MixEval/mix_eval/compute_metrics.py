@@ -386,8 +386,8 @@ def compute_metric_closeended_freeform_modelparse(args):
             for case in results:
                 f.write(json.dumps(case) + "\n")
 
-        print("Sleep 60 seconds to avoid ratelimit error ... ")
-        time.sleep(60)
+        print("Sleep 10 seconds to avoid ratelimit error ... ")
+        time.sleep(10)
 
     if args.verbose:
         print(f"[Close-ended Free-form Model Parser]")
@@ -584,8 +584,8 @@ def compute_metric_closeended_multichoice_modelparse(args):
             for case in results:
                 f.write(json.dumps(case) + "\n")
 
-        print("Sleep 60 seconds to avoid ratelimit error ... ")
-        time.sleep(60)
+        print("Sleep 10 seconds to avoid ratelimit error ... ")
+        time.sleep(10)
 
     if args.verbose:
         print(f"[Close-ended Multiple-choice Model Parser]")
@@ -741,7 +741,7 @@ def compute_metric(args):
         if args.multichoice_judge == args.freeform_judge:
             scorer = args.multichoice_judge
         else:
-            scorer = f"m_{args.multichoice_judge}_ff_{args.freeform_judge}"
+            scorer = f"mc{args.multichoice_judge}_ff{args.freeform_judge}"
         with open(os.path.join(score_dir, f"score_{scorer}.json"), "w") as f:
             f.write(json.dumps(tmp_score_dict_model, indent=4) + "\n")
         print_table(tmp_score_dict_model)

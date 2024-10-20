@@ -28,7 +28,8 @@ def get_git_hash():
     except subprocess.CalledProcessError:
         return None
 
-def flatten_dict(d, parent_key='', sep='/'):
+
+def flatten_dict(d, parent_key="", sep="/"):
     items = []
     for k, v in d.items():
         new_key = f"{parent_key}{sep}{k}" if parent_key else k
@@ -37,6 +38,7 @@ def flatten_dict(d, parent_key='', sep='/'):
         else:
             items.append((new_key, v))
     return dict(items)
+
 
 class DCFTEvaluationTracker:
     """
@@ -205,7 +207,7 @@ class DCFTEvaluationTracker:
     def update_evalresults_db(self, eval_log_dict: Dict[str, Any]) -> None:
         eval_logger.info("Updating DB with eval results")
         with self.session_scope() as session:
-            user = getpass.getuser() # TODO
+            user = getpass.getuser()  # TODO
             model_id, dataset_id = self.get_or_create_model(
                 model_name=eval_log_dict["config"]["model_args"].replace("pretrained=", ""),
                 user=user,

@@ -26,7 +26,8 @@ import lm_eval.api.task
 import lm_eval.models
 from lm_eval.loggers.utils import add_env_info, add_tokenizer_info, get_git_commit_hash
 
-def flatten_dict(d, parent_key='', sep='/'):
+
+def flatten_dict(d, parent_key="", sep="/"):
     items = []
     for k, v in d.items():
         new_key = f"{parent_key}{sep}{k}" if parent_key else k
@@ -35,6 +36,7 @@ def flatten_dict(d, parent_key='', sep='/'):
         else:
             items.append((new_key, v))
     return dict(items)
+
 
 def evaluate(
     lm: LM,
@@ -55,11 +57,11 @@ def evaluate(
     eval_logger = utils.eval_logger
     eval_logger.setLevel(getattr(logging, f"{verbosity}"))
 
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        eval_instruct_results = list(
-            executor.map(lambda task: task(lm), task_manager.get_list_eval_instructs(task_list))
-        )
+    eval_instruct_results = [
+        eval_instruct_task(lm) for eval_instruct_task in task_manager.get_list_eval_instructs(task_list)
+    ]
 
+    with concurrent.futures.ThreadPoolExecutor() as executor:
         evaluate_results = list(
             executor.map(
                 lambda func_args: func_args[0](func_args[1]),
@@ -180,13 +182,15 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
         )
     results = {}
     if len(instruct_task_names) > 0:
-        results["results"] = evaluate(lm, task_manager=task_manager, task_list=instruct_task_names, verbosity=args.verbosity)
+        results["results"] = evaluate(
+            lm, task_manager=task_manager, task_list=instruct_task_names, verbosity=args.verbosity
+        )
 
     # Setup random seeds
     seed_message = setup_random_seeds(args.seed[0], args.seed[1], args.seed[2])
     if seed_message:
         eval_logger.info(seed_message)
-    
+
     # Process results
     if lm.rank == 0:
         results = process_results(results, lm, args, start_date)

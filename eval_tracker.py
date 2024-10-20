@@ -141,7 +141,7 @@ class DCFTEvaluationTracker:
     def update_results_with_benchmark(results: Dict[str, Any], benchmark_name: str) -> Dict[str, Any]:
         return {f"{benchmark_name}_{key}": value for key, value in results.items()}
 
-    def get_or_create_eval_setting(self, name: str, config: Dict[str, Any], session) -> uuid.UUID:
+    def get_or_create_eval_setting(self, name: str, git_hash: str, config: Dict[str, Any], session) -> uuid.UUID:
         try:
             config = self._prepare_config(config)
             eval_setting = session.query(EvalSetting).filter_by(name=name, parameters=config).first()
@@ -150,7 +150,7 @@ class DCFTEvaluationTracker:
                     id=uuid.uuid4(),
                     name=name,
                     parameters=config,
-                    eval_version_hash=get_git_hash(),
+                    eval_version_hash=git_hash,
                 )
                 session.add(eval_setting)
                 session.commit()
@@ -171,13 +171,14 @@ class DCFTEvaluationTracker:
         config: Dict[str, Any],
         completions_location: str,
         creation_location: str,
+        git_hash: str,
         user: str,
         session,
     ) -> None:
         try:
             for key, score in results.items():
                 if isinstance(score, float) or isinstance(score, int):
-                    eval_setting_id = self.get_or_create_eval_setting(key, config, session)
+                    eval_setting_id = self.get_or_create_eval_setting(key, git_hash, config, session)
                     eval_result = EvalResult(
                         id=uuid.uuid4(),
                         model_id=model_id,

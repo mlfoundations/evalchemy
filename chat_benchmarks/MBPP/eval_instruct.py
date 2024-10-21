@@ -136,7 +136,7 @@ def eval_instruct(model: LM, **kwargs) -> Dict[str, Any]:
     return results
 
 
-def evaluate(results: Dict[str, Any]) -> Dict[str, Any]:
+def evaluate(results: Dict[str, Any]) -> Dict[str, float]:
     """
     Evaluate the generated results.
 
@@ -144,7 +144,7 @@ def evaluate(results: Dict[str, Any]) -> Dict[str, Any]:
         results (Dict[str, Any]): The results from eval_instruct, including the temporary directory object.
 
     Returns:
-        Dict[str, Any]: Evaluation results.
+        Dict[str, float]: Evaluation results.
     """
     temp_dir_obj = results["temp_dir_obj"]
     temp_dir = temp_dir_obj.name

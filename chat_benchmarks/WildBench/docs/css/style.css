@@ -1,0 +1,18 @@
+ 
+.callout-box {
+    border: 1px solid #3498db;
+    background-color: #f0f8ff;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.callout-box p {
+    margin: 0;
+    color: #333;
+}
+
+.callout-box h2 {
+    color: #3498db;
+}

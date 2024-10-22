@@ -2,9 +2,10 @@
 
 This is the DCFT fork of the MixEval project, which is a quick evaluation suite for Large Language Models (LLMs). MixEval provides a standardized way to evaluate and compare the performance of various LLMs across a wide range of tasks and benchmarks that should correlate with Arena Elo.
 
-Run `python -m eval.eval --model dummy --tasks MixEval --model_args 'pretrained=llama_3_8b_instruct'  --output_path logs` to evaluate the llama_3_8b_instruct model. By default, the model will be evaluated on all tasks in MixEval and use GPT-4o-mini as the judge.
+To reproduce MixEval results, run `python -m eval.eval --model dummy --tasks MixEval --model_args 'pretrained=llama_3_8b_instruct'  --output_path logs` to evaluate the llama_3_8b_instruct model. By default, the model will be evaluated on all tasks in MixEval and use gpt-3.5-turbo-0125 as the judge.
 Other supported models are in `mix_eval/models`
 
+To evaluate other chat models, for example a huggingface model, run `python -m eval.eval --model hf --tasks MixEval --model_args "pretrained=mistralai/Mistral-7B-Instruct-v0.2" --output_path logs` to evaluate the mistralai/Mistral-7B-Instruct-v0.2 model from huggingface. This will disregard any specific prompt used in the original MixEval evaluation and use the default tokenizer chat template.
 
 You should set the following environment variables to run the evaluation with your own OpenAI API key:
 ```

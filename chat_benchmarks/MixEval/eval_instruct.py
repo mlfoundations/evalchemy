@@ -1,6 +1,7 @@
 from typing import Dict, List, Any
 import mix_eval
 from lm_eval.api.model import LM
+from lm_eval.models.dummy import DummyLM
 import torch
 from tqdm import tqdm
 import os
@@ -20,6 +21,7 @@ from mix_eval.evaluate import parse_args
 from mix_eval.utils.dataset import get_eval_dataset
 from mix_eval.compute_metrics import compute_metrics_p
 from mix_eval.utils.common_utils import cache_status, read_status, dict_equal
+from mix_eval.models.lm_chat_model import LMChatModel
 
 os.environ["MODEL_PARSER_API"] = os.getenv("OPENAI_API_KEY")
 
@@ -51,11 +53,11 @@ args.update(
         "output_dir": "eval/chat_benchmarks/MixEval/results/",
         "api_parallel_num": 32,
         # Original judges in MixEval:
-        # "multichoice_judge": "gpt-3.5-turbo-0125",
-        # "freeform_judge": "gpt-3.5-turbo-0125",
+        "multichoice_judge": "gpt-3.5-turbo-0125",
+        "freeform_judge": "gpt-3.5-turbo-0125",
         # New judges:
-        "multichoice_judge": "gpt-4o-mini",
-        "freeform_judge": "gpt-4o-mini",
+        # "multichoice_judge": "gpt-4o-mini",
+        # "freeform_judge": "gpt-4o-mini",
         "verbose": False,
     }
 )
@@ -109,7 +111,7 @@ def eval_instruct_split(model: LM, split: str) -> Dict[str, Any]:
 
     # TODO: File saving (and verification that eval already exists) should be replaced with DB access
     response_file = os.path.join(
-        args.output_dir, args.model_name, args.benchmark, args.version, f"{args.model_name}_{args.split}.jsonl"
+        args.output_dir, args.model_name, args.benchmark, args.version, f"{model_name}_{split}.jsonl"
     )
     os.makedirs(os.path.dirname(response_file), exist_ok=True)
 
@@ -152,7 +154,11 @@ def eval_instruct_split(model: LM, split: str) -> Dict[str, Any]:
                     "You might consider delete the response and metadata file to start from scratch."
                 )
 
-    model = mix_eval.api.registry.get_model(args.model_name)(args)
+    if isinstance(model, DummyLM):
+        model = mix_eval.api.registry.get_model(args.model_name)(args)
+    else:
+        model = LMChatModel(args, model)
+
     eval_dataset = get_eval_dataset(args)
 
     dataloader = DataLoader(
@@ -207,12 +213,10 @@ def evaluate(results: Dict[str, Any]) -> Dict[str, float]:
         Dict[str, float]: A dictionary containing evaluation metrics for each split.
     """
 
-    # Compute metrics
-    compute_metrics_p(args)
-
-    score_dir = os.path.join(args.model_response_dir, args.model_name, args.benchmark, args.version)
-    # find score file
+    score_file_exists = False
+    score_dir = os.path.join(args.output_dir, args.model_name, args.benchmark, args.version)
     result_files = [f for f in os.listdir(score_dir)]
+    # find score file
     if any(file.startswith("score") and file.endswith(".json") for file in result_files):
         judge_model = (
             args.multichoice_judge
@@ -220,10 +224,27 @@ def evaluate(results: Dict[str, Any]) -> Dict[str, float]:
             else f"mc{args.multichoice_judge}_ff{args.freeform_judge}"
         )
         score_file = f"score_{judge_model}.json"
-        if score_file not in result_files:
-            raise ValueError(f"Expected 'score_{judge_model}.json' in {score_dir}, but found {result_files}")
-    else:
-        raise ValueError(f"Expected a score file in {score_dir}. Check that evaluation has been run properly.")
+        score_file_exists = True
+
+    if not score_file_exists:
+        # Compute metrics (should create score file)
+        compute_metrics_p(args)
+
+        # find score file
+        score_dir = os.path.join(args.model_response_dir, args.model_name, args.benchmark, args.version)
+        result_files = [f for f in os.listdir(score_dir)]
+        if any(file.startswith("score") and file.endswith(".json") for file in result_files):
+            judge_model = (
+                args.multichoice_judge
+                if args.multichoice_judge == args.freeform_judge
+                else f"mc{args.multichoice_judge}_ff{args.freeform_judge}"
+            )
+            score_file = f"score_{judge_model}.json"
+            score_file_exists = True
+            if score_file not in result_files:
+                raise ValueError(f"Expected 'score_{judge_model}.json' in {score_dir}, but found {result_files}")
+        else:
+            raise ValueError(f"Expected a score file in {score_dir}. Check that evaluation has been run properly.")
 
     with open(os.path.join(score_dir, score_file), "r") as f:
         metrics = json.load(f)

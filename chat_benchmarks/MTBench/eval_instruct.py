@@ -14,7 +14,7 @@ from pathlib import Path
 
 from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
-from eval.base import BaseBenchmark
+from eval.task import BaseBenchmark
 from fastchat.llm_judge.common import (
     load_questions,
     load_model_answers,

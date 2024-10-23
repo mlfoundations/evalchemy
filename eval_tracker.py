@@ -7,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 import uuid
 from contextlib import contextmanager
-from typing import Tuple, Dict, Any
+from typing import Tuple, Dict, Any, Optional
 
 import torch
 
@@ -17,6 +17,7 @@ from lm_eval.utils import (
     hash_string,
 )
 from lm_eval.loggers.evaluation_tracker import GeneralConfigTracker
+from lm_eval.utils import simple_parse_args_string
 from eval.database.models import Dataset, Model, EvalResult, EvalSetting
 from eval.database.utils import create_db_engine, create_tables, sessionmaker
 import subprocess
@@ -115,11 +116,14 @@ class DCFTEvaluationTracker:
             eval_logger.info("Output path not provided, skipping saving results aggregated")
 
     def get_or_create_model(
-        self, model_name: str, user: str, creation_location: str, weights_location: str, session
+        self, model_name: str, user: str, creation_location: str, weights_location: str, session, model_id: Optional[str], update_db_by_model_name: bool=False
     ) -> Tuple[uuid.UUID, uuid.UUID]:
         try:
-            model = session.query(Model).filter_by(name=model_name).first()
-            if not model:
+            if model_id:
+                model = session.get(Model, uuid.UUID(model_id))
+            elif update_db_by_model_name:
+                model = session.query(Model).filter_by(name=model_name).first()
+            else:
                 model = Model(
                     id=uuid.uuid4(),
                     name=model_name,
@@ -198,20 +202,26 @@ class DCFTEvaluationTracker:
             session.rollback()
             raise RuntimeError(f"Database error in insert_eval_results: {str(e)}")
 
-    def update_evalresults_db(self, eval_log_dict: Dict[str, Any]) -> None:
+    def update_evalresults_db(self, eval_log_dict: Dict[str, Any], model_id: Optional[str], update_db_by_model_name=False, model_name=Optional[str]) -> None:
         eval_logger.info("Updating DB with eval results")
         with self.session_scope() as session:
             user = getpass.getuser()  # TODO
+
+            if not model_name:
+                args_dict=simple_parse_args_string(eval_log_dict["config"]["model_args"])
+                model_name=args_dict["pretrained"]
+
             model_id, dataset_id = self.get_or_create_model(
-                model_name=eval_log_dict["config"]["model_args"].replace("pretrained=", ""),
+                model_name=model_name,
                 user=user,
                 creation_location="NA",
                 weights_location=eval_log_dict["config"]["model"],
                 session=session,
+                model_id=model_id,
+                update_db_by_model_name=update_db_by_model_name,
             )
 
-            results_log_dict = eval_log_dict["results"]
-            results = results_log_dict["results"]
+            results = eval_log_dict["results"]
             benchmark_name = next(iter(results))
             updated_results = self.update_results_with_benchmark(flatten_dict(results[benchmark_name]), benchmark_name)
 

@@ -193,7 +193,7 @@ def get_model_answers(
     eval_logger.info(f"Completed processing all questions. Results written to {answer_file}")
 
 
-def eval_instruct(model: Any) -> Dict[str, str]:
+def generate_responses(model: Any) -> Dict[str, str]:
     """
     Generates the model completions on the MTBench prompts.
 

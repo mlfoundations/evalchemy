@@ -1,71 +1,205 @@
-from typing import Dict, List, Any
-from alpaca_eval.main import evaluate as alpaca_eval_evaluate
-from lm_eval.api.instance import Instance
-from lm_eval.api.model import LM
+from typing import Dict, List, Any, Optional
+import logging
 import torch
 import datasets
 from tqdm import tqdm
+import pandas as pd
+
+from lm_eval.api.instance import Instance
+from lm_eval.api.model import LM
+from alpaca_eval.main import evaluate as alpaca_eval_evaluate
+from eval.task import BaseBenchmark
 
 
-def eval_instruct(model: LM) -> Dict[str, Any]:
+class AlpacaBenchmark(BaseBenchmark):
     """
-    Generate the completions for the model on the Alpaca dataset.
-
-    Args:
-        model (Any): The language model to evaluate.
-
-    Returns:
-        Dict[str, Any]: A dictionary containing the generations of the model
-        including model outputs and model identifier.
+    Alpaca benchmark for evaluating language model responses on instruction following.
     """
-    eval_set = datasets.load_dataset("tatsu-lab/alpaca_eval", "alpaca_eval", trust_remote_code=True)["eval"]
-    outputs = []
-    with torch.no_grad():
-        all_instances: List[Instance] = []
-        for idx, example in enumerate(tqdm(eval_set)):
-            instruction = example["instruction"]
-            instruction = model.apply_chat_template([{"role": "user", "content": instruction}])
+    
+    def __init__(
+        self,
+        dataset_name: str = "tatsu-lab/alpaca_eval",
+        subset: str = "alpaca_eval",
+        split: str = "eval",
+        max_tokens: int = 1024,
+        temperature: float = 0.5,
+        do_sample: bool = True,
+        debug_size: Optional[int] = None,
+        logger: Optional[logging.Logger] = None
+    ):
+        """
+        Initialize Alpaca benchmark.
+        
+        Args:
+            dataset_name: HuggingFace dataset name
+            subset: Dataset subset name
+            split: Dataset split to use
+            max_tokens: Maximum number of tokens for generation
+            temperature: Sampling temperature
+            do_sample: Whether to use sampling for generation
+            debug_size: If set, only evaluate this many examples
+            logger: Optional logger instance
+        """
+        super().__init__(logger)
+        self.dataset_name = dataset_name
+        self.subset = subset
+        self.split = split
+        self.max_tokens = max_tokens
+        self.temperature = temperature
+        self.do_sample = do_sample
+        self.debug_size = debug_size
+        
+    def load_dataset(self) -> datasets.Dataset:
+        """Load the evaluation dataset."""
+        try:
+            dataset = datasets.load_dataset(
+                self.dataset_name,
+                self.subset,
+                trust_remote_code=True
+            )[self.split]
+            
+            if self.debug_size:
+                dataset = dataset.select(range(self.debug_size))
+                self.logger.info(f"Debug mode: using {self.debug_size} examples")
+            
+            self.logger.info(f"Loaded {len(dataset)} examples for evaluation")
+            return dataset
+            
+        except Exception as e:
+            self.logger.error(f"Error loading dataset: {str(e)}")
+            raise
 
-            all_instances.append(
-                Instance(
-                    "generate_until",
-                    example,
-                    (
-                        instruction,
-                        {"max_new_tokens": 1024, "do_sample": True, "temperature": 0.5},
-                    ),
-                    idx,
-                )
-            )
+    def generate_responses(self, model: LM) -> Dict[str, Any]:
+        """
+        Generate completions for instructions using the provided model.
+        
+        Args:
+            model: Language model instance
+            
+        Returns:
+            Dictionary containing model outputs and identifier
+        """
+        try:
+            eval_set = self.load_dataset()
+            
+            all_instances = []
+            for idx, example in enumerate(eval_set):
+                try:
+                    instruction = example["instruction"]
+                    formatted_instruction = model.apply_chat_template([{
+                        "role": "user",
+                        "content": instruction
+                    }])
+                    
+                    all_instances.append(
+                        Instance(
+                            "generate_until",
+                            example,
+                            (
+                                formatted_instruction,
+                                {
+                                    "max_new_tokens": self.max_tokens,
+                                    "do_sample": self.do_sample,
+                                    "temperature": self.temperature
+                                },
+                            ),
+                            idx,
+                        )
+                    )
+                except Exception as e:
+                    self.logger.error(f"Error preparing instance {idx}: {str(e)}")
+                    continue
 
-        outputs = model.generate_until(all_instances)
-
-        model_outputs: List[Dict[str, Any]] = []
-        for idx, example in enumerate(tqdm(eval_set)):
-            instruction = example["instruction"]
-            instance = {
-                "instruction": instruction,
-                "dataset": example["dataset"],
-                "datasplit": "eval",
-                "generator": model.model_identifier,
-                "output": outputs[idx],
+            with torch.no_grad():
+                self.logger.info("Generating responses...")
+                outputs = model.generate_until(all_instances)
+                
+            model_outputs = []
+            for idx, (example, output) in enumerate(zip(eval_set, outputs)):
+                try:
+                    instance = {
+                        "instruction": example["instruction"],
+                        "dataset": example["dataset"],
+                        "datasplit": self.split,
+                        "generator": model.model_identifier,
+                        "output": output,
+                    }
+                    model_outputs.append(instance)
+                except Exception as e:
+                    self.logger.error(f"Error processing output {idx}: {str(e)}")
+                    continue
+                    
+            self.logger.info(f"Generated {len(model_outputs)} responses")
+            
+            return {
+                "model_outputs": model_outputs,
+                "model_identifier": model.model_identifier
             }
-            model_outputs.append(instance)
+            
+        except Exception as e:
+            self.logger.error(f"Error in generate_responses: {str(e)}")
+            raise
 
-    results = {"model_outputs": model_outputs, "model_identifier": model.model_identifier}
-    return results
+    def evaluate_responses(self, results: Dict[str, Any]) -> Dict[str, float]:
+        """
+        Evaluate the generated responses using Alpaca evaluation metrics.
+        
+        Args:
+            results: Dictionary containing model outputs and identifier
+            
+        Returns:
+            Dictionary containing evaluation metrics
+        """
+        try:
+            model_outputs = results["model_outputs"]
+            model_identifier = results["model_identifier"]
+            
+            if not model_outputs:
+                raise ValueError("No model outputs to evaluate")
+                
+            self.logger.info("Running Alpaca evaluation...")
+            leaderboard = alpaca_eval_evaluate(
+                model_outputs=model_outputs,
+                is_return_instead_of_print=True
+            )
+            
+            metrics = leaderboard[0].loc[model_identifier].to_dict()
+            
+            metrics.update({
+                "num_examples": len(model_outputs),
+                "completion_rate": len(model_outputs) / len(results.get("total_examples", model_outputs))
+            })
+            
+            self.logger.info("Evaluation complete")
+            return metrics
+            
+        except Exception as e:
+            self.logger.error(f"Error in evaluate_responses: {str(e)}")
+            raise
 
-
-def evaluate(results: Dict[str, Any]) -> Dict[str, float]:
-    """
-    Evaluate the model outputs using the Alpaca Eval framework.
-
-    Args:
-        results (Dict[str, Any]): A dictionary containing model outputs and identifier.
-
-    Returns:
-        Dict[str, float]: A dictionary containing evaluation metrics for the model.
-    """
-    model_outputs = results["model_outputs"]
-    leaderboard = alpaca_eval_evaluate(model_outputs=model_outputs, is_return_instead_of_print=True)
-    return leaderboard[0].loc[results["model_identifier"]].to_dict()
+    def run_benchmark(self, model: LM) -> Dict[str, float]:
+        """
+        Run the complete Alpaca benchmark evaluation pipeline.
+        
+        Args:
+            model: Language model instance
+            
+        Returns:
+            Dictionary containing evaluation metrics
+        """
+        self.logger.info("Starting Alpaca benchmark evaluation")
+        try:
+            generation_results = self.generate_responses(model)
+            evaluation_results = self.evaluate_responses(generation_results)
+            
+            evaluation_results.update({
+                "benchmark_version": "alpaca_eval",
+                "temperature": self.temperature,
+                "max_tokens": self.max_tokens
+            })
+            
+            return evaluation_results
+            
+        except Exception as e:
+            self.logger.error(f"Error running benchmark: {str(e)}")
+            return {"error": str(e)}

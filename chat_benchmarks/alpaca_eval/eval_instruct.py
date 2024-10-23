@@ -15,7 +15,7 @@ class AlpacaBenchmark(BaseBenchmark):
     """
     Alpaca benchmark for evaluating language model responses on instruction following.
     """
-    
+
     def __init__(
         self,
         dataset_name: str = "tatsu-lab/alpaca_eval",
@@ -25,11 +25,11 @@ class AlpacaBenchmark(BaseBenchmark):
         temperature: float = 0.5,
         do_sample: bool = True,
         debug_size: Optional[int] = None,
-        logger: Optional[logging.Logger] = None
+        logger: Optional[logging.Logger] = None,
     ):
         """
         Initialize Alpaca benchmark.
-        
+
         Args:
             dataset_name: HuggingFace dataset name
             subset: Dataset subset name
@@ -48,23 +48,19 @@ class AlpacaBenchmark(BaseBenchmark):
         self.temperature = temperature
         self.do_sample = do_sample
         self.debug_size = debug_size
-        
+
     def load_dataset(self) -> datasets.Dataset:
         """Load the evaluation dataset."""
         try:
-            dataset = datasets.load_dataset(
-                self.dataset_name,
-                self.subset,
-                trust_remote_code=True
-            )[self.split]
-            
+            dataset = datasets.load_dataset(self.dataset_name, self.subset, trust_remote_code=True)[self.split]
+
             if self.debug_size:
                 dataset = dataset.select(range(self.debug_size))
                 self.logger.info(f"Debug mode: using {self.debug_size} examples")
-            
+
             self.logger.info(f"Loaded {len(dataset)} examples for evaluation")
             return dataset
-            
+
         except Exception as e:
             self.logger.error(f"Error loading dataset: {str(e)}")
             raise
@@ -72,25 +68,22 @@ class AlpacaBenchmark(BaseBenchmark):
     def generate_responses(self, model: LM) -> Dict[str, Any]:
         """
         Generate completions for instructions using the provided model.
-        
+
         Args:
             model: Language model instance
-            
+
         Returns:
             Dictionary containing model outputs and identifier
         """
         try:
             eval_set = self.load_dataset()
-            
+
             all_instances = []
             for idx, example in enumerate(eval_set):
                 try:
                     instruction = example["instruction"]
-                    formatted_instruction = model.apply_chat_template([{
-                        "role": "user",
-                        "content": instruction
-                    }])
-                    
+                    formatted_instruction = model.apply_chat_template([{"role": "user", "content": instruction}])
+
                     all_instances.append(
                         Instance(
                             "generate_until",
@@ -100,7 +93,7 @@ class AlpacaBenchmark(BaseBenchmark):
                                 {
                                     "max_new_tokens": self.max_tokens,
                                     "do_sample": self.do_sample,
-                                    "temperature": self.temperature
+                                    "temperature": self.temperature,
                                 },
                             ),
                             idx,
@@ -113,7 +106,7 @@ class AlpacaBenchmark(BaseBenchmark):
             with torch.no_grad():
                 self.logger.info("Generating responses...")
                 outputs = model.generate_until(all_instances)
-                
+
             model_outputs = []
             for idx, (example, output) in enumerate(zip(eval_set, outputs)):
                 try:
@@ -128,14 +121,11 @@ class AlpacaBenchmark(BaseBenchmark):
                 except Exception as e:
                     self.logger.error(f"Error processing output {idx}: {str(e)}")
                     continue
-                    
+
             self.logger.info(f"Generated {len(model_outputs)} responses")
-            
-            return {
-                "model_outputs": model_outputs,
-                "model_identifier": model.model_identifier
-            }
-            
+
+            return {"model_outputs": model_outputs, "model_identifier": model.model_identifier}
+
         except Exception as e:
             self.logger.error(f"Error in generate_responses: {str(e)}")
             raise
@@ -143,36 +133,35 @@ class AlpacaBenchmark(BaseBenchmark):
     def evaluate_responses(self, results: Dict[str, Any]) -> Dict[str, float]:
         """
         Evaluate the generated responses using Alpaca evaluation metrics.
-        
+
         Args:
             results: Dictionary containing model outputs and identifier
-            
+
         Returns:
             Dictionary containing evaluation metrics
         """
         try:
             model_outputs = results["model_outputs"]
             model_identifier = results["model_identifier"]
-            
+
             if not model_outputs:
                 raise ValueError("No model outputs to evaluate")
-                
+
             self.logger.info("Running Alpaca evaluation...")
-            leaderboard = alpaca_eval_evaluate(
-                model_outputs=model_outputs,
-                is_return_instead_of_print=True
-            )
-            
+            leaderboard = alpaca_eval_evaluate(model_outputs=model_outputs, is_return_instead_of_print=True)
+
             metrics = leaderboard[0].loc[model_identifier].to_dict()
-            
-            metrics.update({
-                "num_examples": len(model_outputs),
-                "completion_rate": len(model_outputs) / len(results.get("total_examples", model_outputs))
-            })
-            
+
+            metrics.update(
+                {
+                    "num_examples": len(model_outputs),
+                    "completion_rate": len(model_outputs) / len(results.get("total_examples", model_outputs)),
+                }
+            )
+
             self.logger.info("Evaluation complete")
             return metrics
-            
+
         except Exception as e:
             self.logger.error(f"Error in evaluate_responses: {str(e)}")
             raise
@@ -180,10 +169,10 @@ class AlpacaBenchmark(BaseBenchmark):
     def run_benchmark(self, model: LM) -> Dict[str, float]:
         """
         Run the complete Alpaca benchmark evaluation pipeline.
-        
+
         Args:
             model: Language model instance
-            
+
         Returns:
             Dictionary containing evaluation metrics
         """
@@ -191,15 +180,13 @@ class AlpacaBenchmark(BaseBenchmark):
         try:
             generation_results = self.generate_responses(model)
             evaluation_results = self.evaluate_responses(generation_results)
-            
-            evaluation_results.update({
-                "benchmark_version": "alpaca_eval",
-                "temperature": self.temperature,
-                "max_tokens": self.max_tokens
-            })
-            
+
+            evaluation_results.update(
+                {"benchmark_version": "alpaca_eval", "temperature": self.temperature, "max_tokens": self.max_tokens}
+            )
+
             return evaluation_results
-            
+
         except Exception as e:
             self.logger.error(f"Error running benchmark: {str(e)}")
             return {"error": str(e)}

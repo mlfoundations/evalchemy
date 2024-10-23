@@ -17,7 +17,7 @@ class HumanEvalBenchmark(BaseBenchmark):
     """
     HumanEval benchmark for evaluating code generation capabilities across different languages.
     """
-    
+
     def __init__(
         self,
         languages: List[str] = ["python", "sh"],
@@ -26,11 +26,11 @@ class HumanEvalBenchmark(BaseBenchmark):
         num_workers: int = 8,
         timeout: float = 3.0,
         debug: bool = False,
-        logger: Optional[logging.Logger] = None
+        logger: Optional[logging.Logger] = None,
     ):
         """
         Initialize HumanEval benchmark.
-        
+
         Args:
             languages: List of programming languages to evaluate
             data_dir: Directory containing HumanEval datasets
@@ -47,7 +47,7 @@ class HumanEvalBenchmark(BaseBenchmark):
         self.num_workers = num_workers
         self.timeout = timeout
         self.debug = debug
-        
+
     def build_deepseekcoder_instruction(self, language: str, question: str) -> str:
         """Build instruction prompt for the model."""
         return """
@@ -62,10 +62,10 @@ Please continue to complete the function. You are not allowed to modify the give
     def generate_responses(self, model: LM) -> Dict[str, Any]:
         """
         Generate code completions using the provided model.
-        
+
         Args:
             model: Language model instance
-            
+
         Returns:
             Dictionary containing generated responses and temporary directory
         """
@@ -79,7 +79,7 @@ Please continue to complete the function. You are not allowed to modify the give
                 if not os.path.exists(problem_file):
                     self.logger.warning(f"Dataset file not found: {problem_file}")
                     continue
-                    
+
                 examples = [json.loads(x) for x in open(problem_file) if x.strip()]
                 self.logger.info(f"Loaded {len(examples)} examples for {lang}")
 
@@ -90,14 +90,10 @@ Please continue to complete the function. You are not allowed to modify the give
                 all_instances = []
                 for idx, example in enumerate(examples):
                     prompt = self.build_deepseekcoder_instruction(
-                        language_settings[lang]["full_name"], 
-                        example["prompt"]
+                        language_settings[lang]["full_name"], example["prompt"]
                     )
-                    inputs = model.apply_chat_template([{
-                        "role": "user", 
-                        "content": prompt
-                    }])
-                    
+                    inputs = model.apply_chat_template([{"role": "user", "content": prompt}])
+
                     all_instances.append(
                         Instance(
                             "generate_until",
@@ -114,15 +110,12 @@ Please continue to complete the function. You are not allowed to modify the give
                     )
 
                 outputs = model.generate_until(all_instances)
-                
+
                 generated_examples = []
                 for example, output in zip(examples, outputs):
                     example_with_output = example.copy()
                     example_with_output["output"] = output
-                    processed_example = extract_generation_code(
-                        example_with_output, 
-                        lang_code=lang
-                    )
+                    processed_example = extract_generation_code(example_with_output, lang_code=lang)
                     generated_examples.append(processed_example)
 
                 results[lang] = generated_examples
@@ -130,10 +123,8 @@ Please continue to complete the function. You are not allowed to modify the give
                 with open(temp_file_path, "w", encoding="utf-8") as fw:
                     for ex in generated_examples:
                         fw.write(json.dumps(ex) + "\n")
-                
-                self.logger.info(
-                    f"Generated and saved {len(generated_examples)} examples for {lang}"
-                )
+
+                self.logger.info(f"Generated and saved {len(generated_examples)} examples for {lang}")
 
             except Exception as e:
                 self.logger.error(f"Error processing language {lang}: {str(e)}")
@@ -145,10 +136,10 @@ Please continue to complete the function. You are not allowed to modify the give
     def evaluate_responses(self, results: Dict[str, Any]) -> Dict[str, float]:
         """
         Evaluate the generated code completions.
-        
+
         Args:
             results: Dictionary containing generation results
-            
+
         Returns:
             Dictionary containing evaluation metrics
         """
@@ -156,12 +147,12 @@ Please continue to complete the function. You are not allowed to modify the give
         temp_dir = temp_dir_obj.name
 
         evaluation_results = {}
-        
+
         for lang in self.languages:
             try:
                 problem_file = os.path.join(self.data_dir, f"humaneval-{lang}.jsonl")
                 temp_file_path = os.path.join(temp_dir, f"generated_{lang}.jsonl")
-                
+
                 if not os.path.exists(temp_file_path):
                     self.logger.warning(f"Generated file not found: {temp_file_path}")
                     continue
@@ -174,12 +165,12 @@ Please continue to complete the function. You are not allowed to modify the give
                     problem_file=problem_file,
                     language=lang,
                 )
-                
+
                 for metric, value in result.items():
                     evaluation_results[f"{lang}_{metric}"] = value
-                
+
                 self.logger.info(f"Completed evaluation for {lang}")
-                
+
             except Exception as e:
                 self.logger.error(f"Error evaluating {lang}: {str(e)}")
                 continue
@@ -190,10 +181,10 @@ Please continue to complete the function. You are not allowed to modify the give
     def run_benchmark(self, model: LM) -> Dict[str, float]:
         """
         Run the complete benchmark evaluation pipeline.
-        
+
         Args:
             model: Language model instance
-            
+
         Returns:
             Dictionary containing evaluation results
         """

@@ -25,27 +25,27 @@ from src.eval import (
 @dataclass
 class WildBenchConfig:
     """Configuration for WildBench evaluation."""
-    
+
     # Dataset configuration
     data_name: str = "wild_bench"
     dataset_version: str = "v2"
     split: str = "test"
     start_index: int = 0
     end_index: int = -1
-    
+
     # Model configuration
     max_tokens: int = 1024
     temperature: float = 0.0
     do_sample: bool = False
-    
+
     # Evaluation configuration
     eval_template: str = "eval/chat_benchmarks/WildBench/evaluation/eval_template.score.v2.md"
     judge_model: str = "gpt-4"
     batch_mode: bool = True
-    
+
     # Task weights
     task_weights: Dict[str, float] = None
-    
+
     def __post_init__(self):
         if self.task_weights is None:
             self.task_weights = {
@@ -61,16 +61,13 @@ class WildBenchBenchmark(BaseBenchmark):
     """
     WildBench benchmark for evaluating diverse real-world tasks.
     """
-    
+
     def __init__(
-        self,
-        config: Optional[WildBenchConfig] = None,
-        debug: bool = False,
-        logger: Optional[logging.Logger] = None
+        self, config: Optional[WildBenchConfig] = None, debug: bool = False, logger: Optional[logging.Logger] = None
     ):
         """
         Initialize WildBench benchmark.
-        
+
         Args:
             config: WildBench configuration
             debug: If True, run in debug mode
@@ -79,7 +76,7 @@ class WildBenchBenchmark(BaseBenchmark):
         super().__init__(logger)
         self.config = config or WildBenchConfig()
         self.debug = debug
-        
+
         # Task category mapping
         self.task_group_mapping = {
             "Information seeking": "Information/Advice seeking",
@@ -99,43 +96,39 @@ class WildBenchBenchmark(BaseBenchmark):
     def load_dataset(self) -> Tuple[List[str], List[Any], List[str], Dict[str, List[Any]]]:
         """Load and preprocess the evaluation dataset."""
         try:
-            dataset = load_dataset(
-                "allenai/WildBench",
-                self.config.dataset_version,
-                split=self.config.split
-            )
-            
+            dataset = load_dataset("allenai/WildBench", self.config.dataset_version, split=self.config.split)
+
             if self.debug:
                 dataset = dataset.select(range(min(5, len(dataset))))
                 self.logger.info(f"Debug mode: using {len(dataset)} examples")
-            
+
             # Initialize data structures
             chat_history = []
             id_strs = []
             extracted_chats = []
             metadata = {"session_id": [], "primary_tag": []}
-            
+
             # Process each item
             for item in dataset:
                 extracted_chats.append(item["conversation_input"])
                 chat_history.append(item["conversation_input"])
                 id_strs.append(item["session_id"])
-                
+
                 for key in metadata:
                     metadata[key].append(item[key])
-            
+
             # Apply index limits
             if self.config.end_index < 0:
                 self.config.end_index = len(id_strs)
-                
+
             slice_range = slice(self.config.start_index, self.config.end_index)
             return (
                 id_strs[slice_range],
                 chat_history[slice_range],
                 extracted_chats[slice_range],
-                {k: v[slice_range] for k, v in metadata.items()}
+                {k: v[slice_range] for k, v in metadata.items()},
             )
-            
+
         except Exception as e:
             self.logger.error(f"Error loading dataset: {str(e)}")
             raise
@@ -143,28 +136,25 @@ class WildBenchBenchmark(BaseBenchmark):
     def generate_responses(self, model: LM) -> Dict[str, Any]:
         """
         Generate responses for WildBench tasks.
-        
+
         Args:
             model: Language model instance
-            
+
         Returns:
             Dictionary containing file paths and temporary directory
         """
         try:
             # Load data
             id_strs, chat_history, extracted_chats, metadata = self.load_dataset()
-            
+
             # Prepare model inputs
-            model_inputs = [
-                model.apply_chat_template(chat) 
-                for chat in extracted_chats
-            ]
-            
+            model_inputs = [model.apply_chat_template(chat) for chat in extracted_chats]
+
             # Create temporary directory
             temp_dir_obj = tempfile.TemporaryDirectory()
             temp_dir = temp_dir_obj.name
             output_path = os.path.join(temp_dir, "output.json")
-            
+
             # Generate responses
             self.logger.info("Generating responses...")
             all_instances = [
@@ -183,71 +173,54 @@ class WildBenchBenchmark(BaseBenchmark):
                 )
                 for idx, inputs in enumerate(model_inputs)
             ]
-            
+
             outputs = model.generate_until(all_instances)
             outputs = [[output] for output in outputs]
-            
+
             # Save outputs
-            save_outputs(
-                self.config,
-                id_strs,
-                outputs,
-                chat_history,
-                metadata,
-                model_inputs,
-                output_path
-            )
-            
-            return {
-                "filepath": output_path,
-                "temp_dir_obj": temp_dir_obj
-            }
-            
+            save_outputs(self.config, id_strs, outputs, chat_history, metadata, model_inputs, output_path)
+
+            return {"filepath": output_path, "temp_dir_obj": temp_dir_obj}
+
         except Exception as e:
             self.logger.error(f"Error in generate_responses: {str(e)}")
             raise
 
     def process_evaluator_output(
-        self,
-        eval_result: List[Dict[str, Any]],
-        task_mapping: Dict[str, List[str]]
+        self, eval_result: List[Dict[str, Any]], task_mapping: Dict[str, List[str]]
     ) -> Dict[str, Any]:
         """Process and calculate final scores from evaluator output."""
         lengths = []
         scores = []
         task_cat_results = {}
-        
+
         for item in eval_result:
             if "score" not in item:
                 continue
-                
+
             score = float(item["score"])
             scores.append(score)
-            
+
             # Process output length
             model_output = item["model_output"]
             if not model_output.endswith("... (truncated)"):
                 output_len = len(model_output)
                 if output_len > 0:
                     lengths.append(output_len)
-            
+
             # Process task categories
             task_tags = task_mapping[item["session_id"]]
             for tag in task_tags:
                 task_cat_results.setdefault(tag, []).append(score)
-        
+
         # Calculate category scores
-        task_cat_score = {
-            tag: (sum(scores) / len(scores) - 5) * 2
-            for tag, scores in task_cat_results.items()
-        }
-        
+        task_cat_score = {tag: (sum(scores) / len(scores) - 5) * 2 for tag, scores in task_cat_results.items()}
+
         # Calculate weighted macro score
-        task_macro_score = sum(
-            task_cat_score[tag] * self.config.task_weights[tag]
-            for tag in task_cat_score
-        ) / sum(self.config.task_weights.values())
-        
+        task_macro_score = sum(task_cat_score[tag] * self.config.task_weights[tag] for tag in task_cat_score) / sum(
+            self.config.task_weights.values()
+        )
+
         return {
             "score": sum(scores) / len(scores),
             "adjusted_score": (sum(scores) / len(scores) - 5) * 2,
@@ -261,89 +234,73 @@ class WildBenchBenchmark(BaseBenchmark):
     def evaluate_responses(self, results: Dict[str, Any]) -> Dict[str, float]:
         """
         Evaluate generated responses using GPT-4.
-        
+
         Args:
             results: Dictionary containing generation results
-            
+
         Returns:
             Dictionary containing evaluation metrics
         """
         try:
             temp_dir_obj = results["temp_dir_obj"]
             temp_dir = temp_dir_obj.name
-            
+
             # Prepare evaluation files
             eval_file = os.path.join(temp_dir, "batch-submit.jsonl")
-            
+
             # Load benchmark data
-            bench_data = load_dataset(
-                "allenai/WildBench",
-                self.config.dataset_version,
-                split=self.config.split
-            )
-            
+            bench_data = load_dataset("allenai/WildBench", self.config.dataset_version, split=self.config.split)
+
             # Load model outputs
             with open(results["filepath"], "r") as f:
                 target_model_data = json.load(f)
-                
+
             # Prepare evaluation items
             ref_model_data = [None] * len(target_model_data)
             histories = []
             last_queries = []
             checklists = []
-            
+
             for b, t, r in zip(bench_data, target_model_data, ref_model_data):
-                compose_eval_item(
-                    b, t, r,
-                    histories,
-                    last_queries,
-                    checklists
-                )
-            
+                compose_eval_item(b, t, r, histories, last_queries, checklists)
+
             # Generate evaluation data
             eval_results = placeholder_generation(
-                self.config,
-                list(target_model_data),
-                list(ref_model_data),
-                histories,
-                last_queries,
-                checklists
+                self.config, list(target_model_data), list(ref_model_data), histories, last_queries, checklists
             )
-            
+
             # Generate batch evaluation
             json_lines = batch_eval_generate(eval_results, self.config)
             with open(eval_file, "w") as f:
                 for line in json_lines:
                     f.write(json.dumps(line) + "\n")
-            
+
             # Run GPT-4 evaluation
             client = OpenAI()
             self._process_evaluator_file(eval_file, client)
-            
+
             # Process results
             submit_file = os.path.join(temp_dir, "results.jsonl")
             output_file = self._format_eval_file(submit_file, eval_file)
-            
+
             # Create task mapping
             task_mapping = {}
             for item in bench_data:
                 tags = [item["primary_tag"]] + item["secondary_tags"]
-                task_mapping[item["id"]] = list(set(
-                    self.task_group_mapping[tag] for tag in tags
-                ))
-            
+                task_mapping[item["id"]] = list(set(self.task_group_mapping[tag] for tag in tags))
+
             # Load and process evaluation results
             with open(output_file, "r") as f:
                 eval_result = json.load(f)
-            
+
             results = self.process_evaluator_output(eval_result, task_mapping)
-            
+
             temp_dir_obj.cleanup()
             return results
-            
+
         except Exception as e:
             self.logger.error(f"Error in evaluate_responses: {str(e)}")
-            if 'temp_dir_obj' in locals():
+            if "temp_dir_obj" in locals():
                 temp_dir_obj.cleanup()
             raise
 
@@ -352,27 +309,22 @@ class WildBenchBenchmark(BaseBenchmark):
         try:
             with open(eval_file, "r") as file:
                 lines = file.readlines()
-            
+
             results = []
             for line in lines:
                 payload = json.loads(line)
                 payload["body"]["max_tokens"] = 4096
-                response = client.chat.completions.create(
-                    **payload["body"]
-                )
-                
+                response = client.chat.completions.create(**payload["body"])
+
                 result = payload.copy()
                 result["response"] = json.loads(response.json())
                 results.append(result)
-            
-            output_file = eval_file.replace(
-                "batch-submit.jsonl",
-                "results.jsonl"
-            )
+
+            output_file = eval_file.replace("batch-submit.jsonl", "results.jsonl")
             with open(output_file, "w") as file:
                 for result in results:
                     file.write(json.dumps(result) + "\n")
-                    
+
         except Exception as e:
             self.logger.error(f"Error processing evaluator file: {str(e)}")
             raise
@@ -385,7 +337,7 @@ class WildBenchBenchmark(BaseBenchmark):
             with jsonlines.open(submit_file, "r") as f:
                 for line in f:
                     custom_id_to_submission[line["custom_id"]] = line
-            
+
             # Process results
             results_json = []
             with jsonlines.open(submit_file, "r") as f:
@@ -395,51 +347,40 @@ class WildBenchBenchmark(BaseBenchmark):
                         submission = custom_id_to_submission[custom_id]
                         custom_id_splits = custom_id.split("||")
                         session_id = custom_id_splits[0]
-                        
-                        eval_output = json.loads(
-                            item["response"]["choices"][0]["message"]["content"]
-                        )
-                        
+
+                        eval_output = json.loads(item["response"]["choices"][0]["message"]["content"])
+
                         result_item = {
                             "session_id": session_id,
                             "parsed_result": eval_output,
                         }
-                        
+
                         # Extract model output
                         prompt = submission["body"]["messages"][0]["content"]
-                        model_output = prompt.split(
-                            "<|begin_of_response|>\n"
-                        )[1].split(
-                            "<|end_of_response|>\n"
-                        )[0].strip()
-                        
+                        model_output = (
+                            prompt.split("<|begin_of_response|>\n")[1].split("<|end_of_response|>\n")[0].strip()
+                        )
+
                         # Add score information
                         model_test = custom_id_splits[1]
                         if "score" in eval_output:
-                            result_item.update({
-                                "model_test": model_test,
-                                "score": eval_output["score"],
-                                "model_output": model_output
-                            })
-                            
+                            result_item.update(
+                                {"model_test": model_test, "score": eval_output["score"], "model_output": model_output}
+                            )
+
                         results_json.append(result_item)
-                        
+
                     except Exception as e:
-                        self.logger.warning(
-                            f"Error processing item: {str(e)}"
-                        )
+                        self.logger.warning(f"Error processing item: {str(e)}")
                         continue
-            
+
             # Save formatted results
-            output_file = eval_file.replace(
-                "batch_results.jsonl",
-                "scores.json"
-            )
+            output_file = eval_file.replace("batch_results.jsonl", "scores.json")
             with open(output_file, "w") as f:
                 json.dump(results_json, f, indent=2)
-                
+
             return output_file
-            
+
         except Exception as e:
             self.logger.error(f"Error formatting eval file: {str(e)}")
             raise

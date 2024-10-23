@@ -11,7 +11,7 @@ from lm_eval.api.model import LM
 
 class BaseBenchmark(ABC):
     """Abstract base class for implementing LLM evaluation benchmarks."""
-    
+
     def __init__(self, logger: Optional[logging.Logger] = None):
         self.logger = logger or logging.getLogger(self.__class__.__name__)
 
@@ -19,12 +19,12 @@ class BaseBenchmark(ABC):
     def generate_responses(self, model: LM) -> Dict[str, Any]:
         """Generate responses from the model for the benchmark tasks."""
         pass
-    
+
     @abstractmethod
     def evaluate_responses(self, results: Dict[str, Any]) -> Dict[str, float]:
         """Evaluate the model's responses according to the benchmark's metrics."""
         pass
-    
+
     def run_benchmark(self, model: LM) -> Dict[str, float]:
         """Run the complete benchmark evaluation pipeline."""
         print(f"Running {self.__class__.__name__} benchmark")
@@ -38,59 +38,58 @@ class TaskManager:
     Enhanced task manager that dynamically loads and manages benchmarks.
     Provides a unified interface for both class-based benchmarks and legacy tasks.
     """
-    
+
     def __init__(self, benchmarks_dir: str = "chat_benchmarks"):
         self.logger = logging.getLogger("TaskManager")
         self.tasks: Dict[str, Any] = {}
         self.benchmark_instances: Dict[str, BaseBenchmark] = {}
-        
+
         # Load benchmarks from directory
         self._load_benchmarks(benchmarks_dir)
 
     def _load_benchmarks(self, benchmarks_dir: str):
         """Dynamically load benchmarks from the specified directory."""
         current_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), benchmarks_dir)
-        
+
         for item in os.listdir(current_dir):
             item_path = os.path.join(current_dir, item)
             if not os.path.isdir(item_path) or item.startswith("__"):
                 continue
-                
+
             eval_path = os.path.join(item_path, "eval_instruct.py")
             if not os.path.exists(eval_path):
                 self.logger.warning(f"eval_instruct.py not found in {item}")
                 continue
-                
+
             try:
                 # Import the module
                 sys.path.insert(0, item_path)
-                spec = importlib.util.spec_from_file_location(
-                    f"eval.{benchmarks_dir}.{item}.eval_instruct",
-                    eval_path
-                )
+                spec = importlib.util.spec_from_file_location(f"eval.{benchmarks_dir}.{item}.eval_instruct", eval_path)
                 module = importlib.util.module_from_spec(spec)
                 spec.loader.exec_module(module)
                 sys.path.pop(0)
-                
+
                 # Find benchmark class
                 benchmark_classes = [
-                    cls for _, cls in inspect.getmembers(module, inspect.isclass)
-                    if (issubclass(cls, BaseBenchmark) and cls != BaseBenchmark and 
-                        cls.__module__.replace('.', '/') in eval_path)
+                    cls
+                    for _, cls in inspect.getmembers(module, inspect.isclass)
+                    if (
+                        issubclass(cls, BaseBenchmark)
+                        and cls != BaseBenchmark
+                        and cls.__module__.replace(".", "/") in eval_path
+                    )
                 ]
-                
+
                 if not benchmark_classes:
                     self.logger.warning(f"No BaseBenchmark subclass found in {item}")
                     continue
-                    
+
                 if len(benchmark_classes) > 1:
-                    self.logger.warning(
-                        f"Multiple benchmark classes found in {item}, using first one"
-                    )
-                
+                    self.logger.warning(f"Multiple benchmark classes found in {item}, using first one")
+
                 benchmark_class = benchmark_classes[0]
                 self._register_benchmark(item, benchmark_class)
-                
+
             except Exception as e:
                 self.logger.error(f"Error loading benchmark from {item}: {str(e)}")
                 continue
@@ -99,14 +98,14 @@ class TaskManager:
         """Register a benchmark class and create its instance."""
         try:
             # Create instance
-            instance = benchmark_class()  #TODO: add logger
-            
+            instance = benchmark_class()  # TODO: add logger
+
             # Store both class and instance
             self.tasks[name] = benchmark_class
             self.benchmark_instances[name] = instance
-            
+
             self.logger.info(f"Successfully registered benchmark: {name}")
-            
+
         except Exception as e:
             self.logger.error(f"Error registering benchmark {name}: {str(e)}")
 
@@ -145,40 +144,36 @@ class TaskManager:
 
 
 def evaluate(
-    lm: LM,
-    task_manager: TaskManager,
-    task_list: List[str],
-    verbosity: str = "INFO",
-    **eval_kwargs
+    lm: LM, task_manager: TaskManager, task_list: List[str], verbosity: str = "INFO", **eval_kwargs
 ) -> Dict[str, Dict]:
     """
     Evaluate the language model on the given tasks.
-    
+
     Args:
         lm: The language model to evaluate
         task_manager: Task manager containing the benchmarks
         task_list: List of task names to evaluate
         verbosity: Logging verbosity level
         **eval_kwargs: Additional kwargs for evaluation
-        
+
     Returns:
         Dictionary containing evaluation results for each task
     """
     logger = logging.getLogger("evaluate")
     logger.setLevel(getattr(logging, verbosity))
-    
+
     results = {"results": {}}
-    
+
     # Validate tasks
     valid_tasks = [t for t in task_list if task_manager.is_valid_task(t)]
     if len(valid_tasks) != len(task_list):
         invalid_tasks = set(task_list) - set(valid_tasks)
         logger.warning(f"Skipping invalid tasks: {invalid_tasks}")
-    
+
     if not valid_tasks:
         logger.error("No valid tasks to evaluate")
         return results
-    
+
     # Run evaluations
     for task_name in valid_tasks:
         try:
@@ -189,19 +184,16 @@ def evaluate(
         except Exception as e:
             logger.error(f"Error evaluating {task_name}: {str(e)}")
             results["results"][task_name] = {"error": str(e)}
-    
+
     return results
 
 
 if __name__ == "__main__":
     # Setup logging
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    )
-    
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+
     # Initialize task manager
     task_manager = TaskManager()
-    
+
     # Print available tasks
     print("Available tasks:", task_manager.available_tasks)

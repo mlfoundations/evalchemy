@@ -116,7 +116,14 @@ class DCFTEvaluationTracker:
             eval_logger.info("Output path not provided, skipping saving results aggregated")
 
     def get_or_create_model(
-        self, model_name: str, user: str, creation_location: str, weights_location: str, session, model_id: Optional[str], update_db_by_model_name: bool=False
+        self,
+        model_name: str,
+        user: str,
+        creation_location: str,
+        weights_location: str,
+        session,
+        model_id: Optional[str],
+        update_db_by_model_name: bool = False,
     ) -> Tuple[uuid.UUID, uuid.UUID]:
         try:
             if model_id:
@@ -202,14 +209,20 @@ class DCFTEvaluationTracker:
             session.rollback()
             raise RuntimeError(f"Database error in insert_eval_results: {str(e)}")
 
-    def update_evalresults_db(self, eval_log_dict: Dict[str, Any], model_id: Optional[str], update_db_by_model_name=False, model_name=Optional[str]) -> None:
+    def update_evalresults_db(
+        self,
+        eval_log_dict: Dict[str, Any],
+        model_id: Optional[str],
+        update_db_by_model_name=False,
+        model_name=Optional[str],
+    ) -> None:
         eval_logger.info("Updating DB with eval results")
         with self.session_scope() as session:
             user = getpass.getuser()  # TODO
 
             if not model_name:
-                args_dict=simple_parse_args_string(eval_log_dict["config"]["model_args"])
-                model_name=args_dict["pretrained"]
+                args_dict = simple_parse_args_string(eval_log_dict["config"]["model_args"])
+                model_name = args_dict["pretrained"]
 
             model_id, dataset_id = self.get_or_create_model(
                 model_name=model_name,

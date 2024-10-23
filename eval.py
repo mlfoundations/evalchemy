@@ -34,25 +34,20 @@ def setup_custom_parser():
     """
     parser = setup_parser()
     db_group = parser.add_mutually_exclusive_group()
-    
-    db_group.add_argument(
-        "--model_id",
-        type=str,
-        default=None,
-        help="Model UUID for direct database tracking"
-    )
-    
+
+    db_group.add_argument("--model_id", type=str, default=None, help="Model UUID for direct database tracking")
+
     db_group.add_argument(
         "--update_db_by_model_name",
         action="store_true",
-        help="By default, databse is updated based on model uuid. Set this flag if you want to overwrite this and update database by searching for model name. Use model_name argument to specify the model name to update."
+        help="By default, databse is updated based on model uuid. Set this flag if you want to overwrite this and update database by searching for model name. Use model_name argument to specify the model name to update.",
     )
 
     parser.add_argument(
         "--model_name",
         type=str,
         default=None,
-        help="Model name for direct database tracking. If not set, the model path will be used instead."
+        help="Model name for direct database tracking. If not set, the model path will be used instead.",
     )
 
     return parser
@@ -65,7 +60,7 @@ def evaluate(
     task_list: List[str],
     verbosity: str = "INFO",
     args=None,
-    **eval_kwargs
+    **eval_kwargs,
 ) -> Dict[str, Dict]:
     """
     Evaluate the language model on the given tasks.
@@ -84,31 +79,29 @@ def evaluate(
     """
     eval_logger = utils.eval_logger
     eval_logger.setLevel(getattr(logging, f"{verbosity}"))
-    
+
     # Split tasks between benchmark and pretrain
     benchmark_tasks = [t for t in task_list if t in task_manager.tasks]
     pretrain_tasks = [t for t in task_list if t not in task_manager.tasks]
 
-    
     if benchmark_tasks:
         eval_logger.info(f"Benchmark tasks to evaluate: {benchmark_tasks}")
     if pretrain_tasks:
         eval_logger.info(f"Pretrain tasks to evaluate: {pretrain_tasks}")
-        
+
     results = {"results": {}}
 
     # Run benchmark evaluations with concurrent execution
     if benchmark_tasks:
         try:
             generate_methods = task_manager.get_list_generate_responses(benchmark_tasks)
-            
+
             generation_results = []
             with concurrent.futures.ThreadPoolExecutor() as executor:
                 future_to_task = {
-                    executor.submit(method, lm): task
-                    for method, task in zip(generate_methods, benchmark_tasks)
+                    executor.submit(method, lm): task for method, task in zip(generate_methods, benchmark_tasks)
                 }
-                
+
                 # Collect results as they complete
                 for future in concurrent.futures.as_completed(future_to_task):
                     task = future_to_task[future]
@@ -118,30 +111,29 @@ def evaluate(
                     except Exception as e:
                         eval_logger.error(f"Error in generate_responses for {task}: {str(e)}")
                         generation_results.append((task, None))
-            
+
             # Sort results back into original task order
             generation_results.sort(key=lambda x: benchmark_tasks.index(x[0]))
             generation_results = [r[1] for r in generation_results if r[1] is not None]
-            
+
             # Get evaluate methods
             evaluate_methods = task_manager.get_list_evaluates(benchmark_tasks)
-            
+
             # Run evaluation concurrently
             with concurrent.futures.ThreadPoolExecutor() as executor:
                 evaluate_results = list(
                     executor.map(
-                        lambda func_args: func_args[0](func_args[1]),
-                        zip(evaluate_methods, generation_results)
+                        lambda func_args: func_args[0](func_args[1]), zip(evaluate_methods, generation_results)
                     )
                 )
-            
+
             # Store results
             for task, result in zip(benchmark_tasks, evaluate_results):
                 results["results"][task] = result
-                
+
         except Exception as e:
             eval_logger.error(f"Error in benchmark evaluation: {str(e)}")
-    
+
     # Run pretrain evaluations if any exist
     if pretrain_tasks and args is not None:
         try:
@@ -158,7 +150,7 @@ def evaluate(
                 check_integrity=args.check_integrity,
                 write_out=args.write_out,
                 log_samples=args.log_samples,
-                evaluation_tracker=args.evaluation_tracker if hasattr(args, 'evaluation_tracker') else None,
+                evaluation_tracker=args.evaluation_tracker if hasattr(args, "evaluation_tracker") else None,
                 system_instruction=args.system_instruction,
                 apply_chat_template=args.apply_chat_template,
                 fewshot_as_multiturn=args.fewshot_as_multiturn,
@@ -166,15 +158,15 @@ def evaluate(
                 task_manager=pretrain_task_manager,
                 verbosity=args.verbosity,
                 predict_only=args.predict_only,
-                random_seed=args.seed[0] if hasattr(args, 'seed') else None,
-                numpy_random_seed=args.seed[1] if hasattr(args, 'seed') else None,
-                torch_random_seed=args.seed[2] if hasattr(args, 'seed') else None,
-                fewshot_random_seed=args.seed[3] if hasattr(args, 'seed') else None,
+                random_seed=args.seed[0] if hasattr(args, "seed") else None,
+                numpy_random_seed=args.seed[1] if hasattr(args, "seed") else None,
+                torch_random_seed=args.seed[2] if hasattr(args, "seed") else None,
+                fewshot_random_seed=args.seed[3] if hasattr(args, "seed") else None,
             )
             results["results"].update(pretrain_results.get("results", {}))
         except Exception as e:
             eval_logger.error(f"Error in pretrain evaluation: {str(e)}")
-            
+
     return results
 
 
@@ -184,19 +176,18 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
         parser = setup_custom_parser()
         args = parse_eval_args(parser)
 
-
     # Initialize components
     task_list = args.tasks.split(",")
     task_manager = InstructTaskManager()
     pretrain_task_manager = PretrainTaskManager(args.verbosity, include_path=args.include_path)
-    
+
     evaluation_tracker = setup_evaluation_tracker(args)
 
     utils.eval_logger.info(f"Selected Tasks: {[task for task in task_list]}")
 
     # Initialize model
-    lm = initialize_model(args)   
-    
+    lm = initialize_model(args)
+
     # Log experiment args
     if evaluation_tracker is not None:
         evaluation_tracker.general_config_tracker.log_experiment_args(
@@ -232,7 +223,7 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
         limit=args.limit,
         evaluation_tracker=evaluation_tracker,
     )
-    
+
     # Add metadata and handle output
     add_results_metadata(results, args, lm)
     handle_evaluation_output(results, args, evaluation_tracker, wandb_logger if args.wandb_args else None)
@@ -250,7 +241,7 @@ def initialize_model(args: argparse.Namespace) -> LM:
     if isinstance(args.model, str):
         if args.model_args is None:
             args.model_args = ""
-        
+
         lm = lm_eval.api.registry.get_model(args.model).create_from_arg_string(
             args.model_args,
             {
@@ -261,7 +252,7 @@ def initialize_model(args: argparse.Namespace) -> LM:
         )
     else:
         lm = args.model
-        
+
     lm.model_identifier = sanitize_model_name(f"model_{args.model}_model_args_{args.model_args}")
     return lm
 
@@ -271,9 +262,9 @@ def add_results_metadata(results: Dict, args: argparse.Namespace, lm: LM) -> Non
     if lm.rank == 0:
         results["config"] = {
             "model": (
-                args.model if isinstance(args.model, str)
-                else args.model.config._name_or_path if hasattr(args.model, "config")
-                else type(args.model).__name__
+                args.model
+                if isinstance(args.model, str)
+                else args.model.config._name_or_path if hasattr(args.model, "config") else type(args.model).__name__
             ),
             "model_args": args.model_args,
             "batch_size": args.batch_size,
@@ -288,10 +279,10 @@ def add_results_metadata(results: Dict, args: argparse.Namespace, lm: LM) -> Non
             "torch_seed": args.seed[2],
             "fewshot_seed": args.seed[3],
         }
-        
+
         if isinstance(lm, lm_eval.models.huggingface.HFLM):
             results["config"].update(lm.get_model_info())
-            
+
         results["git_hash"] = get_git_commit_hash()
         results["date"] = time.time()
         add_env_info(results)
@@ -307,7 +298,7 @@ def handle_evaluation_output(
     """Handle evaluation output, including logging and saving results."""
     if args.log_samples:
         samples = results.pop("samples")
-        
+
     dumped = json.dumps(results, indent=2, default=handle_non_serializable, ensure_ascii=False)
     if args.show_config:
         print(dumped)
@@ -323,11 +314,8 @@ def handle_evaluation_output(
         except Exception as e:
             eval_logger.info(f"Logging to Weights and Biases failed due to {e}")
 
-    evaluation_tracker.save_results_aggregated(
-        results=results,
-        samples=samples if args.log_samples else None
-    )
-    
+    evaluation_tracker.save_results_aggregated(results=results, samples=samples if args.log_samples else None)
+
     evaluation_tracker.update_evalresults_db(results, args.model_id, args.update_db_by_model_name, args.model_name)
 
     if args.log_samples:
@@ -342,7 +330,6 @@ def handle_evaluation_output(
 
     if wandb_logger:
         wandb_logger.run.finish()
-
 
 
 if __name__ == "__main__":

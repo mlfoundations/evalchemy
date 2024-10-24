@@ -23,7 +23,24 @@ from eval.database.utils import create_db_engine, create_tables, sessionmaker
 import subprocess
 
 
-def flatten_dict(d, parent_key="", sep="/"):
+def flatten_dict(d: Dict[str, Any], parent_key: str = "", sep: str = "/") -> Dict[str, Any]:
+    """
+    Recursively flatten a nested dictionary using a separator in the keys.
+
+    Args:
+        d: The dictionary to flatten
+        parent_key: The base key to prepend to dictionary's keys
+        sep: The separator to use between nested keys
+
+    Returns:
+        A flattened dictionary where nested dictionaries are represented with
+        separated string keys
+    
+    Example:
+        >>> d = {'a': 1, 'b': {'c': 2, 'd': {'e': 3}}}
+        >>> flatten_dict(d)
+        {'a': 1, 'b/c': 2, 'b/d/e': 3}
+    """
     items = []
     for k, v in d.items():
         new_key = f"{parent_key}{sep}{k}" if parent_key else k
@@ -36,8 +53,18 @@ def flatten_dict(d, parent_key="", sep="/"):
 
 class DCFTEvaluationTracker:
     """
-    Keeps track and saves relevant information of the evaluation process.
-    Compiles the data from trackers and writes it to files, which can be published to the Hugging Face hub if requested.
+    Tracks and saves evaluation information for language models.
+    
+    This class handles tracking evaluation metrics, saving results to files,
+    and managing database operations for storing evaluation results. It provides
+    functionality for both real-time tracking during evaluation and persistent
+    storage of results.
+
+    Attributes:
+        general_config_tracker: Tracks general configuration information
+        output_path: Path where results files will be saved
+        engine: SQLAlchemy database engine
+        SessionMaker: Factory for creating database sessions
     """
 
     def __init__(
@@ -45,10 +72,11 @@ class DCFTEvaluationTracker:
         output_path: str = None,
     ) -> None:
         """
-        Creates all the necessary loggers for evaluation tracking.
+        Initialize the evaluation tracker.
 
         Args:
-            output_path (str): Path to save the results. If not provided, the results won't be saved.
+            output_path: Directory path where evaluation results will be saved.
+                       If None, results will not be saved to disk.
         """
         self.general_config_tracker = GeneralConfigTracker()
         self.output_path = output_path
@@ -56,7 +84,18 @@ class DCFTEvaluationTracker:
 
     @contextmanager
     def session_scope(self):
-        """Provide a transactional scope around a series of operations."""
+        """
+        Provide a transactional scope around a series of database operations.
+        
+        This context manager ensures proper handling of database sessions,
+        including automatic rollback on errors and proper session closure.
+        
+        Yields:
+            SQLAlchemy session object for database operations
+        
+        Raises:
+            Any exceptions that occur during database operations
+        """
         session = self.SessionMaker()
         try:
             yield session
@@ -73,11 +112,15 @@ class DCFTEvaluationTracker:
         samples: dict,
     ) -> None:
         """
-        Saves the aggregated results and samples to the output path and pushes them to the Hugging Face hub if requested.
+        Save aggregated evaluation results and samples to disk.
 
         Args:
-            results (dict): The aggregated results to save.
-            samples (dict): The samples results to save.
+            results: Dictionary containing evaluation results
+            samples: Dictionary containing evaluation samples
+
+        Note:
+            Results are saved only if output_path was specified during initialization.
+            Files are saved under a directory named after the model, with timestamps.
         """
         self.general_config_tracker.log_end_time()
 
@@ -119,12 +162,30 @@ class DCFTEvaluationTracker:
         self,
         model_name: str,
         user: str,
-        creation_location: str,
         weights_location: str,
         session,
         model_id: Optional[str],
         update_db_by_model_name: bool = False,
+        is_external: bool = True,
     ) -> Tuple[uuid.UUID, uuid.UUID]:
+        """
+        Retrieve an existing model or create a new one in the database.
+
+        Args:
+            model_name: Name of the model
+            user: Username of who created/is using the model
+            weights_location: Location of model weights
+            session: Database session
+            model_id: Optional UUID of existing model
+            update_db_by_model_name: If True, lookup model by name instead of ID
+            is_external: Whether the model is external or internal
+
+        Returns:
+            Tuple of (model_id, dataset_id)
+
+        Raises:
+            RuntimeError: If database operations fail
+        """
         try:
             if model_id:
                 model = session.get(Model, uuid.UUID(model_id))
@@ -135,11 +196,11 @@ class DCFTEvaluationTracker:
                     id=uuid.uuid4(),
                     name=model_name,
                     created_by=user,
-                    creation_location=creation_location,
+                    creation_location="NA",
                     weights_location=weights_location,
                     training_start=datetime.utcnow(),
                     training_parameters={},
-                    is_external=True,
+                    is_external=is_external,
                 )
                 session.add(model)
                 session.commit()
@@ -150,9 +211,34 @@ class DCFTEvaluationTracker:
 
     @staticmethod
     def update_results_with_benchmark(results: Dict[str, Any], benchmark_name: str) -> Dict[str, Any]:
+        """
+        Prefix all result keys with benchmark name.
+
+        Args:
+            results: Dictionary of evaluation results
+            benchmark_name: Name of the benchmark to prefix
+
+        Returns:
+            Dictionary with updated keys prefixed with benchmark name
+        """
         return {f"{benchmark_name}_{key}": value for key, value in results.items()}
 
     def get_or_create_eval_setting(self, name: str, git_hash: str, config: Dict[str, Any], session) -> uuid.UUID:
+        """
+        Retrieve existing evaluation settings or create new ones.
+
+        Args:
+            name: Name of the evaluation setting
+            git_hash: Git commit hash of the evaluation code
+            config: Evaluation configuration dictionary
+            session: Database session
+
+        Returns:
+            UUID of the evaluation setting
+
+        Raises:
+            RuntimeError: If database operations fail
+        """
         try:
             config = self._prepare_config(config)
             eval_setting = session.query(EvalSetting).filter_by(name=name, parameters=config).first()
@@ -172,6 +258,15 @@ class DCFTEvaluationTracker:
 
     @staticmethod
     def _prepare_config(config: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Prepare configuration dictionary for database storage.
+
+        Args:
+            config: Raw configuration dictionary
+
+        Returns:
+            Processed configuration dictionary with serializable values
+        """
         return {key: str(value) if isinstance(value, torch.dtype) else value for key, value in config.items()}
 
     def insert_eval_results(
@@ -186,6 +281,23 @@ class DCFTEvaluationTracker:
         user: str,
         session,
     ) -> None:
+        """
+        Insert evaluation results into the database.
+
+        Args:
+            model_id: UUID of the evaluated model
+            dataset_id: UUID of the dataset used
+            results: Dictionary of evaluation results
+            config: Evaluation configuration
+            completions_location: Location of completion outputs
+            creation_location: Location where evaluation was run
+            git_hash: Git commit hash of evaluation code
+            user: Username who ran the evaluation
+            session: Database session
+
+        Raises:
+            RuntimeError: If database operations fail
+        """
         try:
             for key, score in results.items():
                 if isinstance(score, float) or isinstance(score, int):
@@ -213,25 +325,43 @@ class DCFTEvaluationTracker:
         self,
         eval_log_dict: Dict[str, Any],
         model_id: Optional[str],
-        update_db_by_model_name=False,
-        model_name=Optional[str],
+        update_db_by_model_name: bool = False,
+        model_name: Optional[str] = None,
+        creation_location: Optional[str] = None,
+        created_by: Optional[str] = None,
+        is_external: Optional[bool] = None
     ) -> None:
+        """
+        Update evaluation results in the database.
+
+        Args:
+            eval_log_dict: Dictionary containing evaluation logs and results
+            model_id: Optional UUID of the model
+            update_db_by_model_name: If True, lookup model by name
+            model_name: Optional name of the model
+            creation_location: Location where evaluation was run
+            created_by: Username who ran the evaluation
+            is_external: Whether the model is external
+
+        Note:
+            This method handles the complete workflow of updating evaluation results,
+            including model lookup/creation and result insertion.
+        """
         eval_logger.info("Updating DB with eval results")
         with self.session_scope() as session:
-            user = getpass.getuser()  # TODO
-
             if not model_name:
                 args_dict = simple_parse_args_string(eval_log_dict["config"]["model_args"])
                 model_name = args_dict["pretrained"]
 
             model_id, dataset_id = self.get_or_create_model(
                 model_name=model_name,
-                user=user,
-                creation_location="NA",
+                user=created_by,
+                creation_location='NA',
                 weights_location=eval_log_dict["config"]["model"],
                 session=session,
                 model_id=model_id,
                 update_db_by_model_name=update_db_by_model_name,
+                is_external=is_external
             )
 
             results = eval_log_dict["results"]
@@ -243,9 +373,34 @@ class DCFTEvaluationTracker:
                 dataset_id=dataset_id,
                 results=updated_results,
                 config=eval_log_dict["config"],
-                completions_location="NA",
-                creation_location="NA",
+                completions_location="NA", # TODO
+                creation_location=creation_location,
                 git_hash=eval_log_dict["git_hash"],
-                user=user,
+                user=created_by,
                 session=session,
             )
+
+    def get_model_name_from_db(
+        self,
+        model_id: str,
+    ) -> str:
+        """
+        Retrieve model name from database using model_id.
+        
+        Args:
+            model_id: UUID string of the model
+            
+        Returns:
+            str: Model name from database
+            
+        Raises:
+            RuntimeError: If model_id is not found in database or if database operation fails
+        """
+        with self.session_scope() as session:
+            try:
+                model = session.get(Model, uuid.UUID(model_id))
+                if model is None:
+                    raise RuntimeError(f"Model with id {model_id} not found in database")
+                return model.name
+            except Exception as e:
+                raise RuntimeError(f"Database error in get_model_name_from_db: {str(e)}")

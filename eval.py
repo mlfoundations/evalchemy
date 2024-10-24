@@ -50,6 +50,25 @@ def setup_custom_parser():
         help="Model name for direct database tracking. If not set, the model path will be used instead.",
     )
 
+    db_group.add_argument(
+        "--is_external_model",
+        action="store_true",
+        help="By default, the model is stored internal in the database. If set, this is overwritten to external.",
+    )
+
+    parser.add_argument(
+        "--creation_location",
+        type=str,
+        default="NA",
+        help="Specifies which compute server is used for evaluating the model.",
+    )
+
+    parser.add_argument(
+        "--created_by",
+        type=str,
+        default="NA",
+        help="Specifies who evaluates the model.",
+    )
     return parser
 
 
@@ -170,25 +189,66 @@ def evaluate(
     return results
 
 
+def update_model_args_with_name(model_args: str, model_name: str) -> str:
+    """
+    Update model_args string to include pretrained model name if not already present.
+    
+    Args:
+        model_args: Original model args string
+        model_name: Model name to add
+        
+    Returns:
+        str: Updated model args string
+    """
+    if not model_args:
+        return f"pretrained={model_name}"
+    
+    args_dict = simple_parse_args_string(model_args)
+    if "pretrained" not in args_dict:
+        return f"pretrained={model_name},{model_args}"
+    return model_args
+
+
 def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
-    """Command-line interface for evaluating language models."""
+    """
+    Command-line interface for evaluating language models.
+    
+    Args:
+        args: Command line arguments. If None, will parse from sys.argv
+    """
+    # Parse arguments if not provided
     if not args:
         parser = setup_custom_parser()
         args = parse_eval_args(parser)
 
-    # Initialize components
+    # Initialize evaluation tracker
+    evaluation_tracker = setup_evaluation_tracker(args)
+
+    # If model_id is provided, lookup model name from database
+    if args.model_id:
+        try:
+            model_name = evaluation_tracker.get_model_name_from_db(args.model_id)
+            args.model_args = update_model_args_with_name(args.model_args or "", model_name)
+            utils.eval_logger.info(f"Retrieved model name from database: {model_name}")
+        except Exception as e:
+            utils.eval_logger.error(f"Failed to retrieve model name from database: {str(e)}")
+            sys.exit(1)
+
+    # Initialize tasks
     task_list = args.tasks.split(",")
     task_manager = InstructTaskManager()
     pretrain_task_manager = PretrainTaskManager(args.verbosity, include_path=args.include_path)
 
-    evaluation_tracker = setup_evaluation_tracker(args)
-
     utils.eval_logger.info(f"Selected Tasks: {[task for task in task_list]}")
 
     # Initialize model
-    lm = initialize_model(args)
+    try:
+        lm = initialize_model(args)
+    except Exception as e:
+        utils.eval_logger.error(f"Failed to initialize model: {str(e)}")
+        sys.exit(1)
 
-    # Log experiment args
+    # Log experiment configuration
     if evaluation_tracker is not None:
         evaluation_tracker.general_config_tracker.log_experiment_args(
             model_source=args.model,
@@ -203,30 +263,85 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
     eval_logger.setLevel(getattr(logging, f"{args.verbosity}"))
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
-    # Setup evaluation tracking
+    # Setup wandb logging if requested
+    wandb_logger = None
     if args.wandb_args:
         wandb_logger = WandbLogger(**simple_parse_args_string(args.wandb_args))
 
     # Run evaluation
-    results = evaluate(
-        lm=lm,
-        task_manager=task_manager,
-        pretrain_task_manager=pretrain_task_manager,
-        task_list=task_list,
-        verbosity=args.verbosity,
-        args=args,
-        num_fewshot=args.num_fewshot,
-        batch_size=args.batch_size,
-        max_batch_size=args.max_batch_size,
-        device=args.device,
-        use_cache=args.use_cache,
-        limit=args.limit,
-        evaluation_tracker=evaluation_tracker,
+    try:
+        results = evaluate(
+            lm=lm,
+            task_manager=task_manager,
+            pretrain_task_manager=pretrain_task_manager,
+            task_list=task_list,
+            verbosity=args.verbosity,
+            args=args,
+            num_fewshot=args.num_fewshot,
+            batch_size=args.batch_size,
+            max_batch_size=args.max_batch_size,
+            device=args.device,
+            use_cache=args.use_cache,
+            limit=args.limit,
+            evaluation_tracker=evaluation_tracker,
+        )
+    except Exception as e:
+        utils.eval_logger.error(f"Evaluation failed: {str(e)}")
+        if wandb_logger:
+            wandb_logger.run.finish()
+        sys.exit(1)
+
+    # Handle evaluation samples if logging is enabled
+    samples = None
+    if args.log_samples:
+        samples = results.pop("samples")
+
+    # Add metadata to results
+    add_results_metadata(results, args, lm)
+
+    # Log results
+    if args.show_config:
+        dumped = json.dumps(results, indent=2, default=handle_non_serializable, ensure_ascii=False)
+        print(dumped)
+
+    # Log batch sizes if available
+    batch_sizes = ",".join(map(str, results["config"]["batch_sizes"]))
+    print(
+        f"{args.model} ({args.model_args}), gen_kwargs: ({args.gen_kwargs}), "
+        f"limit: {args.limit}, num_fewshot: {args.num_fewshot}, "
+        f"batch_size: {args.batch_size}{f' ({batch_sizes})' if batch_sizes else ''}"
     )
 
-    # Add metadata and handle output
-    add_results_metadata(results, args, lm)
-    handle_evaluation_output(results, args, evaluation_tracker, wandb_logger if args.wandb_args else None)
+    # Handle wandb logging
+    if wandb_logger:
+        try:
+            wandb_logger.post_init(results)
+            wandb_logger.log_eval_result()
+            if samples:
+                wandb_logger.log_eval_samples(samples)
+        except Exception as e:
+            eval_logger.warning(f"Logging to Weights and Biases failed: {str(e)}")
+        finally:
+            wandb_logger.run.finish()
+
+    # Save results
+    try:
+        evaluation_tracker.save_results_aggregated(results=results, samples=samples)
+        evaluation_tracker.update_evalresults_db(
+            results, 
+            args.model_id,
+            args.update_db_by_model_name,
+            args.model_name,
+            args.creation_location,
+            args.created_by,
+            args.is_external_model
+        )
+
+        if args.log_samples:
+            for task_name, config in results["configs"].items():
+                evaluation_tracker.save_results_samples(task_name=task_name, samples=samples[task_name])
+    except Exception as e:
+        utils.eval_logger.error(f"Failed to save results: {str(e)}")
 
 
 def setup_evaluation_tracker(args: argparse.Namespace) -> DCFTEvaluationTracker:
@@ -315,8 +430,7 @@ def handle_evaluation_output(
             eval_logger.info(f"Logging to Weights and Biases failed due to {e}")
 
     evaluation_tracker.save_results_aggregated(results=results, samples=samples if args.log_samples else None)
-
-    evaluation_tracker.update_evalresults_db(results, args.model_id, args.update_db_by_model_name, args.model_name)
+    evaluation_tracker.update_evalresults_db(results, args.model_id, args.update_db_by_model_name, args.model_name, args.creation_location, agrs.created_by, args.is_external_model)
 
     if args.log_samples:
         for task_name, config in results["configs"].items():

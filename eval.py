@@ -83,18 +83,6 @@ def evaluate(
 ) -> Dict[str, Dict]:
     """
     Evaluate the language model on the given tasks.
-
-    Args:
-        lm: The language model to evaluate
-        task_manager: Task manager containing benchmark tasks
-        pretrain_task_manager: Task manager for pretrain tasks
-        task_list: List of task names to evaluate
-        verbosity: Logging verbosity level
-        args: Arguments for pretrain evaluation
-        **eval_kwargs: Additional kwargs for evaluation
-
-    Returns:
-        Dictionary containing evaluation results for each task
     """
     eval_logger = utils.eval_logger
     eval_logger.setLevel(getattr(logging, f"{verbosity}"))
@@ -110,44 +98,37 @@ def evaluate(
 
     results = {"results": {}}
 
-    # Run benchmark evaluations with concurrent execution
+    # Run benchmark evaluations - sequential generation, parallel evaluation
     if benchmark_tasks:
         try:
+            # Sequential generation since it's GPU-bound
             generate_methods = task_manager.get_list_generate_responses(benchmark_tasks)
-
             generation_results = []
-            with concurrent.futures.ThreadPoolExecutor() as executor:
-                future_to_task = {
-                    executor.submit(method, lm): task for method, task in zip(generate_methods, benchmark_tasks)
-                }
+            valid_tasks = []  # Keep track of valid tasks
 
-                # Collect results as they complete
-                for future in concurrent.futures.as_completed(future_to_task):
-                    task = future_to_task[future]
-                    try:
-                        result = future.result()
-                        generation_results.append((task, result))
-                    except Exception as e:
-                        eval_logger.error(f"Error in generate_responses for {task}: {str(e)}")
-                        generation_results.append((task, None))
+            for method, task in zip(generate_methods, benchmark_tasks):
+                try:
+                    result = method(lm)
+                    if result is not None:  # Only keep valid results and their corresponding tasks
+                        generation_results.append(result)
+                        valid_tasks.append(task)
+                except Exception as e:
+                    eval_logger.error(f"Error in generate_responses for {task}: {str(e)}")
 
-            # Sort results back into original task order
-            generation_results.sort(key=lambda x: benchmark_tasks.index(x[0]))
-            generation_results = [r[1] for r in generation_results if r[1] is not None]
+            # Get evaluation methods only for valid tasks
+            evaluate_methods = task_manager.get_list_evaluates(valid_tasks)
+            cpu_count = os.cpu_count()
+            max_workers = min(len(valid_tasks), cpu_count * 2)
 
-            # Get evaluate methods
-            evaluate_methods = task_manager.get_list_evaluates(benchmark_tasks)
-
-            # Run evaluation concurrently
-            with concurrent.futures.ThreadPoolExecutor() as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
                 evaluate_results = list(
                     executor.map(
                         lambda func_args: func_args[0](func_args[1]), zip(evaluate_methods, generation_results)
                     )
                 )
 
-            # Store results
-            for task, result in zip(benchmark_tasks, evaluate_results):
+            # Store results using valid tasks for correct mapping
+            for task, result in zip(valid_tasks, evaluate_results):
                 results["results"][task] = result
 
         except Exception as e:

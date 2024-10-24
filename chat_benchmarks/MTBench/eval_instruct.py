@@ -288,9 +288,9 @@ class MTBenchBenchmark(BaseBenchmark):
 
             model_id = results["model_id"]
             return {
-                "Turn 1": df_1.loc[results["model_id"]].score.values[0],
-                "Turn 2": df_2.loc[results["model_id"]].score.values[0],
-                "Average": df_3.loc[results["model_id"]].score,
+                "Turn 1": df_turn1.loc[results["model_id"]].score.values[0],
+                "Turn 2": df_turn2.loc[results["model_id"]].score.values[0],
+                "Average": df_avg.loc[results["model_id"]].score,
             }
 
         except Exception as e:

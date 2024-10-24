@@ -53,7 +53,7 @@ def setup_custom_parser():
     db_group.add_argument(
         "--is_external_model",
         action="store_true",
-        help="By default, the model is stored internal in the database. If set, this is overwritten to external.",
+        help="By default, the model is stored as internal in the database. If set, this is overwritten to external.",
     )
 
     parser.add_argument(

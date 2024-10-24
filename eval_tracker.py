@@ -3,6 +3,7 @@ import getpass
 import re
 import time
 from dataclasses import asdict, dataclass
+from huggingface_hub import model_info
 from datetime import datetime
 from pathlib import Path
 import uuid
@@ -49,6 +50,18 @@ def flatten_dict(d: Dict[str, Any], parent_key: str = "", sep: str = "/") -> Dic
         else:
             items.append((new_key, v))
     return dict(items)
+
+
+def check_hf_model_exists(model_id: str) -> bool:
+    """
+    Check if a model exists on HuggingFace Hub.
+    """
+    try:
+        model_info(model_id)
+        return True
+    except Exception as e:
+        print(f"Error checking model: {e}")
+        return False
 
 
 class DCFTEvaluationTracker:
@@ -353,11 +366,14 @@ class DCFTEvaluationTracker:
                 args_dict = simple_parse_args_string(eval_log_dict["config"]["model_args"])
                 model_name = args_dict["pretrained"]
 
+            weights_location = (
+                f"https://huggingface.co/{model_name}" if is_external and check_hf_model_exists(model_name) else "NA"
+            )
+
             model_id, dataset_id = self.get_or_create_model(
                 model_name=model_name,
                 user=created_by,
-                creation_location="NA",
-                weights_location=eval_log_dict["config"]["model"],
+                weights_location=weights_location,
                 session=session,
                 model_id=model_id,
                 update_db_by_model_name=update_db_by_model_name,

@@ -192,17 +192,17 @@ def evaluate(
 def update_model_args_with_name(model_args: str, model_name: str) -> str:
     """
     Update model_args string to include pretrained model name if not already present.
-    
+
     Args:
         model_args: Original model args string
         model_name: Model name to add
-        
+
     Returns:
         str: Updated model args string
     """
     if not model_args:
         return f"pretrained={model_name}"
-    
+
     args_dict = simple_parse_args_string(model_args)
     if "pretrained" not in args_dict:
         return f"pretrained={model_name},{model_args}"
@@ -212,7 +212,7 @@ def update_model_args_with_name(model_args: str, model_name: str) -> str:
 def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
     """
     Command-line interface for evaluating language models.
-    
+
     Args:
         args: Command line arguments. If None, will parse from sys.argv
     """
@@ -328,13 +328,13 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
     try:
         evaluation_tracker.save_results_aggregated(results=results, samples=samples)
         evaluation_tracker.update_evalresults_db(
-            results, 
+            results,
             args.model_id,
             args.update_db_by_model_name,
             args.model_name,
             args.creation_location,
             args.created_by,
-            args.is_external_model
+            args.is_external_model,
         )
 
         if args.log_samples:
@@ -430,7 +430,15 @@ def handle_evaluation_output(
             eval_logger.info(f"Logging to Weights and Biases failed due to {e}")
 
     evaluation_tracker.save_results_aggregated(results=results, samples=samples if args.log_samples else None)
-    evaluation_tracker.update_evalresults_db(results, args.model_id, args.update_db_by_model_name, args.model_name, args.creation_location, agrs.created_by, args.is_external_model)
+    evaluation_tracker.update_evalresults_db(
+        results,
+        args.model_id,
+        args.update_db_by_model_name,
+        args.model_name,
+        args.creation_location,
+        agrs.created_by,
+        args.is_external_model,
+    )
 
     if args.log_samples:
         for task_name, config in results["configs"].items():

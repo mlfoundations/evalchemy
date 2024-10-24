@@ -35,7 +35,7 @@ def flatten_dict(d: Dict[str, Any], parent_key: str = "", sep: str = "/") -> Dic
     Returns:
         A flattened dictionary where nested dictionaries are represented with
         separated string keys
-    
+
     Example:
         >>> d = {'a': 1, 'b': {'c': 2, 'd': {'e': 3}}}
         >>> flatten_dict(d)
@@ -54,7 +54,7 @@ def flatten_dict(d: Dict[str, Any], parent_key: str = "", sep: str = "/") -> Dic
 class DCFTEvaluationTracker:
     """
     Tracks and saves evaluation information for language models.
-    
+
     This class handles tracking evaluation metrics, saving results to files,
     and managing database operations for storing evaluation results. It provides
     functionality for both real-time tracking during evaluation and persistent
@@ -86,13 +86,13 @@ class DCFTEvaluationTracker:
     def session_scope(self):
         """
         Provide a transactional scope around a series of database operations.
-        
+
         This context manager ensures proper handling of database sessions,
         including automatic rollback on errors and proper session closure.
-        
+
         Yields:
             SQLAlchemy session object for database operations
-        
+
         Raises:
             Any exceptions that occur during database operations
         """
@@ -329,7 +329,7 @@ class DCFTEvaluationTracker:
         model_name: Optional[str] = None,
         creation_location: Optional[str] = None,
         created_by: Optional[str] = None,
-        is_external: Optional[bool] = None
+        is_external: Optional[bool] = None,
     ) -> None:
         """
         Update evaluation results in the database.
@@ -356,12 +356,12 @@ class DCFTEvaluationTracker:
             model_id, dataset_id = self.get_or_create_model(
                 model_name=model_name,
                 user=created_by,
-                creation_location='NA',
+                creation_location="NA",
                 weights_location=eval_log_dict["config"]["model"],
                 session=session,
                 model_id=model_id,
                 update_db_by_model_name=update_db_by_model_name,
-                is_external=is_external
+                is_external=is_external,
             )
 
             results = eval_log_dict["results"]
@@ -373,7 +373,7 @@ class DCFTEvaluationTracker:
                 dataset_id=dataset_id,
                 results=updated_results,
                 config=eval_log_dict["config"],
-                completions_location="NA", # TODO
+                completions_location="NA",  # TODO
                 creation_location=creation_location,
                 git_hash=eval_log_dict["git_hash"],
                 user=created_by,
@@ -386,13 +386,13 @@ class DCFTEvaluationTracker:
     ) -> str:
         """
         Retrieve model name from database using model_id.
-        
+
         Args:
             model_id: UUID string of the model
-            
+
         Returns:
             str: Model name from database
-            
+
         Raises:
             RuntimeError: If model_id is not found in database or if database operation fails
         """

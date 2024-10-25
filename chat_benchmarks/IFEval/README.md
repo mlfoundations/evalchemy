@@ -42,3 +42,8 @@ If you use our work, please consider citing our preprint:
   year={2023}
 }
 ```
+
+## Status (ChangeLog)
+This is a manual copy of the main branch folder -- instruction\_following\_eval in google-research repository -- [Link](https://github.com/google-research/google-research/tree/master/instruction_following_eval) on October 24th, 2024. To check commit history please go to the link. Any changes made in the code are tracked here README.
+
+* Added eval\_instruct.py to integrate with lm\_eval API. (Ongoing)

@@ -17,8 +17,8 @@ from lm_eval.utils import (
     hash_string,
 )
 from lm_eval.loggers.evaluation_tracker import GeneralConfigTracker
-from eval.database.models import Dataset, Model, EvalResult, EvalSetting
-from eval.database.utils import create_db_engine, create_tables, sessionmaker
+from database.models import Dataset, Model, EvalResult, EvalSetting
+from database.utils import create_db_engine, create_tables, sessionmaker
 import subprocess
 
 

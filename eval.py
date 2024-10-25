@@ -278,12 +278,7 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
     # Add metadata to results
     add_results_metadata(results, args, lm)
 
-    handle_evaluation_output(
-            results,
-            args,
-            evaluation_tracker,
-            wandb_logger
-    )
+    handle_evaluation_output(results, args, evaluation_tracker, wandb_logger)
 
 
 def setup_evaluation_tracker(args: argparse.Namespace) -> DCFTEvaluationTracker:

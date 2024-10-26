@@ -48,7 +48,7 @@ class Mistral_8_22B_Instruct_V01(ChatModel):
             torch_dtype=torch.bfloat16,
             # trust_remote_code=True,
             token=self.hf_token,
-            **kwargs
+            **kwargs,
         ).eval()
         return model
 

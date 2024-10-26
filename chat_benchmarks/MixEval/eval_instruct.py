@@ -26,6 +26,7 @@ os.environ["MODEL_PARSER_API"] = os.getenv("OPENAI_API_KEY")
 warnings.simplefilter("ignore", category=DeprecationWarning)
 warnings.simplefilter("ignore", category=FutureWarning)
 
+
 class MixEvalBenchmark(BaseBenchmark):
     """
     MixEval benchmark for evaluating language model responses on various tasks.
@@ -63,18 +64,20 @@ class MixEvalBenchmark(BaseBenchmark):
         """
         super().__init__(logger)
         os.makedirs(output_dir, exist_ok=True)
-        self.args = self._get_args({
-            "output_dir": output_dir,
-            "benchmark": benchmark,
-            "version": version,
-            "batch_size": batch_size,
-            "max_gpu_memory": max_gpu_memory,
-            "data_path": data_path,
-            "api_parallel_num": api_parallel_num,
-            "multichoice_judge": multichoice_judge,
-            "freeform_judge": freeform_judge,
-            "verbose": verbose,
-        })
+        self.args = self._get_args(
+            {
+                "output_dir": output_dir,
+                "benchmark": benchmark,
+                "version": version,
+                "batch_size": batch_size,
+                "max_gpu_memory": max_gpu_memory,
+                "data_path": data_path,
+                "api_parallel_num": api_parallel_num,
+                "multichoice_judge": multichoice_judge,
+                "freeform_judge": freeform_judge,
+                "verbose": verbose,
+            }
+        )
 
     def _get_args(self, params: Dict[str, Any]) -> Namespace:
         """
@@ -152,16 +155,18 @@ class MixEvalBenchmark(BaseBenchmark):
             for b_id, batch in enumerate(tqdm(dataloader, desc=f"Evaluating {split}", unit="batch")):
                 if resume_info["resume"] and resume_info["status"]["batch_id"] >= b_id:
                     continue
-                
+
                 model.get_responses(batch, response_file)
-                
+
                 time_elapsed += time.time() - start_time
                 start_time = time.time()
 
                 self._update_status(b_id, time_elapsed, "in progress")
 
         self._update_status(b_id, time_elapsed, "complete")
-        self.logger.info(f"Finished evaluating {self.args.model_name}'s {split} split. Used {round(time_elapsed / 60, 2)} minutes.")
+        self.logger.info(
+            f"Finished evaluating {self.args.model_name}'s {split} split. Used {round(time_elapsed / 60, 2)} minutes."
+        )
 
         return self._load_results(response_file)
 
@@ -176,7 +181,7 @@ class MixEvalBenchmark(BaseBenchmark):
             Dictionary containing evaluation metrics and samples
         """
         score_file = self._get_score_file()
-        
+
         if not os.path.exists(score_file):
             compute_metrics_p(self.args)
 
@@ -210,11 +215,13 @@ class MixEvalBenchmark(BaseBenchmark):
         generation_results = self.generate_responses(model)
         evaluation_results = self.evaluate_responses(generation_results)
 
-        evaluation_results.update({
-            "benchmark_version": f"{self.args.benchmark}-{self.args.version}",
-            "batch_size": self.args.batch_size,
-            "max_gpu_memory": self.args.max_gpu_memory,
-        })
+        evaluation_results.update(
+            {
+                "benchmark_version": f"{self.args.benchmark}-{self.args.version}",
+                "batch_size": self.args.batch_size,
+                "max_gpu_memory": self.args.max_gpu_memory,
+            }
+        )
 
         return evaluation_results
 
@@ -238,8 +245,11 @@ class MixEvalBenchmark(BaseBenchmark):
 
     def _get_response_file(self) -> str:
         response_file = os.path.join(
-            self.args.output_dir, self.args.model_name, self.args.benchmark, self.args.version,
-            f"{self.args.model_name}_{self.args.split}.jsonl"
+            self.args.output_dir,
+            self.args.model_name,
+            self.args.benchmark,
+            self.args.version,
+            f"{self.args.model_name}_{self.args.split}.jsonl",
         )
         os.makedirs(os.path.dirname(response_file), exist_ok=True)
         return response_file
@@ -250,7 +260,9 @@ class MixEvalBenchmark(BaseBenchmark):
             status = read_status(self.args)
             if self._args_match(status["args"]):
                 if status["status"]["status"] == "complete":
-                    self.logger.info(f"The evaluation for {self.args.model_name}'s {self.args.split} split is already complete. Skipping.")
+                    self.logger.info(
+                        f"The evaluation for {self.args.model_name}'s {self.args.split} split is already complete. Skipping."
+                    )
                     resume_info["resume"] = True
                     resume_info["status"] = status["status"]
                 else:
@@ -261,7 +273,15 @@ class MixEvalBenchmark(BaseBenchmark):
         return resume_info
 
     def _args_match(self, cached_args: Dict[str, Any]) -> bool:
-        not_gen_args = ["freeform_judge", "multichoice_judge", "max_gpu_memory", "api_parallel_num", "max_tasks", "batch_size", "api_parallel_num"]
+        not_gen_args = [
+            "freeform_judge",
+            "multichoice_judge",
+            "max_gpu_memory",
+            "api_parallel_num",
+            "max_tasks",
+            "batch_size",
+            "api_parallel_num",
+        ]
         subdict_status = {k: v for k, v in cached_args.items() if k not in not_gen_args}
         subdict_args = {k: v for k, v in self.args.__dict__.items() if k not in not_gen_args}
         return dict_equal(subdict_status, subdict_args)

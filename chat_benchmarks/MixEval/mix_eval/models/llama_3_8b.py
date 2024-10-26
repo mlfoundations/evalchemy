@@ -45,7 +45,7 @@ class Llama_3_8B(BaseModel):
             torch_dtype=self.model_dtype,
             trust_remote_code=self.trust_remote_code,
             token=self.hf_token,
-            **kwargs
+            **kwargs,
         ).eval()
         return model
 

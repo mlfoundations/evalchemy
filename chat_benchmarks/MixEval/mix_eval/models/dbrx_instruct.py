@@ -47,7 +47,7 @@ class DBRX_Instruct(ChatModel):
             torch_dtype=torch.bfloat16,
             # trust_remote_code=True,
             token=self.hf_token,
-            **kwargs
+            **kwargs,
         ).eval()
         return model
 

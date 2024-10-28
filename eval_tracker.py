@@ -211,7 +211,7 @@ class DCFTEvaluationTracker:
                     created_by=user,
                     creation_location="NA",
                     weights_location=weights_location,
-                    training_start=datetime(2000, 1, 1),
+                    training_start=datetime(1912, 6, 23),
                     training_parameters={},
                     is_external=is_external,
                 )

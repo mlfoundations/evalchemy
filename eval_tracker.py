@@ -329,9 +329,9 @@ class DCFTEvaluationTracker:
                         completions_location=completions_location,
                     )
                     session.add(eval_result)
-                    print(f"Added {key}:{score} to the database.")
+                    eval_logger.info(f"Added {key}:{score} to the database.")
                 else:
-                    print(f"Warning: Omitting '{key}' with score {score} (type: {type(score).__name__})")
+                    eval_logger.warning(f"Omitting '{key}' with score {score} (type: {type(score).__name__})")
             session.commit()
         except Exception as e:
             session.rollback()
@@ -382,6 +382,7 @@ class DCFTEvaluationTracker:
                 update_db_by_model_name=update_db_by_model_name,
                 is_external=is_external,
             )
+            eval_logger.info(f"Updating results for model_id: {str(model_id)}")
 
             results = eval_log_dict["results"]
             benchmark_name = next(iter(results))

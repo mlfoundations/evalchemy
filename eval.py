@@ -276,9 +276,9 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
         sys.exit(1)
 
     # Add metadata to results
-    if lm.rank == 0:
-        add_results_metadata(results, args, lm)
-        handle_evaluation_output(results, args, evaluation_tracker, wandb_logger)
+    add_results_metadata(results, args, lm)
+
+    handle_evaluation_output(results, args, evaluation_tracker, wandb_logger)
 
 
 def setup_evaluation_tracker(args: argparse.Namespace) -> DCFTEvaluationTracker:
@@ -311,33 +311,34 @@ def initialize_model(args: argparse.Namespace) -> LM:
 
 def add_results_metadata(results: Dict, args: argparse.Namespace, lm: LM) -> None:
     """Add metadata and configuration to results."""
-    results["config"] = {
-        "model": (
-            args.model
-            if isinstance(args.model, str)
-            else args.model.config._name_or_path if hasattr(args.model, "config") else type(args.model).__name__
-        ),
-        "model_args": args.model_args,
-        "batch_size": args.batch_size,
-        "batch_sizes": (list(lm.batch_sizes.values()) if hasattr(lm, "batch_sizes") else []),
-        "device": args.device,
-        "use_cache": args.use_cache,
-        "limit": args.limit,
-        # "bootstrap_iters": args.bootstrap_iters,
-        "gen_kwargs": args.gen_kwargs,
-        "random_seed": args.seed[0],
-        "numpy_seed": args.seed[1],
-        "torch_seed": args.seed[2],
-        "fewshot_seed": args.seed[3],
-    }
+    if lm.rank == 0:
+        results["config"] = {
+            "model": (
+                args.model
+                if isinstance(args.model, str)
+                else args.model.config._name_or_path if hasattr(args.model, "config") else type(args.model).__name__
+            ),
+            "model_args": args.model_args,
+            "batch_size": args.batch_size,
+            "batch_sizes": (list(lm.batch_sizes.values()) if hasattr(lm, "batch_sizes") else []),
+            "device": args.device,
+            "use_cache": args.use_cache,
+            "limit": args.limit,
+            # "bootstrap_iters": args.bootstrap_iters,
+            "gen_kwargs": args.gen_kwargs,
+            "random_seed": args.seed[0],
+            "numpy_seed": args.seed[1],
+            "torch_seed": args.seed[2],
+            "fewshot_seed": args.seed[3],
+        }
 
-    if isinstance(lm, lm_eval.models.huggingface.HFLM):
-        results["config"].update(lm.get_model_info())
+        if isinstance(lm, lm_eval.models.huggingface.HFLM):
+            results["config"].update(lm.get_model_info())
 
-    results["git_hash"] = get_git_commit_hash()
-    results["date"] = time.time()
-    add_env_info(results)
-    add_tokenizer_info(results, lm)
+        results["git_hash"] = get_git_commit_hash()
+        results["date"] = time.time()
+        add_env_info(results)
+        add_tokenizer_info(results, lm)
 
 
 def handle_evaluation_output(

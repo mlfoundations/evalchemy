@@ -257,11 +257,8 @@ class DCFTEvaluationTracker:
         try:
             config = self._prepare_config(config)
             eval_setting = session.query(EvalSetting).filter_by(name=name, parameters=config).first()
-
             if not eval_setting:
-                # Use the class method to determine display order
                 display_order = EvalSetting.determine_display_order(session, name)
-
                 eval_setting = EvalSetting(
                     id=uuid.uuid4(),
                     name=name,
@@ -271,7 +268,6 @@ class DCFTEvaluationTracker:
                 )
                 session.add(eval_setting)
                 session.commit()
-
             return eval_setting.id
         except Exception as e:
             session.rollback()

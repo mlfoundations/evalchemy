@@ -28,12 +28,11 @@ from reka.client import Reka
  
 from datasets import load_dataset
 from tqdm import tqdm
-from fastchat_conversation import map_to_conv, HF_Conversation
+from .fastchat_conversation import map_to_conv, HF_Conversation
 import json   
 from together import Together
 
-from task_configs import mapping_task_names, prompt_generation, result_format
-
+from .task_configs import mapping_task_names, prompt_generation, result_format
 
 
 def apply_template(chat_history, model_name, args):

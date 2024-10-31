@@ -1,9 +1,9 @@
 import json
 
 
-from templates.ZEBRA_GRID import ZEBRA_GRID
-from templates.MCQA import MCQA
-from templates.OEQA import OEQA, OEQA_DIRECT
+from .templates.ZEBRA_GRID import ZEBRA_GRID
+from .templates.MCQA import MCQA
+from .templates.OEQA import OEQA, OEQA_DIRECT
 
 
 def generate_choice_string(choices):

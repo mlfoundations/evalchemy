@@ -1,5 +1,5 @@
 from datasets import load_dataset
-from _TEMPLATES import apply_mc_template, apply_lgp_grid_template, apply_oeqa_template
+from ._TEMPLATES import apply_mc_template, apply_lgp_grid_template, apply_oeqa_template
 
 def mapping_task_names(data_name):
     """

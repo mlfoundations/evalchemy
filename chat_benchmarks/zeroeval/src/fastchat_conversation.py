@@ -7,7 +7,7 @@ import dataclasses
 from enum import auto, IntEnum
 from typing import List, Any, Dict, Union, Tuple
 from transformers import AutoTokenizer
-from global_configs import HF_TEMPLATED_MODELS
+from .global_configs import HF_TEMPLATED_MODELS
 
 def map_to_conv(model_name):
     if model_name in HF_TEMPLATED_MODELS:

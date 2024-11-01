@@ -214,6 +214,9 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
         except Exception as e:
             utils.eval_logger.error(f"Failed to retrieve model name from database: {str(e)}")
             sys.exit(1)
+    elif args.model_name:
+        model_name = args.model_name
+        args.model_args = update_model_args_with_name(args.model_args or "", model_name)
 
     # Initialize tasks
     task_list = args.tasks.split(",")
@@ -272,57 +275,10 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
             wandb_logger.run.finish()
         sys.exit(1)
 
-    # Handle evaluation samples if logging is enabled
-    samples = None
-    if args.log_samples:
-        samples = results.pop("samples")
-
     # Add metadata to results
     add_results_metadata(results, args, lm)
 
-    # Log results
-    if args.show_config:
-        dumped = json.dumps(results, indent=2, default=handle_non_serializable, ensure_ascii=False)
-        print(dumped)
-
-    # Log batch sizes if available
-    batch_sizes = ",".join(map(str, results["config"]["batch_sizes"]))
-    print(
-        f"{args.model} ({args.model_args}), gen_kwargs: ({args.gen_kwargs}), "
-        f"limit: {args.limit}, num_fewshot: {args.num_fewshot}, "
-        f"batch_size: {args.batch_size}{f' ({batch_sizes})' if batch_sizes else ''}"
-    )
-
-    # Handle wandb logging
-    if wandb_logger:
-        try:
-            wandb_logger.post_init(results)
-            wandb_logger.log_eval_result()
-            if samples:
-                wandb_logger.log_eval_samples(samples)
-        except Exception as e:
-            eval_logger.warning(f"Logging to Weights and Biases failed: {str(e)}")
-        finally:
-            wandb_logger.run.finish()
-
-    # Save results
-    try:
-        evaluation_tracker.save_results_aggregated(results=results, samples=samples)
-        evaluation_tracker.update_evalresults_db(
-            results,
-            args.model_id,
-            args.update_db_by_model_name,
-            args.model_name,
-            args.creation_location,
-            args.created_by,
-            args.is_external_model,
-        )
-
-        if args.log_samples:
-            for task_name, config in results["configs"].items():
-                evaluation_tracker.save_results_samples(task_name=task_name, samples=samples[task_name])
-    except Exception as e:
-        utils.eval_logger.error(f"Failed to save results: {str(e)}")
+    handle_evaluation_output(results, args, evaluation_tracker, wandb_logger)
 
 
 def setup_evaluation_tracker(args: argparse.Namespace) -> DCFTEvaluationTracker:
@@ -417,7 +373,7 @@ def handle_evaluation_output(
         args.update_db_by_model_name,
         args.model_name,
         args.creation_location,
-        agrs.created_by,
+        args.created_by,
         args.is_external_model,
     )
 

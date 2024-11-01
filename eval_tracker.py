@@ -19,8 +19,10 @@ from lm_eval.utils import (
 )
 from lm_eval.loggers.evaluation_tracker import GeneralConfigTracker
 from lm_eval.utils import simple_parse_args_string
-from eval.database.models import Dataset, Model, EvalResult, EvalSetting
-from eval.database.utils import create_db_engine, create_tables, sessionmaker
+
+from database.models import Dataset, Model, EvalResult, EvalSetting
+from database.utils import create_db_engine, create_tables, sessionmaker
+
 import subprocess
 
 
@@ -211,7 +213,7 @@ class DCFTEvaluationTracker:
                     created_by=user,
                     creation_location="NA",
                     weights_location=weights_location,
-                    training_start=datetime.utcnow(),
+                    training_start=datetime(1912, 6, 23),
                     training_parameters={},
                     is_external=is_external,
                 )
@@ -327,6 +329,7 @@ class DCFTEvaluationTracker:
                         completions_location=completions_location,
                     )
                     session.add(eval_result)
+                    print(f"Added {key}:{score} to the database.")
                 else:
                     print(f"Warning: Omitting '{key}' with score {score} (type: {type(score).__name__})")
             session.commit()

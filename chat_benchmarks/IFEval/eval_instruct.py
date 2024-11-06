@@ -1,5 +1,8 @@
 from typing import Dict, List, Any, Generator, Optional
-import json, logging, tempfile
+import json
+import logging
+import tempfile
+import os
 
 from lm_eval.api.model import LM
 from lm_eval.api.instance import Instance
@@ -9,7 +12,7 @@ from .evaluation import evaluate_accuracy
 class IFEvalBenchmark(BaseBenchmark):
     def __init__(
         self,
-        data_dir: str  = "eval/chatbenchmarks/IFEval/data",
+        data_dir: str  = "eval/chat_benchmarks/IFEval/data",
         max_tokens: int = 512,
         num_examples: int = 3,
         start_idx: int = 10,
@@ -50,7 +53,7 @@ class IFEvalBenchmark(BaseBenchmark):
         """
         try:
             with open(data_path, "r") as f:
-                examples = json.loads(f)
+                examples = [json.loads(x) for x in f]
 
             self.logger.info(f"Loaded {len(examples)} examples from {data_path}")
 
@@ -90,11 +93,11 @@ class IFEvalBenchmark(BaseBenchmark):
             temp_dir = temp_dir_obj.name
 
             problem_file = os.path.join(self.data_dir, "input_data.jsonl")
-            examples = list(self.read_test_examples(problem_file)
-            self.logger.info(f"Process {len(examples) examples}")
+            examples = list(self.read_test_examples(problem_file))
+            self.logger.info(f"Process {len(examples)} examples")
 
             all_instances = []
-            for idx, example enumerate(examples):
+            for idx, example in enumerate(examples):
                 try:
                     inputs = model.apply_chat_template([{"role": "user", "content": example["prompt"]}])
                     all_instances.append(
@@ -123,7 +126,7 @@ class IFEvalBenchmark(BaseBenchmark):
             for example, output in zip(examples, outputs):
                 try:
                     example_with_output = example.copy()
-                    example_with_output["generation"] = output
+                    example_with_output["response"] = output
                     generated_examples.append(example_with_output)
 
                 except Exception as e:
@@ -132,7 +135,7 @@ class IFEvalBenchmark(BaseBenchmark):
 
             output_path = os.path.join(temp_dir, "ifeval.jsonl")
 
-            with open(output_path, "w", encoding="utf-8") as f:
+            with open(output_path, "w", encoding="utf-8") as fw:
                 for ex in generated_examples:
                     fw.write(json.dumps(ex) + "\n")
 
@@ -140,7 +143,7 @@ class IFEvalBenchmark(BaseBenchmark):
 
             return {
                 "temp_dir_obj": temp_dir_obj,
-                "num_examples": len(generated_examples)
+                "num_examples": len(generated_examples),
                 "total_examples": len(examples)
             }
 
@@ -163,7 +166,9 @@ class IFEvalBenchmark(BaseBenchmark):
             temp_dir_obj = results["temp_dir_obj"]
             temp_dir = temp_dir_obj.name
 
-            result = evaluate_accuracy(os.path.join(temp_dir, "ifeval.jsonl")
+            input_file = os.path.join(self.data_dir, "input_data.jsonl")
+            response_file = os.path.join(temp_dir, "ifeval.jsonl")
+            result = evaluate_accuracy(input_file, response_file)
 
             result.update(
                 {
@@ -176,7 +181,7 @@ class IFEvalBenchmark(BaseBenchmark):
 
             return result
 
-        catch Exception as e:
+        except Exception as e:
             self.logger.error(f"Error in evaluate_responses: {str(e)}")
             if temp_dir_obj:
                 temp_dir_obj.cleanup()

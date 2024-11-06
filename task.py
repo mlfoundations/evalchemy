@@ -39,10 +39,11 @@ class TaskManager:
     Provides a unified interface for both class-based benchmarks and legacy tasks.
     """
 
-    def __init__(self, benchmarks_dir: str = "chat_benchmarks"):
+    def __init__(self, benchmarks_dir: str = "chat_benchmarks", **benchmark_kwargs):
         self.logger = logging.getLogger("TaskManager")
         self.tasks: Dict[str, Any] = {}
         self.benchmark_instances: Dict[str, BaseBenchmark] = {}
+        self.benchmark_kwargs = benchmark_kwargs
 
         # Load benchmarks from directory
         self._load_benchmarks(benchmarks_dir)
@@ -97,10 +98,17 @@ class TaskManager:
     def _register_benchmark(self, name: str, benchmark_class: Type[BaseBenchmark]):
         """Register a benchmark class and create its instance."""
         try:
-            # Create instance
-            instance = benchmark_class()  # TODO: add logger
+            init_params = inspect.signature(benchmark_class.__init__).parameters
+            valid_kwargs = {}
 
-            # Store both class and instance
+            # Only pass kwargs that the benchmark's __init__ accepts
+            for param_name, param in init_params.items():
+                if param_name in self.benchmark_kwargs:
+                    valid_kwargs[param_name] = self.benchmark_kwargs[param_name]
+                    self.logger.info(f"Passing {param_name} to {name} benchmark")
+
+            instance = benchmark_class(**valid_kwargs)
+
             self.tasks[name] = benchmark_class
             self.benchmark_instances[name] = instance
 

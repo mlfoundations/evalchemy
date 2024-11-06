@@ -41,8 +41,7 @@ class MixEvalBenchmark(BaseBenchmark):
         max_gpu_memory: str = "60GB",
         data_path: str = "eval/chat_benchmarks/MixEval/mix_eval/data/",
         api_parallel_num: int = 32,
-        multichoice_judge: str = "gpt-3.5-turbo-0125",
-        freeform_judge: str = "gpt-3.5-turbo-0125",
+        annotator_model: str = "gpt-4o-mini-2024-07-18",
         verbose: bool = False,
         logger: Optional[logging.Logger] = None,
     ):
@@ -57,13 +56,14 @@ class MixEvalBenchmark(BaseBenchmark):
             max_gpu_memory: Maximum GPU memory to use
             data_path: Path to evaluation data
             api_parallel_num: Number of parallel API calls
-            multichoice_judge: Model to use for multichoice judging
-            freeform_judge: Model to use for freeform judging
+            annotator_model: Model to use for multichoice judging and freeform judging
             verbose: Whether to print verbose output
             logger: Optional logger instance
         """
         super().__init__(logger)
         os.makedirs(output_dir, exist_ok=True)
+        self.multichoice_judge = annotator_model
+        self.freeform_judge = annotator_model
         self.args = self._get_args(
             {
                 "output_dir": output_dir,
@@ -73,8 +73,8 @@ class MixEvalBenchmark(BaseBenchmark):
                 "max_gpu_memory": max_gpu_memory,
                 "data_path": data_path,
                 "api_parallel_num": api_parallel_num,
-                "multichoice_judge": multichoice_judge,
-                "freeform_judge": freeform_judge,
+                "multichoice_judge": self.multichoice_judge,
+                "freeform_judge": self.freeform_judge,
                 "verbose": verbose,
             }
         )
@@ -211,25 +211,24 @@ class MixEvalBenchmark(BaseBenchmark):
             Dictionary containing evaluation metrics and samples
         """
         self.logger.info("Starting MixEval benchmark evaluation")
-        # try:
-        generation_results = self.generate_responses(model)
-        evaluation_results = self.evaluate_responses(generation_results)
+        try:
+            generation_results = self.generate_responses(model)
+            evaluation_results = self.evaluate_responses(generation_results)
 
-        evaluation_results.update(
-            {
-                "benchmark_version": f"{self.args.benchmark}-{self.args.version}",
-                "batch_size": self.args.batch_size,
-                "max_gpu_memory": self.args.max_gpu_memory,
-            }
-        )
+            evaluation_results.update(
+                {
+                    "benchmark_version": f"{self.args.benchmark}-{self.args.version}",
+                    "batch_size": self.args.batch_size,
+                    "max_gpu_memory": self.args.max_gpu_memory,
+                }
+            )
 
-        return evaluation_results
+            return evaluation_results
 
-        # except Exception as e:
-        #     self.logger.error(f"Error running benchmark: {str(e)}")
-        #     return {"error": str(e)}
+        except Exception as e:
+            self.logger.error(f"Error running benchmark: {str(e)}")
+            return {"error": str(e)}
 
-    # Helper methods
     def _get_model_name(self, model: LM) -> str:
         if "model_identifier" in model.__dict__:
             return (

@@ -16,6 +16,8 @@ class AlpacaBenchmark(BaseBenchmark):
     Alpaca benchmark for evaluating language model responses on instruction following.
     """
 
+    ANNOTATOR_CONFIG_MAP = {"gpt-4o-mini-2024-07-18": "weighted_alpaca_eval_gpt-4o-mini-2024-07-18"}
+
     def __init__(
         self,
         dataset_name: str = "tatsu-lab/alpaca_eval",
@@ -25,6 +27,7 @@ class AlpacaBenchmark(BaseBenchmark):
         temperature: float = 0.5,
         do_sample: bool = True,
         debug_size: Optional[int] = None,
+        annotator_model: str = "gpt-4o-mini-2024-07-18",
         logger: Optional[logging.Logger] = None,
     ):
         """
@@ -48,6 +51,7 @@ class AlpacaBenchmark(BaseBenchmark):
         self.temperature = temperature
         self.do_sample = do_sample
         self.debug_size = debug_size
+        self.annotator_conf = self.ANNOTATOR_CONFIG_MAP[annotator_model]
 
     def load_dataset(self) -> datasets.Dataset:
         """Load the evaluation dataset."""
@@ -148,7 +152,12 @@ class AlpacaBenchmark(BaseBenchmark):
                 raise ValueError("No model outputs to evaluate")
 
             self.logger.info("Running Alpaca evaluation...")
-            leaderboard = alpaca_eval_evaluate(model_outputs=model_outputs, is_return_instead_of_print=True)
+            leaderboard = alpaca_eval_evaluate(
+                model_outputs=model_outputs,
+                is_return_instead_of_print=True,
+                is_overwrite_leaderboard=True,
+                annotators_config=self.annotator_conf,
+            )
 
             metrics = leaderboard[0].loc[model_identifier].to_dict()
 

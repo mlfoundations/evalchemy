@@ -69,6 +69,13 @@ def setup_custom_parser():
         default="NA",
         help="Specifies who evaluates the model.",
     )
+
+    parser.add_argument(
+        "--annotator_model",
+        type=str,
+        default="gpt-4o-mini-2024-07-18",
+        help="Judge model used to evaluate generations.",
+    )
     return parser
 
 
@@ -147,6 +154,7 @@ def evaluate(
                 device=args.device,
                 use_cache=args.use_cache,
                 limit=args.limit,
+                annotator_model=args.annotator_model,
                 check_integrity=args.check_integrity,
                 write_out=args.write_out,
                 log_samples=args.log_samples,
@@ -220,7 +228,7 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
 
     # Initialize tasks
     task_list = args.tasks.split(",")
-    task_manager = InstructTaskManager()
+    task_manager = InstructTaskManager(annotator_model=args.annotator_model)
     pretrain_task_manager = PretrainTaskManager(args.verbosity, include_path=args.include_path)
 
     utils.eval_logger.info(f"Selected Tasks: {[task for task in task_list]}")
@@ -267,6 +275,7 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
             device=args.device,
             use_cache=args.use_cache,
             limit=args.limit,
+            annotator_model=args.annotator_model,
             evaluation_tracker=evaluation_tracker,
         )
     except Exception as e:
@@ -323,6 +332,7 @@ def add_results_metadata(results: Dict, args: argparse.Namespace, lm: LM) -> Non
         "device": args.device,
         "use_cache": args.use_cache,
         "limit": args.limit,
+        "annotator_model": args.annotator_model,
         # "bootstrap_iters": args.bootstrap_iters,
         "gen_kwargs": args.gen_kwargs,
         "random_seed": args.seed[0],
@@ -382,7 +392,7 @@ def handle_evaluation_output(
 
     print(
         f"{args.model} ({args.model_args}), gen_kwargs: ({args.gen_kwargs}), "
-        f"limit: {args.limit}, num_fewshot: {args.num_fewshot}, "
+        f"limit: {args.limit}, num_fewshot: {args.num_fewshot}, annotator_model: {args.annotator_model}, "
         f"batch_size: {args.batch_size}{f' ({batch_sizes})' if batch_sizes else ''}"
     )
 

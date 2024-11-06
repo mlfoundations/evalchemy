@@ -17,7 +17,8 @@
 
 from absl.testing import absltest
 from absl.testing import parameterized
-from instruction_following_eval import instructions
+#from instructions_following_eval import instructions
+from .instructions import *
 
 
 # pylint:disable=g-complex-comprehension
@@ -38,7 +39,8 @@ class InstructionsTest(parameterized.TestCase):
   def test_response_language(self, response, language):
     """Test on single language response."""
     instruction_id = 'language:response_language'
-    instruction = instructions.ResponseLanguageChecker(instruction_id)
+    #instruction = instructions.ResponseLanguageChecker(instruction_id)
+    instruction = ResponseLanguageChecker(instruction_id)
     instruction.build_description(language=language)
     self.assertTrue(instruction.check_following(response))
 
@@ -58,7 +60,8 @@ class InstructionsTest(parameterized.TestCase):
   def test_response_multilanguage(self, response, language):
     """Test on responses that contain multi-language tokens."""
     instruction_id = 'language:response_language'
-    instruction = instructions.ResponseLanguageChecker(instruction_id)
+    #instruction = instructions.ResponseLanguageChecker(instruction_id)
+    instruction = ResponseLanguageChecker(instruction_id)
     instruction.build_description(language=language)
     self.assertTrue(instruction.check_following(response))
 
@@ -74,22 +77,34 @@ class InstructionsTest(parameterized.TestCase):
               'num_sentences': num_sentences,
               'expected': expected,
           }
+          #for response, relation, num_sentences, expected in [
+          #    ('xx,x. xx,x! xx/x. x{x}x?', instructions._COMPARISON_RELATION[0],
+          #     4, False),
+          #    ('xxxx. xx,x! xxxx. x(x)x?', instructions._COMPARISON_RELATION[0],
+          #     5, True),
+          #    ('xxxx. xx,x! xx|x. x&x x?', instructions._COMPARISON_RELATION[1],
+          #     4, True),
+          #    ('xx-x. xx,x! xx}x. x,xx?', instructions._COMPARISON_RELATION[1],
+          #     5, False),
+          #]
           for response, relation, num_sentences, expected in [
-              ('xx,x. xx,x! xx/x. x{x}x?', instructions._COMPARISON_RELATION[0],
+              ('xx,x. xx,x! xx/x. x{x}x?', _COMPARISON_RELATION[0],
                4, False),
-              ('xxxx. xx,x! xxxx. x(x)x?', instructions._COMPARISON_RELATION[0],
+              ('xxxx. xx,x! xxxx. x(x)x?', _COMPARISON_RELATION[0],
                5, True),
-              ('xxxx. xx,x! xx|x. x&x x?', instructions._COMPARISON_RELATION[1],
+              ('xxxx. xx,x! xx|x. x&x x?', _COMPARISON_RELATION[1],
                4, True),
-              ('xx-x. xx,x! xx}x. x,xx?', instructions._COMPARISON_RELATION[1],
+              ('xx-x. xx,x! xx}x. x,xx?', _COMPARISON_RELATION[1],
                5, False),
           ]
+
       ]
   )
   def test_number_sentences(self, response, relation, num_sentences, expected):
     """Test the number of sentences."""
     instruction_id = 'length_constraints:number_sentences'
-    instruction = instructions.NumberOfSentences(instruction_id)
+    #instruction = instructions.NumberOfSentences(instruction_id)
+    instruction = NumberOfSentences(instruction_id)
     instruction.build_description(relation=relation,
                                   num_sentences=num_sentences)
     actual = instruction.check_following(response)
@@ -120,7 +135,8 @@ class InstructionsTest(parameterized.TestCase):
   def test_number_placeholders(self, template, num_placeholders, expected):
     """Test the number of placeholders."""
     instruction_id = 'detectable_content:number_placeholders'
-    instruction = instructions.PlaceholderChecker(instruction_id)
+    #instruction = instructions.PlaceholderChecker(instruction_id)
+    instruction = PlaceholderChecker(instruction_id)
     instruction.build_description(num_placeholders=num_placeholders)
     actual = instruction.check_following(template)
     self.assertEqual(actual, expected)
@@ -182,7 +198,8 @@ class InstructionsTest(parameterized.TestCase):
   def test_number_bullet_lists(self, template, num_bullets, expected):
     """Test the number of bullets."""
     instruction_id = 'detectable_format:exact_number_bullet_points'
-    instruction = instructions.BulletListChecker(instruction_id)
+    #instruction = instructions.BulletListChecker(instruction_id)
+    instruction = BulletListChecker(instruction_id)
     instruction.build_description(num_bullets=num_bullets)
     actual = instruction.check_following(template)
     self.assertEqual(actual, expected)
@@ -197,7 +214,8 @@ class InstructionsTest(parameterized.TestCase):
   def test_constrained_response(self):
     """Test the constrained response checker."""
     instruction_id = 'detectable_format:constrained_response'
-    instruction = instructions.ConstrainedResponseChecker(instruction_id)
+    #instruction = instructions.ConstrainedResponseChecker(instruction_id)
+    instruction = ConstrainedResponseChecker(instruction_id)
     instruction.build_description()
 
     with self.subTest('test with CONSTRAINED_RESPONSE_TEST_RESPONSE_1'):
@@ -252,7 +270,8 @@ class InstructionsTest(parameterized.TestCase):
   def test_number_highlights(self, response, min_num_highlights, expected):
     """Test the minimum number of highlighted sections."""
     instruction_id = 'detectable_format:minimum_number_highlighted_sections'
-    instruction = instructions.HighlightSectionChecker(instruction_id)
+    #instruction = instructions.HighlightSectionChecker(instruction_id)
+    instruction = HighlightSectionChecker(instruction_id)
     instruction.build_description(num_highlights=min_num_highlights)
     actual = instruction.check_following(response)
     self.assertEqual(actual, expected)
@@ -273,7 +292,8 @@ class InstructionsTest(parameterized.TestCase):
   def test_section_checker(self):
     """Test the number of sections."""
     instruction_id = 'detectable_format:multiple_sections'
-    instruction = instructions.SectionChecker(instruction_id)
+    #instruction = instructions.SectionChecker(instruction_id)
+    instruction = SectionChecker(instruction_id)
     section_keyword = 'Section'
     min_num_sections = 3
     instruction.build_description(section_spliter=section_keyword,
@@ -323,7 +343,8 @@ class InstructionsTest(parameterized.TestCase):
   def test_paragraph_checker(self):
     """Test the number of sections."""
     instruction_id = 'length_constraint:number_paragraphs'
-    instruction = instructions.ParagraphChecker(instruction_id)
+    #instruction = instructions.ParagraphChecker(instruction_id)
+    instruction = ParagraphChecker(instruction_id)
     num_paragraphs = 3
     instruction.build_description(num_paragraphs=num_paragraphs)
     with self.subTest(f'test {self.PARAGRAPH_TEST_MESSAGE_1} and '
@@ -391,8 +412,10 @@ class InstructionsTest(parameterized.TestCase):
   def test_postscript_checker(self):
     """Test the postscript checker."""
     instruction_id = 'detectable_content:postscript'
-    instruction = instructions.PostscriptChecker(instruction_id)
-    postscript_start_keyword = instructions._POSTSCRIPT_MARKER[0]
+    #instruction = instructions.PostscriptChecker(instruction_id)
+    instruction = PostscriptChecker(instruction_id)
+    #postscript_start_keyword = instructions._POSTSCRIPT_MARKER[0]
+    postscript_start_keyword = _POSTSCRIPT_MARKER[0]
     instruction.build_description(postscript_marker=postscript_start_keyword)
     with self.subTest(f'test {postscript_start_keyword}'):
       self.assertTrue(
@@ -404,7 +427,8 @@ class InstructionsTest(parameterized.TestCase):
       self.assertFalse(
           instruction.check_following(self.POSTSCRIPT_TEST_MESSAGE_1))
 
-    postscript_start_keyword = instructions._POSTSCRIPT_MARKER[1]
+    #postscript_start_keyword = instructions._POSTSCRIPT_MARKER[1]
+    postscript_start_keyword = _POSTSCRIPT_MARKER[1]
     instruction.build_description(postscript_marker=postscript_start_keyword)
     with self.subTest(f'test {postscript_start_keyword}'):
       self.assertTrue(
@@ -445,7 +469,8 @@ class InstructionsTest(parameterized.TestCase):
   def test_constrained_start_checker(self):
     """Test the constrained start checker."""
     instruction_id = 'multi-turn:constrained_start'
-    instruction = instructions.ConstrainedStartChecker(instruction_id)
+    #instruction = instructions.ConstrainedStartChecker(instruction_id)
+    instruction = ConstrainedStartChecker(instruction_id)
     start_keyword = 'My response is:'
     instruction.build_description(starter=start_keyword)
     with self.subTest(f'test {start_keyword}'):
@@ -480,7 +505,8 @@ class InstructionsTest(parameterized.TestCase):
   def test_rephrase_checker(self):
     """Test the rephrase checker."""
     instruction_id = 'detectable_format:rephrasing'
-    instruction = instructions.RephraseChecker(instruction_id)
+    #instruction = instructions.RephraseChecker(instruction_id)
+    instruction = RephraseChecker(instruction_id)
     instruction.build_description(
         original_message=self.REPHRASE_TEST_ORIGINAL_MESSAGE_1)
     with self.subTest(f'test {self.REPHRASE_TEST_REPHRASED_MESSAGE_1}'):
@@ -527,7 +553,8 @@ class InstructionsTest(parameterized.TestCase):
   def test_keyword_checker(self):
     """Test the inclusion of keywords."""
     instruction_id = 'keywords:include_keywords'
-    instruction = instructions.KeywordChecker(instruction_id)
+    #instruction = instructions.KeywordChecker(instruction_id)
+    instruction = KeywordChecker(instruction_id)
 
     instruction.build_description(keywords=self.KEYWORDS)
     with self.subTest(f'test {self.TEST_INCLUDE_KEYWORD_MESSAGE_1}'):
@@ -555,12 +582,14 @@ class InstructionsTest(parameterized.TestCase):
     """Test the frequency of keywords."""
 
     instruction_id = 'keywords:keyword_frequency'
-    instruction = instructions.KeywordFrequencyChecker(instruction_id)
+    #instruction = instructions.KeywordFrequencyChecker(instruction_id)
+    instruction = KeywordFrequencyChecker(instruction_id)
 
     frequency = 4
     instruction.build_description(keyword=self.TEST_KEYWORD_FREQUENCY_KEYWORD_1,
                                   frequency=frequency,
-                                  relation=instructions._COMPARISON_RELATION[0])
+                                  relation=_COMPARISON_RELATION[0])
+                                  #relation=instructions._COMPARISON_RELATION[0])
     with self.subTest(
         f'test {self.TEST_KEYWORD_FREQUENCY_KEYWORD_1} {frequency}'):
       self.assertTrue(
@@ -569,7 +598,8 @@ class InstructionsTest(parameterized.TestCase):
     frequency = 3
     instruction.build_description(keyword=self.TEST_KEYWORD_FREQUENCY_KEYWORD_1,
                                   frequency=frequency,
-                                  relation=instructions._COMPARISON_RELATION[1])
+                                  relation=_COMPARISON_RELATION[1])
+                                  #relation=instructions._COMPARISON_RELATION[1])
     with self.subTest(
         f'test {self.TEST_KEYWORD_FREQUENCY_KEYWORD_1} {frequency}'):
       self.assertTrue(
@@ -578,7 +608,8 @@ class InstructionsTest(parameterized.TestCase):
     frequency = 4
     instruction.build_description(keyword=self.TEST_KEYWORD_FREQUENCY_KEYWORD_2,
                                   frequency=frequency,
-                                  relation=instructions._COMPARISON_RELATION[1])
+                                  relation=_COMPARISON_RELATION[1])
+                                  #relation=instructions._COMPARISON_RELATION[1])
     with self.subTest(
         f'test {self.TEST_KEYWORD_FREQUENCY_KEYWORD_2} {frequency}'):
       self.assertFalse(
@@ -594,11 +625,13 @@ class InstructionsTest(parameterized.TestCase):
   def test_num_words_checker(self):
     """Test the checker on the number of words."""
     instruction_id = 'length_constraint:number_words'
-    instruction = instructions.NumberOfWords(instruction_id)
+    #instruction = instructions.NumberOfWords(instruction_id)
+    instruction = NumberOfWords(instruction_id)
 
     word_counts = 8
     instruction.build_description(num_words=word_counts,
-                                  relation=instructions._COMPARISON_RELATION[0])
+                                  relation=_COMPARISON_RELATION[0])
+                                  #relation=instructions._COMPARISON_RELATION[0])
     with self.subTest(
         f'test {self.TEST_NUM_WORDS_MESSAGE_1} {word_counts}'):
       self.assertTrue(
@@ -606,7 +639,8 @@ class InstructionsTest(parameterized.TestCase):
 
     word_counts = 16
     instruction.build_description(num_words=word_counts,
-                                  relation=instructions._COMPARISON_RELATION[0])
+                                  relation=_COMPARISON_RELATION[0])
+                                  #relation=instructions._COMPARISON_RELATION[0])
     with self.subTest(
         f'test {self.TEST_NUM_WORDS_MESSAGE_2} less than {word_counts}'):
       self.assertFalse(
@@ -614,7 +648,8 @@ class InstructionsTest(parameterized.TestCase):
 
     word_counts = 16
     instruction.build_description(num_words=word_counts,
-                                  relation=instructions._COMPARISON_RELATION[1])
+                                  relation=_COMPARISON_RELATION[1])
+                                  #relation=instructions._COMPARISON_RELATION[1])
     with self.subTest(
         f'test {self.TEST_NUM_WORDS_MESSAGE_2} at least {word_counts}'):
       self.assertTrue(
@@ -675,7 +710,8 @@ class InstructionsTest(parameterized.TestCase):
   def test_paragraph_first_word(self):
     """Test number of paragraphs and first word of nth paragraph."""
     instruction_id = 'length_constraints:nth_paragraph_first_word'
-    instruction = instructions.ParagraphFirstWordCheck(instruction_id)
+    #instruction = instructions.ParagraphFirstWordCheck(instruction_id)
+    instruction = ParagraphFirstWordCheck(instruction_id)
     tests = [
         self.PARAGRAPH_FIRST_WORD_TEST_1,
         self.PARAGRAPH_FIRST_WORD_TEST_2,
@@ -743,7 +779,8 @@ I love it too much. I'll just have to make sure to eat it in moderation.
   def test_key_sentences(self):
     """Test the inclusion of key sentences."""
     instruction_id = 'keywords:key_sentences'
-    instruction = instructions.KeySentenceChecker(instruction_id)
+    #instruction = instructions.KeySentenceChecker(instruction_id)
+    instruction = KeySentenceChecker(instruction_id)
 
     num_sentences = 2
     instruction.build_description(
@@ -795,7 +832,8 @@ I love it too much. I'll just have to make sure to eat it in moderation.
   def test_forbidden_words(self):
     """Test the exclusion of key words."""
     instruction_id = 'keywords:forbidden_words'
-    instruction = instructions.ForbiddenWords(instruction_id)
+    #instruction = instructions.ForbiddenWords(instruction_id)
+    instruction = ForbiddenWords(instruction_id)
 
     instruction.build_description(forbidden_words=self.FORBIDDEN_WORDS_1)
     with self.subTest(f'test {self.TEST_FORBIDDEN_WORDS_MESSAGE_1}\n ' +
@@ -874,7 +912,8 @@ I love it too much. I'll just have to make sure to eat it in moderation.
   def test_rephrase_paragraph(self):
     """Test the rephrasing of paragraph."""
     instruction_id = 'detectable_content:rephrase_paragraph'
-    instruction = instructions.RephraseParagraph(instruction_id)
+    #instruction = instructions.RephraseParagraph(instruction_id)
+    instruction = RephraseParagraph(instruction_id)
     low, high = 20, 30
     instruction.build_description(
         low=low, high=high, original_paragraph=self.TEST_ORIGINAL_PARAGRAPH_1)
@@ -960,7 +999,8 @@ I love it too much. I'll just have to make sure to eat it in moderation.
   def test_two_responses(self):
     """Test that two responses are given."""
     instruction_id = 'combination:two_responses'
-    instruction = instructions.TwoResponsesChecker(instruction_id)
+    #instruction = instructions.TwoResponsesChecker(instruction_id)
+    instruction = TwoResponsesChecker(instruction_id)
     instruction.build_description()
 
     with self.subTest(f'test {self.TEST_TWO_RESPONSES_1}'):
@@ -991,7 +1031,8 @@ I love it too much. I'll just have to make sure to eat it in moderation.
   def test_prompt_repeat_answer(self):
     """Test that prompt is repeated then anwered."""
     instruction_id = 'combination:repeat_prompt'
-    instruction = instructions.RepeatPromptThenAnswer(instruction_id)
+    #instruction = instructions.RepeatPromptThenAnswer(instruction_id)
+    instruction = RepeatPromptThenAnswer(instruction_id)
 
     instruction.build_description(prompt_to_repeat=self.PROMPT_TO_REPEAT)
     with self.subTest(f'test {self.TEST_PROMPT_ANSWER_1}' +
@@ -1029,7 +1070,8 @@ I love it too much. I'll just have to make sure to eat it in moderation.
   def test_end_checker(self):
     """Check the end of the prompt."""
     instruction_id = 'startend:end_checker'
-    instruction = instructions.EndChecker(instruction_id)
+    #instruction = instructions.EndChecker(instruction_id)
+    instruction = EndChecker(instruction_id)
     instruction.build_description(end_phrase=self.END_PHRASE_1)
     with self.subTest(f'test {self.TEST_END_CHECKER_1}'):
       self.assertTrue(instruction.check_following(self.TEST_END_CHECKER_1))
@@ -1064,7 +1106,8 @@ I love it too much. I'll just have to make sure to eat it in moderation.
   def test_title_checker(self):
     """Check the prompt for a title."""
     instruction_id = 'detectable_format:title'
-    instruction = instructions.TitleChecker(instruction_id)
+    #instruction = instructions.TitleChecker(instruction_id)
+    instruction = TitleChecker(instruction_id)
     instruction.build_description()
     with self.subTest(f'test {self.TEST_TITLE_MESSAGE_1}'):
       self.assertTrue(instruction.check_following(self.TEST_TITLE_MESSAGE_1))
@@ -1091,14 +1134,16 @@ I love it too much. I'll just have to make sure to eat it in moderation.
   def test_letter_frequency_checker(self):
     """Test the frequency of letters."""
     instruction_id = 'keywords:letter_frequency'
-    instruction = instructions.LetterFrequencyChecker(instruction_id)
+    #instruction = instructions.LetterFrequencyChecker(instruction_id)
+    instruction = LetterFrequencyChecker(instruction_id)
 
     letter = 'T'
     frequency = 4
     instruction.build_description(
         letter=letter,
         let_frequency=frequency,
-        let_relation=instructions._COMPARISON_RELATION[1],
+        let_relation=_COMPARISON_RELATION[1],
+        #let_relation=instructions._COMPARISON_RELATION[1],
     )
     with self.subTest(f'test {self.TEST_LETTER_FREQUENCY_MESSAGE_1}'):
       self.assertTrue(
@@ -1110,7 +1155,8 @@ I love it too much. I'll just have to make sure to eat it in moderation.
     instruction.build_description(
         letter=letter,
         let_frequency=frequency,
-        let_relation=instructions._COMPARISON_RELATION[0],
+        let_relation=_COMPARISON_RELATION[0],
+        #let_relation=instructions._COMPARISON_RELATION[0],
     )
     with self.subTest(f'test {self.TEST_LETTER_FREQUENCY_MESSAGE_2}'):
       self.assertTrue(
@@ -1122,7 +1168,8 @@ I love it too much. I'll just have to make sure to eat it in moderation.
     instruction.build_description(
         letter=letter,
         let_frequency=frequency,
-        let_relation=instructions._COMPARISON_RELATION[1],
+        let_relation=_COMPARISON_RELATION[1],
+        #let_relation=instructions._COMPARISON_RELATION[1],
     )
     with self.subTest(f'test {self.TEST_LETTER_FREQUENCY_MESSAGE_2}'):
       self.assertFalse(
@@ -1140,7 +1187,8 @@ I love it too much. I'll just have to make sure to eat it in moderation.
   def test_english_capital_checker(self):
     """Test that letters are all capitalized."""
     instruction_id = 'change_case:english_capital'
-    instruction = instructions.CapitalLettersEnglishChecker(instruction_id)
+    #instruction = instructions.CapitalLettersEnglishChecker(instruction_id)
+    instruction = CapitalLettersEnglishChecker(instruction_id)
     instruction.build_description()
     with self.subTest(f'test {self.TEST_ENGLISH_CAPITAL_1}'):
       self.assertTrue(instruction.check_following(self.TEST_ENGLISH_CAPITAL_1))
@@ -1159,7 +1207,8 @@ I love it too much. I'll just have to make sure to eat it in moderation.
   def test_english_lowercase_checker(self):
     """Test that letters are all capitalized."""
     instruction_id = 'change_case:english_lowercase'
-    instruction = instructions.LowercaseLettersEnglishChecker(instruction_id)
+    #instruction = instructions.LowercaseLettersEnglishChecker(instruction_id)
+    instruction = LowercaseLettersEnglishChecker(instruction_id)
     instruction.build_description()
     with self.subTest(f'test {self.TEST_ENGLISH_LOWERCASE_1}'):
       self.assertTrue(
@@ -1181,7 +1230,8 @@ I love it too much. I'll just have to make sure to eat it in moderation.
 
   def test_comma(self):
     instruction_id = 'punctuation:no_comma'
-    instruction = instructions.CommaChecker(instruction_id)
+    #instruction = instructions.CommaChecker(instruction_id)
+    instruction = CommaChecker(instruction_id)
     instruction.build_description()
     with self.subTest(f'test {self.TEST_COMMA_MESSAGE_1}'):
       self.assertTrue(instruction.check_following(self.TEST_COMMA_MESSAGE_1))
@@ -1198,12 +1248,14 @@ I love it too much. I'll just have to make sure to eat it in moderation.
 
   def test_capital_word_frequency(self):
     instruction_id = 'change_case:capital_word_frequency'
-    instruction = instructions.CapitalWordFrequencyChecker(instruction_id)
+    #instruction = instructions.CapitalWordFrequencyChecker(instruction_id)
+    instruction = CapitalWordFrequencyChecker(instruction_id)
 
     capital_frequency = 3
     instruction.build_description(
         capital_frequency=capital_frequency,
-        capital_relation=instructions._COMPARISON_RELATION[1],
+        capital_relation=_COMPARISON_RELATION[1],
+        #capital_relation=instructions._COMPARISON_RELATION[1],
     )
     with self.subTest(f'test {self.TEST_CAPITAL_WORD_FREQUENCY_MESSAGE_1}'):
       self.assertTrue(
@@ -1215,7 +1267,8 @@ I love it too much. I'll just have to make sure to eat it in moderation.
     capital_frequency = 5
     instruction.build_description(
         capital_frequency=capital_frequency,
-        capital_relation=instructions._COMPARISON_RELATION[0],
+        capital_relation=_COMPARISON_RELATION[0],
+        #capital_relation=instructions._COMPARISON_RELATION[0],
     )
     with self.subTest(f'test {self.TEST_CAPITAL_WORD_FREQUENCY_MESSAGE_2}'):
       self.assertTrue(
@@ -1227,7 +1280,8 @@ I love it too much. I'll just have to make sure to eat it in moderation.
     capital_frequency = 4
     instruction.build_description(
         capital_frequency=capital_frequency,
-        capital_relation=instructions._COMPARISON_RELATION[0],
+        capital_relation=_COMPARISON_RELATION[0],
+        #capital_relation=instructions._COMPARISON_RELATION[0],
     )
     with self.subTest(f'test {self.TEST_CAPITAL_WORD_FREQUENCY_MESSAGE_2}'):
       self.assertFalse(
@@ -1246,7 +1300,8 @@ I love it too much. I'll just have to make sure to eat it in moderation.
 
   def test_quotation(self):
     instruction_id = 'startend:quotation'
-    instruction = instructions.QuotationChecker(instruction_id)
+    #instruction = instructions.QuotationChecker(instruction_id)
+    instruction = QuotationChecker(instruction_id)
     instruction.build_description()
     with self.subTest(f'test {self.TEST_QUOTATION_MESSAGE_1}'):
       self.assertTrue(
@@ -1257,20 +1312,35 @@ I love it too much. I'll just have to make sure to eat it in moderation.
           instruction.check_following(self.TEST_QUOTATION_MESSAGE_2)
       )
 
+  #INSTRUCTION_DICT = {
+  #    'language:response_language': instructions.ResponseLanguageChecker,
+  #    'length_constraints:number_sentences': instructions.NumberOfSentences,
+  #    'length_constraints:number_paragraphs': instructions.ParagraphChecker,
+  #    'length_constraints:number_words': instructions.NumberOfWords,
+  #    'detectable_content:number_placeholders': instructions.PlaceholderChecker,
+  #    'detectable_content:postscript': instructions.PostscriptChecker,
+  #    'detectable_format:number_bullet_lists': instructions.BulletListChecker,
+  #    'detectable_format:constrained_response': (
+  #        instructions.ConstrainedResponseChecker),
+  #    'detectable_format:number_highlighted_sections': (
+  #        instructions.HighlightSectionChecker),
+  #    'detectable_format:multiple_sections': instructions.SectionChecker,
+  #    'detectable_format:json_format': instructions.JsonFormat,
+  #}
   INSTRUCTION_DICT = {
-      'language:response_language': instructions.ResponseLanguageChecker,
-      'length_constraints:number_sentences': instructions.NumberOfSentences,
-      'length_constraints:number_paragraphs': instructions.ParagraphChecker,
-      'length_constraints:number_words': instructions.NumberOfWords,
-      'detectable_content:number_placeholders': instructions.PlaceholderChecker,
-      'detectable_content:postscript': instructions.PostscriptChecker,
-      'detectable_format:number_bullet_lists': instructions.BulletListChecker,
+      'language:response_language': ResponseLanguageChecker,
+      'length_constraints:number_sentences': NumberOfSentences,
+      'length_constraints:number_paragraphs': ParagraphChecker,
+      'length_constraints:number_words': NumberOfWords,
+      'detectable_content:number_placeholders': PlaceholderChecker,
+      'detectable_content:postscript': PostscriptChecker,
+      'detectable_format:number_bullet_lists': BulletListChecker,
       'detectable_format:constrained_response': (
-          instructions.ConstrainedResponseChecker),
+          ConstrainedResponseChecker),
       'detectable_format:number_highlighted_sections': (
-          instructions.HighlightSectionChecker),
-      'detectable_format:multiple_sections': instructions.SectionChecker,
-      'detectable_format:json_format': instructions.JsonFormat,
+          HighlightSectionChecker),
+      'detectable_format:multiple_sections': SectionChecker,
+      'detectable_format:json_format': JsonFormat,
   }
 
   def test_get_instruction_args(self):

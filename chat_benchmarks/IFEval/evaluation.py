@@ -3,7 +3,7 @@ import collections
 import dataclasses
 import json
 
-from evaluation_main import test_instruction_following_strict, test_instruction_following_loose, read_prompt_to_response_dict, read_prompt_list
+from .evaluation_main import test_instruction_following_strict, test_instruction_following_loose, read_prompt_to_response_dict, read_prompt_list
 
 
 def get_report(outputs):
@@ -58,16 +58,16 @@ def evaluate_accuracy(input_filename, response_filename):
     inputs = read_prompt_list(input_filename)
     prompt_to_response = read_prompt_to_response_dict(response_filename)
 
-    for fun, output_file in [
+    for func, output_file in [
         (test_instruction_following_strict, "eval_results_strict"),
         (test_instruction_following_loose, "eval_restuls_loose"),
     ]:
-        logging.info(f"Generating {output_file}")
-
-        outputs []
+        #logging.info(f"Generating {output_file}")
+        outputs = []
         for inp in inputs:
             outputs.append(func(inp, prompt_to_response))
 
+        logging.info(f"{outputs[0]}")
         follow_all_instructions = [o.follow_all_instructions for o in outputs]
         accuracy = sum(follow_all_instructions) / len(outputs)
 

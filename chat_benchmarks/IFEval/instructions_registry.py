@@ -14,7 +14,8 @@
 # limitations under the License.
 
 """Registry of all instructions."""
-from instruction_following_eval import instructions
+#from instruction_following_eval import instructions
+from .instructions import *
 
 _KEYWORD = "keywords:"
 
@@ -36,44 +37,84 @@ _CHANGE_CASES = "change_case:"
 
 _PUNCTUATION = "punctuation:"
 
+#INSTRUCTION_DICT = {
+#    _KEYWORD + "existence": instructions.KeywordChecker,
+#    _KEYWORD + "frequency": instructions.KeywordFrequencyChecker,
+#    # TODO(jeffreyzhou): make a proper set of sentences to choose from
+#    # _KEYWORD + "key_sentences": instructions.KeySentenceChecker,
+#    _KEYWORD + "forbidden_words": instructions.ForbiddenWords,
+#    _KEYWORD + "letter_frequency": instructions.LetterFrequencyChecker,
+#    _LANGUAGE + "response_language": instructions.ResponseLanguageChecker,
+#    _LENGTH + "number_sentences": instructions.NumberOfSentences,
+#    _LENGTH + "number_paragraphs": instructions.ParagraphChecker,
+#    _LENGTH + "number_words": instructions.NumberOfWords,
+#    _LENGTH + "nth_paragraph_first_word": instructions.ParagraphFirstWordCheck,
+#    _CONTENT + "number_placeholders": instructions.PlaceholderChecker,
+#    _CONTENT + "postscript": instructions.PostscriptChecker,
+#    _FORMAT + "number_bullet_lists": instructions.BulletListChecker,
+#    # TODO(jeffreyzhou): Pre-create paragraph or use prompt to replace
+#    # _CONTENT + "rephrase_paragraph": instructions.RephraseParagraph,
+#    _FORMAT + "constrained_response": instructions.ConstrainedResponseChecker,
+#    _FORMAT + "number_highlighted_sections": (
+#       instructions.HighlightSectionChecker),
+#    _FORMAT + "multiple_sections": instructions.SectionChecker,
+#    # TODO(tianjianlu): Re-enable rephrasing with preprocessing the message.
+#    # _FORMAT + "rephrase": instructions.RephraseChecker,
+#    _FORMAT + "json_format": instructions.JsonFormat,
+#    _FORMAT + "title": instructions.TitleChecker,
+#    # TODO(tianjianlu): Re-enable with specific prompts.
+#    # _MULTITURN + "constrained_start": instructions.ConstrainedStartChecker,
+#    _COMBINATION + "two_responses": instructions.TwoResponsesChecker,
+#    _COMBINATION + "repeat_prompt": instructions.RepeatPromptThenAnswer,
+#    _STARTEND + "end_checker": instructions.EndChecker,
+#    _CHANGE_CASES
+#    + "capital_word_frequency": instructions.CapitalWordFrequencyChecker,
+#    _CHANGE_CASES
+#    + "english_capital": instructions.CapitalLettersEnglishChecker,
+#    _CHANGE_CASES
+#    + "english_lowercase": instructions.LowercaseLettersEnglishChecker,
+#    _PUNCTUATION + "no_comma": instructions.CommaChecker,
+#    _STARTEND + "quotation": instructions.QuotationChecker,
+#}
+
 INSTRUCTION_DICT = {
-    _KEYWORD + "existence": instructions.KeywordChecker,
-    _KEYWORD + "frequency": instructions.KeywordFrequencyChecker,
+    _KEYWORD + "existence": KeywordChecker,
+    _KEYWORD + "frequency": KeywordFrequencyChecker,
     # TODO(jeffreyzhou): make a proper set of sentences to choose from
     # _KEYWORD + "key_sentences": instructions.KeySentenceChecker,
-    _KEYWORD + "forbidden_words": instructions.ForbiddenWords,
-    _KEYWORD + "letter_frequency": instructions.LetterFrequencyChecker,
-    _LANGUAGE + "response_language": instructions.ResponseLanguageChecker,
-    _LENGTH + "number_sentences": instructions.NumberOfSentences,
-    _LENGTH + "number_paragraphs": instructions.ParagraphChecker,
-    _LENGTH + "number_words": instructions.NumberOfWords,
-    _LENGTH + "nth_paragraph_first_word": instructions.ParagraphFirstWordCheck,
-    _CONTENT + "number_placeholders": instructions.PlaceholderChecker,
-    _CONTENT + "postscript": instructions.PostscriptChecker,
-    _FORMAT + "number_bullet_lists": instructions.BulletListChecker,
+    _KEYWORD + "forbidden_words": ForbiddenWords,
+    _KEYWORD + "letter_frequency": LetterFrequencyChecker,
+    _LANGUAGE + "response_language": ResponseLanguageChecker,
+    _LENGTH + "number_sentences": NumberOfSentences,
+    _LENGTH + "number_paragraphs": ParagraphChecker,
+    _LENGTH + "number_words": NumberOfWords,
+    _LENGTH + "nth_paragraph_first_word": ParagraphFirstWordCheck,
+    _CONTENT + "number_placeholders": PlaceholderChecker,
+    _CONTENT + "postscript": PostscriptChecker,
+    _FORMAT + "number_bullet_lists": BulletListChecker,
     # TODO(jeffreyzhou): Pre-create paragraph or use prompt to replace
     # _CONTENT + "rephrase_paragraph": instructions.RephraseParagraph,
-    _FORMAT + "constrained_response": instructions.ConstrainedResponseChecker,
+    _FORMAT + "constrained_response": ConstrainedResponseChecker,
     _FORMAT + "number_highlighted_sections": (
-        instructions.HighlightSectionChecker),
-    _FORMAT + "multiple_sections": instructions.SectionChecker,
+        HighlightSectionChecker),
+    _FORMAT + "multiple_sections": SectionChecker,
     # TODO(tianjianlu): Re-enable rephrasing with preprocessing the message.
     # _FORMAT + "rephrase": instructions.RephraseChecker,
-    _FORMAT + "json_format": instructions.JsonFormat,
-    _FORMAT + "title": instructions.TitleChecker,
+    _FORMAT + "json_format": JsonFormat,
+    _FORMAT + "title": TitleChecker,
     # TODO(tianjianlu): Re-enable with specific prompts.
     # _MULTITURN + "constrained_start": instructions.ConstrainedStartChecker,
-    _COMBINATION + "two_responses": instructions.TwoResponsesChecker,
-    _COMBINATION + "repeat_prompt": instructions.RepeatPromptThenAnswer,
-    _STARTEND + "end_checker": instructions.EndChecker,
+    _COMBINATION + "two_responses": TwoResponsesChecker,
+    _COMBINATION + "repeat_prompt": RepeatPromptThenAnswer,
+    _STARTEND + "end_checker": EndChecker,
     _CHANGE_CASES
-    + "capital_word_frequency": instructions.CapitalWordFrequencyChecker,
+    + "capital_word_frequency": CapitalWordFrequencyChecker,
     _CHANGE_CASES
-    + "english_capital": instructions.CapitalLettersEnglishChecker,
+    + "english_capital": CapitalLettersEnglishChecker,
     _CHANGE_CASES
-    + "english_lowercase": instructions.LowercaseLettersEnglishChecker,
-    _PUNCTUATION + "no_comma": instructions.CommaChecker,
-    _STARTEND + "quotation": instructions.QuotationChecker,
+    + "english_lowercase": LowercaseLettersEnglishChecker,
+    _PUNCTUATION + "no_comma": CommaChecker,
+    _STARTEND + "quotation": QuotationChecker,
 }
 
 INSTRUCTION_CONFLICTS = {

@@ -25,8 +25,8 @@ from absl import app
 from absl import flags
 from absl import logging
 
-from instruction_following_eval import instructions_registry
-
+#from instruction_following_eval import instructions_registry
+from .instructions_registry import *
 
 _INPUT_DATA = flags.DEFINE_string(
     "input_data", None, "path to input data", required=True
@@ -103,7 +103,8 @@ def test_instruction_following_strict(
   is_following_list = []
 
   for index, instruction_id in enumerate(instruction_list):
-    instruction_cls = instructions_registry.INSTRUCTION_DICT[instruction_id]
+    #instruction_cls = instructions_registry.INSTRUCTION_DICT[instruction_id]
+    instruction_cls = INSTRUCTION_DICT[instruction_id]
     instruction = instruction_cls(instruction_id)
 
     instruction.build_description(**inp.kwargs[index])
@@ -153,7 +154,8 @@ def test_instruction_following_loose(
   is_following_list = []
 
   for index, instruction_id in enumerate(instruction_list):
-    instruction_cls = instructions_registry.INSTRUCTION_DICT[instruction_id]
+    #instruction_cls = instructions_registry.INSTRUCTION_DICT[instruction_id]
+    instruction_cls = INSTRUCTION_DICT[instruction_id]
     instruction = instruction_cls(instruction_id)
 
     instruction.build_description(**inp.kwargs[index])

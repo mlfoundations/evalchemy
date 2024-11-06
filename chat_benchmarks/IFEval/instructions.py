@@ -24,12 +24,13 @@ from typing import Dict, Optional, Sequence, Union
 from absl import logging
 import langdetect
 
-from instruction_following_eval import instructions_util
-
+#from instruction_following_eval import instructions_util
+from .instructions_util import *
 
 _InstructionArgsDtype = Optional[Dict[str, Union[int, str, Sequence[str]]]]
 
-_LANGUAGES = instructions_util.LANGUAGE_CODES
+#_LANGUAGES = instructions_util.LANGUAGE_CODES
+_LANGUAGES = LANGUAGE_CODES
 
 # The relational operation for comparison.
 _COMPARISON_RELATION = ("less than", "at least")
@@ -225,7 +226,8 @@ class NumberOfSentences(Instruction):
         ValueError if the string in `instruction_args` is not in
         [`less_than`, `at_least`].
     """
-    num_sentences = instructions_util.count_sentences(value)
+    #num_sentences = instructions_util.count_sentences(value)
+    num_sentences = count_senteces(value)
     if self._comparison_relation == _COMPARISON_RELATION[0]:
       return num_sentences < self._num_sentences_threshold
     elif self._comparison_relation == _COMPARISON_RELATION[1]:
@@ -716,7 +718,8 @@ class KeywordChecker(Instruction):
     """
 
     if not keywords:
-      self._keywords = instructions_util.generate_keywords(
+      # self.keywords = instructions_util.generate_keywords(
+      self._keywords = generate_keywords(
           num_keywords=_NUM_KEYWORDS)
     else:
       self._keywords = keywords
@@ -764,7 +767,8 @@ class KeywordFrequencyChecker(Instruction):
       A string representing the instruction description.
     """
     if not keyword:
-      self._keyword = instructions_util.generate_keywords(num_keywords=1)[0]
+      #self._keyword = instructions_util.generate_keywords(num_keywords=1)[0]
+      self._keyword = generate_keywords(num_keywords=1)[0]
     else:
       self._keyword = keyword.strip()
 
@@ -862,7 +866,8 @@ class NumberOfWords(Instruction):
 
   def check_following(self, value):
     """Checks if the response contains the expected number of words."""
-    num_words = instructions_util.count_words(value)
+    #num_words = instructions_util.count_words(value)
+    num_words = count_words(value)
 
     if self._comparison_relation == _COMPARISON_RELATION[0]:
       return num_words < self._num_words
@@ -938,7 +943,8 @@ class ParagraphFirstWordCheck(Instruction):
 
     self._first_word = first_word
     if self._first_word is None:
-      self._first_word = instructions_util.generate_keywords(num_keywords=1)[0]
+      #self._first_word = instructions_util.generate_keywords(num_keywords=1)[0]
+      self._first_word = generate_keywords(num_keywords=1)[0]
     self._first_word = self._first_word.lower()
 
     self._description_pattern = (
@@ -1059,7 +1065,8 @@ class KeySentenceChecker(Instruction):
   def check_following(self, value):
     """Checks if the response contains the expected key sentences."""
     count = 0
-    sentences = instructions_util.split_into_sentences(value)
+    #sentences = instructions_util.split_into_sentences(value)
+    sentences = split_into_sentences(value)
     for sentence in self._key_sentences:
       if sentence in sentences:
         count += 1
@@ -1083,7 +1090,8 @@ class ForbiddenWords(Instruction):
     """
 
     if not forbidden_words:
-      self._forbidden_words = instructions_util.generate_keywords(
+      #self._forbidden_words = instructions_util.generate_keywords(
+      self._forbidden_words = generate_keywords(
           num_keywords=_NUM_KEYWORDS)
     else:
       self._forbidden_words = list(set(forbidden_words))
@@ -1531,7 +1539,8 @@ class CapitalWordFrequencyChecker(Instruction):
   def check_following(self, value):
     """Checks the frequency of words with all capital letters."""
     # Hyphenated words will count as one word
-    words = instructions_util.nltk.word_tokenize(value)
+    #words = instructions_util.nltk.word_tokenize(value)
+    words = nltk.word_tokenize(value)
     capital_words = [word for word in words if word.isupper()]
 
     capital_words = len(capital_words)

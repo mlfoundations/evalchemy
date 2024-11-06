@@ -48,3 +48,7 @@ This is a manual copy of the main branch folder -- instruction\_following\_eval 
 
 * Added eval\_instruct.py to integrate with lm\_eval API. (Complete)
 * Added evaluation.py which is wrapper around evaluation_main.py to call important functions and calculate similar evaluations and return a json. (Complete)
+* For package inclusion some changes were made. Check the earlier commit after bug fixes which works on changes to package inclusion.
+
+
+Package needed to be installed: `langdetect immutabledict`

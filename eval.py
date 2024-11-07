@@ -37,12 +37,6 @@ def setup_custom_parser():
 
     db_group.add_argument("--model_id", type=str, default=None, help="Model UUID for direct database tracking")
 
-    db_group.add_argument(
-        "--update_db_by_model_name",
-        action="store_true",
-        help="By default, databse is updated based on model uuid. Set this flag if you want to overwrite this and update database by searching for model name. Use model_name argument to specify the model name to update.",
-    )
-
     parser.add_argument(
         "--model_name",
         type=str,
@@ -379,7 +373,6 @@ def handle_evaluation_output(
     evaluation_tracker.update_evalresults_db(
         results,
         args.model_id,
-        args.update_db_by_model_name,
         args.model_name,
         args.creation_location,
         args.created_by,

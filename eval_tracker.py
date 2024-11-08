@@ -21,7 +21,7 @@ from lm_eval.loggers.evaluation_tracker import GeneralConfigTracker
 from lm_eval.utils import simple_parse_args_string
 
 from database.models import Dataset, Model, EvalResult, EvalSetting
-from database.utils import create_db_engine, create_tables, sessionmaker
+from database.utils import create_db_engine, create_tables, sessionmaker, get_or_add_model_by_name, get_model_from_db
 
 import subprocess
 
@@ -173,27 +173,13 @@ class DCFTEvaluationTracker:
         else:
             eval_logger.info("Output path not provided, skipping saving results aggregated")
 
-    def get_or_create_model(
-        self,
-        model_name: str,
-        user: str,
-        weights_location: str,
-        session,
-        model_id: Optional[str],
-        update_db_by_model_name: bool = False,
-        is_external: bool = True,
-    ) -> Tuple[uuid.UUID, uuid.UUID]:
+    def get_or_create_model(self, model_name: str, model_id: Optional[str]) -> Tuple[uuid.UUID, uuid.UUID]:
         """
         Retrieve an existing model or create a new one in the database.
 
         Args:
             model_name: Name of the model
-            user: Username of who created/is using the model
-            weights_location: Location of model weights
-            session: Database session
             model_id: Optional UUID of existing model
-            update_db_by_model_name: If True, lookup model by name instead of ID
-            is_external: Whether the model is external or internal
 
         Returns:
             Tuple of (model_id, dataset_id)
@@ -201,27 +187,13 @@ class DCFTEvaluationTracker:
         Raises:
             RuntimeError: If database operations fail
         """
+        assert model_name or model_id
         try:
-            if model_id:
-                model = session.get(Model, uuid.UUID(model_id))
-            elif update_db_by_model_name:
-                model = session.query(Model).filter_by(name=model_name).first()
-            else:
-                model = Model(
-                    id=uuid.uuid4(),
-                    name=model_name,
-                    created_by=user,
-                    creation_location="NA",
-                    weights_location=weights_location,
-                    training_start=datetime(1912, 6, 23),
-                    training_parameters={},
-                    is_external=is_external,
-                )
-                session.add(model)
-                session.commit()
-            return model.id, model.dataset_id
+            if not model_id:
+                model_id = get_or_add_model_by_name(model_name)
+            model_configs = get_model_from_db(model_id)
+            return model_id, model_configs["dataset_id"]
         except Exception as e:
-            session.rollback()
             raise RuntimeError(f"Database error in get_or_create_model: {str(e)}")
 
     @staticmethod
@@ -329,9 +301,9 @@ class DCFTEvaluationTracker:
                         completions_location=completions_location,
                     )
                     session.add(eval_result)
-                    print(f"Added {key}:{score} to the database.")
+                    eval_logger.info(f"Added {key}:{score} to the database.")
                 else:
-                    print(f"Warning: Omitting '{key}' with score {score} (type: {type(score).__name__})")
+                    eval_logger.warning(f"Omitting '{key}' with score {score} (type: {type(score).__name__})")
             session.commit()
         except Exception as e:
             session.rollback()
@@ -341,7 +313,6 @@ class DCFTEvaluationTracker:
         self,
         eval_log_dict: Dict[str, Any],
         model_id: Optional[str],
-        update_db_by_model_name: bool = False,
         model_name: Optional[str] = None,
         creation_location: Optional[str] = None,
         created_by: Optional[str] = None,
@@ -353,7 +324,6 @@ class DCFTEvaluationTracker:
         Args:
             eval_log_dict: Dictionary containing evaluation logs and results
             model_id: Optional UUID of the model
-            update_db_by_model_name: If True, lookup model by name
             model_name: Optional name of the model
             creation_location: Location where evaluation was run
             created_by: Username who ran the evaluation
@@ -373,15 +343,8 @@ class DCFTEvaluationTracker:
                 f"https://huggingface.co/{model_name}" if is_external and check_hf_model_exists(model_name) else "NA"
             )
 
-            model_id, dataset_id = self.get_or_create_model(
-                model_name=model_name,
-                user=created_by,
-                weights_location=weights_location,
-                session=session,
-                model_id=model_id,
-                update_db_by_model_name=update_db_by_model_name,
-                is_external=is_external,
-            )
+            model_id, dataset_id = self.get_or_create_model(model_name=model_name, model_id=model_id)
+            eval_logger.info(f"Updating results for model_id: {str(model_id)}")
 
             results = eval_log_dict["results"]
             benchmark_name = next(iter(results))

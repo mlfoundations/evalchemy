@@ -44,7 +44,7 @@ class MTBenchConfig:
     dtype: Optional[str] = None
     revision: str = "main"
     judge_file: str = "eval/chat_benchmarks/MTBench/fastchat/llm_judge/data/judge_prompts.jsonl"
-    judge_model: str = "gpt-4"
+    judge_model: str = "gpt-4o-mini-2024-07-18"
     baseline_model: str = "gpt-3.5-turbo"
     mode: str = "single"
     parallel: int = 4
@@ -61,6 +61,7 @@ class MTBenchBenchmark(BaseBenchmark):
         base_path: str = "eval/chat_benchmarks/MTBench",
         config: Optional[MTBenchConfig] = None,
         debug: bool = False,
+        annotator_model: str = "gpt-4o-mini-2024-07-18",
         logger: Optional[logging.Logger] = None,
     ):
         """
@@ -74,7 +75,10 @@ class MTBenchBenchmark(BaseBenchmark):
         """
         super().__init__(logger)
         self.base_path = Path(base_path)
-        self.config = config or MTBenchConfig()
+        if config:
+            print(f"Warning: Overwriting config.judge_model = {annotator_model} ")
+            config.judge_model = annotator_model
+        self.config = config or MTBenchConfig(judge_model=annotator_model)
         self.debug = debug
 
         # Setup paths

@@ -17,7 +17,9 @@ You can update the database using either:
 Use the model's unique identifier: ``` --model_id <YOUR_MODEL_ID> ```
 
 2. Search by Model Name
-To search using the model's name instead: ``` --update_db_by_model_name --model-name <MODEL_NAME_IN_DB> ```
+To search using the model's name instead: ``` --model-name <MODEL_NAME_IN_DB> ```
+
+If both model_name and model_id are supplied, then model_id will take precedence.
 
 ## Implementing a new evaluation system
 

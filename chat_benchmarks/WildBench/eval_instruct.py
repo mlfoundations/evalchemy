@@ -40,7 +40,7 @@ class WildBenchConfig:
 
     # Evaluation configuration
     eval_template: str = "eval/chat_benchmarks/WildBench/evaluation/eval_template.score.v2.md"
-    judge_model: str = "gpt-4"
+    judge_model: str = "gpt-4o-mini-2024-07-18"
     batch_mode: bool = True
 
     # Task weights
@@ -63,7 +63,11 @@ class WildBenchBenchmark(BaseBenchmark):
     """
 
     def __init__(
-        self, config: Optional[WildBenchConfig] = None, debug: bool = False, logger: Optional[logging.Logger] = None
+        self,
+        config: Optional[WildBenchConfig] = None,
+        annotator_model: str = "gpt-4o-mini-2024-07-18",
+        debug: bool = False,
+        logger: Optional[logging.Logger] = None,
     ):
         """
         Initialize WildBench benchmark.
@@ -74,7 +78,10 @@ class WildBenchBenchmark(BaseBenchmark):
             logger: Optional logger instance
         """
         super().__init__(logger)
-        self.config = config or WildBenchConfig()
+        if config:
+            self.logger.warning(f"Overwriting config.judge_model = {annotator_model} ")
+            config.judge_model = annotator_model
+        self.config = config or WildBenchConfig(judge_model=annotator_model)
         self.debug = debug
 
         # Task category mapping

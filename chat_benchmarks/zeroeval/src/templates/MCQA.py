@@ -21,4 +21,3 @@ Please show your choice in the `answer` field with only the choice letter, e.g.,
 }
 ```
 """
- 

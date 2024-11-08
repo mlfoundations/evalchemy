@@ -1,7 +1,7 @@
 from datasets import load_dataset, Dataset
 from datasets import get_dataset_config_names
 from huggingface_hub import HfApi
-import os 
+import os
 
 data_name = "openai/gsm8k"
 
@@ -9,21 +9,23 @@ data_name = "openai/gsm8k"
 subset = "main"
 split = "test"
 reformatted_data = []
- 
+
 subset_data = load_dataset(data_name, subset, split=split)
-for index, item in enumerate(subset_data): 
-    reformatted_data.append({
-        "id": f"gsm8k-{subset}-{split}-#{index}",
-        "question": item["question"], 
-        "answer": item["answer"].split("###")[1].strip(),
-        "source": data_name,
-        "config": subset,
-        "task_type": "qa",
-    })
+for index, item in enumerate(subset_data):
+    reformatted_data.append(
+        {
+            "id": f"gsm8k-{subset}-{split}-#{index}",
+            "question": item["question"],
+            "answer": item["answer"].split("###")[1].strip(),
+            "source": data_name,
+            "config": subset,
+            "task_type": "qa",
+        }
+    )
 
 print(len(reformatted_data))
 
-# Upload to HF 
+# Upload to HF
 target_dataset_name = "yuchenlin/zero-eval"
 target_dataset_config = "gsm"
 target_dataset_split = "test"

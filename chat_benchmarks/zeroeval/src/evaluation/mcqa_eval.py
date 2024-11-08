@@ -1,10 +1,17 @@
-import json 
+import json
 from collections import defaultdict
-import os 
-from tabulate import tabulate 
+import os
+from tabulate import tabulate
 import re
 import sys
-from eval_utils import load_model_results, extract_values_from_json, extract_first_complete_json, model_specific_extraction, model_name_replacement
+from eval_utils import (
+    load_model_results,
+    extract_values_from_json,
+    extract_first_complete_json,
+    model_specific_extraction,
+    model_name_replacement,
+)
+
 
 def eval_model(model, filepath):
     global private_solutions
@@ -12,44 +19,49 @@ def eval_model(model, filepath):
         print(f"Processing {filepath}")
         data = json.load(f)
 
-    solved_examples = 0 
-    num_total_examples = len(data) 
-    no_answer = 0  
-    
+    solved_examples = 0
+    num_total_examples = len(data)
+    no_answer = 0
+
     reason_lens = []
     parsed_results = []
-    for item in data:  
+    for item in data:
         # Read and Parse the prediction from model output
-        
+
         prediction_str = item["output"][0]
         prediction_json = extract_first_complete_json(prediction_str)
         if prediction_json is None or "answer" not in prediction_json:
             prediction_json = extract_values_from_json(prediction_str, allow_no_quotes=True)
-        if prediction_json is None or "answer" not in prediction_json or prediction_json["answer"] is None or prediction_json["answer"] == "": 
+        if (
+            prediction_json is None
+            or "answer" not in prediction_json
+            or prediction_json["answer"] is None
+            or prediction_json["answer"] == ""
+        ):
             try_extracted_answer = model_specific_extraction(model, prediction_str)
             if try_extracted_answer:
                 # print(f"Extracted answer from model: {try_extracted_answer}")
                 prediction_json["answer"] = try_extracted_answer
             else:
-                no_answer += 1 
-                # print the no answer examples for debugging 
+                no_answer += 1
+                # print the no answer examples for debugging
                 if False and "Llama-3.1" in model:
                     print(f"No answer for {item['id']}")
                     print(prediction_str)
                     print(prediction_json)
                     print(correct_answer)
-                continue 
+                continue
         reason = prediction_json.get("reasoning", "")
         model_answer = prediction_json["answer"]
         correct_answer = item["correct_answer"]
         index_of_correct_answer = item["choices"].index(correct_answer)
         label_of_correct_answer = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[index_of_correct_answer]
-        if  model_answer == label_of_correct_answer or f"{label_of_correct_answer})" in model_answer:
+        if model_answer == label_of_correct_answer or f"{label_of_correct_answer})" in model_answer:
             solved_examples += 1
             correct = True
         else:
             correct = False
-            if False and "Llama-3.1" in model: # for debugging 
+            if False and "Llama-3.1" in model:  # for debugging
                 print(f"## Example ID {item['id']}")
                 # print(f"Input: {item['chat_history'][0]}")
                 print(f"\n### Question:\n\n {item['question']}")
@@ -80,13 +92,13 @@ def eval_model(model, filepath):
     return result, parsed_results
 
 
-def gen_results(run_name_folders): 
+def gen_results(run_name_folders):
     model_results = load_model_results(run_name_folders)
 
     columns = ["Model", "Mode", "Acc", "No answer", "Total", "Reason Lens"]
     rows = []
-    for model_name, filepath in model_results.items(): 
-        result, parsed_results = eval_model(model_name, filepath) 
+    for model_name, filepath in model_results.items():
+        result, parsed_results = eval_model(model_name, filepath)
         # Save the parsed_results to the same filepath with a new prefix
         parsed_results_filepath = filepath.replace("result_dirs", "result_dirs_parsed")
         # Create folders if they don't exist
@@ -104,10 +116,10 @@ def gen_results(run_name_folders):
     print(tabulate(table_data, headers=columns, tablefmt="fancy_outline", stralign="center", numalign="center"))
     # print(tabulate(rows, headers=columns, tablefmt="github"))
 
-    # write to json file 
+    # write to json file
     with open(f"result_dirs/{data_name}.summary.json", "w") as f:
         json.dump(rows, f, indent=2)
-    
+
     # write to markdown file
     banner_header = """
 <div style="text-align: center;">
@@ -117,7 +129,10 @@ def gen_results(run_name_folders):
 
 """
     with open(f"result_dirs/{data_name}.summary.md", "w") as f:
-        f.write(banner_header+tabulate(table_data, headers=columns, tablefmt="github", stralign="center", numalign="center"))
+        f.write(
+            banner_header
+            + tabulate(table_data, headers=columns, tablefmt="github", stralign="center", numalign="center")
+        )
 
 
 if __name__ == "__main__":
@@ -126,6 +141,6 @@ if __name__ == "__main__":
         print(f"Invalid data name: {data_name}")
         sys.exit(1)
     run_name_folders = {
-        "greedy": f"result_dirs/{data_name}", 
-    }  
+        "greedy": f"result_dirs/{data_name}",
+    }
     gen_results(run_name_folders)

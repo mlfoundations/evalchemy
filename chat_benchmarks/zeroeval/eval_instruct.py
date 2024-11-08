@@ -16,33 +16,35 @@ from .src.evaluation.zebra_grid_eval import eval_model as zebra_grid_eval_model,
 from .src.evaluation.crux_eval import eval_model as crux_eval_model
 from .src.evaluation.math_eval import eval_model as math_eval_model
 
+
 @dataclass
 class ZeroEvalConfig:
     # Dataset configuration
     start_index: int = 0
     end_index: int = -1
-    
+
     # Generation configuration
     temperature: float = 0.0
     max_tokens: int = 4096
     do_sample: bool = False
-    
+
+
 class ZeroEvalBenchmark(BaseBenchmark):
     """
     ZeroEval benchmark for a number of tasks and benchmarks.
     """
-    
+
     def __init__(
         self,
         tasks: List[str] = ["zebra-grid", "numersense-v2", "crux", "math-l5"],
         config: Optional[ZeroEvalConfig] = None,
-        logger: Optional[logging.Logger] = None
+        logger: Optional[logging.Logger] = None,
     ):
         super().__init__(logger)
         self.tasks = tasks
         self.config = config or ZeroEvalConfig()
         self.debug = False
-        
+
     def load_dataset(self, data_name: str) -> Tuple[List[str], List[str], List[Dict[str, Any]], Dict[str, Any]]:
         """
         Load dataset for ZeroEval tasks.
@@ -53,37 +55,42 @@ class ZeroEvalBenchmark(BaseBenchmark):
             extracted_chats = []
             metadata = {}
             dataset, id_name = mapping_task_names(data_name)
-            
+
             if self.debug:
                 dataset = dataset.select(range(min(10, len(dataset))))
                 self.logger.info(f"Debug mode: using {len(dataset)} examples")
                 self.logger.info(f"Example: {dataset[0]}")
-            
+
             # Process each item
             prompt_generation_args = Namespace(run_name="")
             for ind, item in enumerate(dataset):
-                id_strs.append(item.get(id_name, f"{data_name}#{ind}")) 
+                id_strs.append(item.get(id_name, f"{data_name}#{ind}"))
                 prompt = prompt_generation(data_name, item, prompt_generation_args)
                 chat_history.append([prompt])
                 extracted_chats.append([{"content": prompt, "role": "user"}])
-                for key in item: 
+                for key in item:
                     if key not in metadata:
                         metadata[key] = []
                     metadata[key].append(item[key])
-            
+
             self.logger.info(f"Finished processing {data_name} dataset.")
 
             # Apply index limits
             if self.config.end_index < 0:
                 self.config.end_index = len(id_strs)
-                
+
             slice_range = slice(self.config.start_index, self.config.end_index)
-            return id_strs[slice_range], chat_history[slice_range], extracted_chats[slice_range], {k: v[slice_range] for k, v in metadata.items()}
-            
+            return (
+                id_strs[slice_range],
+                chat_history[slice_range],
+                extracted_chats[slice_range],
+                {k: v[slice_range] for k, v in metadata.items()},
+            )
+
         except Exception as e:
             self.logger.error(f"Error loading dataset for task {data_name}: {e}")
             raise e
-        
+
     def generate_responses(self, model: LM) -> Dict[str, Any]:
         """
         Generate responses for ZeroEval tasks.
@@ -97,29 +104,29 @@ class ZeroEvalBenchmark(BaseBenchmark):
         temp_dir_obj = tempfile.TemporaryDirectory()
         temp_dir = temp_dir_obj.name
         results = {}
-            
+
         for task in self.tasks:
             self.logger.info(f"Generating responses for task: {task}")
-            
+
             # Load data
             try:
                 id_strs, chat_history, extracted_chats, metadata = self.load_dataset(task)
             except Exception as e:
                 self.logger.error(f"Error loading data for task {task}: {e}")
                 continue
-            
+
             self.logger.info(f"Finished loading data for task {task}.")
-            
+
             # Apply template
             model_inputs = [model.apply_chat_template(chat) for chat in extracted_chats]
-            
+
             if self.debug:
                 self.logger.info(f"Example chat history: {chat_history[0]}")
                 self.logger.info(f"Example model inputs: {model_inputs[0]}")
-            
+
             output_path = os.path.join(temp_dir, f"{task}.json")
             results[task] = output_path
-            
+
             # Generate responses
             self.logger.info("Generating responses...")
             all_instances = [
@@ -138,24 +145,31 @@ class ZeroEvalBenchmark(BaseBenchmark):
                 )
                 for idx, inputs in enumerate(model_inputs)
             ]
-            
+
             outputs = model.generate_until(all_instances)
             outputs = [[output] for output in outputs]
-            
+
             if self.debug:
                 self.logger.info(f"Example outputs: {outputs[0]}")
 
             # Save outputs
-            save_args = Namespace(data_name=task, model_name="", engine="", repetition_penalty=0.0, temperature=0.0, top_p=0.0, max_tokens=4096)
+            save_args = Namespace(
+                data_name=task,
+                model_name="",
+                engine="",
+                repetition_penalty=0.0,
+                temperature=0.0,
+                top_p=0.0,
+                max_tokens=4096,
+            )
             save_outputs(save_args, id_strs, outputs, chat_history, metadata, model_inputs, output_path)
-            
+
             if self.debug:
                 self.logger.info(f"Example output path: {output_path}")
 
         results["temp_dir_obj"] = temp_dir_obj
         return results
-            
-            
+
     def evaluate_responses(self, results: Dict[str, Any]) -> Dict[str, float]:
         """
         Evaluate responses for ZeroEval tasks.
@@ -163,9 +177,9 @@ class ZeroEvalBenchmark(BaseBenchmark):
         temp_dir_obj = results["temp_dir_obj"]
         temp_dir = temp_dir_obj.name
         del results["temp_dir_obj"]
-        
+
         eval_results = {}
-        
+
         for task, filepath in results.items():
             try:
                 # Special handling for zebra-grid task
@@ -179,14 +193,27 @@ class ZeroEvalBenchmark(BaseBenchmark):
                     eval_func = math_eval_model if task in ["numersense-v2", "math-l5"] else crux_eval_model
                     result, _ = eval_func("%", filepath)
                     eval_results[task] = result["Acc"]
-                
+
                 # Common metrics for all tasks
-                eval_results[f"{task}_no_answer"] = result["No answer"] 
+                eval_results[f"{task}_no_answer"] = result["No answer"]
                 eval_results[f"{task}_reason_lens"] = result["Reason Lens"]
-                    
+
             except Exception as e:
                 self.logger.error(f"Error evaluating responses for task {task}: {e}")
                 raise e
-            
+
         temp_dir_obj.cleanup()
         return eval_results
+
+    def run_benchmark(self, model: LM) -> Dict[str, float]:
+        """
+        Run the complete ZeroEval benchmark evaluation pipeline.
+        """
+        self.logger.info(f"Starting ZeroEval benchmark evaluation on tasks: {self.tasks}")
+        try:
+            generation_results = self.generate_responses(model)
+            evaluation_results = self.evaluate_responses(generation_results)
+            return evaluation_results
+        except Exception as e:
+            self.logger.error(f"Error running benchmark: {str(e)}")
+            return {"error": str(e)}

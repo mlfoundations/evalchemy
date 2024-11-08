@@ -1,7 +1,7 @@
 from datasets import load_dataset, Dataset
 from datasets import get_dataset_config_names
 from huggingface_hub import HfApi
-import os 
+import os
 
 data_name = "edinburgh-dawg/mmlu-redux"
 
@@ -10,7 +10,7 @@ configs = get_dataset_config_names(data_name)
 
 reformatted_data = []
 
-for subset in configs: 
+for subset in configs:
     subset_data = load_dataset(data_name, subset, split="test")
     for index, item in enumerate(subset_data):
         correct_answer = None
@@ -20,20 +20,22 @@ for subset in configs:
             correct_answer = item["choices"]["ABCDEF".index(item["correct_answer"])]
         else:
             # multiple answers, bad questions, etc.
-            continue 
-        reformatted_data.append({
-            "id": f"mmlu-redux-{subset}-#{index}",
-            "question": item["question"],
-            "choices": item["choices"],
-            "correct_answer": correct_answer,
-            "source": data_name,
-            "config": subset,
-            "task_type": "multiple_choice",
-        })
+            continue
+        reformatted_data.append(
+            {
+                "id": f"mmlu-redux-{subset}-#{index}",
+                "question": item["question"],
+                "choices": item["choices"],
+                "correct_answer": correct_answer,
+                "source": data_name,
+                "config": subset,
+                "task_type": "multiple_choice",
+            }
+        )
 
 print(len(reformatted_data))
 
-# Upload to HF 
+# Upload to HF
 target_dataset_name = "yuchenlin/zero-eval"
 target_dataset_config = "mmlu-redux"
 target_dataset_split = "test"

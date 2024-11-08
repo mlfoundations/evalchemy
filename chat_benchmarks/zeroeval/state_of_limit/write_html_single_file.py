@@ -1,18 +1,20 @@
 import json
 import os
 
+
 def escape_html(text):
     """Escape special characters in the given text for HTML."""
     return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
+
 def format_text_with_newlines(text):
     if text is None:
         return ""
-    
+
     lines = text.split("\n")
     formatted_lines = []
     in_code_block = False
-    
+
     for i, line in enumerate(lines):
         if "[PYTHON]" in line:
             in_code_block = True
@@ -26,23 +28,24 @@ def format_text_with_newlines(text):
             formatted_lines.append(escape_html(line))
             formatted_lines.append("</code></pre>")
             continue
-        
+
         if in_code_block:
             formatted_lines.append(escape_html(line) + "\n")
         else:
             formatted_lines.append(escape_html(line) + "<br>")
-    
+
     return "".join(formatted_lines)
+
 
 def write_html(task_summaries, output_file):
     """
     Write all task summaries to a single HTML file with toggle buttons.
-    
+
     Args:
     task_summaries (dict): Contains task information and model results for all tasks
     output_file (str): Path to save the HTML file
     """
-    
+
     html_content = """
     <!DOCTYPE html>
     <html lang="en">
@@ -109,18 +112,18 @@ def write_html(task_summaries, output_file):
             <h1>ZeroEval: Benchmarking LLMs for Reasoning</h1>
             <div>
     """
-    
+
     # Add toggle buttons
     for task_name in task_summaries.keys():
         html_content += f'<button class="task-button" onclick="showTask(\'{task_name}\')">{task_name}</button>'
-    
+
     html_content += "</div>"
-    
+
     # Add content for each task
     for task_name, task_summary in task_summaries.items():
         html_content += f'<div id="{task_name}" class="task-content">'
         for example_id, example in task_summary.items():
-            if example['correct_ratio'] < 0.1:  # Only process examples with correct_ratio < 10%
+            if example["correct_ratio"] < 0.1:  # Only process examples with correct_ratio < 10%
                 table_id = f"table_{task_name}_{example_id}"
                 html_content += f"""
                 <h2>Example: {example_id}</h2>
@@ -134,14 +137,14 @@ def write_html(task_summaries, output_file):
                         <th>Answer</th>
                     </tr>
                 """
-                
-                correct_models = example['correct_models'].split('|') if example['correct_models'] else []
-                incorrect_models = example['incorrect_models'].split('|') if example['incorrect_models'] else []
-                
+
+                correct_models = example["correct_models"].split("|") if example["correct_models"] else []
+                incorrect_models = example["incorrect_models"].split("|") if example["incorrect_models"] else []
+
                 model_id = 0
                 for model in correct_models + incorrect_models:
-                    answer = example['model_answers'].get(model, 'N/A')
-                    reasoning = example['reasoning'].get(model, 'No reasoning provided')
+                    answer = example["model_answers"].get(model, "N/A")
+                    reasoning = example["reasoning"].get(model, "No reasoning provided")
                     is_correct = model in correct_models
                     unique_model_id = f"model_{task_name}_{example_id}_{model_id}"
                     html_content += f"""
@@ -157,10 +160,10 @@ def write_html(task_summaries, output_file):
                     </tr>
                     """
                     model_id += 1
-                
+
                 html_content += "</table>"
         html_content += "</div>"
-    
+
     html_content += """
         </div>
         <script>
@@ -179,21 +182,22 @@ def write_html(task_summaries, output_file):
     </body>
     </html>
     """
-    
-    with open(output_file, 'w') as f:
+
+    with open(output_file, "w") as f:
         f.write(html_content)
+
 
 # Read all JSON files in the current folder and convert to HTML
 task_summaries = {}
-for task in ['gsm', 'math-l5', 'crux', 'mmlu-redux']:
-    json_file = f'state_of_limit/task_summary_{task}.json'
+for task in ["gsm", "math-l5", "crux", "mmlu-redux"]:
+    json_file = f"state_of_limit/task_summary_{task}.json"
     if os.path.exists(json_file):
-        with open(json_file, 'r') as f:
+        with open(json_file, "r") as f:
             task_summaries[task] = json.load(f)
         print(f"Loaded JSON for {task}")
     else:
         print(f"JSON file for {task} not found")
 
-output_file = 'state_of_limit/html/all_tasks.html'
+output_file = "state_of_limit/html/all_tasks.html"
 write_html(task_summaries, output_file)
 print(f"Generated HTML for all tasks: {output_file}")

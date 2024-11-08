@@ -1,10 +1,16 @@
-import json 
+import json
 from collections import defaultdict
-import os 
-from tabulate import tabulate 
+import os
+from tabulate import tabulate
 import re
-import sys 
-from .eval_utils import load_model_results, extract_values_from_json, extract_first_complete_json, model_specific_extraction, model_name_replacement
+import sys
+from .eval_utils import (
+    load_model_results,
+    extract_values_from_json,
+    extract_first_complete_json,
+    model_specific_extraction,
+    model_name_replacement,
+)
 
 
 def eval_model(model, filepath):
@@ -13,40 +19,40 @@ def eval_model(model, filepath):
         print(f"Processing {filepath}")
         data = json.load(f)
 
-    solved_examples = 0 
-    num_total_examples = len(data) 
-    no_answer = 0  
-    
+    solved_examples = 0
+    num_total_examples = len(data)
+    no_answer = 0
+
     reason_lens = []
     parsed_results = []
-    for item in data:  
+    for item in data:
         # Read and Parse the prediction from model output
-        prediction_str = item["output"][0] 
+        prediction_str = item["output"][0]
         prediction_json = extract_first_complete_json(prediction_str)
         if prediction_json is None or "answer" not in prediction_json:
             prediction_json = extract_values_from_json(prediction_str, allow_no_quotes=True)
             # print("-")
-        if prediction_json is None or "answer" not in prediction_json: 
+        if prediction_json is None or "answer" not in prediction_json:
             try_extracted_answer = model_specific_extraction(model, prediction_str)
             if try_extracted_answer:
                 # print(f"Extracted answer from model: {try_extracted_answer}")
                 prediction_json["answer"] = try_extracted_answer
             else:
-                no_answer += 1 
-                if False and  "3.1" in model: # used for debugging the format of the output
+                no_answer += 1
+                if False and "3.1" in model:  # used for debugging the format of the output
                     print("--------------------------")
                     print(f"No answer for {item['id']}")
                     print(prediction_str)
                     print(prediction_json)
                     print(correct_answer)
-                continue 
+                continue
         reason = prediction_json.get("reasoning", "")
-        
+
         # We use string to compare the answers, so we need to strip the quotes
-        model_answer = str(prediction_json["answer"]).strip("'\"").replace('\n', '\\n')
+        model_answer = str(prediction_json["answer"]).strip("'\"").replace("\n", "\\n")
         correct_answer = str(item["answer"]).strip("'\"")
-        
-        correct = False 
+
+        correct = False
         if model_answer and correct_answer:
             if model_answer == correct_answer:
                 correct = True
@@ -55,7 +61,9 @@ def eval_model(model, filepath):
                     if raw_model_answer != correct_answer:
                         print(f"Raw Model Answer: {raw_model_answer}")
                         print(f"Model Answer: {model_answer}, Truth: {correct_answer}")
-                        print(f"Extracted from model: {first_number_in_model_answer.group()}, Extracted from truth: {first_number_in_correct_answer.group()}")
+                        print(
+                            f"Extracted from model: {first_number_in_model_answer.group()}, Extracted from truth: {first_number_in_correct_answer.group()}"
+                        )
                         print("--- correct")
             else:
                 # To debug the wrong examples
@@ -94,13 +102,13 @@ def eval_model(model, filepath):
     return result, parsed_results
 
 
-def gen_results(run_name_folders): 
+def gen_results(run_name_folders):
     model_results = load_model_results(run_name_folders)
 
     columns = ["Model", "Mode", "Acc", "No answer", "Total", "Reason Lens"]
     rows = []
-    for model_name, filepath in model_results.items(): 
-        result, parsed_results = eval_model(model_name, filepath) 
+    for model_name, filepath in model_results.items():
+        result, parsed_results = eval_model(model_name, filepath)
         # Save the parsed_results to the same filepath with a new prefix
         parsed_results_filepath = filepath.replace("result_dirs", "result_dirs_parsed")
         # Create folders if they don't exist
@@ -127,21 +135,24 @@ def gen_results(run_name_folders):
 
 """
     with open(f"result_dirs/{data_name}.summary.md", "w") as f:
-        f.write(banner_header+tabulate(table_data, headers=columns, tablefmt="github", stralign="center", numalign="center"))
+        f.write(
+            banner_header
+            + tabulate(table_data, headers=columns, tablefmt="github", stralign="center", numalign="center")
+        )
 
-    # write to json file 
+    # write to json file
     with open(f"result_dirs/{data_name}.summary.json", "w") as f:
         json.dump(rows, f, indent=2)
 
 
 if __name__ == "__main__":
 
-    data_name = "crux" # by default if there is no sys.argv[1]
+    data_name = "crux"  # by default if there is no sys.argv[1]
     if len(sys.argv) > 1:
         data_name = sys.argv[1]
     run_name_folders = {
-        "greedy": f"result_dirs/{data_name}", 
+        "greedy": f"result_dirs/{data_name}",
         "sampling": f"result_dirs/{data_name}/sampling",
         "greedy@no_cot": f"result_dirs/{data_name}/greedy@no_cot",
-    }  
+    }
     gen_results(run_name_folders)

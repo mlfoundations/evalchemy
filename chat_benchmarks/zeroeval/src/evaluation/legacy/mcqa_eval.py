@@ -1,25 +1,26 @@
-import json 
-import sys 
+import json
+import sys
+
 filepath = sys.argv[1]
 
-# Load the prediction file 
+# Load the prediction file
 # filepath = "ZeroEval/result_dirs/mmlu-redux/cot=false/Llama-3-8B-Tulu-330K.json"
 # filepath = "ZeroEval/result_dirs/mmlu-redux/cot=false/Magpie-Pro-SFT-v0.1.json"
 # filepath = "ZeroEval/result_dirs/mmlu-redux/cot=false/Llama-3-8B-OpenHermes-243K.json"
 # filepath = "ZeroEval/result_dirs/mmlu-redux/cot=false/Llama-3-8B-Ultrachat-200K.json"
 
 filepath = filepath.replace("ZeroEval/", "")
-with open(filepath, 'r') as f:
+with open(filepath, "r") as f:
     predictions = json.load(f)
 
 answers = {}
-total = 0 
+total = 0
 correct = 0
 eval_ed_ids = set()
 
-total_examples = 0 
-correct = 0 
-for prediction_item in predictions: 
+total_examples = 0
+correct = 0
+for prediction_item in predictions:
     total_examples += 1
     answer = prediction_item["correct_answer"]
     # remove the endding "." from the answer
@@ -41,15 +42,15 @@ for prediction_item in predictions:
     elif f"is {answer_label}" in output:
         correct += 1
     elif f"is {answer}" in output:
-        correct += 1  
+        correct += 1
     elif f"be {answer_label}" in output:
-        correct += 1 
+        correct += 1
     elif f"be {answer}" in output:
-        correct += 1  
-        
+        correct += 1
+
 print("---------------------------------")
 print(f"File: {filepath}")
-# print(f"Total examples: {total_examples}") 
+# print(f"Total examples: {total_examples}")
 # print(f"Correct: {correct}")
 print(f"Accuracy: {correct/total_examples}")
 print("---------------------------------")

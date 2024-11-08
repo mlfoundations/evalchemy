@@ -9,6 +9,7 @@ from typing import List, Any, Dict, Union, Tuple
 from transformers import AutoTokenizer
 from .global_configs import HF_TEMPLATED_MODELS
 
+
 def map_to_conv(model_name):
     if model_name in HF_TEMPLATED_MODELS:
         print(f"Model {model_name} is using HF chat-template method.")
@@ -38,37 +39,40 @@ def map_to_conv(model_name):
     else:
         raise ValueError(f"Model {model_name} is not supported.")
 
-    return conv 
+    return conv
+
 
 class HF_Conversation:
     def __init__(self, model_name):
         self.roles = ["user", "assistant"]
         self.messages = []
         self.system_prompt = ""
-        self.hf_tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True) 
+        self.hf_tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
 
     def set_system_message(self, system_message: str):
         self.system_prompt = system_message
         if len(self.messages) > 0:
             self.messages.insert(0, {"role": "system", "content": system_message})
-            print(f"Warning: System message is set after the conversation has started. The system message will be added to the beginning of the conversation.")
+            print(
+                f"Warning: System message is set after the conversation has started. The system message will be added to the beginning of the conversation."
+            )
         else:
             self.messages.append({"role": "system", "content": system_message})
 
     def append_message(self, role: str, message: str):
         if message is not None:
-            self.messages.append({"role": role, "content": message}) 
-        # We only append the message if it is not None.  
-        
+            self.messages.append({"role": role, "content": message})
+        # We only append the message if it is not None.
 
     def get_prompt(self):
         # add_generation_prompt is True so we don't have to add the generation prompt manually
         full_prompt = self.hf_tokenizer.apply_chat_template(self.messages, tokenize=False, add_generation_prompt=True)
         return full_prompt
-    
+
     def clear(self):
         self.messages = []
         self.system_prompt = ""
+
 
 class SeparatorStyle(IntEnum):
     """Separator styles."""
@@ -92,7 +96,7 @@ class SeparatorStyle(IntEnum):
     CHATGLM3 = auto()
     DEEPSEEK_CHAT = auto()
     METAMATH = auto()
-    URIAL = auto() 
+    URIAL = auto()
     URIAL_V6 = auto()
 
 
@@ -178,11 +182,7 @@ class Conversation:
             ret = system_prompt
             for i, (role, message) in enumerate(self.messages):
                 if message:
-                    ret += (
-                        role
-                        + ": "
-                        + message.replace("\r\n", "\n").replace("\n\n", "\n")
-                    )
+                    ret += role + ": " + message.replace("\r\n", "\n").replace("\n\n", "\n")
                     ret += "\n\n"
                 else:
                     ret += role + ":"
@@ -321,7 +321,6 @@ class Conversation:
                 else:
                     ret += role + ":"
             return ret
-        
 
     def set_system_message(self, system_message: str):
         """Set the system message."""
@@ -387,7 +386,7 @@ class Conversation:
 
     def clear(self):
         """Clear the conversation."""
-        self.messages = [] 
+        self.messages = []
 
 
 # A global registry for all conversation templates
@@ -397,9 +396,7 @@ conv_templates: Dict[str, Conversation] = {}
 def register_conv_template(template: Conversation, override: bool = False):
     """Register a new conversation template."""
     if not override:
-        assert (
-            template.name not in conv_templates
-        ), f"{template.name} has been registered."
+        assert template.name not in conv_templates, f"{template.name} has been registered."
 
     conv_templates[template.name] = template
 
@@ -1457,7 +1454,7 @@ register_conv_template(
         sep="\n\n",
         stop_str="</s>",
     )
-)  
+)
 
 
 # Gemma
@@ -1489,7 +1486,7 @@ register_conv_template(
 )
 
 
-if __name__ == "__main__":  
+if __name__ == "__main__":
 
     print("-- Vicuna template --")
     conv = get_conv_template("vicuna_v1.1")

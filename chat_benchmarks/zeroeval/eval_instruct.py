@@ -41,7 +41,7 @@ class ZeroEvalBenchmark(BaseBenchmark):
         super().__init__(logger)
         self.tasks = tasks
         self.config = config or ZeroEvalConfig()
-        self.debug = True
+        self.debug = False
         
     def load_dataset(self, data_name: str) -> Tuple[List[str], List[str], List[Dict[str, Any]], Dict[str, Any]]:
         """

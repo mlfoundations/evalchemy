@@ -4,7 +4,7 @@ import os
 from tabulate import tabulate 
 import re
 import sys 
-from eval_utils import load_model_results, extract_values_from_json, extract_first_complete_json, model_specific_extraction, model_name_replacement
+from .eval_utils import load_model_results, extract_values_from_json, extract_first_complete_json, model_specific_extraction, model_name_replacement
  
 
 

@@ -4,6 +4,7 @@ import os
 import tempfile
 from typing import List, Dict, Any, Optional, Tuple
 import logging
+import json
 
 from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
@@ -11,14 +12,21 @@ from eval.chat_benchmarks.zeroeval.src.task_configs import prompt_generation
 from eval.task import BaseBenchmark
 
 from .src.unified_utils import mapping_task_names, save_outputs
+from .src.evaluation.zebra_grid_eval import eval_model as zebra_grid_eval_model, load_private_solutions
+from .src.evaluation.crux_eval import eval_model as crux_eval_model
+from .src.evaluation.math_eval import eval_model as math_eval_model
 
 @dataclass
 class ZeroEvalConfig:
-    
     # Dataset configuration
     start_index: int = 0
     end_index: int = -1
-
+    
+    # Generation configuration
+    temperature: float = 0.0
+    max_tokens: int = 4096
+    do_sample: bool = False
+    
 class ZeroEvalBenchmark(BaseBenchmark):
     """
     ZeroEval benchmark for a number of tasks and benchmarks.
@@ -26,7 +34,7 @@ class ZeroEvalBenchmark(BaseBenchmark):
     
     def __init__(
         self,
-        tasks: List[str] = ["mmlu-redux", "gsm", "zebra-grid", "alpaca_eval", "numersense-v2", "crux", "math-l5"],
+        tasks: List[str] = ["zebra-grid", "numersense-v2", "crux", "math-l5"],
         config: Optional[ZeroEvalConfig] = None,
         logger: Optional[logging.Logger] = None
     ):
@@ -47,16 +55,17 @@ class ZeroEvalBenchmark(BaseBenchmark):
             dataset, id_name = mapping_task_names(data_name)
             
             if self.debug:
-                dataset = dataset.select(range(min(5, len(dataset))))
+                dataset = dataset.select(range(min(10, len(dataset))))
                 self.logger.info(f"Debug mode: using {len(dataset)} examples")
                 self.logger.info(f"Example: {dataset[0]}")
             
             # Process each item
+            prompt_generation_args = Namespace(run_name="")
             for ind, item in enumerate(dataset):
                 id_strs.append(item.get(id_name, f"{data_name}#{ind}")) 
-                prompt = prompt_generation(data_name, item, None)
+                prompt = prompt_generation(data_name, item, prompt_generation_args)
                 chat_history.append([prompt])
-                extracted_chats.append(prompt)
+                extracted_chats.append([{"content": prompt, "role": "user"}])
                 for key in item: 
                     if key not in metadata:
                         metadata[key] = []
@@ -85,9 +94,12 @@ class ZeroEvalBenchmark(BaseBenchmark):
         Returns:
             Dict[str, Any]: Dictionary containing file paths and temporary directory
         """
+        temp_dir_obj = tempfile.TemporaryDirectory()
+        temp_dir = temp_dir_obj.name
+        results = {}
+            
         for task in self.tasks:
             self.logger.info(f"Generating responses for task: {task}")
-            self.logger.info(f"LM: {model.model}")
             
             # Load data
             try:
@@ -105,9 +117,8 @@ class ZeroEvalBenchmark(BaseBenchmark):
                 self.logger.info(f"Example chat history: {chat_history[0]}")
                 self.logger.info(f"Example model inputs: {model_inputs[0]}")
             
-            temp_dir_obj = tempfile.TemporaryDirectory()
-            temp_dir = temp_dir_obj.name
-            output_path = os.path.join(temp_dir, "output.json")
+            output_path = os.path.join(temp_dir, f"{task}.json")
+            results[task] = output_path
             
             # Generate responses
             self.logger.info("Generating responses...")
@@ -118,9 +129,9 @@ class ZeroEvalBenchmark(BaseBenchmark):
                     (
                         inputs,
                         {
-                            "max_new_tokens": self.config.max_tokens,
-                            "do_sample": self.config.do_sample,
                             "temperature": self.config.temperature,
+                            "max_length": self.config.max_tokens,
+                            "do_sample": self.config.do_sample,
                         },
                     ),
                     idx,
@@ -130,16 +141,52 @@ class ZeroEvalBenchmark(BaseBenchmark):
             
             outputs = model.generate_until(all_instances)
             outputs = [[output] for output in outputs]
+            
+            if self.debug:
+                self.logger.info(f"Example outputs: {outputs[0]}")
 
             # Save outputs
-            save_outputs(self.config, id_strs, outputs, chat_history, metadata, model_inputs, output_path)
+            save_args = Namespace(data_name=task, model_name="", engine="", repetition_penalty=0.0, temperature=0.0, top_p=0.0, max_tokens=4096)
+            save_outputs(save_args, id_strs, outputs, chat_history, metadata, model_inputs, output_path)
+            
+            if self.debug:
+                self.logger.info(f"Example output path: {output_path}")
 
-            return {"filepath": output_path, "temp_dir_obj": temp_dir_obj}
+        results["temp_dir_obj"] = temp_dir_obj
+        return results
             
             
     def evaluate_responses(self, results: Dict[str, Any]) -> Dict[str, float]:
         """
         Evaluate responses for ZeroEval tasks.
         """
-        pass
+        temp_dir_obj = results["temp_dir_obj"]
+        temp_dir = temp_dir_obj.name
+        del results["temp_dir_obj"]
+        
+        eval_results = {}
+        
+        for task, filepath in results.items():
+            try:
+                # Special handling for zebra-grid task
+                if task == "zebra-grid":
+                    load_private_solutions()
+                    result, _ = zebra_grid_eval_model("%", filepath)
+                    eval_results[task] = result["Puzzle Acc"]
+                    eval_results[f"{task}_cell_acc"] = result["Cell Acc"]
+                else:
+                    # Handle other tasks (numersense-v2, crux, math-l5)
+                    eval_func = math_eval_model if task in ["numersense-v2", "math-l5"] else crux_eval_model
+                    result, _ = eval_func("%", filepath)
+                    eval_results[task] = result["Acc"]
+                
+                # Common metrics for all tasks
+                eval_results[f"{task}_no_answer"] = result["No answer"] 
+                eval_results[f"{task}_reason_lens"] = result["Reason Lens"]
+                    
+            except Exception as e:
+                self.logger.error(f"Error evaluating responses for task {task}: {e}")
+                raise e
             
+        temp_dir_obj.cleanup()
+        return eval_results

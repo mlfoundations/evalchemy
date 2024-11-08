@@ -4,7 +4,7 @@ import os
 from tabulate import tabulate
 from datasets import load_dataset
 
-from eval_utils import load_model_results, extract_last_complete_json, model_name_replacement
+from .eval_utils import load_model_results, extract_last_complete_json, model_name_replacement
 
 private_solutions = {}
 

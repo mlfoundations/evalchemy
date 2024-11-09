@@ -144,7 +144,7 @@ class MTBenchBenchmark(BaseBenchmark):
 
                 # If not primary rank, return None early
                 if outputs is None:
-                    return None
+                    continue
 
                 # Process outputs
                 for q_idx, output in enumerate(outputs):

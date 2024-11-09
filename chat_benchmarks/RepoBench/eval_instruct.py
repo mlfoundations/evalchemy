@@ -55,14 +55,18 @@ class RepoBenchmark(BaseBenchmark):
         if self.legacy_mode:
             return self._generate_responses_legacy(model)
 
-        temp_dir_obj = tempfile.TemporaryDirectory()
-        temp_dir = temp_dir_obj.name
+        if model.rank == 0:
+            temp_dir_obj = tempfile.TemporaryDirectory()
+            temp_dir = temp_dir_obj.name
 
+        print(f"Rank {model.rank} generating responses")
         for lang in self.languages:
             datasets = load_dataset(f"tianyang/repobench_{lang}_v1.1", verification_mode="no_checks")
+            print(f"Rank {model.rank} loaded {len(datasets)} datasets for {lang}")
 
             for subset, dataset in datasets.items():
                 if subset not in self.subsets:
+                    print(f"Rank {model.rank} skipping {subset}")
                     continue
 
                 all_instances = []
@@ -82,12 +86,15 @@ class RepoBenchmark(BaseBenchmark):
                             idx,
                         )
                     )
-
+                print(f"Rank {model.rank} generated {len(all_instances)} instances for {lang}/{subset}")
                 outputs = self.compute(model, all_instances)
 
                 # Return None early for non-primary ranks
-                if outputs is None:
-                    return None
+                if model.rank != 0:
+                    print(f"Rank {model.rank} continuing")
+                    continue
+
+                print(f"Rank {model.rank} got {len(outputs)} outputs")
 
                 generated_examples = []
                 for idx, (example, output) in enumerate(zip(dataset, outputs)):
@@ -143,6 +150,9 @@ class RepoBenchmark(BaseBenchmark):
                     )
 
                 outputs = self.compute(model, all_instances)
+
+                if outputs is None:
+                    continue
 
                 generated_examples = []
                 for idx, (example, output) in enumerate(zip(examples, outputs)):

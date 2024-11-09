@@ -181,7 +181,7 @@ class WildBenchBenchmark(BaseBenchmark):
                 for idx, inputs in enumerate(model_inputs)
             ]
 
-            outputs = model.generate_until(all_instances)
+            outputs = self.compute(model, all_instances)
             outputs = [[output] for output in outputs]
 
             # Save outputs

@@ -157,7 +157,7 @@ Here is my problem:
                     continue
 
             self.logger.info("Generating responses...")
-            outputs = model.generate_until(all_instances)
+            outputs = self.compute(model, all_instances)
 
             generated_examples = []
             for example, output in zip(examples, outputs):

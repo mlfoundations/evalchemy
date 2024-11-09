@@ -82,7 +82,7 @@ class RepoBenchmark(BaseBenchmark):
                         )
                     )
 
-                outputs = model.generate_until(all_instances)
+                outputs = self.compute(model, all_instances)
 
                 generated_examples = []
                 for idx, (example, output) in enumerate(zip(dataset, outputs)):
@@ -137,7 +137,7 @@ class RepoBenchmark(BaseBenchmark):
                         )
                     )
 
-                outputs = model.generate_until(all_instances)
+                outputs = self.compute(model, all_instances)
 
                 generated_examples = []
                 for idx, (example, output) in enumerate(zip(examples, outputs)):

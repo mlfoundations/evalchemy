@@ -109,7 +109,7 @@ Please continue to complete the function. You are not allowed to modify the give
                         )
                     )
 
-                outputs = model.generate_until(all_instances)
+                outputs = self.compute(model, all_instances)
 
                 generated_examples = []
                 for example, output in zip(examples, outputs):

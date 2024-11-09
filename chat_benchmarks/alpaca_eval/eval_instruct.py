@@ -109,7 +109,7 @@ class AlpacaBenchmark(BaseBenchmark):
 
             with torch.no_grad():
                 self.logger.info("Generating responses...")
-                outputs = model.generate_until(all_instances)
+                outputs = self.compute(model, all_instances)
 
             model_outputs = []
             for idx, (example, output) in enumerate(zip(eval_set, outputs)):

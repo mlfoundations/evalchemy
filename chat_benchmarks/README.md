@@ -64,7 +64,7 @@ all_instances.append(
         )
 )
 
-outputs = model.generate_until(all_instances)
+outputs = self.compute(model, all_instances)
 ```
 
 2. Try to use lm-eval logger as much as possible.

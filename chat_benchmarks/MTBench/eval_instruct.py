@@ -134,7 +134,7 @@ class MTBenchBenchmark(BaseBenchmark):
 
             # Generate responses
             if batch_instances:
-                outputs = model.generate_until(batch_instances)
+                outputs = self.compute(model, batch_instances)
 
                 # Process outputs
                 for q_idx, output in enumerate(outputs):

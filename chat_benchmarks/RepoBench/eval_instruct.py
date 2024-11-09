@@ -49,7 +49,8 @@ class RepoBenchmark(BaseBenchmark):
             model: Language model instance
 
         Returns:
-            Dictionary containing temporary directory with generated responses
+            Dictionary containing temporary directory with generated responses,
+            or None for non-primary ranks
         """
         if self.legacy_mode:
             return self._generate_responses_legacy(model)
@@ -83,6 +84,10 @@ class RepoBenchmark(BaseBenchmark):
                     )
 
                 outputs = self.compute(model, all_instances)
+
+                # Return None early for non-primary ranks
+                if outputs is None:
+                    return None
 
                 generated_examples = []
                 for idx, (example, output) in enumerate(zip(dataset, outputs)):
@@ -166,8 +171,12 @@ class RepoBenchmark(BaseBenchmark):
             results: Dictionary containing temporary directory with generations
 
         Returns:
-            Dictionary containing evaluation metrics
+            Dictionary containing evaluation metrics, or None for non-primary ranks
         """
+        # Handle None result from non-primary ranks
+        if results is None:
+            return None
+
         temp_dir_obj = results["temp_dir_obj"]
         temp_dir = temp_dir_obj.name
 
@@ -217,3 +226,27 @@ class RepoBenchmark(BaseBenchmark):
 
         temp_dir_obj.cleanup()
         return evaluation_results
+
+    def run_benchmark(self, model: LM) -> Dict[str, float]:
+        """
+        Run the complete benchmark evaluation pipeline.
+
+        Args:
+            model: Language model instance
+
+        Returns:
+            Dictionary containing evaluation metrics, or None for non-primary ranks
+        """
+        try:
+            generation_results = self.generate_responses(model)
+
+            # If not primary rank, return None early
+            if generation_results is None:
+                return None
+
+            evaluation_results = self.evaluate_responses(generation_results)
+            return evaluation_results
+
+        except Exception as e:
+            self.logger.error(f"Error running benchmark: {str(e)}")
+            return {"error": str(e)}

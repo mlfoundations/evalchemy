@@ -8,6 +8,7 @@ from typing import Optional, List, Dict, Type, Any
 import random
 import concurrent.futures
 from abc import ABC, abstractmethod
+import torch.distributed as dist
 
 import numpy as np
 import torch
@@ -116,21 +117,22 @@ def evaluate(
                 except Exception as e:
                     eval_logger.error(f"Error in generate_responses for {task}: {str(e)}")
 
-            # Get evaluation methods only for valid tasks
-            evaluate_methods = task_manager.get_list_evaluates(valid_tasks)
-            cpu_count = os.cpu_count()
-            max_workers = min(len(valid_tasks), cpu_count * 2)
+            if len(valid_tasks) > 0:
+                # Get evaluation methods only for valid tasks
+                evaluate_methods = task_manager.get_list_evaluates(valid_tasks)
+                cpu_count = os.cpu_count()
+                max_workers = min(len(valid_tasks), cpu_count * 2)
 
-            with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-                evaluate_results = list(
-                    executor.map(
-                        lambda func_args: func_args[0](func_args[1]), zip(evaluate_methods, generation_results)
+                with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+                    evaluate_results = list(
+                        executor.map(
+                            lambda func_args: func_args[0](func_args[1]), zip(evaluate_methods, generation_results)
+                        )
                     )
-                )
 
-            # Store results using valid tasks for correct mapping
-            for task, result in zip(valid_tasks, evaluate_results):
-                results["results"][task] = result
+                # Store results using valid tasks for correct mapping
+                for task, result in zip(valid_tasks, evaluate_results):
+                    results["results"][task] = result
 
         except Exception as e:
             eval_logger.error(f"Error in benchmark evaluation: {str(e)}")
@@ -255,33 +257,30 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
         wandb_logger = WandbLogger(**simple_parse_args_string(args.wandb_args))
 
     # Run evaluation
-    try:
-        results = evaluate(
-            lm=lm,
-            task_manager=task_manager,
-            pretrain_task_manager=pretrain_task_manager,
-            task_list=task_list,
-            verbosity=args.verbosity,
-            args=args,
-            num_fewshot=args.num_fewshot,
-            batch_size=args.batch_size,
-            max_batch_size=args.max_batch_size,
-            device=args.device,
-            use_cache=args.use_cache,
-            limit=args.limit,
-            annotator_model=args.annotator_model,
-            evaluation_tracker=evaluation_tracker,
-        )
-    except Exception as e:
-        utils.eval_logger.error(f"Evaluation failed: {str(e)}")
-        if wandb_logger:
-            wandb_logger.run.finish()
-        sys.exit(1)
+    results = evaluate(
+        lm=lm,
+        task_manager=task_manager,
+        pretrain_task_manager=pretrain_task_manager,
+        task_list=task_list,
+        verbosity=args.verbosity,
+        args=args,
+        num_fewshot=args.num_fewshot,
+        batch_size=args.batch_size,
+        max_batch_size=args.max_batch_size,
+        device=args.device,
+        use_cache=args.use_cache,
+        limit=args.limit,
+        annotator_model=args.annotator_model,
+        evaluation_tracker=evaluation_tracker,
+    )
 
     # Add metadata to results
     if lm.rank == 0:
         add_results_metadata(results, args, lm)
         handle_evaluation_output(results, args, evaluation_tracker, wandb_logger)
+
+    if dist.is_initialized():
+        dist.destroy_process_group()
 
 
 def setup_evaluation_tracker(args: argparse.Namespace) -> DCFTEvaluationTracker:

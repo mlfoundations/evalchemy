@@ -26,7 +26,13 @@ from fastchat.llm_judge.common import (
     temperature_config,
 )
 from fastchat.utils import str_to_torch_dtype
-from fastchat.llm_judge.gen_judgment import make_match, make_match_all_pairs, make_match_single, make_judge_single
+from fastchat.llm_judge.gen_judgment import (
+    make_match,
+    make_match_all_pairs,
+    make_match_single,
+    make_judge_single,
+    make_judge_pairwise,
+)
 
 
 @dataclass
@@ -136,6 +142,10 @@ class MTBenchBenchmark(BaseBenchmark):
             if batch_instances:
                 outputs = self.compute(model, batch_instances)
 
+                # If not primary rank, return None early
+                if outputs is None:
+                    return None
+
                 # Process outputs
                 for q_idx, output in enumerate(outputs):
                     all_convs[q_idx].append({"role": "assistant", "content": output})
@@ -164,7 +174,7 @@ class MTBenchBenchmark(BaseBenchmark):
             model: Language model instance
 
         Returns:
-            Dictionary containing model identifier and responses
+            Dictionary containing model identifier, or None for non-primary ranks
         """
         try:
             # Load questions
@@ -178,7 +188,11 @@ class MTBenchBenchmark(BaseBenchmark):
             random.shuffle(questions)
 
             # Generate answers
-            self.get_model_answers(model=model, model_id=model.model_identifier, questions=questions)
+            answers = self.get_model_answers(model=model, model_id=model.model_identifier, questions=questions)
+
+            # Return None early for non-primary ranks if compute() returned None
+            if answers is None:
+                return None
 
             return {"model_id": model.model_identifier}
 
@@ -194,8 +208,12 @@ class MTBenchBenchmark(BaseBenchmark):
             results: Dictionary containing model identifier
 
         Returns:
-            Dictionary containing evaluation metrics
+            Dictionary containing evaluation metrics, or None for non-primary ranks
         """
+        # Handle None result from non-primary ranks
+        if results is None:
+            return None
+
         try:
             # Load data
             questions = load_questions(self.question_file, None, None)
@@ -300,3 +318,28 @@ class MTBenchBenchmark(BaseBenchmark):
         except Exception as e:
             self.logger.error(f"Error in evaluate_responses: {str(e)}")
             raise
+
+    def run_benchmark(self, model: LM) -> Dict[str, float]:
+        """
+        Run the complete MTBench evaluation pipeline.
+
+        Args:
+            model: Language model instance
+
+        Returns:
+            Dictionary containing evaluation metrics, or None for non-primary ranks
+        """
+        self.logger.info("Starting MTBench evaluation")
+        try:
+            generation_results = self.generate_responses(model)
+
+            # If not primary rank, return None early
+            if generation_results is None:
+                return None
+
+            evaluation_results = self.evaluate_responses(generation_results)
+            return evaluation_results
+
+        except Exception as e:
+            self.logger.error(f"Error running benchmark: {str(e)}")
+            return {"error": str(e)}

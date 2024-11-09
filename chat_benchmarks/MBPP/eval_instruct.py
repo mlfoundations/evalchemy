@@ -123,7 +123,8 @@ Here is my problem:
             model: Language model instance
 
         Returns:
-            Dictionary containing generated responses and temporary directory
+            Dictionary containing generated responses and temporary directory,
+            or None for non-primary ranks
         """
         try:
             temp_dir_obj = tempfile.TemporaryDirectory()
@@ -158,6 +159,10 @@ Here is my problem:
 
             self.logger.info("Generating responses...")
             outputs = self.compute(model, all_instances)
+
+            # Return None early for non-primary ranks
+            if outputs is None:
+                return None
 
             generated_examples = []
             for example, output in zip(examples, outputs):
@@ -197,6 +202,10 @@ Here is my problem:
         Returns:
             Dictionary containing evaluation metrics
         """
+        # Handle None result from non-primary ranks
+        if results is None:
+            return None
+
         try:
             temp_dir_obj = results["temp_dir_obj"]
             temp_dir = temp_dir_obj.name
@@ -233,11 +242,16 @@ Here is my problem:
             model: Language model instance
 
         Returns:
-            Dictionary containing evaluation metrics
+            Dictionary containing evaluation metrics, or None for non-primary ranks
         """
         self.logger.info("Starting MBPP benchmark evaluation")
         try:
             generation_results = self.generate_responses(model)
+
+            # If not primary rank, return None early
+            if generation_results is None:
+                return None
+
             evaluation_results = self.evaluate_responses(generation_results)
 
             evaluation_results.update(

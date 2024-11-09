@@ -111,6 +111,9 @@ class AlpacaBenchmark(BaseBenchmark):
                 self.logger.info("Generating responses...")
                 outputs = self.compute(model, all_instances)
 
+            if outputs is None:
+                return None
+
             model_outputs = []
             for idx, (example, output) in enumerate(zip(eval_set, outputs)):
                 try:
@@ -144,36 +147,34 @@ class AlpacaBenchmark(BaseBenchmark):
         Returns:
             Dictionary containing evaluation metrics
         """
-        try:
-            model_outputs = results["model_outputs"]
-            model_identifier = results["model_identifier"]
+        if results is None:
+            return None
 
-            if not model_outputs:
-                raise ValueError("No model outputs to evaluate")
+        model_outputs = results["model_outputs"]
+        model_identifier = results["model_identifier"]
 
-            self.logger.info("Running Alpaca evaluation...")
-            leaderboard = alpaca_eval_evaluate(
-                model_outputs=model_outputs,
-                is_return_instead_of_print=True,
-                is_overwrite_leaderboard=True,
-                annotators_config=self.annotator_conf,
-            )
+        if not model_outputs:
+            raise ValueError("No model outputs to evaluate")
 
-            metrics = leaderboard[0].loc[model_identifier].to_dict()
+        self.logger.info("Running Alpaca evaluation...")
+        leaderboard = alpaca_eval_evaluate(
+            model_outputs=model_outputs,
+            is_return_instead_of_print=True,
+            is_overwrite_leaderboard=True,
+            annotators_config=self.annotator_conf,
+        )
 
-            metrics.update(
-                {
-                    "num_examples": len(model_outputs),
-                    "completion_rate": len(model_outputs) / len(results.get("total_examples", model_outputs)),
-                }
-            )
+        metrics = leaderboard[0].loc[model_identifier].to_dict()
 
-            self.logger.info("Evaluation complete")
-            return metrics
+        metrics.update(
+            {
+                "num_examples": len(model_outputs),
+                "completion_rate": len(model_outputs) / len(results.get("total_examples", model_outputs)),
+            }
+        )
 
-        except Exception as e:
-            self.logger.error(f"Error in evaluate_responses: {str(e)}")
-            raise
+        self.logger.info("Evaluation complete")
+        return metrics
 
     def run_benchmark(self, model: LM) -> Dict[str, float]:
         """
@@ -183,17 +184,20 @@ class AlpacaBenchmark(BaseBenchmark):
             model: Language model instance
 
         Returns:
-            Dictionary containing evaluation metrics
+            Dictionary containing evaluation metrics, or None for non-primary ranks
         """
         self.logger.info("Starting Alpaca benchmark evaluation")
         try:
             generation_results = self.generate_responses(model)
-            evaluation_results = self.evaluate_responses(generation_results)
 
+            # If not rank 0, return None early
+            if generation_results is None:
+                return None
+
+            evaluation_results = self.evaluate_responses(generation_results)
             evaluation_results.update(
                 {"benchmark_version": "alpaca_eval", "temperature": self.temperature, "max_tokens": self.max_tokens}
             )
-
             return evaluation_results
 
         except Exception as e:

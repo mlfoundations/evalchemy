@@ -24,6 +24,8 @@ class BaseBenchmark(ABC):
         if model.world_size > 1:
             all_results = [None for _ in range(model.world_size)]
             dist.all_gather_object(all_results, results)
+            if model.rank != 0:
+                return None
             length = sum(len(res) for res in all_results)
             merged = [None] * length
             for rank, sub_results in enumerate(all_results):

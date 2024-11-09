@@ -148,7 +148,8 @@ class WildBenchBenchmark(BaseBenchmark):
             model: Language model instance
 
         Returns:
-            Dictionary containing file paths and temporary directory
+            Dictionary containing file paths and temporary directory,
+            or None for non-primary ranks
         """
         try:
             # Load data
@@ -182,6 +183,11 @@ class WildBenchBenchmark(BaseBenchmark):
             ]
 
             outputs = self.compute(model, all_instances)
+
+            # Return None early for non-primary ranks
+            if outputs is None:
+                return None
+
             outputs = [[output] for output in outputs]
 
             # Save outputs
@@ -246,8 +252,12 @@ class WildBenchBenchmark(BaseBenchmark):
             results: Dictionary containing generation results
 
         Returns:
-            Dictionary containing evaluation metrics
+            Dictionary containing evaluation metrics, or None for non-primary ranks
         """
+        # Handle None result from non-primary ranks
+        if results is None:
+            return None
+
         try:
             temp_dir_obj = results["temp_dir_obj"]
             temp_dir = temp_dir_obj.name

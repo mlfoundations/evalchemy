@@ -67,7 +67,8 @@ Please continue to complete the function. You are not allowed to modify the give
             model: Language model instance
 
         Returns:
-            Dictionary containing generated responses and temporary directory
+            Dictionary containing generated responses and temporary directory,
+            or None for non-primary ranks
         """
         results = {}
         temp_dir_obj = tempfile.TemporaryDirectory()
@@ -111,6 +112,9 @@ Please continue to complete the function. You are not allowed to modify the give
 
                 outputs = self.compute(model, all_instances)
 
+                if outputs is None:
+                    continue
+
                 generated_examples = []
                 for example, output in zip(examples, outputs):
                     example_with_output = example.copy()
@@ -143,6 +147,10 @@ Please continue to complete the function. You are not allowed to modify the give
         Returns:
             Dictionary containing evaluation metrics
         """
+        # Handle None result from non-primary ranks
+        if results is None:
+            return None
+
         temp_dir_obj = results["temp_dir_obj"]
         temp_dir = temp_dir_obj.name
 
@@ -186,11 +194,16 @@ Please continue to complete the function. You are not allowed to modify the give
             model: Language model instance
 
         Returns:
-            Dictionary containing evaluation results
+            Dictionary containing evaluation results, or None for non-primary ranks
         """
         self.logger.info(f"Running HumanEval benchmark for languages: {self.languages}")
         try:
             generation_results = self.generate_responses(model)
+
+            # If not primary rank, return None early
+            if generation_results is None:
+                return None
+
             evaluation_results = self.evaluate_responses(generation_results)
             return evaluation_results
         except Exception as e:

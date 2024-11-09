@@ -59,14 +59,11 @@ class RepoBenchmark(BaseBenchmark):
             temp_dir_obj = tempfile.TemporaryDirectory()
             temp_dir = temp_dir_obj.name
 
-        print(f"Rank {model.rank} generating responses")
         for lang in self.languages:
             datasets = load_dataset(f"tianyang/repobench_{lang}_v1.1", verification_mode="no_checks")
-            print(f"Rank {model.rank} loaded {len(datasets)} datasets for {lang}")
 
             for subset, dataset in datasets.items():
                 if subset not in self.subsets:
-                    print(f"Rank {model.rank} skipping {subset}")
                     continue
 
                 all_instances = []
@@ -86,15 +83,11 @@ class RepoBenchmark(BaseBenchmark):
                             idx,
                         )
                     )
-                print(f"Rank {model.rank} generated {len(all_instances)} instances for {lang}/{subset}")
                 outputs = self.compute(model, all_instances)
 
                 # Return None early for non-primary ranks
                 if model.rank != 0:
-                    print(f"Rank {model.rank} continuing")
                     continue
-
-                print(f"Rank {model.rank} got {len(outputs)} outputs")
 
                 generated_examples = []
                 for idx, (example, output) in enumerate(zip(dataset, outputs)):
@@ -111,8 +104,6 @@ class RepoBenchmark(BaseBenchmark):
                     for ex in generated_examples:
                         fw.write(json.dumps(ex) + "\n")
 
-                print(f"Saved {len(generated_examples)} examples for {lang}/{subset}")
-
         return {"temp_dir_obj": temp_dir_obj}
 
     def _generate_responses_legacy(self, model: LM) -> Dict[str, Any]:
@@ -128,7 +119,6 @@ class RepoBenchmark(BaseBenchmark):
                 dataset = load_data(split="test", task="completion", language=lang, length="2k", setting=subset)
 
                 examples = construct_trainable_data(dataset, language=lang)
-                print(f"Loaded {len(examples)} examples for evaluation")
 
                 all_instances = []
                 for idx, example in enumerate(examples):

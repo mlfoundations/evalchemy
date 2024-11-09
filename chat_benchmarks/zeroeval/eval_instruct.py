@@ -146,7 +146,7 @@ class ZeroEvalBenchmark(BaseBenchmark):
                 for idx, inputs in enumerate(model_inputs)
             ]
 
-            outputs = model.generate_until(all_instances)
+            outputs = self.compute(model, all_instances)
             outputs = [[output] for output in outputs]
 
             if self.debug:
@@ -204,16 +204,3 @@ class ZeroEvalBenchmark(BaseBenchmark):
 
         temp_dir_obj.cleanup()
         return eval_results
-
-    def run_benchmark(self, model: LM) -> Dict[str, float]:
-        """
-        Run the complete ZeroEval benchmark evaluation pipeline.
-        """
-        self.logger.info(f"Starting ZeroEval benchmark evaluation on tasks: {self.tasks}")
-        try:
-            generation_results = self.generate_responses(model)
-            evaluation_results = self.evaluate_responses(generation_results)
-            return evaluation_results
-        except Exception as e:
-            self.logger.error(f"Error running benchmark: {str(e)}")
-            return {"error": str(e)}

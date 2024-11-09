@@ -206,33 +206,33 @@ Here is my problem:
         if results is None:
             return None
 
-        try:
-            temp_dir_obj = results["temp_dir_obj"]
-            temp_dir = temp_dir_obj.name
+        # try:
+        temp_dir_obj = results["temp_dir_obj"]
+        temp_dir = temp_dir_obj.name
 
-            result = evaluate_functional_correctness(
-                input_file=os.path.join(temp_dir, "mbpp.jsonl"),
-                tmp_dir=temp_dir,
-                problem_file=os.path.join(self.data_dir, "mbpp_test.jsonl"),
-                language="python",
-                is_mbpp=True,
-            )
+        result = evaluate_functional_correctness(
+            input_file=os.path.join(temp_dir, "mbpp.jsonl"),
+            tmp_dir=temp_dir,
+            problem_file=os.path.join(self.data_dir, "mbpp_test.jsonl"),
+            language="python",
+            is_mbpp=True,
+        )
 
-            result.update(
-                {
-                    "num_examples": results["num_examples"],
-                    "completion_rate": results["num_examples"] / results["total_examples"],
-                }
-            )
+        result.update(
+            {
+                "num_examples": results["num_examples"],
+                "completion_rate": results["num_examples"] / results["total_examples"],
+            }
+        )
 
-            temp_dir_obj.cleanup()
-            return result
+        temp_dir_obj.cleanup()
+        return result
 
-        except Exception as e:
-            self.logger.error(f"Error in evaluate_responses: {str(e)}")
-            if temp_dir_obj:
-                temp_dir_obj.cleanup()
-            raise
+        # except Exception as e:
+        #     self.logger.error(f"Error in evaluate_responses: {str(e)}")
+        #     if temp_dir_obj:
+        #         temp_dir_obj.cleanup()
+        #     raise
 
     def run_benchmark(self, model: LM) -> Dict[str, float]:
         """

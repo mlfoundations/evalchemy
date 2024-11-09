@@ -8,6 +8,7 @@ import logging
 import numpy as np
 import pandas as pd
 import shortuuid
+import torch.distributed as dist
 from tqdm import tqdm
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -140,6 +141,7 @@ class MTBenchBenchmark(BaseBenchmark):
 
             # Generate responses
             if batch_instances:
+                dist.broadcast_object_list(batch_instances, src=0)
                 outputs = self.compute(model, batch_instances)
 
                 # If not primary rank, return None early
@@ -176,29 +178,24 @@ class MTBenchBenchmark(BaseBenchmark):
         Returns:
             Dictionary containing model identifier, or None for non-primary ranks
         """
-        try:
-            # Load questions
-            questions = load_questions(self.question_file, self.config.question_begin, self.config.question_end)
+        # Load questions
+        questions = load_questions(self.question_file, self.config.question_begin, self.config.question_end)
 
-            if self.debug:
-                questions = questions[:2]
-                self.logger.info("Debug mode: using first 2 questions")
+        if self.debug:
+            questions = questions[:2]
+            self.logger.info("Debug mode: using first 2 questions")
 
-            # Shuffle questions for better load balancing
-            random.shuffle(questions)
+        # Shuffle questions for better load balancing
+        random.shuffle(questions)
 
-            # Generate answers
-            answers = self.get_model_answers(model=model, model_id=model.model_identifier, questions=questions)
+        # Generate answers
+        answers = self.get_model_answers(model=model, model_id=model.model_identifier, questions=questions)
 
-            # Return None early for non-primary ranks if compute() returned None
-            if answers is None:
-                return None
+        # Return None early for non-primary ranks if compute() returned None
+        if answers is None:
+            return None
 
-            return {"model_id": model.model_identifier}
-
-        except Exception as e:
-            self.logger.error(f"Error in generate_responses: {str(e)}")
-            raise
+        return {"model_id": model.model_identifier}
 
     def evaluate_responses(self, results: Dict[str, Any]) -> Dict[str, float]:
         """
@@ -214,110 +211,105 @@ class MTBenchBenchmark(BaseBenchmark):
         if results is None:
             return None
 
-        try:
-            # Load data
-            questions = load_questions(self.question_file, None, None)
-            if self.debug:
-                questions = questions[:2]
+        # Load data
+        questions = load_questions(self.question_file, None, None)
+        if self.debug:
+            questions = questions[:2]
 
-            model_answers = load_model_answers(self.answer_dir)
-            ref_answers = load_model_answers(self.ref_answer_dir)
-            judge_prompts = load_judge_prompts(self.config.judge_file)
+        model_answers = load_model_answers(self.answer_dir)
+        ref_answers = load_model_answers(self.ref_answer_dir)
+        judge_prompts = load_judge_prompts(self.config.judge_file)
 
-            # Setup evaluation
-            models = [results["model_id"]]
-            if self.config.mode == "single":
-                judges = make_judge_single(self.config.judge_model, judge_prompts)
-                play_a_match_func = play_a_match_single
-                output_file = self.judgment_dir / "gpt-4_single.jsonl"
-                make_match_func = make_match_single
+        # Setup evaluation
+        models = [results["model_id"]]
+        if self.config.mode == "single":
+            judges = make_judge_single(self.config.judge_model, judge_prompts)
+            play_a_match_func = play_a_match_single
+            output_file = self.judgment_dir / "gpt-4_single.jsonl"
+            make_match_func = make_match_single
+            baseline_model = None
+        else:
+            judges = make_judge_pairwise(self.config.judge_model, judge_prompts)
+            play_a_match_func = play_a_match_pair
+            output_file = self.judgment_dir / "gpt-4_pair.jsonl"
+            if self.config.mode == "pairwise-all":
+                make_match_func = make_match_all_pairs
                 baseline_model = None
             else:
-                judges = make_judge_pairwise(self.config.judge_model, judge_prompts)
-                play_a_match_func = play_a_match_pair
-                output_file = self.judgment_dir / "gpt-4_pair.jsonl"
-                if self.config.mode == "pairwise-all":
-                    make_match_func = make_match_all_pairs
-                    baseline_model = None
-                else:
-                    make_match_func = make_match
-                    baseline_model = self.config.baseline_model
+                make_match_func = make_match
+                baseline_model = self.config.baseline_model
 
-            # Verify data
-            check_data(questions, model_answers, ref_answers, models, judges)
+        # Verify data
+        check_data(questions, model_answers, ref_answers, models, judges)
 
-            # Split questions by category
-            questions_math = [q for q in questions if q["category"] in NEED_REF_CATS]
-            questions_default = [q for q in questions if q["category"] not in NEED_REF_CATS]
+        # Split questions by category
+        questions_math = [q for q in questions if q["category"] in NEED_REF_CATS]
+        questions_default = [q for q in questions if q["category"] not in NEED_REF_CATS]
 
-            # Create matches
-            matches = []
-            matches.extend(make_match_func(questions_default, models, model_answers, judges["default"], baseline_model))
-            matches.extend(
-                make_match_func(
-                    questions_math,
-                    models,
-                    model_answers,
-                    judges["math"],
-                    baseline_model,
-                    ref_answers,
-                )
+        # Create matches
+        matches = []
+        matches.extend(make_match_func(questions_default, models, model_answers, judges["default"], baseline_model))
+        matches.extend(
+            make_match_func(
+                questions_math,
+                models,
+                model_answers,
+                judges["math"],
+                baseline_model,
+                ref_answers,
             )
-            matches.extend(
-                make_match_func(
-                    questions_default,
-                    models,
-                    model_answers,
-                    judges["default-mt"],
-                    baseline_model,
-                    multi_turn=True,
-                )
+        )
+        matches.extend(
+            make_match_func(
+                questions_default,
+                models,
+                model_answers,
+                judges["default-mt"],
+                baseline_model,
+                multi_turn=True,
             )
-            matches.extend(
-                make_match_func(
-                    questions_math,
-                    models,
-                    model_answers,
-                    judges["math-mt"],
-                    baseline_model,
-                    ref_answers,
-                    multi_turn=True,
-                )
+        )
+        matches.extend(
+            make_match_func(
+                questions_math,
+                models,
+                model_answers,
+                judges["math-mt"],
+                baseline_model,
+                ref_answers,
+                multi_turn=True,
             )
+        )
 
-            # Run evaluation
-            if self.config.parallel == 1:
-                for match in tqdm(matches):
-                    play_a_match_func(match, output_file=output_file)
-            else:
-                with ThreadPoolExecutor(self.config.parallel) as executor:
-                    list(
-                        tqdm(
-                            executor.map(lambda m: play_a_match_func(m, output_file=output_file), matches),
-                            total=len(matches),
-                        )
+        # Run evaluation
+        if self.config.parallel == 1:
+            for match in tqdm(matches):
+                play_a_match_func(match, output_file=output_file)
+        else:
+            with ThreadPoolExecutor(self.config.parallel) as executor:
+                list(
+                    tqdm(
+                        executor.map(lambda m: play_a_match_func(m, output_file=output_file), matches),
+                        total=len(matches),
                     )
+                )
 
-            # Load and process results
-            df_all = pd.read_json(output_file, lines=True)
-            df = df_all[["model", "score", "turn"]]
-            df = df[df["score"] != -1]
+        # Load and process results
+        df_all = pd.read_json(output_file, lines=True)
+        df = df_all[["model", "score", "turn"]]
+        df = df[df["score"] != -1]
 
-            # Calculate scores
-            df_turn1 = df[df["turn"] == 1].groupby(["model", "turn"]).mean()
-            df_turn2 = df[df["turn"] == 2].groupby(["model", "turn"]).mean()
-            df_avg = df[["model", "score"]].groupby(["model"]).mean()
+        # Calculate scores
+        df_turn1 = df[df["turn"] == 1].groupby(["model", "turn"]).mean()
+        df_turn2 = df[df["turn"] == 2].groupby(["model", "turn"]).mean()
+        df_avg = df[["model", "score"]].groupby(["model"]).mean()
 
-            model_id = results["model_id"]
-            return {
-                "Turn 1": df_turn1.loc[results["model_id"]].score.values[0],
-                "Turn 2": df_turn2.loc[results["model_id"]].score.values[0],
-                "Average": df_avg.loc[results["model_id"]].score,
-            }
-
-        except Exception as e:
-            self.logger.error(f"Error in evaluate_responses: {str(e)}")
-            raise
+        model_id = results["model_id"]
+        return {
+            "Turn 1": df_turn1.loc[results["model_id"]].score.values[0],
+            "Turn 2": df_turn2.loc[results["model_id"]].score.values[0],
+            "Average": df_avg.loc[results["model_id"]].score,
+        }
 
     def run_benchmark(self, model: LM) -> Dict[str, float]:
         """

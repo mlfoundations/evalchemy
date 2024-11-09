@@ -5,8 +5,11 @@ import importlib.util
 import sys
 import inspect
 import logging
+from itertools import islice
 
+import torch.distributed as dist
 from lm_eval.api.model import LM
+from lm_eval.api.instance import Instance
 
 
 class BaseBenchmark(ABC):
@@ -14,6 +17,22 @@ class BaseBenchmark(ABC):
 
     def __init__(self, logger: Optional[logging.Logger] = None):
         self.logger = logger or logging.getLogger(self.__class__.__name__)
+
+    def compute(self, model: LM, inputs: List[Instance]) -> List[str]:
+        prompts = list(islice(inputs, model.rank, len(inputs), model.world_size))
+        results = model.generate_until(prompts)
+        if model.world_size > 1:
+            all_results = [None for _ in range(model.world_size)]
+            dist.all_gather_object(all_results, results)
+            length = sum(len(res) for res in all_results)
+            merged = [None] * length
+            for rank, sub_results in enumerate(all_results):
+                for i, item in enumerate(sub_results):
+                    merged[i * model.world_size + rank] = item
+
+            return merged
+        else:
+            return results
 
     @abstractmethod
     def generate_responses(self, model: LM) -> Dict[str, Any]:

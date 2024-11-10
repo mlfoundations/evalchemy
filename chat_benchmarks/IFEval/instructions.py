@@ -26,6 +26,7 @@ import langdetect
 
 #from instruction_following_eval import instructions_util
 from .instructions_util import *
+import nltk
 
 _InstructionArgsDtype = Optional[Dict[str, Union[int, str, Sequence[str]]]]
 
@@ -227,7 +228,7 @@ class NumberOfSentences(Instruction):
         [`less_than`, `at_least`].
     """
     #num_sentences = instructions_util.count_sentences(value)
-    num_sentences = count_senteces(value)
+    num_sentences = count_sentences(value)
     if self._comparison_relation == _COMPARISON_RELATION[0]:
       return num_sentences < self._num_sentences_threshold
     elif self._comparison_relation == _COMPARISON_RELATION[1]:

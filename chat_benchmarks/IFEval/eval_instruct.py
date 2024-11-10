@@ -139,8 +139,6 @@ class IFEvalBenchmark(BaseBenchmark):
                 for ex in generated_examples:
                     fw.write(json.dumps(ex) + "\n")
 
-            self.logger.info(f"Save {len(generated_examples)} examples to {output_path}")
-
             return {
                 "temp_dir_obj": temp_dir_obj,
                 "num_examples": len(generated_examples),
@@ -168,7 +166,7 @@ class IFEvalBenchmark(BaseBenchmark):
 
             input_file = os.path.join(self.data_dir, "input_data.jsonl")
             response_file = os.path.join(temp_dir, "ifeval.jsonl")
-            result = evaluate_accuracy(input_file, response_file)
+            result = evaluate_accuracy(response_file)
 
             result.update(
                 {

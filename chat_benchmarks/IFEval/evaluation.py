@@ -41,21 +41,21 @@ def get_report(outputs):
                 tier1_correct[instruction_id] += 1
 
 
-    for instruction_id in sorted(tier0_tota.keys()):
+    for instruction_id in sorted(tier0_total.keys()):
         tight_accuracy = tier0_correct[instruction_id] / tier0_total[instruction_id]
-        logger.info(f"tier0 accuracy {instrution_id} {tight_accuracy}")
+        logging.info(f"tier0 accuracy {instruction_id} {tight_accuracy}")
 
     for instruction_id in sorted(tier1_total.keys()):
         loose_accuracy = tier1_correct[instruction_id] / tier1_total[instruction_id]
-        logger.info(f"tier1 accuracy {instrution_id} {loose_accuracy}")
+        logging.info(f"tier1 accuracy {instruction_id} {loose_accuracy}")
 
     return {
         "prompt-level": prompt_correct/prompt_total,
         "instruction-level": instruction_correct/instruction_total
     }
 
-def evaluate_accuracy(input_filename, response_filename):
-    inputs = read_prompt_list(input_filename)
+def evaluate_accuracy(response_filename):
+    inputs = read_prompt_list(response_filename)
     prompt_to_response = read_prompt_to_response_dict(response_filename)
 
     for func, output_file in [
@@ -67,7 +67,6 @@ def evaluate_accuracy(input_filename, response_filename):
         for inp in inputs:
             outputs.append(func(inp, prompt_to_response))
 
-        logging.info(f"{outputs[0]}")
         follow_all_instructions = [o.follow_all_instructions for o in outputs]
         accuracy = sum(follow_all_instructions) / len(outputs)
 

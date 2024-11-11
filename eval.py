@@ -37,12 +37,6 @@ def setup_custom_parser():
 
     db_group.add_argument("--model_id", type=str, default=None, help="Model UUID for direct database tracking")
 
-    db_group.add_argument(
-        "--update_db_by_model_name",
-        action="store_true",
-        help="By default, databse is updated based on model uuid. Set this flag if you want to overwrite this and update database by searching for model name. Use model_name argument to specify the model name to update.",
-    )
-
     parser.add_argument(
         "--model_name",
         type=str,
@@ -68,6 +62,13 @@ def setup_custom_parser():
         type=str,
         default="NA",
         help="Specifies who evaluates the model.",
+    )
+
+    parser.add_argument(
+        "--annotator_model",
+        type=str,
+        default="gpt-4o-mini-2024-07-18",
+        help="Judge model used to evaluate generations.",
     )
     return parser
 
@@ -147,6 +148,7 @@ def evaluate(
                 device=args.device,
                 use_cache=args.use_cache,
                 limit=args.limit,
+                annotator_model=args.annotator_model,
                 check_integrity=args.check_integrity,
                 write_out=args.write_out,
                 log_samples=args.log_samples,
@@ -220,7 +222,7 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
 
     # Initialize tasks
     task_list = args.tasks.split(",")
-    task_manager = InstructTaskManager()
+    task_manager = InstructTaskManager(annotator_model=args.annotator_model)
     pretrain_task_manager = PretrainTaskManager(args.verbosity, include_path=args.include_path)
 
     utils.eval_logger.info(f"Selected Tasks: {[task for task in task_list]}")
@@ -267,6 +269,7 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
             device=args.device,
             use_cache=args.use_cache,
             limit=args.limit,
+            annotator_model=args.annotator_model,
             evaluation_tracker=evaluation_tracker,
         )
     except Exception as e:
@@ -276,9 +279,9 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
         sys.exit(1)
 
     # Add metadata to results
-    add_results_metadata(results, args, lm)
-
-    handle_evaluation_output(results, args, evaluation_tracker, wandb_logger)
+    if lm.rank == 0:
+        add_results_metadata(results, args, lm)
+        handle_evaluation_output(results, args, evaluation_tracker, wandb_logger)
 
 
 def setup_evaluation_tracker(args: argparse.Namespace) -> DCFTEvaluationTracker:
@@ -311,34 +314,34 @@ def initialize_model(args: argparse.Namespace) -> LM:
 
 def add_results_metadata(results: Dict, args: argparse.Namespace, lm: LM) -> None:
     """Add metadata and configuration to results."""
-    if lm.rank == 0:
-        results["config"] = {
-            "model": (
-                args.model
-                if isinstance(args.model, str)
-                else args.model.config._name_or_path if hasattr(args.model, "config") else type(args.model).__name__
-            ),
-            "model_args": args.model_args,
-            "batch_size": args.batch_size,
-            "batch_sizes": (list(lm.batch_sizes.values()) if hasattr(lm, "batch_sizes") else []),
-            "device": args.device,
-            "use_cache": args.use_cache,
-            "limit": args.limit,
-            # "bootstrap_iters": args.bootstrap_iters,
-            "gen_kwargs": args.gen_kwargs,
-            "random_seed": args.seed[0],
-            "numpy_seed": args.seed[1],
-            "torch_seed": args.seed[2],
-            "fewshot_seed": args.seed[3],
-        }
+    results["config"] = {
+        "model": (
+            args.model
+            if isinstance(args.model, str)
+            else args.model.config._name_or_path if hasattr(args.model, "config") else type(args.model).__name__
+        ),
+        "model_args": args.model_args,
+        "batch_size": args.batch_size,
+        "batch_sizes": (list(lm.batch_sizes.values()) if hasattr(lm, "batch_sizes") else []),
+        "device": args.device,
+        "use_cache": args.use_cache,
+        "limit": args.limit,
+        "annotator_model": args.annotator_model,
+        # "bootstrap_iters": args.bootstrap_iters,
+        "gen_kwargs": args.gen_kwargs,
+        "random_seed": args.seed[0],
+        "numpy_seed": args.seed[1],
+        "torch_seed": args.seed[2],
+        "fewshot_seed": args.seed[3],
+    }
 
-        if isinstance(lm, lm_eval.models.huggingface.HFLM):
-            results["config"].update(lm.get_model_info())
+    if isinstance(lm, lm_eval.models.huggingface.HFLM):
+        results["config"].update(lm.get_model_info())
 
-        results["git_hash"] = get_git_commit_hash()
-        results["date"] = time.time()
-        add_env_info(results)
-        add_tokenizer_info(results, lm)
+    results["git_hash"] = get_git_commit_hash()
+    results["date"] = time.time()
+    add_env_info(results)
+    add_tokenizer_info(results, lm)
 
 
 def handle_evaluation_output(
@@ -370,7 +373,6 @@ def handle_evaluation_output(
     evaluation_tracker.update_evalresults_db(
         results,
         args.model_id,
-        args.update_db_by_model_name,
         args.model_name,
         args.creation_location,
         args.created_by,
@@ -383,7 +385,7 @@ def handle_evaluation_output(
 
     print(
         f"{args.model} ({args.model_args}), gen_kwargs: ({args.gen_kwargs}), "
-        f"limit: {args.limit}, num_fewshot: {args.num_fewshot}, "
+        f"limit: {args.limit}, num_fewshot: {args.num_fewshot}, annotator_model: {args.annotator_model}, "
         f"batch_size: {args.batch_size}{f' ({batch_sizes})' if batch_sizes else ''}"
     )
 

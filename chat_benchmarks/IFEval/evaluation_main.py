@@ -68,7 +68,7 @@ def read_prompt_list(input_jsonl_filename):
                     key=example["key"],
                     instruction_id_list=example["instruction_id_list"],
                     prompt=example["prompt"],
-                    kwargs=example["kwargs"]
+                    kwargs=example["kwargs"],
                 )
             )
     return inputs
@@ -83,9 +83,7 @@ def write_outputs(output_jsonl_filename, outputs):
                 json.dumps(
                     {
                         attr_name: o.__getattribute__(attr_name)
-                        for attr_name in [
-                            name for name in dir(o) if not name.startswith("_")
-                        ]
+                        for attr_name in [name for name in dir(o) if not name.startswith("_")]
                     }
                 )
             )
@@ -126,8 +124,8 @@ def test_instruction_following_strict(
 
 
 def test_instruction_following_loose(
-        inp,
-        prompt_to_response,
+    inp,
+    prompt_to_response,
 ):
     """Tests response for an upper bound for following instructions."""
     response = prompt_to_response[inp.prompt]
@@ -220,9 +218,7 @@ def print_report(outputs):
             if followed_or_not:
                 tier0_correct[instruction_id] += 1
 
-        for instruction_id, followed_or_not in zip(
-                instruction_id_list, follow_instruction_list
-        ):
+        for instruction_id, followed_or_not in zip(instruction_id_list, follow_instruction_list):
             tier1_total[instruction_id] += 1
             if followed_or_not:
                 tier1_correct[instruction_id] += 1

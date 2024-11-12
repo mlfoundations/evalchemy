@@ -172,10 +172,11 @@ INSTRUCTION_CONFLICTS = {
             _KEYWORD + "existence",
             _LANGUAGE + "response_language",
             _FORMAT + "title",
-            _PUNCTUATION + "no_comma"
+            _PUNCTUATION + "no_comma",
         }
     ),
-    _COMBINATION + "repeat_prompt": set(INSTRUCTION_DICT.keys()).difference(
+    _COMBINATION
+    + "repeat_prompt": set(INSTRUCTION_DICT.keys()).difference(
         {_KEYWORD + "existence", _FORMAT + "title", _PUNCTUATION + "no_comma"}
     ),
     _STARTEND + "end_checker": {_STARTEND + "end_checker"},

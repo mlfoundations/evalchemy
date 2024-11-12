@@ -4,6 +4,8 @@ import json
 import os
 from tqdm import tqdm
 from datasets import load_dataset
+import torch.distributed as dist
+import time
 
 from lm_eval.api.model import LM
 from lm_eval.api.instance import Instance
@@ -63,11 +65,19 @@ class RepoBenchmark(BaseBenchmark):
             datasets = load_dataset(f"tianyang/repobench_{lang}_v1.1", verification_mode="no_checks")
 
             for subset, dataset in datasets.items():
+                print(f"Rank {model.rank} is processing {lang}/{subset}")
+                dist.barrier()
                 if subset not in self.subsets:
                     continue
 
                 all_instances = []
-                for idx, example in enumerate(dataset):
+                time_start = time.time()
+                # Split dataset across ranks for parallel construction
+                # Get subset of dataset for this rank using built-in slice functionality
+                rank_dataset = dataset.shard(num_shards=model.world_size, index=model.rank)
+
+                # Process examples for this rank's shard
+                for idx, example in enumerate(rank_dataset):
                     prompt = construct_prompt(
                         example, tokenizer=model.tokenizer, max_token_nums=self.max_tokens, language=lang
                     )
@@ -83,9 +93,16 @@ class RepoBenchmark(BaseBenchmark):
                             idx,
                         )
                     )
-                outputs = self.compute(model, all_instances)
+                time_end = time.time()
+                print(
+                    f"Rank {model.rank} finished constructing {len(all_instances)} instances for {lang}/{subset} in {time_end - time_start:.2f} seconds"
+                )
+                time_start = time.time()
+                outputs = self.compute(model, all_instances, gather_to_rank=0, do_slice=False)
+                time_end = time.time()
+                print(f"Rank {model.rank} finished processing {lang}/{subset} in {time_end - time_start:.2f} seconds")
 
-                # Return None early for non-primary ranks
+                # Only rank 0 should save the results
                 if model.rank != 0:
                     continue
 
@@ -103,8 +120,10 @@ class RepoBenchmark(BaseBenchmark):
                 with open(output_path, "w", encoding="utf-8") as fw:
                     for ex in generated_examples:
                         fw.write(json.dumps(ex) + "\n")
+                print(f"Saved {len(generated_examples)} examples for {lang}/{subset}")
 
-        return {"temp_dir_obj": temp_dir_obj}
+        if model.rank == 0:
+            return {"temp_dir_obj": temp_dir_obj}
 
     def _generate_responses_legacy(self, model: LM) -> Dict[str, Any]:
         """Legacy (v0) generation implementation."""
@@ -139,9 +158,9 @@ class RepoBenchmark(BaseBenchmark):
                         )
                     )
 
-                outputs = self.compute(model, all_instances)
+                outputs = self.compute(model, all_instances, gather_to_rank=0)
 
-                if outputs is None:
+                if model.rank != 0:
                     continue
 
                 generated_examples = []

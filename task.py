@@ -18,20 +18,36 @@ class BaseBenchmark(ABC):
     def __init__(self, logger: Optional[logging.Logger] = None):
         self.logger = logger or logging.getLogger(self.__class__.__name__)
 
-    def compute(self, model: LM, inputs: List[Instance]) -> List[str]:
-        prompts = list(islice(inputs, model.rank, len(inputs), model.world_size))
+    def compute(
+        self, model: LM, inputs: List[Instance], gather_to_rank: Optional[int] = 0, do_slice: bool = True
+    ) -> List[str]:
+        if do_slice:
+            prompts = list(islice(inputs, model.rank, len(inputs), model.world_size))
+        else:
+            prompts = inputs
         results = model.generate_until(prompts)
         if model.world_size > 1:
             all_results = [None for _ in range(model.world_size)]
-            dist.all_gather_object(all_results, results)
-            if model.rank != 0:
+            if gather_to_rank is None:
+                # Gather results from all ranks to all ranks
+                dist.all_gather_object(all_results, results)
+            else:
+                # Gather results from all ranks to gather rank
+                if model.rank == gather_to_rank:
+                    dist.gather_object(results, all_results, dst=gather_to_rank)
+                else:
+                    dist.gather_object(results, None, dst=gather_to_rank)
+                    return None
+
+            if model.rank != gather_to_rank:
                 return None
-            length = sum(len(res) for res in all_results)
+            # Merge results from all ranks
+            length = sum(len(res) for res in all_results if res is not None)
             merged = [None] * length
             for rank, sub_results in enumerate(all_results):
-                for i, item in enumerate(sub_results):
-                    merged[i * model.world_size + rank] = item
-
+                if sub_results is not None:
+                    for i, item in enumerate(sub_results):
+                        merged[i * model.world_size + rank] = item
             return merged
         else:
             return results

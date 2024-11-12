@@ -158,7 +158,7 @@ Here is my problem:
                     continue
 
             self.logger.info("Generating responses...")
-            outputs = self.compute(model, all_instances)
+            outputs = self.compute(model, all_instances, gather_to_rank=0)
 
             # Return None early for non-primary ranks
             if outputs is None:

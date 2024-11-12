@@ -182,7 +182,7 @@ class WildBenchBenchmark(BaseBenchmark):
                 for idx, inputs in enumerate(model_inputs)
             ]
 
-            outputs = self.compute(model, all_instances)
+            outputs = self.compute(model, all_instances, gather_to_rank=0)
 
             # Return None early for non-primary ranks
             if outputs is None:

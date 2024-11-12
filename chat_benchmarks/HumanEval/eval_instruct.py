@@ -110,7 +110,7 @@ Please continue to complete the function. You are not allowed to modify the give
                         )
                     )
 
-                outputs = self.compute(model, all_instances)
+                outputs = self.compute(model, all_instances, gather_to_rank=0)
 
                 if outputs is None:
                     continue

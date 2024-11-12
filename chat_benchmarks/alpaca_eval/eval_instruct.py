@@ -109,7 +109,7 @@ class AlpacaBenchmark(BaseBenchmark):
 
             with torch.no_grad():
                 self.logger.info("Generating responses...")
-                outputs = self.compute(model, all_instances)
+                outputs = self.compute(model, all_instances, gather_to_rank=0)
 
             if outputs is None:
                 return None

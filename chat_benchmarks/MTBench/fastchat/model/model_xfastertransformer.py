@@ -25,9 +25,7 @@ def generate_stream_xft(
     max_new_tokens = int(params.get("max_new_tokens", 4096))
     echo = params.get("echo", True)
 
-    inputs = tokenizer(
-        prompt, return_tensors="pt", padding=model.config.padding
-    ).input_ids
+    inputs = tokenizer(prompt, return_tensors="pt", padding=model.config.padding).input_ids
     input_echo_len = len(inputs[0])
     max_len = max_new_tokens + input_echo_len
 

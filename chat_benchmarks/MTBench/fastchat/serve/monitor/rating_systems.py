@@ -68,9 +68,7 @@ def preprocess_for_style(
     style_elements=STYLE_CONTROL_ELEMENTS_V1,
     add_one=True,
 ):
-    matchups, outcomes, models = preprocess_for_elo(
-        df
-    )  # this can use the same preprocessing as Elo
+    matchups, outcomes, models = preprocess_for_elo(df)  # this can use the same preprocessing as Elo
 
     n = matchups.shape[0]
     k = int(len(style_elements) / 2)
@@ -84,9 +82,7 @@ def preprocess_for_style(
 
     style_vector = np.zeros(shape=(2 * k, n), dtype=np.int32)
     for idx, element in enumerate(style_elements):
-        style_vector[idx, :] = df.conv_metadata.map(
-            partial(extract_style_feature, feature=element)
-        ).values
+        style_vector[idx, :] = df.conv_metadata.map(partial(extract_style_feature, feature=element)).values
     style_vector = np.ascontiguousarray(style_vector)
 
     style_diff = (style_vector[:k] - style_vector[k:]).astype(float)
@@ -141,23 +137,17 @@ def compute_elo(df, k=4.0, base=10.0, init_rating=1000.0, scale=400.0):
     alpha = math.log(base) / scale
     ratings = np.full(shape=(len(models),), fill_value=init_rating)
     for (model_a_idx, model_b_idx), outcome in zip(matchups, outcomes):
-        prob = 1.0 / (
-            1.0 + math.exp(alpha * (ratings[model_b_idx] - ratings[model_a_idx]))
-        )
+        prob = 1.0 / (1.0 + math.exp(alpha * (ratings[model_b_idx] - ratings[model_a_idx])))
         update = k * (outcome - prob)
         ratings[model_a_idx] += update
         ratings[model_b_idx] -= update
     return {model: ratings[idx] for idx, model in enumerate(models)}
 
 
-def compute_bootstrap_elo(
-    df, num_round=100, k=4.0, base=10.0, init_rating=1000.0, scale=400.0
-):
+def compute_bootstrap_elo(df, num_round=100, k=4.0, base=10.0, init_rating=1000.0, scale=400.0):
     matchups, outcomes, models = preprocess_for_elo(df)
     sample_indices = np.random.randint(low=0, high=len(df), size=(len(df), num_round))
-    ratings = fit_vectorized_elo(
-        matchups, outcomes, sample_indices, len(models), k, base, init_rating, scale
-    )
+    ratings = fit_vectorized_elo(matchups, outcomes, sample_indices, len(models), k, base, init_rating, scale)
     df = pd.DataFrame(data=ratings, columns=models)
     return df[df.median().sort_values(ascending=False).index]
 
@@ -167,9 +157,7 @@ def bt_loss_and_grad(ratings, matchups, outcomes, weights, alpha=1.0):
     logits = alpha * (matchup_ratings[:, 0] - matchup_ratings[:, 1])
     probs = expit(logits)
     # this form naturally counts a draw as half a win and half a loss
-    loss = -(
-        (np.log(probs) * outcomes + np.log(1.0 - probs) * (1.0 - outcomes)) * weights
-    ).sum()
+    loss = -((np.log(probs) * outcomes + np.log(1.0 - probs) * (1.0 - outcomes)) * weights).sum()
     matchups_grads = -alpha * (outcomes - probs) * weights
     model_grad = np.zeros_like(ratings)
     # aggregate gradients at the model level using the indices in matchups
@@ -229,16 +217,12 @@ def compute_bootstrap_bt(
     matchups, outcomes, models, weights = preprocess_for_bt(battles)
     # bootstrap sample the unique outcomes and their counts directly using the multinomial distribution
     rng = np.random.default_rng(seed=0)
-    idxs = rng.multinomial(
-        n=len(battles), pvals=weights / weights.sum(), size=(num_round)
-    )
+    idxs = rng.multinomial(n=len(battles), pvals=weights / weights.sum(), size=(num_round))
     # only the distribution over their occurance counts changes between samples (and it can be 0)
     boot_weights = idxs.astype(np.float64) / len(battles)
 
     # the only thing different across samples is the distribution of weights
-    bt_fn = partial(
-        fit_bt, matchups, outcomes, n_models=len(models), alpha=np.log(base), tol=tol
-    )
+    bt_fn = partial(fit_bt, matchups, outcomes, n_models=len(models), alpha=np.log(base), tol=tol)
     with mp.Pool(num_cpu if num_cpu else os.cpu_count()) as pool:
         results = list(tqdm(pool.imap_unordered(bt_fn, boot_weights), total=num_round))
 
@@ -248,9 +232,7 @@ def compute_bootstrap_bt(
     return df[df.median().sort_values(ascending=False).index]
 
 
-DIFF_MASK = np.array(
-    [1.0, -1.0], dtype=np.float64
-)  # create globally to not incur the instantiation cost in each call
+DIFF_MASK = np.array([1.0, -1.0], dtype=np.float64)  # create globally to not incur the instantiation cost in each call
 
 
 def contextual_bt_loss_and_grad(
@@ -273,17 +255,12 @@ def contextual_bt_loss_and_grad(
     bt_logits = alpha * (matchup_ratings[:, 0] - matchup_ratings[:, 1])
     context_logits = np.dot(features, feature_params)
     probs = expit(bt_logits + context_logits)
-    loss = (
-        -((np.log(probs) * outcomes + np.log(1.0 - probs) * (1.0 - outcomes))).sum()
-        + reg_loss
-    )
+    loss = -((np.log(probs) * outcomes + np.log(1.0 - probs) * (1.0 - outcomes))).sum() + reg_loss
 
     error = outcomes - probs
     grad = reg * params  # initialize the grad as the regularization grad
     matchups_grads = -alpha * error
-    np.add.at(
-        grad[:n_competitors], matchups[:, [0, 1]], matchups_grads[:, None] * DIFF_MASK
-    )
+    np.add.at(grad[:n_competitors], matchups[:, [0, 1]], matchups_grads[:, None] * DIFF_MASK)
     grad[n_competitors:] -= np.dot(features.T, error)
     return loss, grad
 
@@ -323,9 +300,7 @@ def fit_contextual_bt(
     return result["x"]
 
 
-def compute_style_control(
-    df, alpha=math.log(10.0), reg=0.5, init_rating=1000.0, scale=400.0, tol=1e-6
-):
+def compute_style_control(df, alpha=math.log(10.0), reg=0.5, init_rating=1000.0, scale=400.0, tol=1e-6):
     matchups, features, outcomes, models = preprocess_for_style(df)
     ratings_params = fit_contextual_bt(
         matchups,
@@ -339,9 +314,7 @@ def compute_style_control(
     ratings = ratings_params[: len(models)]
     params = ratings_params[len(models) :]
     scaled_ratings = scale_and_offset(ratings, models, scale, init_rating)
-    scaled_ratings = pd.Series(scaled_ratings, index=models).sort_values(
-        ascending=False
-    )
+    scaled_ratings = pd.Series(scaled_ratings, index=models).sort_values(ascending=False)
     return scaled_ratings, params
 
 
@@ -368,14 +341,10 @@ def compute_bootstrap_style_control(
         tol=tol,
     )
 
-    boot_idxs = np.random.randint(
-        low=0, high=matchups.shape[0], size=(num_round, matchups.shape[0])
-    )
+    boot_idxs = np.random.randint(low=0, high=matchups.shape[0], size=(num_round, matchups.shape[0]))
 
     with mp.Pool(num_cpu if num_cpu else os.cpu_count()) as pool:
-        results = list(
-            tqdm(pool.imap_unordered(contextual_bt_fn, boot_idxs), total=num_round)
-        )
+        results = list(tqdm(pool.imap_unordered(contextual_bt_fn, boot_idxs), total=num_round))
 
     ratings_params = np.array(results)
     ratings = ratings_params[:, : len(models)]

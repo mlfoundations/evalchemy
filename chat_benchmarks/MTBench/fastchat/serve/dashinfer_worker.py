@@ -75,9 +75,7 @@ class DashInferWorker(BaseModelWorker):
             conv_template,
         )
 
-        logger.info(
-            f"Loading the model {self.model_names} on worker {worker_id}, worker type: dash-infer worker..."
-        )
+        logger.info(f"Loading the model {self.model_names} on worker {worker_id}, worker type: dash-infer worker...")
         # check if model_path is existed at local path
         if not os.path.exists(model_path):
             model_path = download_model(model_path, revision)
@@ -129,9 +127,7 @@ class DashInferWorker(BaseModelWorker):
             gen_cfg["presence_penalty"] = float(presence_penalty)
         if len(stop_token_ids) != 0:
             dashinfer_style_stop_token_ids = [[id] for id in set(stop_token_ids)]
-            logger.info(
-                f"dashinfer_style_stop_token_ids = {dashinfer_style_stop_token_ids}"
-            )
+            logger.info(f"dashinfer_style_stop_token_ids = {dashinfer_style_stop_token_ids}")
             gen_cfg["stop_words_ids"] = dashinfer_style_stop_token_ids
         if seed is not None:
             gen_cfg["seed"] = int(seed)
@@ -139,32 +135,22 @@ class DashInferWorker(BaseModelWorker):
             gen_cfg["logprobs"] = True
             gen_cfg["top_logprobs"] = int(logprobs)
         if frequency_penalty is not None:
-            logger.warning(
-                "dashinfer worker does not support `frequency_penalty` parameter"
-            )
+            logger.warning("dashinfer worker does not support `frequency_penalty` parameter")
         if stop is not None:
             logger.warning("dashinfer worker does not support `stop` parameter")
         if use_beam_search == True:
-            logger.warning(
-                "dashinfer worker does not support `use_beam_search` parameter"
-            )
+            logger.warning("dashinfer worker does not support `use_beam_search` parameter")
         if best_of is not None:
             logger.warning("dashinfer worker does not support `best_of` parameter")
 
-        logger.info(
-            f"dashinfer engine helper creates request with context: {context}, gen_cfg: {gen_cfg}"
-        )
+        logger.info(f"dashinfer engine helper creates request with context: {context}, gen_cfg: {gen_cfg}")
 
         request_list = self.engine_helper.create_request([context], gen_cfg=[gen_cfg])
 
         engine_req = request_list[0]
 
         # check if prompt tokens exceed the max_tokens
-        max_tokens = (
-            gen_cfg["max_length"]
-            if max_new_tokens is None
-            else engine_req.in_tokens_len + max_new_tokens
-        )
+        max_tokens = gen_cfg["max_length"] if max_new_tokens is None else engine_req.in_tokens_len + max_new_tokens
         if engine_req.in_tokens_len > max_tokens:
             ret = {
                 "text": f"This model's maximum generated tokens include context are {max_tokens}, However, your context resulted in {engine_req.in_tokens_len} tokens",
@@ -173,12 +159,8 @@ class DashInferWorker(BaseModelWorker):
             yield json.dumps(ret).encode() + b"\0"
         else:
             gen_cfg["max_length"] = int(max_tokens)
-            logger.info(
-                f"dashinfer is going to process one request in stream mode: {engine_req}"
-            )
-            results_generator = self.engine_helper.process_one_request_stream(
-                engine_req
-            )
+            logger.info(f"dashinfer is going to process one request in stream mode: {engine_req}")
+            results_generator = self.engine_helper.process_one_request_stream(engine_req)
 
             try:
                 for generate_text in results_generator:
@@ -271,9 +253,7 @@ if __name__ == "__main__":
     parser.add_argument("--host", type=str, default="localhost")
     parser.add_argument("--port", type=int, default=21002)
     parser.add_argument("--worker-address", type=str, default="http://localhost:21002")
-    parser.add_argument(
-        "--controller-address", type=str, default="http://localhost:21001"
-    )
+    parser.add_argument("--controller-address", type=str, default="http://localhost:21001")
     parser.add_argument("--model-path", type=str, default="qwen/Qwen-7B-Chat")
     parser.add_argument(
         "--model-names",
@@ -289,9 +269,7 @@ if __name__ == "__main__":
         default="main",
         help="Hugging Face Hub model revision identifier",
     )
-    parser.add_argument(
-        "--conv-template", type=str, default=None, help="Conversation prompt template."
-    )
+    parser.add_argument("--conv-template", type=str, default=None, help="Conversation prompt template.")
     parser.add_argument(
         "config_file",
         metavar="config-file",
@@ -304,9 +282,7 @@ if __name__ == "__main__":
     config = ConfigManager.get_config_from_json(args.config_file)
 
     cmd = f"pip show dashinfer | grep 'Location' | cut -d ' ' -f 2"
-    package_location = subprocess.run(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, text=True
-    )
+    package_location = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, text=True)
     package_location = package_location.stdout.strip()
     os.environ["AS_DAEMON_PATH"] = package_location + "/dashinfer/allspark/bin"
     os.environ["AS_NUMA_NUM"] = str(len(config["device_ids"]))

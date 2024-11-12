@@ -69,9 +69,7 @@ cat_name_to_baseline = {
     "Hard Prompts (English)": "English",
 }
 
-notebook_url = (
-    "https://colab.research.google.com/drive/1KdwokPjirkTmpO_P1WByFNFiqxWQquwH"
-)
+notebook_url = "https://colab.research.google.com/drive/1KdwokPjirkTmpO_P1WByFNFiqxWQquwH"
 
 basic_component_values = [None] * 6
 leader_component_values = [None] * 5

@@ -52,9 +52,7 @@ class Image(BaseModel):
         elif self.image_format == ImageFormat.BYTES:
             return f"data:image/{self.filetype};base64,{self.base64_str}"
         else:
-            raise ValueError(
-                f"This file is not valid or not currently supported by the OpenAI API: {self.url}"
-            )
+            raise ValueError(f"This file is not valid or not currently supported by the OpenAI API: {self.url}")
 
     def resize_image_and_return_image_in_bytes(self, image, max_image_size_mb):
         import math
@@ -107,18 +105,14 @@ class Image(BaseModel):
         else:
             pil_image = Image.open(self.url).convert("RGBA")
 
-        image_format, image_bytes = self.resize_image_and_return_image_in_bytes(
-            pil_image, max_image_size_mb
-        )
+        image_format, image_bytes = self.resize_image_and_return_image_in_bytes(pil_image, max_image_size_mb)
 
         img_base64_str = base64.b64encode(image_bytes.getvalue()).decode()
 
         return image_format, img_base64_str
 
     def to_conversation_format(self, max_image_size_mb):
-        image_format, image_bytes = self.convert_url_to_image_bytes(
-            max_image_size_mb=max_image_size_mb
-        )
+        image_format, image_bytes = self.convert_url_to_image_bytes(max_image_size_mb=max_image_size_mb)
 
         self.filetype = image_format
         self.image_format = ImageFormat.BYTES

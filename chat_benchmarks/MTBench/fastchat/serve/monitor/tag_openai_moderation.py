@@ -1,6 +1,7 @@
 """
 Add OpenAI moderation API results to all conversations.
 """
+
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 import json
@@ -40,9 +41,7 @@ def tag_openai_moderation(x):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", type=str, required=True)
-    parser.add_argument(
-        "--parallel", type=int, default=1, help="The number of concurrent API calls."
-    )
+    parser.add_argument("--parallel", type=int, default=1, help="The number of concurrent API calls.")
     parser.add_argument("--first-n", type=int)
     args = parser.parse_args()
 
@@ -52,9 +51,7 @@ if __name__ == "__main__":
         battles = battles[: args.first_n]
 
     with ThreadPoolExecutor(args.parallel) as executor:
-        for line in tqdm(
-            executor.map(tag_openai_moderation, battles), total=len(battles)
-        ):
+        for line in tqdm(executor.map(tag_openai_moderation, battles), total=len(battles)):
             pass
 
     output = args.input.replace(".json", "_tagged.json")

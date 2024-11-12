@@ -147,18 +147,14 @@ def clear_history(request: gr.Request):
     ip = get_ip(request)
     logger.info(f"clear_history. ip: {ip}")
     state = None
-    return (state, [], enable_multimodal, invisible_text, invisible_btn) + (
-        disable_btn,
-    ) * 5
+    return (state, [], enable_multimodal, invisible_text, invisible_btn) + (disable_btn,) * 5
 
 
 def clear_history_example(request: gr.Request):
     ip = get_ip(request)
     logger.info(f"clear_history_example. ip: {ip}")
     state = None
-    return (state, [], enable_multimodal, invisible_text, invisible_btn) + (
-        disable_btn,
-    ) * 5
+    return (state, [], enable_multimodal, invisible_text, invisible_btn) + (disable_btn,) * 5
 
 
 # TODO(Chris): At some point, we would like this to be a live-reporting feature.
@@ -228,11 +224,7 @@ def add_text(
     else:
         text, images = chat_input, []
 
-    if (
-        len(images) > 0
-        and model_selector in context.text_models
-        and model_selector not in context.vision_models
-    ):
+    if len(images) > 0 and model_selector in context.text_models and model_selector not in context.vision_models:
         gr.Warning(f"{model_selector} is a text-only model. Image is ignored.")
         images = []
 
@@ -247,18 +239,14 @@ def add_text(
 
     if len(text) <= 0:
         state.skip_next = True
-        return (state, state.to_gradio_chatbot(), None, "", no_change_btn) + (
-            no_change_btn,
-        ) * 5
+        return (state, state.to_gradio_chatbot(), None, "", no_change_btn) + (no_change_btn,) * 5
 
     all_conv_text = state.conv.get_prompt()
     all_conv_text = all_conv_text[-2000:] + "\nuser: " + text
 
     images = convert_images_to_conversation_format(images)
 
-    text, image_flagged, csam_flag = moderate_input(
-        state, text, all_conv_text, [state.model_name], images, ip
-    )
+    text, image_flagged, csam_flag = moderate_input(state, text, all_conv_text, [state.model_name], images, ip)
 
     if image_flagged:
         logger.info(f"image flagged. ip: {ip}. text: {text}")
@@ -295,9 +283,7 @@ def add_text(
     ) + (disable_btn,) * 5
 
 
-def build_single_vision_language_model_ui(
-    context: Context, add_promotion_links=False, random_questions=None
-):
+def build_single_vision_language_model_ui(context: Context, add_promotion_links=False, random_questions=None):
     promotion = (
         f"""
 [Blog](https://blog.lmarena.ai/blog/2023/arena/) | [GitHub](https://github.com/lm-sys/FastChat) | [Paper](https://arxiv.org/abs/2403.04132) | [Dataset](https://github.com/lm-sys/FastChat/blob/main/docs/dataset_release.md) | [Twitter](https://twitter.com/lmsysorg) | [Discord](https://discord.gg/6GXcFg3TH8) | [Kaggle Competition](https://www.kaggle.com/competitions/lmsys-chatbot-arena)
@@ -318,9 +304,7 @@ Note: You can only chat with <span style='color: #DE3163; font-weight: bold'>one
 
     state = gr.State()
     gr.Markdown(notice_markdown, elem_id="notice_markdown")
-    vision_not_in_text_models = [
-        model for model in context.vision_models if model not in context.text_models
-    ]
+    vision_not_in_text_models = [model for model in context.vision_models if model not in context.text_models]
     text_and_vision_models = context.text_models + vision_not_in_text_models
     context_state = gr.State(context)
 
@@ -328,9 +312,7 @@ Note: You can only chat with <span style='color: #DE3163; font-weight: bold'>one
         with gr.Row(elem_id="model_selector_row"):
             model_selector = gr.Dropdown(
                 choices=text_and_vision_models,
-                value=text_and_vision_models[0]
-                if len(text_and_vision_models) > 0
-                else "",
+                value=text_and_vision_models[0] if len(text_and_vision_models) > 0 else "",
                 interactive=True,
                 show_label=False,
                 container=False,
@@ -366,9 +348,7 @@ Note: You can only chat with <span style='color: #DE3163; font-weight: bold'>one
             visible=False,
         )
 
-        send_btn = gr.Button(
-            value="Send", variant="primary", scale=0, visible=False, interactive=False
-        )
+        send_btn = gr.Button(value="Send", variant="primary", scale=0, visible=False, interactive=False)
 
         multimodal_textbox = gr.MultimodalTextbox(
             file_types=["image"],

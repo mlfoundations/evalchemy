@@ -96,12 +96,8 @@ def load_demo(context: Context, request: gr.Request):
         direct_chat_updates = load_demo_single(context, request.query_params)
     else:
         direct_chat_updates = load_demo_single(context, request.query_params)
-        side_by_side_anony_updates = load_demo_side_by_side_anony(
-            context.all_text_models, request.query_params
-        )
-        side_by_side_named_updates = load_demo_side_by_side_named(
-            context.text_models, request.query_params
-        )
+        side_by_side_anony_updates = load_demo_side_by_side_anony(context.all_text_models, request.query_params)
+        side_by_side_named_updates = load_demo_side_by_side_named(context.text_models, request.query_params)
 
     tabs_list = (
         [gr.Tabs(selected=inner_selected)]
@@ -113,9 +109,7 @@ def load_demo(context: Context, request: gr.Request):
     return tabs_list
 
 
-def build_demo(
-    context: Context, elo_results_file: str, leaderboard_table_file, arena_hard_table
-):
+def build_demo(context: Context, elo_results_file: str, leaderboard_table_file, arena_hard_table):
     if args.show_terms_of_use:
         load_js = get_window_url_params_with_tos_js
     else:
@@ -168,28 +162,17 @@ window.__gradio_mode__ = "app";
             else:
                 with gr.Tab("⚔️ Arena (battle)", id=0) as arena_tab:
                     arena_tab.select(None, None, None, js=load_js)
-                    side_by_side_anony_list = build_side_by_side_ui_anony(
-                        context.all_text_models
-                    )
+                    side_by_side_anony_list = build_side_by_side_ui_anony(context.all_text_models)
 
                 with gr.Tab("⚔️ Arena (side-by-side)", id=1) as side_by_side_tab:
                     side_by_side_tab.select(None, None, None, js=alert_js)
-                    side_by_side_named_list = build_side_by_side_ui_named(
-                        context.text_models
-                    )
+                    side_by_side_named_list = build_side_by_side_ui_named(context.text_models)
 
                 with gr.Tab("💬 Direct Chat", id=2) as direct_tab:
                     direct_tab.select(None, None, None, js=alert_js)
-                    single_model_list = build_single_model_ui(
-                        context.text_models, add_promotion_links=True
-                    )
+                    single_model_list = build_single_model_ui(context.text_models, add_promotion_links=True)
 
-            demo_tabs = (
-                [inner_tabs]
-                + side_by_side_anony_list
-                + side_by_side_named_list
-                + single_model_list
-            )
+            demo_tabs = [inner_tabs] + side_by_side_anony_list + side_by_side_named_list + single_model_list
 
             if elo_results_file:
                 with gr.Tab("🏆 Leaderboard", id=3):
@@ -257,12 +240,8 @@ if __name__ == "__main__":
         action="store_true",
         help="Shows term of use before loading the demo",
     )
-    parser.add_argument(
-        "--vision-arena", action="store_true", help="Show tabs for vision arena."
-    )
-    parser.add_argument(
-        "--random-questions", type=str, help="Load random questions from a JSON file"
-    )
+    parser.add_argument("--vision-arena", action="store_true", help="Show tabs for vision arena.")
+    parser.add_argument("--random-questions", type=str, help="Load random questions from a JSON file")
     parser.add_argument(
         "--register-api-endpoint-file",
         type=str,
@@ -274,15 +253,9 @@ if __name__ == "__main__":
         help='Set the gradio authentication file path. The file should contain one or more user:password pairs in this format: "u1:p1,u2:p2,u3:p3"',
         default=None,
     )
-    parser.add_argument(
-        "--elo-results-file", type=str, help="Load leaderboard results and plots"
-    )
-    parser.add_argument(
-        "--leaderboard-table-file", type=str, help="Load leaderboard results and plots"
-    )
-    parser.add_argument(
-        "--arena-hard-table", type=str, help="Load leaderboard results and plots"
-    )
+    parser.add_argument("--elo-results-file", type=str, help="Load leaderboard results and plots")
+    parser.add_argument("--leaderboard-table-file", type=str, help="Load leaderboard results and plots")
+    parser.add_argument("--arena-hard-table", type=str, help="Load leaderboard results and plots")
     parser.add_argument(
         "--gradio-root-path",
         type=str,
@@ -324,12 +297,8 @@ if __name__ == "__main__":
         vision_arena=True,
     )
 
-    models = text_models + [
-        model for model in vision_models if model not in text_models
-    ]
-    all_models = all_text_models + [
-        model for model in all_vision_models if model not in all_text_models
-    ]
+    models = text_models + [model for model in vision_models if model not in text_models]
+    all_models = all_text_models + [model for model in all_vision_models if model not in all_text_models]
     context = Context(
         text_models,
         all_text_models,

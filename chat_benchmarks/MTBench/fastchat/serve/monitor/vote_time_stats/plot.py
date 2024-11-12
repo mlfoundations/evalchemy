@@ -17,9 +17,7 @@ with open(infile) as f:
         v = data["timestamp"]
         durations.append(v - max(l, r))
 
-print(
-    f"Avg: {np.mean(durations)}, Median: {np.median(durations)}, Max: {np.max(durations)}"
-)
+print(f"Avg: {np.mean(durations)}, Median: {np.median(durations)}, Max: {np.max(durations)}")
 
 # Define the new cutoff and number of bins
 cutoff = 200.0  # New cutoff value
@@ -33,24 +31,18 @@ for i, n in enumerate(durations):
 bin_edges = np.linspace(0, cutoff, num_bins_inside_cutoff + 1)
 
 # Adjusting the overflow bin to end at 110
-overflow_cap = (
-    cutoff + cutoff / num_bins_inside_cutoff
-)  # Adjust as needed based on distribution
+overflow_cap = cutoff + cutoff / num_bins_inside_cutoff  # Adjust as needed based on distribution
 bin_edges = np.append(bin_edges, overflow_cap)
 
 # Create the plot with custom bins
-sns.histplot(
-    durations, bins=bin_edges, kde=False
-)  # Turn off KDE for clearer bar visibility
+sns.histplot(durations, bins=bin_edges, kde=False)  # Turn off KDE for clearer bar visibility
 plt.title(f'Distribution of "time to vote" {date}')
 plt.xlabel("Duration (seconds)")
 plt.ylabel("Frequency")
 
 # Highlight the overflow bin
 plt.axvline(x=cutoff, color="red", linestyle="--")
-plt.text(
-    cutoff + 1, plt.ylim()[1] * 0.9, "Overflow", color="red", ha="left"
-)  # Adjust text alignment
+plt.text(cutoff + 1, plt.ylim()[1] * 0.9, "Overflow", color="red", ha="left")  # Adjust text alignment
 
 # Customizing x-axis labels to hide the "110"
 ax = plt.gca()  # Get current axis

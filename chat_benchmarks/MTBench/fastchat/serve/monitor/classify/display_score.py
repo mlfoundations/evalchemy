@@ -24,16 +24,10 @@ if __name__ == "__main__":
     for file in glob(os.path.join("label_bench", args.bench, "data", "*.json")):
         output = pd.read_json(file)
 
-        tag_map = (
-            output[["question_id", "category_tag"]]
-            .set_index("question_id")
-            .to_dict("index")
-        )
+        tag_map = output[["question_id", "category_tag"]].set_index("question_id").to_dict("index")
 
         tag_1, tag_2 = tag_names[args.bench]
-        test["pred"] = test.question_id.map(
-            lambda id: tag_map[id]["category_tag"][tag_1][tag_2]
-        )
+        test["pred"] = test.question_id.map(lambda id: tag_map[id]["category_tag"][tag_1][tag_2])
 
         accuracy = (test.label == test.pred).mean()
         recall = recall_score(y_pred=test.pred, y_true=test.label)
@@ -50,11 +44,7 @@ if __name__ == "__main__":
             print()
             conflict = test[test.label & ~test.pred]
             print("Ground Truth = True; Pred = False")
-            prompts = (
-                conflict.conversation_a.map(lambda x: x[0]["content"])
-                .sample(n=5)
-                .tolist()
-            )
+            prompts = conflict.conversation_a.map(lambda x: x[0]["content"]).sample(n=5).tolist()
             for prompt in prompts:
                 print("####################")
                 print(prompt)
@@ -63,11 +53,7 @@ if __name__ == "__main__":
 
             conflict = test[~test.label & test.pred]
             print("Ground Truth = False; Pred = True")
-            prompts = (
-                conflict.conversation_a.map(lambda x: x[0]["content"])
-                .sample(n=5)
-                .tolist()
-            )
+            prompts = conflict.conversation_a.map(lambda x: x[0]["content"]).sample(n=5).tolist()
             for prompt in prompts:
                 print("####################")
                 print(prompt)

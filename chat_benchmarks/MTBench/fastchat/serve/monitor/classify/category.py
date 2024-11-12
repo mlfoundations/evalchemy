@@ -148,11 +148,7 @@ class CategoryCreativeWriting(Category):
 
     def get_score(self, judgment):
         matches = self.pattern.findall(
-            judgment.replace("\n", "")
-            .replace("[", "")
-            .replace("]", "")
-            .replace(" ", "")
-            .lower()
+            judgment.replace("\n", "").replace("[", "").replace("]", "").replace(" ", "").lower()
         )
         matches = [m for m in matches if m != ""]
         if len(set(matches)) == 0:

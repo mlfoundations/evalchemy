@@ -136,11 +136,7 @@ class Conversation:
             ret = system_prompt
             for i, (role, message) in enumerate(self.messages):
                 if message:
-                    ret += (
-                        role
-                        + ": "
-                        + message.replace("\r\n", "\n").replace("\n\n", "\n")
-                    )
+                    ret += role + ": " + message.replace("\r\n", "\n").replace("\n\n", "\n")
                     ret += "\n\n"
                 else:
                     ret += role + ":"
@@ -516,9 +512,7 @@ class Conversation:
 
                     ret.append({"role": "user", "content": content_list})
                 else:
-                    ret.append(
-                        {"role": "user", "content": [{"type": "text", "text": msg}]}
-                    )
+                    ret.append({"role": "user", "content": [{"type": "text", "text": msg}]})
             else:
                 if msg is not None:
                     ret.append(
@@ -698,9 +692,7 @@ conv_templates: Dict[str, Conversation] = {}
 def register_conv_template(template: Conversation, override: bool = False):
     """Register a new conversation template."""
     if not override:
-        assert (
-            template.name not in conv_templates
-        ), f"{template.name} has been registered."
+        assert template.name not in conv_templates, f"{template.name} has been registered."
 
     conv_templates[template.name] = template
 

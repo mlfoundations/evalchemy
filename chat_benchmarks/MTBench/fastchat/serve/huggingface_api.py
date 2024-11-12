@@ -5,6 +5,7 @@ Usage:
 python3 -m fastchat.serve.huggingface_api --model lmsys/vicuna-7b-v1.5
 python3 -m fastchat.serve.huggingface_api --model lmsys/fastchat-t5-3b-v1.0
 """
+
 import argparse
 
 import torch
@@ -47,9 +48,7 @@ def main(args):
         output_ids = output_ids[0]
     else:
         output_ids = output_ids[0][len(inputs["input_ids"][0]) :]
-    outputs = tokenizer.decode(
-        output_ids, skip_special_tokens=True, spaces_between_special_tokens=False
-    )
+    outputs = tokenizer.decode(output_ids, skip_special_tokens=True, spaces_between_special_tokens=False)
 
     # Print results
     print(f"{conv.roles[0]}: {msg}")

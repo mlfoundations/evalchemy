@@ -2,6 +2,7 @@
 Usage:
 python3 -m playground.benchmark.benchmark_api_provider --api-endpoint-file api_endpoints.json --output-file ./benchmark_results.json --random-questions metadata_sampled.json
 """
+
 import argparse
 import json
 import time
@@ -81,11 +82,7 @@ def run_benchmark(model_name, model_api_dict, random_questions_dict, num_calls=2
         text, image_path = sample_image_and_question(random_questions_dict, index)
         max_image_size_mb = 5 / 1.5
 
-        images = [
-            Image(url=image_path).to_conversation_format(
-                max_image_size_mb=max_image_size_mb
-            )
-        ]
+        images = [Image(url=image_path).to_conversation_format(max_image_size_mb=max_image_size_mb)]
         message = (text, images)
 
         state.conv.append_message(state.conv.roles[0], message)

@@ -32,7 +32,7 @@ class InstructionsTest(parameterized.TestCase):
                 "response ": response,
                 "language ": language,
             }
-            for response, language in [("The response is English ",  "en ")]
+            for response, language in [("The response is English ", "en ")]
         ]
     )
     def test_response_language(self, response, language):
@@ -86,9 +86,8 @@ class InstructionsTest(parameterized.TestCase):
                 ("xx,x. xx,x! xx/x. x{x}x?", _COMPARISON_RELATION[0], 4, False),
                 ("xxxx. xx,x! xxxx. x(x)x?", _COMPARISON_RELATION[0], 5, True),
                 ("xxxx. xx,x! xx|x. x&x x?", _COMPARISON_RELATION[1], 4, True),
-                ("xx-x. xx,x! xx}x. x,xx?", _COMPARISON_RELATION[1], 5, False)
+                ("xx-x. xx,x! xx}x. x,xx?", _COMPARISON_RELATION[1], 5, False),
             ]
-
         ]
     )
     def test_number_sentences(self, response, relation, num_sentences, expected):
@@ -118,7 +117,7 @@ class InstructionsTest(parameterized.TestCase):
                         + "a sign-up form."
                     ),
                     5, 
-                    True
+                    True,
                 ),
                 (("My [adjective] [noun] is [adjective] [noun]. I [verb] and [verb]."), 7, False),
             ]
@@ -181,7 +180,7 @@ class InstructionsTest(parameterized.TestCase):
                 (BULLET_TEST_MESSAGE_2, 2, True),
                 (BULLET_TEST_MESSAGE_3, 3, True),
                 (BULLET_TEST_MESSAGE_4, 3, True),
-                (BULLET_TEST_MESSAGE_5, 1, True)
+                (BULLET_TEST_MESSAGE_5, 1, True),
             ]
         ]
     )
@@ -249,7 +248,7 @@ class InstructionsTest(parameterized.TestCase):
             for response, min_num_highlights, expected in [
                 (HIGHLIGHTED_TEST_MESSAGE_1, 2, True),
                 (HIGHLIGHTED_TEST_MESSAGE_2, 2, False),
-                (HIGHLIGHTED_TEST_MESSAGE_3, 4, True)
+                (HIGHLIGHTED_TEST_MESSAGE_3, 4, True),
             ]
         ]
     )

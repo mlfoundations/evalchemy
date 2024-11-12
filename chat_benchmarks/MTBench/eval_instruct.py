@@ -79,8 +79,7 @@ class MTBenchBenchmark(BaseBenchmark):
             print(f"Warning: Overwriting config.judge_model = {annotator_model} ")
             config.judge_model = annotator_model
         self.config = config or MTBenchConfig(judge_model=annotator_model)
-        print("self.config, self.config", self.config)
-        self.debug = True
+        self.debug = debug
 
         # Setup paths
         self.data_path = self.base_path / "fastchat/llm_judge/data/mt_bench"

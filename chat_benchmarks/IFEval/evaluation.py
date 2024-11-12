@@ -3,7 +3,12 @@ import collections
 import dataclasses
 import json
 
-from .evaluation_main import test_instruction_following_strict, test_instruction_following_loose, read_prompt_to_response_dict, read_prompt_list
+from .evaluation_main import (
+    test_instruction_following_strict,
+    test_instruction_following_loose,
+    read_prompt_to_response_dict,
+    read_prompt_list,
+)
 
 
 def get_report(outputs):
@@ -40,7 +45,6 @@ def get_report(outputs):
             if followed_or_not:
                 tier1_correct[instruction_id] += 1
 
-
     for instruction_id in sorted(tier0_total.keys()):
         tight_accuracy = tier0_correct[instruction_id] / tier0_total[instruction_id]
         logging.info(f"tier0 accuracy {instruction_id} {tight_accuracy}")
@@ -49,10 +53,8 @@ def get_report(outputs):
         loose_accuracy = tier1_correct[instruction_id] / tier1_total[instruction_id]
         logging.info(f"tier1 accuracy {instruction_id} {loose_accuracy}")
 
-    return {
-        "prompt-level": prompt_correct/prompt_total,
-        "instruction-level": instruction_correct/instruction_total
-    }
+    return {"prompt-level": prompt_correct/prompt_total, "instruction-level": instruction_correct/instruction_total}
+
 
 def evaluate_accuracy(response_filename):
     inputs = read_prompt_list(response_filename)
@@ -62,7 +64,7 @@ def evaluate_accuracy(response_filename):
         (test_instruction_following_strict, "eval_results_strict"),
         (test_instruction_following_loose, "eval_restuls_loose"),
     ]:
-        #logging.info(f"Generating {output_file}")
+        # logging.info(f"Generating {output_file}")
         outputs = []
         for inp in inputs:
             outputs.append(func(inp, prompt_to_response))

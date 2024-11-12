@@ -9,6 +9,7 @@ from lm_eval.api.instance import Instance
 from eval.task import BaseBenchmark
 from .evaluation import evaluate_accuracy
 
+
 class IFEvalBenchmark(BaseBenchmark):
     def __init__(
         self,
@@ -21,16 +22,16 @@ class IFEvalBenchmark(BaseBenchmark):
         logger: Optional[logging.Logger] = None,
     ):
         """
-            Initialize Instruction Following Benchmark
+        Initialize Instruction Following Benchmark
 
-            Args:
-            data_dir: Directory containing MBPP datasets
-            max_tokens: Maximum number of tokens for generation
-            num_examples: Number of examples to show in few-shot prompt
-            start_idx: Start index for evaluation examples
-            end_idx: End index for evaluation examples
-            debug_size: If set, only evaluate this many examples
-            logger: Optional logger instance
+        Args:
+        data_dir: Directory containing MBPP datasets
+        max_tokens: Maximum number of tokens for generation
+        num_examples: Number of examples to show in few-shot prompt
+        start_idx: Start index for evaluation examples
+        end_idx: End index for evaluation examples
+        debug_size: If set, only evaluate this many examples
+        logger: Optional logger instance
         """
         super().__init__(logger)
         self.data_dir = data_dir
@@ -39,7 +40,6 @@ class IFEvalBenchmark(BaseBenchmark):
         self.start_idx = start_idx
         self.end_idx = end_idx
         self.debug_size = debug_size
-
 
     def read_test_examples(self, data_path: str) -> Generator[Dict[str, str], None, None]:
         """
@@ -66,17 +66,16 @@ class IFEvalBenchmark(BaseBenchmark):
                 ex = examples[i]
 
                 yield ex
-                #yield {
+                # yield {
                 #    "task_id": ex["key"],
                 #    "prompt": ex["prompt"],
                 #    "instruction_id_list": ex["instruction_id_list"],
                 #    "kwargs": ex["kwargs"]
-                #}
+                # }
 
         except Exception as e:
             self.logger.error(f"Error reading examples: {str(e)}")
             raise
-
 
     def generate_responses(self, model: LM) -> Dict[str, Any]:
         """
@@ -149,7 +148,6 @@ class IFEvalBenchmark(BaseBenchmark):
             self.logger.error(f"Error in generate_responses: {str(e)}")
             raise
 
-
     def evaluate_responses(self, results: Dict[str, Any]) -> Dict[str, Any]:
         """
         Evaluate generated responses for specific instructions
@@ -186,7 +184,6 @@ class IFEvalBenchmark(BaseBenchmark):
 
             raise
 
-
     def run_benchmark(self, model: LM) -> Dict[str, float]:
         """
         Run the complete Instruction Following Evaluation pipeline
@@ -212,4 +209,3 @@ class IFEvalBenchmark(BaseBenchmark):
         except Exception as e:
             self.logger.error(f"Error running benchmark: {str(e)}")
             return {"error": str(e)}
-

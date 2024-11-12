@@ -14,7 +14,7 @@
 # limitations under the License.
 
 """Registry of all instructions."""
-#from instruction_following_eval import instructions
+# from instruction_following_eval import instructions
 from .instructions import *
 
 _KEYWORD = "keywords:"
@@ -37,7 +37,7 @@ _CHANGE_CASES = "change_case:"
 
 _PUNCTUATION = "punctuation:"
 
-#INSTRUCTION_DICT = {
+# INSTRUCTION_DICT = {
 #    _KEYWORD + "existence": instructions.KeywordChecker,
 #    _KEYWORD + "frequency": instructions.KeywordFrequencyChecker,
 #    # TODO(jeffreyzhou): make a proper set of sentences to choose from
@@ -75,7 +75,7 @@ _PUNCTUATION = "punctuation:"
 #    + "english_lowercase": instructions.LowercaseLettersEnglishChecker,
 #    _PUNCTUATION + "no_comma": instructions.CommaChecker,
 #    _STARTEND + "quotation": instructions.QuotationChecker,
-#}
+# }
 
 INSTRUCTION_DICT = {
     _KEYWORD + "existence": KeywordChecker,
@@ -200,18 +200,18 @@ INSTRUCTION_CONFLICTS = {
 
 
 def conflict_make(conflicts):
-  """Makes sure if A conflicts with B, B will conflict with A.
+    """Makes sure if A conflicts with B, B will conflict with A.
 
-  Args:
-    conflicts: Dictionary of potential conflicts where key is instruction id
-      and value is set of instruction ids that it conflicts with.
+    Args:
+        conflicts: Dictionary of potential conflicts where key is instruction id
+            and value is set of instruction ids that it conflicts with.
 
-  Returns:
-    Revised version of the dictionary. All instructions conflict with
-    themselves. If A conflicts with B, B will conflict with A.
-  """
-  for key in conflicts:
-    for k in conflicts[key]:
-      conflicts[k].add(key)
-    conflicts[key].add(key)
-  return conflicts
+    Returns:
+        Revised version of the dictionary. All instructions conflict with
+        themselves. If A conflicts with B, B will conflict with A.
+    """
+    for key in conflicts:
+        for k in conflicts[key]:
+            conflicts[k].add(key)
+        conflicts[key].add(key)
+    return conflicts

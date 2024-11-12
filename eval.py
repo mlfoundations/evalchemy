@@ -167,7 +167,8 @@ def evaluate(
                 torch_random_seed=args.seed[2] if hasattr(args, "seed") else None,
                 fewshot_random_seed=args.seed[3] if hasattr(args, "seed") else None,
             )
-            results["results"].update(pretrain_results.get("results", {}))
+            if pretrain_results is not None:
+                results["results"].update(pretrain_results.get("results", {}))
         except Exception as e:
             eval_logger.error(f"Error in pretrain evaluation: {str(e)}")
 

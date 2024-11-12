@@ -65,8 +65,6 @@ class RepoBenchmark(BaseBenchmark):
             datasets = load_dataset(f"tianyang/repobench_{lang}_v1.1", verification_mode="no_checks")
 
             for subset, dataset in datasets.items():
-                print(f"Rank {model.rank} is processing {lang}/{subset}")
-                dist.barrier()
                 if subset not in self.subsets:
                     continue
 
@@ -93,14 +91,7 @@ class RepoBenchmark(BaseBenchmark):
                             idx,
                         )
                     )
-                time_end = time.time()
-                print(
-                    f"Rank {model.rank} finished constructing {len(all_instances)} instances for {lang}/{subset} in {time_end - time_start:.2f} seconds"
-                )
-                time_start = time.time()
                 outputs = self.compute(model, all_instances, gather_to_rank=0, do_slice=False)
-                time_end = time.time()
-                print(f"Rank {model.rank} finished processing {lang}/{subset} in {time_end - time_start:.2f} seconds")
 
                 # Only rank 0 should save the results
                 if model.rank != 0:
@@ -120,7 +111,6 @@ class RepoBenchmark(BaseBenchmark):
                 with open(output_path, "w", encoding="utf-8") as fw:
                     for ex in generated_examples:
                         fw.write(json.dumps(ex) + "\n")
-                print(f"Saved {len(generated_examples)} examples for {lang}/{subset}")
 
         if model.rank == 0:
             return {"temp_dir_obj": temp_dir_obj}
@@ -177,8 +167,6 @@ class RepoBenchmark(BaseBenchmark):
                 with open(output_path, "w", encoding="utf-8") as fw:
                     for ex in generated_examples:
                         fw.write(json.dumps(ex) + "\n")
-
-                print(f"Saved {len(generated_examples)} examples for {lang}/{subset}")
 
         return {"temp_dir_obj": temp_dir_obj}
 

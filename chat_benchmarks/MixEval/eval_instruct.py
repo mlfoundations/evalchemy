@@ -8,6 +8,9 @@ import warnings
 from argparse import Namespace
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+import torch.distributed as dist
+from torch.nn.parallel import DistributedDataParallel
+from torch.utils.data.distributed import DistributedSampler
 
 from lm_eval.api.model import LM
 from lm_eval.models.dummy import DummyLM
@@ -111,7 +114,7 @@ class MixEvalBenchmark(BaseBenchmark):
 
     def generate_responses(self, model: LM) -> Dict[str, Any]:
         """
-        Generate responses for the MixEval benchmark.
+        Generate responses using distributed processing, but only for generation.
 
         Args:
             model: Language model instance
@@ -121,8 +124,33 @@ class MixEvalBenchmark(BaseBenchmark):
         """
         splits = ["close_freeform", "close_multichoice"]
         out_dict = {}
+
         for split in splits:
-            out_dict[split] = self._eval_split(model, split)
+            results = self._eval_split(model, split)
+            if model.world_size > 1:
+                # Gather results from all GPUs
+                all_results = [None for _ in range(model.world_size)]
+                dist.all_gather_object(all_results, results)
+
+                if model.rank == 0:
+                    # Combine results on main process
+                    combined_results = []
+                    for gpu_results in all_results:
+                        combined_results.extend(gpu_results)
+                    out_dict[split] = combined_results
+                    response_file = self._get_response_file()
+                    with open(response_file, "w") as f:
+                        for result in combined_results:
+                            f.write(json.dumps(result) + "\n")
+            else:
+                out_dict[split] = results
+
+        if model.world_size > 1:
+            dist.destroy_process_group()
+
+        # Only return results on rank 0
+        if model.world_size > 1 and model.rank != 0:
+            return None
         return out_dict
 
     def _eval_split(self, model: LM, split: str) -> List[Dict[str, Any]]:
@@ -138,14 +166,30 @@ class MixEvalBenchmark(BaseBenchmark):
         """
         self.args.split = split
         self.args.model_name = self._get_model_name(model)
-
         response_file = self._get_response_file()
+        if model.world_size > 1:
+            # Add GPU rank to filename to avoid conflicts
+            response_file = response_file.replace(".jsonl", f"_rank{model.rank}.jsonl")
+
         resume_info = self._check_resume(response_file)
 
-        model = self._get_model(model)
+        chat_model = self._get_model(model)
         eval_dataset = get_eval_dataset(self.args)
+
+        if model.world_size > 1:
+            sampler = DistributedSampler(eval_dataset, num_replicas=model.world_size, rank=model.rank)
+            shuffle = False
+        else:
+            sampler = None
+            shuffle = False
+
         dataloader = DataLoader(
-            eval_dataset, batch_size=self.args.batch_size, shuffle=False, num_workers=32, collate_fn=lambda x: x
+            eval_dataset,
+            batch_size=self.args.batch_size,
+            shuffle=shuffle,
+            num_workers=32,
+            collate_fn=lambda x: x,
+            sampler=sampler,
         )
 
         time_elapsed = resume_info["time_elapsed"]
@@ -156,7 +200,7 @@ class MixEvalBenchmark(BaseBenchmark):
                 if resume_info["resume"] and resume_info["status"]["batch_id"] >= b_id:
                     continue
 
-                model.get_responses(batch, response_file)
+                chat_model.get_responses(batch, response_file)
 
                 time_elapsed += time.time() - start_time
                 start_time = time.time()
@@ -172,7 +216,7 @@ class MixEvalBenchmark(BaseBenchmark):
 
     def evaluate_responses(self, results: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Evaluate the model outputs and compute metrics.
+        Evaluate responses only on rank 0
 
         Args:
             results: The model outputs to evaluate
@@ -202,7 +246,7 @@ class MixEvalBenchmark(BaseBenchmark):
 
     def run_benchmark(self, model: LM) -> Dict[str, Any]:
         """
-        Run the complete MixEval benchmark evaluation pipeline.
+        Run benchmark with distributed generation but centralized evaluation
 
         Args:
             model: Language model instance
@@ -211,28 +255,27 @@ class MixEvalBenchmark(BaseBenchmark):
             Dictionary containing evaluation metrics and samples
         """
         self.logger.info("Starting MixEval benchmark evaluation")
-        try:
-            generation_results = self.generate_responses(model)
-            evaluation_results = self.evaluate_responses(generation_results)
+        generation_results = self.generate_responses(model)
 
-            evaluation_results.update(
-                {
-                    "benchmark_version": f"{self.args.benchmark}-{self.args.version}",
-                    "batch_size": self.args.batch_size,
-                    "max_gpu_memory": self.args.max_gpu_memory,
-                }
-            )
+        # Only evaluate on rank 0
+        if model.world_size > 1 and model.rank != 0:
+            return None
 
-            return evaluation_results
-
-        except Exception as e:
-            self.logger.error(f"Error running benchmark: {str(e)}")
-            return {"error": str(e)}
+        evaluation_results = self.evaluate_responses(generation_results)
+        evaluation_results.update(
+            {
+                "benchmark_version": f"{self.args.benchmark}-{self.args.version}",
+                "batch_size": self.args.batch_size,
+                "max_gpu_memory": self.args.max_gpu_memory,
+            }
+        )
+        return evaluation_results
 
     def _get_model_name(self, model: LM) -> str:
         if "model_identifier" in model.__dict__:
             return (
-                model.model_identifier.split("=")[-1]
+                model.model_identifier.split("pretrained=")[1]
+                .split(",")[0]
                 .split("__")[-1]
                 .replace("Meta-", "")
                 .replace("-", "_")

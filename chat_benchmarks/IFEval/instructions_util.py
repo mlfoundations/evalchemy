@@ -22,7 +22,7 @@ from typing import List
 
 import immutabledict
 import nltk
-nltk.download('punkt_tab')
+nltk.download("punkt_tab")
 
 WORD_LIST = [
     "western",
@@ -1591,7 +1591,9 @@ LANGUAGE_CODES = immutabledict.immutabledict(
 _ALPHABETS = "([A-Za-z])"
 _PREFIXES = "(Mr|St|Mrs|Ms|Dr)[.]"
 _SUFFIXES = "(Inc|Ltd|Jr|Sr|Co)"
-_STARTERS = r"(Mr|Mrs|Ms|Dr|Prof|Capt|Cpt|Lt|He\s|She\s|It\s|They\s|Their\s|Our\s|We\s|But\s|However\s|That\s|This\s|Wherever)"
+_STARTERS = (
+    r"(Mr|Mrs|Ms|Dr|Prof|Capt|Cpt|Lt|He\s|She\s|It\s|They\s|Their\s|Our\s|We\s|But\s|However\s|That\s|This\s|Wherever)"
+)
 _ACRONYMS = "([A-Z][.][A-Z][.](?:[A-Z][.])?)"
 _WEBSITES = "[.](com|net|org|io|gov|edu|me)"
 _DIGITS = "([0-9])"
@@ -1613,22 +1615,20 @@ def split_into_sentences(text):
     text = re.sub(_WEBSITES, "<prd>\\1", text)
     text = re.sub(_DIGITS + "[.]" + _DIGITS, "\\1<prd>\\2", text)
     text = re.sub(
-            _MULTIPLE_DOTS,
-            lambda match: "<prd>" * len(match.group(0)) + "<stop>",
-            text,
+        _MULTIPLE_DOTS,
+        lambda match: "<prd>" * len(match.group(0)) + "<stop>",
+        text,
     )
     if "Ph.D" in text:
         text = text.replace("Ph.D.", "Ph<prd>D<prd>")
     text = re.sub(r"\s" + _ALPHABETS + "[.] ", " \\1<prd> ", text)
     text = re.sub(_ACRONYMS + " " + _STARTERS, "\\1<stop> \\2", text)
     text = re.sub(
-            _ALPHABETS + "[.]" + _ALPHABETS + "[.]" + _ALPHABETS + "[.]",
-            "\\1<prd>\\2<prd>\\3<prd>",
-            text,
+        _ALPHABETS + "[.]" + _ALPHABETS + "[.]" + _ALPHABETS + "[.]",
+        "\\1<prd>\\2<prd>\\3<prd>",
+        text,
     )
-    text = re.sub(
-            _ALPHABETS + "[.]" + _ALPHABETS + "[.]", "\\1<prd>\\2<prd>", text
-    )
+    text = re.sub( _ALPHABETS + "[.]" + _ALPHABETS + "[.]", "\\1<prd>\\2<prd>", text)
     text = re.sub(" " + _SUFFIXES + "[.] " + _STARTERS, " \\1<stop> \\2", text)
     text = re.sub(" " + _SUFFIXES + "[.]", " \\1<prd>", text)
     text = re.sub(" " + _ALPHABETS + "[.]", " \\1<prd>", text)

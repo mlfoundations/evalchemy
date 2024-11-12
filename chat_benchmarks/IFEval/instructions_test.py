@@ -1253,42 +1253,30 @@ I love it too much. I'll just have to make sure to eat it in moderation.
 
         capital_frequency = 3
         instruction.build_description(
-                capital_frequency=capital_frequency,
-                capital_relation=_COMPARISON_RELATION[1],
-                # capital_relation=instructions._COMPARISON_RELATION[1],
+            capital_frequency=capital_frequency,
+            capital_relation=_COMPARISON_RELATION[1],
+            # capital_relation=instructions._COMPARISON_RELATION[1],
         )
         with self.subTest(f'test {self.TEST_CAPITAL_WORD_FREQUENCY_MESSAGE_1}'):
-            self.assertTrue(
-                    instruction.check_following(
-                            self.TEST_CAPITAL_WORD_FREQUENCY_MESSAGE_1
-                    )
-            )
+            self.assertTrue(instruction.check_following(self.TEST_CAPITAL_WORD_FREQUENCY_MESSAGE_1))
 
         capital_frequency = 5
         instruction.build_description(
-                capital_frequency=capital_frequency,
-                capital_relation=_COMPARISON_RELATION[0],
-                # capital_relation=instructions._COMPARISON_RELATION[0],
+            capital_frequency=capital_frequency,
+            capital_relation=_COMPARISON_RELATION[0],
+            # capital_relation=instructions._COMPARISON_RELATION[0],
         )
         with self.subTest(f'test {self.TEST_CAPITAL_WORD_FREQUENCY_MESSAGE_2}'):
-            self.assertTrue(
-                    instruction.check_following(
-                            self.TEST_CAPITAL_WORD_FREQUENCY_MESSAGE_2
-                    )
-            )
+            self.assertTrue(instruction.check_following(self.TEST_CAPITAL_WORD_FREQUENCY_MESSAGE_2))
 
         capital_frequency = 4
         instruction.build_description(
-                capital_frequency=capital_frequency,
-                capital_relation=_COMPARISON_RELATION[0],
-                # capital_relation=instructions._COMPARISON_RELATION[0],
+            capital_frequency=capital_frequency,
+            capital_relation=_COMPARISON_RELATION[0],
+            # capital_relation=instructions._COMPARISON_RELATION[0],
         )
         with self.subTest(f'test {self.TEST_CAPITAL_WORD_FREQUENCY_MESSAGE_2}'):
-            self.assertFalse(
-                    instruction.check_following(
-                            self.TEST_CAPITAL_WORD_FREQUENCY_MESSAGE_2
-                    )
-            )
+            self.assertFalse(instruction.check_following(self.TEST_CAPITAL_WORD_FREQUENCY_MESSAGE_2))
 
     TEST_QUOTATION_MESSAGE_1 = """
     "This entire message is wrapped in double quotation marks."
@@ -1328,19 +1316,17 @@ I love it too much. I'll just have to make sure to eat it in moderation.
     #        'detectable_format:json_format': instructions.JsonFormat,
     # }
     INSTRUCTION_DICT = {
-            'language:response_language': ResponseLanguageChecker,
-            'length_constraints:number_sentences': NumberOfSentences,
-            'length_constraints:number_paragraphs': ParagraphChecker,
-            'length_constraints:number_words': NumberOfWords,
-            'detectable_content:number_placeholders': PlaceholderChecker,
-            'detectable_content:postscript': PostscriptChecker,
-            'detectable_format:number_bullet_lists': BulletListChecker,
-            'detectable_format:constrained_response': (
-                    ConstrainedResponseChecker),
-            'detectable_format:number_highlighted_sections': (
-                    HighlightSectionChecker),
-            'detectable_format:multiple_sections': SectionChecker,
-            'detectable_format:json_format': JsonFormat,
+        "language:response_language": ResponseLanguageChecker,
+        "length_constraints:number_sentences": NumberOfSentences,
+        "length_constraints:number_paragraphs": ParagraphChecker,
+        "length_constraints:number_words": NumberOfWords,
+        "detectable_content:number_placeholders": PlaceholderChecker,
+        "detectable_content:postscript": PostscriptChecker,
+        "detectable_format:number_bullet_lists": BulletListChecker,
+        "detectable_format:constrained_response": (ConstrainedResponseChecker),
+        "detectable_format:number_highlighted_sections": (HighlightSectionChecker),
+        "detectable_format:multiple_sections": SectionChecker,
+        "detectable_format:json_format": JsonFormat,
     }
 
     def test_get_instruction_args(self):
@@ -1352,7 +1338,7 @@ I love it too much. I'll just have to make sure to eat it in moderation.
             # The keyword args can be None.
             if kwargs:
                 inst_description_closed_loop = instruction.build_description(**kwargs)
-                with self.subTest(f'test {inst_id}'):
+                with self.subTest(f"test {inst_id}"):
                     self.assertEqual(inst_description, inst_description_closed_loop)
 
 

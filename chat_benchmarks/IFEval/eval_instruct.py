@@ -13,7 +13,7 @@ from .evaluation import evaluate_accuracy
 class IFEvalBenchmark(BaseBenchmark):
     def __init__(
         self,
-        data_dir: str  = "eval/chat_benchmarks/IFEval/data",
+        data_dir: str = "eval/chat_benchmarks/IFEval/data",
         max_tokens: int = 512,
         num_examples: int = 3,
         start_idx: int = 10,
@@ -141,7 +141,7 @@ class IFEvalBenchmark(BaseBenchmark):
             return {
                 "temp_dir_obj": temp_dir_obj,
                 "num_examples": len(generated_examples),
-                "total_examples": len(examples)
+                "total_examples": len(examples),
             }
 
         except Exception as e:

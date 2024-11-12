@@ -53,7 +53,7 @@ def get_report(outputs):
         loose_accuracy = tier1_correct[instruction_id] / tier1_total[instruction_id]
         logging.info(f"tier1 accuracy {instruction_id} {loose_accuracy}")
 
-    return {"prompt-level": prompt_correct/prompt_total, "instruction-level": instruction_correct/instruction_total}
+    return {"prompt-level": prompt_correct / prompt_total, "instruction-level": instruction_correct / instruction_total}
 
 
 def evaluate_accuracy(response_filename):

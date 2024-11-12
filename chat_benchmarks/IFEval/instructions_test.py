@@ -17,6 +17,7 @@
 
 from absl.testing import absltest
 from absl.testing import parameterized
+
 # from instructions_following_eval import instructions
 from .instructions import *
 
@@ -25,16 +26,16 @@ from .instructions import *
 class InstructionsTest(parameterized.TestCase):
 
     @parameterized.named_parameters(
-            [
-                    {
-                            'testcase_name': (
-                                    f'_response={response}_language={language}'
-                            ),
-                            'response': response,
-                            'language': language,
-                    }
-                    for response, language in [('The response is English', 'en')]
-            ]
+        [
+            {
+                 "testcase_name ": (
+                        f "_response={response}_language={language} "
+                ),
+                 "response ": response,
+                 "language ": language,
+            }
+            for response, language in [( "The response is English ",  "en ")]
+        ]
     )
     def test_response_language(self, response, language):
         """Test on single language response."""
@@ -45,96 +46,95 @@ class InstructionsTest(parameterized.TestCase):
         self.assertTrue(instruction.check_following(response))
 
     @parameterized.named_parameters(
-            [
-                    {
-                            'testcase_name': (
-                                    f'_response={response}_language={language}'
-                            ),
-                            'response': response,
-                            'language': language,
-                    }
-                    for response, language in [("Desayunamos en McDonald's hoy", 'es'),
-                                                                         ('Today we visit the Louvre', 'en'),]
-            ]
+        [
+            {
+                "testcase_name": (
+                    f"_response={response}_language={language}"
+                ),
+                "response": response,
+                "language": language,
+            }
+            for response, language in [("Desayunamos en McDonald's hoy", "es"), ("Today we visit the Louvre", "en"),]
+        ]
     )
     def test_response_multilanguage(self, response, language):
         """Test on responses that contain multi-language tokens."""
-        instruction_id = 'language:response_language'
+        instruction_id = "language:response_language"
         # instruction = instructions.ResponseLanguageChecker(instruction_id)
         instruction = ResponseLanguageChecker(instruction_id)
         instruction.build_description(language=language)
         self.assertTrue(instruction.check_following(response))
 
     @parameterized.named_parameters(
-            [
-                    {
-                            'testcase_name': (
-                                    f'_response={response}_relation={relation}'
-                                    f'_num_sentences={num_sentences}_expected={expected}'
-                            ),
-                            'response': response,
-                            'relation': relation,
-                            'num_sentences': num_sentences,
-                            'expected': expected,
-                    }
-                    # for response, relation, num_sentences, expected in [
-                    #        ('xx,x. xx,x! xx/x. x{x}x?', instructions._COMPARISON_RELATION[0],
-                    #         4, False),
-                    #        ('xxxx. xx,x! xxxx. x(x)x?', instructions._COMPARISON_RELATION[0],
-                    #         5, True),
-                    #        ('xxxx. xx,x! xx|x. x&x x?', instructions._COMPARISON_RELATION[1],
-                    #         4, True),
-                    #        ('xx-x. xx,x! xx}x. x,xx?', instructions._COMPARISON_RELATION[1],
-                    #         5, False),
-                    # ]
-                    for response, relation, num_sentences, expected in [
-                            ('xx,x. xx,x! xx/x. x{x}x?', _COMPARISON_RELATION[0],
-                             4, False),
-                            ('xxxx. xx,x! xxxx. x(x)x?', _COMPARISON_RELATION[0],
-                             5, True),
-                            ('xxxx. xx,x! xx|x. x&x x?', _COMPARISON_RELATION[1],
-                             4, True),
-                            ('xx-x. xx,x! xx}x. x,xx?', _COMPARISON_RELATION[1],
-                             5, False),
-                    ]
-
+        [
+            {
+                "testcase_name": (
+                        f"_response={response}_relation={relation}"
+                        f"_num_sentences={num_sentences}_expected={expected}"
+                ),
+                "response": response,
+                "relation": relation,
+                "num_sentences": num_sentences,
+                "expected": expected,
+            }
+            # for response, relation, num_sentences, expected in [
+            #        ('xx,x. xx,x! xx/x. x{x}x?', instructions._COMPARISON_RELATION[0],
+            #         4, False),
+            #        ('xxxx. xx,x! xxxx. x(x)x?', instructions._COMPARISON_RELATION[0],
+            #         5, True),
+            #        ('xxxx. xx,x! xx|x. x&x x?', instructions._COMPARISON_RELATION[1],
+            #         4, True),
+            #        ('xx-x. xx,x! xx}x. x,xx?', instructions._COMPARISON_RELATION[1],
+            #         5, False),
+            # ]
+            for response, relation, num_sentences, expected in [
+                ('xx,x. xx,x! xx/x. x{x}x?', _COMPARISON_RELATION[0], 4, False),
+                ('xxxx. xx,x! xxxx. x(x)x?', _COMPARISON_RELATION[0], 5, True),
+                ('xxxx. xx,x! xx|x. x&x x?', _COMPARISON_RELATION[1], 4, True),
+                ('xx-x. xx,x! xx}x. x,xx?', _COMPARISON_RELATION[1], 5, False),
             ]
+
+        ]
     )
     def test_number_sentences(self, response, relation, num_sentences, expected):
         """Test the number of sentences."""
-        instruction_id = 'length_constraints:number_sentences'
+        instruction_id = "length_constraints:number_sentences"
         # instruction = instructions.NumberOfSentences(instruction_id)
         instruction = NumberOfSentences(instruction_id)
-        instruction.build_description(relation=relation,
-                                                                    num_sentences=num_sentences)
+        instruction.build_description(relation=relation, num_sentences=num_sentences)
         actual = instruction.check_following(response)
         self.assertEqual(actual, expected)
 
     @parameterized.named_parameters(
-            [
-                    {
-                            'testcase_name': (
-                                    f'_templated={template}_num_placeholders={num_placeholders}'
-                                    f'_expected={expected}'
-                            ),
-                            'template': template,
-                            'num_placeholders': num_placeholders,
-                            'expected': expected,
-                    }
-                    for template, num_placeholders, expected in [
-                            (('Sure, here is a short template with 5 placeholders:\n' +
-                                '[Name]\n[Email]\n[Phone]\n[Address]\n[Website]\n' +
-                                'This template can be used for a variety of purposes, such ' +
-                                'ascreating a contact list, sending out surveys, or creating ' +
-                                'a sign-up form.'), 5, True),
-                            (('My [adjective] [noun] is [adjective] [noun]. I [verb] and ' +
-                                '[verb].'), 7, False),
-                            ]
+        [
+            {
+                "testcase_name": (
+                    f"_templated={template}_num_placeholders={num_placeholders}"
+                    f"_expected={expected}"
+                ),
+                "template": template,
+                "num_placeholders": num_placeholders,
+                "expected": expected,
+            }
+            for template, num_placeholders, expected in [
+                (
+                    (
+                        "Sure, here is a short template with 5 placeholders:\n"
+                        + "[Name]\n[Email]\n[Phone]\n[Address]\n[Website]\n"
+                        + "This template can be used for a variety of purposes, such "
+                        + "ascreating a contact list, sending out surveys, or creating "
+                        + "a sign-up form."
+                    ),
+                    5, 
+                    True
+                ),
+                (("My [adjective] [noun] is [adjective] [noun]. I [verb] and [verb]."), 7, False),
             ]
+        ]
     )
     def test_number_placeholders(self, template, num_placeholders, expected):
         """Test the number of placeholders."""
-        instruction_id = 'detectable_content:number_placeholders'
+        instruction_id = "detectable_content:number_placeholders"
         # instruction = instructions.PlaceholderChecker(instruction_id)
         instruction = PlaceholderChecker(instruction_id)
         instruction.build_description(num_placeholders=num_placeholders)
@@ -177,27 +177,28 @@ class InstructionsTest(parameterized.TestCase):
     """
 
     @parameterized.named_parameters(
-            [
-                    {
-                            'testcase_name': (
-                                    f'_templated={template}_num_bullets={num_bullets}'
-                                    f'_expected={expected}'
-                            ),
-                            'template': template,
-                            'num_bullets': num_bullets,
-                            'expected': expected,
-                    }
-                    for template, num_bullets, expected in [
-                            (BULLET_TEST_MESSAGE_1, 3, True),
-                            (BULLET_TEST_MESSAGE_2, 2, True),
-                            (BULLET_TEST_MESSAGE_3, 3, True),
-                            (BULLET_TEST_MESSAGE_4, 3, True),
-                            (BULLET_TEST_MESSAGE_5, 1, True)]
+        [
+            {
+                "testcase_name": (
+                    f"_templated={template}_num_bullets={num_bullets}"
+                    f"_expected={expected}"
+                ),
+                "template": template,
+                "num_bullets": num_bullets,
+                "expected": expected,
+            }
+            for template, num_bullets, expected in [
+                (BULLET_TEST_MESSAGE_1, 3, True),
+                (BULLET_TEST_MESSAGE_2, 2, True),
+                (BULLET_TEST_MESSAGE_3, 3, True),
+                (BULLET_TEST_MESSAGE_4, 3, True),
+                (BULLET_TEST_MESSAGE_5, 1, True)
             ]
+        ]
     )
     def test_number_bullet_lists(self, template, num_bullets, expected):
         """Test the number of bullets."""
-        instruction_id = 'detectable_format:exact_number_bullet_points'
+        instruction_id = "detectable_format:exact_number_bullet_points"
         # instruction = instructions.BulletListChecker(instruction_id)
         instruction = BulletListChecker(instruction_id)
         instruction.build_description(num_bullets=num_bullets)
@@ -218,17 +219,14 @@ class InstructionsTest(parameterized.TestCase):
         instruction = ConstrainedResponseChecker(instruction_id)
         instruction.build_description()
 
-        with self.subTest('test with CONSTRAINED_RESPONSE_TEST_RESPONSE_1'):
-            self.assertTrue(instruction.check_following(
-                    self.CONSTRAINED_RESPONSE_TEST_RESPONSE_1))
+        with self.subTest("test with CONSTRAINED_RESPONSE_TEST_RESPONSE_1"):
+            self.assertTrue(instruction.check_following(self.CONSTRAINED_RESPONSE_TEST_RESPONSE_1))
 
-        with self.subTest('test with CONSTRAINED_RESPONSE_TEST_RESPONSE_2'):
-            self.assertTrue(instruction.check_following(
-                    self.CONSTRAINED_RESPONSE_TEST_RESPONSE_2))
+        with self.subTest("test with CONSTRAINED_RESPONSE_TEST_RESPONSE_2"):
+            self.assertTrue(instruction.check_following(self.CONSTRAINED_RESPONSE_TEST_RESPONSE_2))
 
-        with self.subTest('test with CONSTRAINED_RESPONSE_TEST_RESPONSE_3'):
-            self.assertTrue(instruction.check_following(
-                    self.CONSTRAINED_RESPONSE_TEST_RESPONSE_3))
+        with self.subTest("test with CONSTRAINED_RESPONSE_TEST_RESPONSE_3"):
+            self.assertTrue(instruction.check_following(self.CONSTRAINED_RESPONSE_TEST_RESPONSE_3))
 
     HIGHLIGHTED_TEST_MESSAGE_1 = """
     To highlight text with Markdown, you can use the * character before and after
@@ -250,22 +248,23 @@ class InstructionsTest(parameterized.TestCase):
     """
 
     @parameterized.named_parameters(
-            [
-                    {
-                            'testcase_name': (
-                                    f'_response={response}'
-                                    f'_min_num_highlights={min_num_highlights}'
-                                    f'_expected={expected}'
-                            ),
-                            'response': response,
-                            'min_num_highlights': min_num_highlights,
-                            'expected': expected,
-                    }
-                    for response, min_num_highlights, expected in [
-                            (HIGHLIGHTED_TEST_MESSAGE_1, 2, True),
-                            (HIGHLIGHTED_TEST_MESSAGE_2, 2, False),
-                            (HIGHLIGHTED_TEST_MESSAGE_3, 4, True)]
+        [
+            {
+                "testcase_name": (
+                    f"_response={response}"
+                    f"_min_num_highlights={min_num_highlights}"
+                    f"_expected={expected}"
+                ),
+                "response": response,
+                "min_num_highlights": min_num_highlights,
+                "expected": expected,
+            }
+            for response, min_num_highlights, expected in [
+                (HIGHLIGHTED_TEST_MESSAGE_1, 2, True),
+                (HIGHLIGHTED_TEST_MESSAGE_2, 2, False),
+                (HIGHLIGHTED_TEST_MESSAGE_3, 4, True)
             ]
+        ]
     )
     def test_number_highlights(self, response, min_num_highlights, expected):
         """Test the minimum number of highlighted sections."""
@@ -291,24 +290,20 @@ class InstructionsTest(parameterized.TestCase):
 
     def test_section_checker(self):
         """Test the number of sections."""
-        instruction_id = 'detectable_format:multiple_sections'
+        instruction_id = "detectable_format:multiple_sections"
         # instruction = instructions.SectionChecker(instruction_id)
         instruction = SectionChecker(instruction_id)
-        section_keyword = 'Section'
+        section_keyword = "Section"
         min_num_sections = 3
-        instruction.build_description(section_spliter=section_keyword,
-                                                                    num_sections=min_num_sections)
+        instruction.build_description(section_spliter=section_keyword, num_sections=min_num_sections)
         with self.subTest(f'test {section_keyword} and {min_num_sections}'):
-            self.assertFalse(
-                    instruction.check_following(self.SECTION_TEST_MESSAGE_1))
+            self.assertFalse(instruction.check_following(self.SECTION_TEST_MESSAGE_1))
 
-        section_keyword = 'SECTION'
+        section_keyword = "SECTION"
         min_num_sections = 2
-        instruction.build_description(section_spliter=section_keyword,
-                                                                    num_sections=min_num_sections)
+        instruction.build_description(section_spliter=section_keyword, num_sections=min_num_sections)
         with self.subTest(f'test {section_keyword} and {min_num_sections}'):
-            self.assertTrue(
-                    instruction.check_following(self.SECTION_TEST_MESSAGE_2))
+            self.assertTrue(instruction.check_following(self.SECTION_TEST_MESSAGE_2))
 
     PARAGRAPH_TEST_MESSAGE_1 = """
     paragraph 1
@@ -342,36 +337,28 @@ class InstructionsTest(parameterized.TestCase):
 
     def test_paragraph_checker(self):
         """Test the number of sections."""
-        instruction_id = 'length_constraint:number_paragraphs'
+        instruction_id = "length_constraint:number_paragraphs"
         # instruction = instructions.ParagraphChecker(instruction_id)
         instruction = ParagraphChecker(instruction_id)
         num_paragraphs = 3
         instruction.build_description(num_paragraphs=num_paragraphs)
-        with self.subTest(f'test {self.PARAGRAPH_TEST_MESSAGE_1} and '
-                                            f'{num_paragraphs} paragraphs'):
-            self.assertTrue(instruction.check_following(
-                    self.PARAGRAPH_TEST_MESSAGE_1))
+        with self.subTest(f"test {self.PARAGRAPH_TEST_MESSAGE_1} and " f"{num_paragraphs} paragraphs"):
+            self.assertTrue(instruction.check_following(self.PARAGRAPH_TEST_MESSAGE_1))
 
         num_paragraphs = 3
         instruction.build_description(num_paragraphs=num_paragraphs)
-        with self.subTest(f'test {self.PARAGRAPH_TEST_MESSAGE_2} and '
-                                            f'{num_paragraphs} paragraphs'):
-            self.assertTrue(instruction.check_following(
-                    self.PARAGRAPH_TEST_MESSAGE_2))
+        with self.subTest(f"test {self.PARAGRAPH_TEST_MESSAGE_2} and " f"{num_paragraphs} paragraphs"):
+            self.assertTrue(instruction.check_following(self.PARAGRAPH_TEST_MESSAGE_2))
 
         num_paragraphs = 3
         instruction.build_description(num_paragraphs=num_paragraphs)
-        with self.subTest(f'test {self.PARAGRAPH_TEST_MESSAGE_3} and '
-                                            f'{num_paragraphs} paragraphs'):
-            self.assertTrue(instruction.check_following(
-                    self.PARAGRAPH_TEST_MESSAGE_3))
+        with self.subTest(f"test {self.PARAGRAPH_TEST_MESSAGE_3} and " f"{num_paragraphs} paragraphs"):
+            self.assertTrue(instruction.check_following(self.PARAGRAPH_TEST_MESSAGE_3))
 
         num_paragraphs = 2
         instruction.build_description(num_paragraphs=num_paragraphs)
-        with self.subTest(f'test {self.PARAGRAPH_TEST_MESSAGE_4} and '
-                                            f'{num_paragraphs} paragraphs'):
-            self.assertFalse(instruction.check_following(
-                    self.PARAGRAPH_TEST_MESSAGE_4))
+        with self.subTest(f"test {self.PARAGRAPH_TEST_MESSAGE_4} and " f"{num_paragraphs} paragraphs"):
+            self.assertFalse(instruction.check_following(self.PARAGRAPH_TEST_MESSAGE_4))
 
     POSTSCRIPT_TEST_MESSAGE_1 = """
     I will do my best to follow your instructions and always start my responses
@@ -411,46 +398,40 @@ class InstructionsTest(parameterized.TestCase):
 
     def test_postscript_checker(self):
         """Test the postscript checker."""
-        instruction_id = 'detectable_content:postscript'
+        instruction_id = "detectable_content:postscript"
         # instruction = instructions.PostscriptChecker(instruction_id)
         instruction = PostscriptChecker(instruction_id)
         # postscript_start_keyword = instructions._POSTSCRIPT_MARKER[0]
         postscript_start_keyword = _POSTSCRIPT_MARKER[0]
         instruction.build_description(postscript_marker=postscript_start_keyword)
-        with self.subTest(f'test {postscript_start_keyword}'):
-            self.assertTrue(
-                    instruction.check_following(self.POSTSCRIPT_TEST_MESSAGE_1))
+        with self.subTest(f"test {postscript_start_keyword}"):
+            self.assertTrue(instruction.check_following(self.POSTSCRIPT_TEST_MESSAGE_1))
 
-        postscript_start_keyword = 'PS:'
+        postscript_start_keyword = "PS:"
         instruction.build_description(postscript_marker=postscript_start_keyword)
-        with self.subTest(f'test {postscript_start_keyword}'):
-            self.assertFalse(
-                    instruction.check_following(self.POSTSCRIPT_TEST_MESSAGE_1))
+        with self.subTest(f"test {postscript_start_keyword}"):
+            self.assertFalse(instruction.check_following(self.POSTSCRIPT_TEST_MESSAGE_1))
 
         # postscript_start_keyword = instructions._POSTSCRIPT_MARKER[1]
         postscript_start_keyword = _POSTSCRIPT_MARKER[1]
         instruction.build_description(postscript_marker=postscript_start_keyword)
-        with self.subTest(f'test {postscript_start_keyword}'):
-            self.assertTrue(
-                    instruction.check_following(self.POSTSCRIPT_TEST_MESSAGE_2))
+        with self.subTest(f"test {postscript_start_keyword}"):
+            self.assertTrue(instruction.check_following(self.POSTSCRIPT_TEST_MESSAGE_2))
 
-        postscript_start_keyword = 'P.S.'
+        postscript_start_keyword = "P.S."
         instruction.build_description(postscript_marker=postscript_start_keyword)
-        with self.subTest(f'test {postscript_start_keyword}'):
-            self.assertTrue(
-                    instruction.check_following(self.POSTSCRIPT_TEST_MESSAGE_3))
+        with self.subTest(f"test {postscript_start_keyword}"):
+            self.assertTrue(instruction.check_following(self.POSTSCRIPT_TEST_MESSAGE_3))
 
-        postscript_start_keyword = 'P.P.S'
+        postscript_start_keyword = "P.P.S"
         instruction.build_description(postscript_marker=postscript_start_keyword)
-        with self.subTest(f'test {postscript_start_keyword}'):
-            self.assertTrue(
-                    instruction.check_following(self.POSTSCRIPT_TEST_MESSAGE_4))
+        with self.subTest(f"test {postscript_start_keyword}"):
+            self.assertTrue(instruction.check_following(self.POSTSCRIPT_TEST_MESSAGE_4))
 
-        postscript_start_keyword = 'P.S.'
+        postscript_start_keyword = "P.S."
         instruction.build_description(postscript_marker=postscript_start_keyword)
-        with self.subTest(f'test {postscript_start_keyword}'):
-            self.assertTrue(
-                    instruction.check_following(self.POSTSCRIPT_TEST_MESSAGE_5))
+        with self.subTest(f"test {postscript_start_keyword}"):
+            self.assertTrue(instruction.check_following(self.POSTSCRIPT_TEST_MESSAGE_5))
 
     CONSTRAINED_START_TEST_MESSAGE_1 = """
     My response is: ASIC is a specialized chip for specific tasks in electronic
@@ -468,23 +449,20 @@ class InstructionsTest(parameterized.TestCase):
 
     def test_constrained_start_checker(self):
         """Test the constrained start checker."""
-        instruction_id = 'multi-turn:constrained_start'
+        instruction_id = "multi-turn:constrained_start"
         # instruction = instructions.ConstrainedStartChecker(instruction_id)
         instruction = ConstrainedStartChecker(instruction_id)
-        start_keyword = 'My response is:'
+        start_keyword = "My response is:"
         instruction.build_description(starter=start_keyword)
-        with self.subTest(f'test {start_keyword}'):
-            self.assertTrue(
-                    instruction.check_following(self.CONSTRAINED_START_TEST_MESSAGE_1))
+        with self.subTest(f"test {start_keyword}"):
+            self.assertTrue(instruction.check_following(self.CONSTRAINED_START_TEST_MESSAGE_1))
 
-        with self.subTest(f'test {start_keyword} with spaces in the beginning'):
-            self.assertTrue(instruction.check_following(
-                    self.CONSTRAINED_START_TEST_MESSAGE_2))
+        with self.subTest(f"test {start_keyword} with spaces in the beginning"):
+            self.assertTrue(instruction.check_following(self.CONSTRAINED_START_TEST_MESSAGE_2))
 
-        start_keyword = 'my response is'
-        with self.subTest(f'test {start_keyword} embedded in the middle'):
-            self.assertFalse(
-                    instruction.check_following(self.CONSTRAINED_START_TEST_MESSAGE_3))
+        start_keyword = "my response is"
+        with self.subTest(f"test {start_keyword} embedded in the middle"):
+            self.assertFalse(instruction.check_following(self.CONSTRAINED_START_TEST_MESSAGE_3))
 
     REPHRASE_TEST_REPHRASED_MESSAGE_1 = """
     I am *content*."""
@@ -504,35 +482,26 @@ class InstructionsTest(parameterized.TestCase):
 
     def test_rephrase_checker(self):
         """Test the rephrase checker."""
-        instruction_id = 'detectable_format:rephrasing'
+        instruction_id = "detectable_format:rephrasing"
         # instruction = instructions.RephraseChecker(instruction_id)
         instruction = RephraseChecker(instruction_id)
-        instruction.build_description(
-                original_message=self.REPHRASE_TEST_ORIGINAL_MESSAGE_1)
-        with self.subTest(f'test {self.REPHRASE_TEST_REPHRASED_MESSAGE_1}'):
-            self.assertTrue(
-                    instruction.check_following(self.REPHRASE_TEST_REPHRASED_MESSAGE_1))
+        instruction.build_description(riginal_message=self.REPHRASE_TEST_ORIGINAL_MESSAGE_1)
+        with self.subTest(f"test {self.REPHRASE_TEST_REPHRASED_MESSAGE_1}"):
+            self.assertTrue(instruction.check_following(self.REPHRASE_TEST_REPHRASED_MESSAGE_1))
 
-        instruction.build_description(
-                original_message=self.REPHRASE_TEST_ORIGINAL_MESSAGE_1)
-        with self.subTest(
-                f'test {self.REPHRASE_TEST_REPHRASED_MESSAGE_1_NOCHANGE}'):
+        instruction.build_description(original_message=self.REPHRASE_TEST_ORIGINAL_MESSAGE_1)
+        with self.subTest(f"test {self.REPHRASE_TEST_REPHRASED_MESSAGE_1_NOCHANGE}"):
             with self.assertRaises(ValueError):
-                instruction.check_following(
-                        self.REPHRASE_TEST_REPHRASED_MESSAGE_1_NOCHANGE)
+                instruction.check_following(self.REPHRASE_TEST_REPHRASED_MESSAGE_1_NOCHANGE)
 
-        instruction.build_description(
-                original_message=self.REPHRASE_TEST_ORIGINAL_MESSAGE_1)
-        with self.subTest(f'test {self.REPHRASE_TEST_REPHRASED_MESSAGE_1_FORMAT}'):
+        instruction.build_description(original_message=self.REPHRASE_TEST_ORIGINAL_MESSAGE_1)
+        with self.subTest(f"test {self.REPHRASE_TEST_REPHRASED_MESSAGE_1_FORMAT}"):
             with self.assertRaises(ValueError):
-                instruction.check_following(
-                        self.REPHRASE_TEST_REPHRASED_MESSAGE_1_FORMAT)
+                instruction.check_following(self.REPHRASE_TEST_REPHRASED_MESSAGE_1_FORMAT)
 
-        instruction.build_description(
-                original_message=self.REPHRASE_TEST_ORIGINAL_MESSAGE_2)
-        with self.subTest(f'test {self.REPHRASE_TEST_REPHRASED_MESSAGE_2}'):
-            self.assertFalse(
-                    instruction.check_following(self.REPHRASE_TEST_REPHRASED_MESSAGE_2))
+        instruction.build_description(original_message=self.REPHRASE_TEST_ORIGINAL_MESSAGE_2)
+        with self.subTest(f"test {self.REPHRASE_TEST_REPHRASED_MESSAGE_2}"):
+            self.assertFalse(instruction.check_following(self.REPHRASE_TEST_REPHRASED_MESSAGE_2))
 
     TEST_INCLUDE_KEYWORD_MESSAGE_1 = """
     Paris is a city of beauty and romance. The romantic river Seine winds its way
@@ -548,72 +517,64 @@ class InstructionsTest(parameterized.TestCase):
     river cruises, its delicious food, and its stylish people.
     """
 
-    KEYWORDS = ('romantic', 'river', 'Mona Lisa')
+    KEYWORDS = ("romantic", "river", "Mona Lisa")
 
     def test_keyword_checker(self):
         """Test the inclusion of keywords."""
-        instruction_id = 'keywords:include_keywords'
+        instruction_id = "keywords:include_keywords"
         # instruction = instructions.KeywordChecker(instruction_id)
         instruction = KeywordChecker(instruction_id)
 
         instruction.build_description(keywords=self.KEYWORDS)
-        with self.subTest(f'test {self.TEST_INCLUDE_KEYWORD_MESSAGE_1}'):
-            self.assertTrue(
-                    instruction.check_following(self.TEST_INCLUDE_KEYWORD_MESSAGE_1))
+        with self.subTest(f"test {self.TEST_INCLUDE_KEYWORD_MESSAGE_1}"):
+            self.assertTrue(instruction.check_following(self.TEST_INCLUDE_KEYWORD_MESSAGE_1))
 
         instruction.build_description(keywords=self.KEYWORDS)
-        with self.subTest(f'test {self.TEST_INCLUDE_KEYWORD_MESSAGE_2}'):
-            self.assertFalse(
-                    instruction.check_following(self.TEST_INCLUDE_KEYWORD_MESSAGE_2))
+        with self.subTest(f"test {self.TEST_INCLUDE_KEYWORD_MESSAGE_2}"):
+            self.assertFalse(nstruction.check_following(self.TEST_INCLUDE_KEYWORD_MESSAGE_2))
 
     TEST_KEYWORD_FREQUNECY_MESSAGE_1 = """
     keyword, Keyword, KEYWORD
     """
-    TEST_KEYWORD_FREQUENCY_KEYWORD_1 = '    keyword '
+    TEST_KEYWORD_FREQUENCY_KEYWORD_1 = "    keyword "
 
     TEST_KEYWORD_FREQUNECY_MESSAGE_2 = """
         *keyword
         *Keyword
         *KEYWORD
     """
-    TEST_KEYWORD_FREQUENCY_KEYWORD_2 = 'KEYWORD'
+    TEST_KEYWORD_FREQUENCY_KEYWORD_2 = "KEYWORD"
 
     def test_keyword_frequency_checker(self):
         """Test the frequency of keywords."""
 
-        instruction_id = 'keywords:keyword_frequency'
+        instruction_id = "keywords:keyword_frequency"
         # instruction = instructions.KeywordFrequencyChecker(instruction_id)
         instruction = KeywordFrequencyChecker(instruction_id)
 
         frequency = 4
-        instruction.build_description(keyword=self.TEST_KEYWORD_FREQUENCY_KEYWORD_1,
-                                                                    frequency=frequency,
-                                                                    relation=_COMPARISON_RELATION[0])
-                                                                    # relation=instructions._COMPARISON_RELATION[0])
-        with self.subTest(
-                f'test {self.TEST_KEYWORD_FREQUENCY_KEYWORD_1} {frequency}'):
-            self.assertTrue(
-                    instruction.check_following(self.TEST_KEYWORD_FREQUNECY_MESSAGE_1))
+        instruction.build_description(
+            keyword=self.TEST_KEYWORD_FREQUENCY_KEYWORD_1, frequency=frequency, relation=_COMPARISON_RELATION[0]
+        )
+        # relation=instructions._COMPARISON_RELATION[0])
+        with self.subTest(f"test {self.TEST_KEYWORD_FREQUENCY_KEYWORD_1} {frequency}"):
+            self.assertTrue(instruction.check_following(self.TEST_KEYWORD_FREQUNECY_MESSAGE_1))
 
         frequency = 3
-        instruction.build_description(keyword=self.TEST_KEYWORD_FREQUENCY_KEYWORD_1,
-                                                                    frequency=frequency,
-                                                                    relation=_COMPARISON_RELATION[1])
-                                                                    # relation=instructions._COMPARISON_RELATION[1])
-        with self.subTest(
-                f'test {self.TEST_KEYWORD_FREQUENCY_KEYWORD_1} {frequency}'):
-            self.assertTrue(
-                    instruction.check_following(self.TEST_KEYWORD_FREQUNECY_MESSAGE_1))
+        instruction.build_description(
+            keyword=self.TEST_KEYWORD_FREQUENCY_KEYWORD_1, frequency=frequency, relation=_COMPARISON_RELATION[1]
+        )
+        # relation=instructions._COMPARISON_RELATION[1])
+        with self.subTest(f"test {self.TEST_KEYWORD_FREQUENCY_KEYWORD_1} {frequency}"):
+            self.assertTrue(instruction.check_following(self.TEST_KEYWORD_FREQUNECY_MESSAGE_1))
 
         frequency = 4
-        instruction.build_description(keyword=self.TEST_KEYWORD_FREQUENCY_KEYWORD_2,
-                                                                    frequency=frequency,
-                                                                    relation=_COMPARISON_RELATION[1])
-                                                                    # relation=instructions._COMPARISON_RELATION[1])
-        with self.subTest(
-                f'test {self.TEST_KEYWORD_FREQUENCY_KEYWORD_2} {frequency}'):
-            self.assertFalse(
-                    instruction.check_following(self.TEST_KEYWORD_FREQUNECY_MESSAGE_2))
+        instruction.build_description(
+            keyword=self.TEST_KEYWORD_FREQUENCY_KEYWORD_2, frequency=frequency, relation=_COMPARISON_RELATION[1]
+        )
+        # relation=instructions._COMPARISON_RELATION[1])
+        with self.subTest(f"test {self.TEST_KEYWORD_FREQUENCY_KEYWORD_2} {frequency}"):
+            self.assertFalse(instruction.check_following(self.TEST_KEYWORD_FREQUNECY_MESSAGE_2))
 
     TEST_NUM_WORDS_MESSAGE_1 = """
     d3sCRi7 lArge lAnguagE M0del w1tH 20 w0RdS."""
@@ -624,36 +585,27 @@ class InstructionsTest(parameterized.TestCase):
 
     def test_num_words_checker(self):
         """Test the checker on the number of words."""
-        instruction_id = 'length_constraint:number_words'
+        instruction_id = "length_constraint:number_words"
         # instruction = instructions.NumberOfWords(instruction_id)
         instruction = NumberOfWords(instruction_id)
 
         word_counts = 8
-        instruction.build_description(num_words=word_counts,
-                                                                    relation=_COMPARISON_RELATION[0])
-                                                                    # relation=instructions._COMPARISON_RELATION[0])
-        with self.subTest(
-                f'test {self.TEST_NUM_WORDS_MESSAGE_1} {word_counts}'):
-            self.assertTrue(
-                    instruction.check_following(self.TEST_NUM_WORDS_MESSAGE_1))
+        instruction.build_description(num_words=word_counts,relation=_COMPARISON_RELATION[0])
+        # relation=instructions._COMPARISON_RELATION[0])
+        with self.subTest(f"test {self.TEST_NUM_WORDS_MESSAGE_1} {word_counts}"):
+            self.assertTrue(instruction.check_following(self.TEST_NUM_WORDS_MESSAGE_1))
 
         word_counts = 16
-        instruction.build_description(num_words=word_counts,
-                                                                    relation=_COMPARISON_RELATION[0])
-                                                                    # relation=instructions._COMPARISON_RELATION[0])
-        with self.subTest(
-                f'test {self.TEST_NUM_WORDS_MESSAGE_2} less than {word_counts}'):
-            self.assertFalse(
-                    instruction.check_following(self.TEST_NUM_WORDS_MESSAGE_2))
+        instruction.build_description(num_words=word_counts, relation=_COMPARISON_RELATION[0])
+        # relation=instructions._COMPARISON_RELATION[0])
+        with self.subTest(f"test {self.TEST_NUM_WORDS_MESSAGE_2} less than {word_counts}"):
+            self.assertFalse(instruction.check_following(self.TEST_NUM_WORDS_MESSAGE_2))
 
         word_counts = 16
-        instruction.build_description(num_words=word_counts,
-                                                                    relation=_COMPARISON_RELATION[1])
-                                                                    # relation=instructions._COMPARISON_RELATION[1])
-        with self.subTest(
-                f'test {self.TEST_NUM_WORDS_MESSAGE_2} at least {word_counts}'):
-            self.assertTrue(
-                    instruction.check_following(self.TEST_NUM_WORDS_MESSAGE_2))
+        instruction.build_description(num_words=word_counts, relation=_COMPARISON_RELATION[1])
+        # relation=instructions._COMPARISON_RELATION[1])
+        with self.subTest(f"test {self.TEST_NUM_WORDS_MESSAGE_2} at least {word_counts}"):
+            self.assertTrue(instruction.check_following(self.TEST_NUM_WORDS_MESSAGE_2))
 
     PARAGRAPH_FIRST_WORD_TEST_1 = """
     paragraph 1
@@ -709,48 +661,52 @@ class InstructionsTest(parameterized.TestCase):
 
     def test_paragraph_first_word(self):
         """Test number of paragraphs and first word of nth paragraph."""
-        instruction_id = 'length_constraints:nth_paragraph_first_word'
+        instruction_id = "length_constraints:nth_paragraph_first_word"
         # instruction = instructions.ParagraphFirstWordCheck(instruction_id)
         instruction = ParagraphFirstWordCheck(instruction_id)
         tests = [
-                self.PARAGRAPH_FIRST_WORD_TEST_1,
-                self.PARAGRAPH_FIRST_WORD_TEST_2,
-                self.PARAGRAPH_FIRST_WORD_TEST_3,
-                self.PARAGRAPH_FIRST_WORD_TEST_4,
-                self.PARAGRAPH_FIRST_WORD_TEST_5,
-                self.PARAGRAPH_FIRST_WORD_TEST_6,
+            self.PARAGRAPH_FIRST_WORD_TEST_1,
+            self.PARAGRAPH_FIRST_WORD_TEST_2,
+            self.PARAGRAPH_FIRST_WORD_TEST_3,
+            self.PARAGRAPH_FIRST_WORD_TEST_4,
+            self.PARAGRAPH_FIRST_WORD_TEST_5,
+            self.PARAGRAPH_FIRST_WORD_TEST_6,
         ]
 
         for test in tests:
-            if (test == self.PARAGRAPH_FIRST_WORD_TEST_1
-                    or test == self.PARAGRAPH_FIRST_WORD_TEST_2
-                    or test == self.PARAGRAPH_FIRST_WORD_TEST_3):
+            if (
+                test == self.PARAGRAPH_FIRST_WORD_TEST_1
+                or test == self.PARAGRAPH_FIRST_WORD_TEST_2
+                or test == self.PARAGRAPH_FIRST_WORD_TEST_3
+            ):
                 num_paragraphs = 3
                 nth_paragraph = 2
-                first_word = 'I'
+                first_word = "I"
             elif test == self.PARAGRAPH_FIRST_WORD_TEST_4:
                 num_paragraphs = 5
                 nth_paragraph = 5
-                first_word = 'haha'
+                first_word = "haha"
             else:
                 num_paragraphs = 5
                 nth_paragraph = 3
-                first_word = 'Really'
+                first_word = "Really"
 
             instruction.build_description(
-                    num_paragraphs=num_paragraphs,
-                    nth_paragraph=nth_paragraph,
-                    first_word=first_word,
+                num_paragraphs=num_paragraphs,
+                nth_paragraph=nth_paragraph,
+                first_word=first_word,
             )
             with self.subTest(
-                    f'test {test} \n. Test for '
-                    f'{num_paragraphs} paragraphs and '
-                    f'for paragraph {nth_paragraph} '
-                    f'{first_word} is first word'
+                f"test {test} \n. Test for "
+                f"{num_paragraphs} paragraphs and "
+                f"for paragraph {nth_paragraph} "
+                f"{first_word} is first word"
             ):
-                if (test == self.PARAGRAPH_FIRST_WORD_TEST_1
-                        or test == self.PARAGRAPH_FIRST_WORD_TEST_4
-                        or test == self.PARAGRAPH_FIRST_WORD_TEST_5):
+                if (
+                    test == self.PARAGRAPH_FIRST_WORD_TEST_1
+                    or test == self.PARAGRAPH_FIRST_WORD_TEST_4
+                    or test == self.PARAGRAPH_FIRST_WORD_TEST_5
+                ):
                     self.assertTrue(instruction.check_following(test))
                 else:
                     self.assertFalse(instruction.check_following(test))
@@ -773,30 +729,28 @@ I know that candy isn't the healthiest thing to eat, but I don't care.
 I love it too much. I'll just have to make sure to eat it in moderation.
     """
 
-    key_sentences = {'Puppies love to run, jump, and play fetch.',
-                                     'I like to eat candy.', 'Puppies are fun.'}
+    key_sentences = {"Puppies love to run, jump, and play fetch.",
+                                     "I like to eat candy.", "Puppies are fun."}
 
     def test_key_sentences(self):
         """Test the inclusion of key sentences."""
-        instruction_id = 'keywords:key_sentences'
+        instruction_id = "keywords:key_sentences"
         # instruction = instructions.KeySentenceChecker(instruction_id)
         instruction = KeySentenceChecker(instruction_id)
 
         num_sentences = 2
-        instruction.build_description(
-                key_sentences=self.key_sentences, num_sentences=num_sentences)
+        instruction.build_description(key_sentences=self.key_sentences, num_sentences=num_sentences)
 
-        with self.subTest(f'test {self.TEST_KEY_SENTENCES_1}'):
+        with self.subTest(f"test {self.TEST_KEY_SENTENCES_1}"):
             self.assertTrue(instruction.check_following(self.TEST_KEY_SENTENCES_1))
 
         num_sentences = 1
-        instruction.build_description(
-                key_sentences=self.key_sentences, num_sentences=num_sentences)
+        instruction.build_description(key_sentences=self.key_sentences, num_sentences=num_sentences)
 
-        with self.subTest(f'test {self.TEST_KEY_SENTENCES_2}'):
+        with self.subTest(f"test {self.TEST_KEY_SENTENCES_2}"):
             self.assertTrue(instruction.check_following(self.TEST_KEY_SENTENCES_2))
 
-        with self.subTest(f'test {self.TEST_KEY_SENTENCES_3}'):
+        with self.subTest(f"test {self.TEST_KEY_SENTENCES_3}"):
             self.assertFalse(instruction.check_following(self.TEST_KEY_SENTENCES_3))
 
     TEST_FORBIDDEN_WORDS_MESSAGE_1 = """
@@ -825,53 +779,40 @@ I love it too much. I'll just have to make sure to eat it in moderation.
     have been shown to be very effective at these tasks, and are being used by
     a variety of companies and organizations like Google.
     """
-    FORBIDDEN_WORDS_1 = ('HOUSE', 'POWER', 'BECOME')
-    FORBIDDEN_WORDS_2 = ('GOOGLE', 'TEXT')
-    FORBIDDEN_WORDS_3 = ('GENE', 'TRANSFORM')
+    FORBIDDEN_WORDS_1 = ("HOUSE", "POWER", "BECOME")
+    FORBIDDEN_WORDS_2 = ("GOOGLE", "TEXT")
+    FORBIDDEN_WORDS_3 = ("GENE", "TRANSFORM")
 
     def test_forbidden_words(self):
         """Test the exclusion of key words."""
-        instruction_id = 'keywords:forbidden_words'
+        instruction_id = "keywords:forbidden_words"
         # instruction = instructions.ForbiddenWords(instruction_id)
         instruction = ForbiddenWords(instruction_id)
 
         instruction.build_description(forbidden_words=self.FORBIDDEN_WORDS_1)
-        with self.subTest(f'test {self.TEST_FORBIDDEN_WORDS_MESSAGE_1}\n ' +
-                                            f'with forbidden words: {self.FORBIDDEN_WORDS_1}. '):
-            self.assertFalse(
-                    instruction.check_following(self.TEST_FORBIDDEN_WORDS_MESSAGE_1))
+        with self.subTest(f"test {self.TEST_FORBIDDEN_WORDS_MESSAGE_1}\n " + f"with forbidden words: {self.FORBIDDEN_WORDS_1}. "):
+            self.assertFalse(instruction.check_following(self.TEST_FORBIDDEN_WORDS_MESSAGE_1))
 
-        with self.subTest(f'test {self.TEST_FORBIDDEN_WORDS_MESSAGE_2}\n ' +
-                                            f'with forbidden words: {self.FORBIDDEN_WORDS_1}. '):
-            self.assertTrue(
-                    instruction.check_following(self.TEST_FORBIDDEN_WORDS_MESSAGE_2))
+        with self.subTest(f"test {self.TEST_FORBIDDEN_WORDS_MESSAGE_2}\n " + f"with forbidden words: {self.FORBIDDEN_WORDS_1}. "):
+            self.assertTrue(instruction.check_following(self.TEST_FORBIDDEN_WORDS_MESSAGE_2))
 
-        with self.subTest(f'test {self.TEST_FORBIDDEN_WORDS_MESSAGE_3}\n ' +
-                                            f'with forbidden words: {self.FORBIDDEN_WORDS_1}. '):
+        with self.subTest(f"test {self.TEST_FORBIDDEN_WORDS_MESSAGE_3}\n " + f"with forbidden words: {self.FORBIDDEN_WORDS_1}. "):
             self.assertTrue(
                     instruction.check_following(self.TEST_FORBIDDEN_WORDS_MESSAGE_3))
 
         instruction.build_description(forbidden_words=self.FORBIDDEN_WORDS_2)
-        with self.subTest(f'test {self.TEST_FORBIDDEN_WORDS_MESSAGE_1}\n ' +
-                                            f'with forbidden words: {self.FORBIDDEN_WORDS_2}. '):
-            self.assertTrue(
-                    instruction.check_following(self.TEST_FORBIDDEN_WORDS_MESSAGE_1))
+        with self.subTest(f"test {self.TEST_FORBIDDEN_WORDS_MESSAGE_1}\n " + f"with forbidden words: {self.FORBIDDEN_WORDS_2}. "):
+            self.assertTrue(instruction.check_following(self.TEST_FORBIDDEN_WORDS_MESSAGE_1))
 
-        with self.subTest(f'test {self.TEST_FORBIDDEN_WORDS_MESSAGE_2}\n ' +
-                                            f'with forbidden words: {self.FORBIDDEN_WORDS_2}. '):
-            self.assertTrue(
-                    instruction.check_following(self.TEST_FORBIDDEN_WORDS_MESSAGE_2))
+        with self.subTest(f"test {self.TEST_FORBIDDEN_WORDS_MESSAGE_2}\n " + f"with forbidden words: {self.FORBIDDEN_WORDS_2}. "):
+            self.assertTrue(instruction.check_following(self.TEST_FORBIDDEN_WORDS_MESSAGE_2))
 
-        with self.subTest(f'test {self.TEST_FORBIDDEN_WORDS_MESSAGE_3}\n ' +
-                                            f'with forbidden words: {self.FORBIDDEN_WORDS_2}. '):
-            self.assertFalse(
-                    instruction.check_following(self.TEST_FORBIDDEN_WORDS_MESSAGE_3))
+        with self.subTest(f"test {self.TEST_FORBIDDEN_WORDS_MESSAGE_3}\n " + f"with forbidden words: {self.FORBIDDEN_WORDS_2}. "):
+            self.assertFalse(instruction.check_following(self.TEST_FORBIDDEN_WORDS_MESSAGE_3))
 
         instruction.build_description(forbidden_words=self.FORBIDDEN_WORDS_3)
-        with self.subTest(f'test {self.TEST_FORBIDDEN_WORDS_MESSAGE_3}\n ' +
-                                            f'with forbidden words: {self.FORBIDDEN_WORDS_2}. '):
-            self.assertTrue(
-                    instruction.check_following(self.TEST_FORBIDDEN_WORDS_MESSAGE_3))
+        with self.subTest(f"test {self.TEST_FORBIDDEN_WORDS_MESSAGE_3}\n " + f"with forbidden words: {self.FORBIDDEN_WORDS_2}. "):
+            self.assertTrue(instruction.check_following(self.TEST_FORBIDDEN_WORDS_MESSAGE_3))
 
     TEST_ORIGINAL_PARAGRAPH_1 = """
     The sun is shining brightly today, and the birds are singing in the trees.
@@ -911,53 +852,38 @@ I love it too much. I'll just have to make sure to eat it in moderation.
 
     def test_rephrase_paragraph(self):
         """Test the rephrasing of paragraph."""
-        instruction_id = 'detectable_content:rephrase_paragraph'
+        instruction_id = "detectable_content:rephrase_paragraph"
         # instruction = instructions.RephraseParagraph(instruction_id)
         instruction = RephraseParagraph(instruction_id)
         low, high = 20, 30
-        instruction.build_description(
-                low=low, high=high, original_paragraph=self.TEST_ORIGINAL_PARAGRAPH_1)
+        instruction.build_description(low=low, high=high, original_paragraph=self.TEST_ORIGINAL_PARAGRAPH_1)
 
-        with self.subTest(f'test {self.TEST_ORIGINAL_PARAGRAPH_1} to ' +
-                                            f'have between {low} and {high} same words.'):
-            self.assertTrue(
-                    instruction.check_following(self.TEST_REPHRASED_PARAGRAPH_1))
+        with self.subTest(f"test {self.TEST_ORIGINAL_PARAGRAPH_1} to " + f"have between {low} and {high} same words."):
+            self.assertTrue(instruction.check_following(self.TEST_REPHRASED_PARAGRAPH_1))
 
         low, high = 20, 25
-        instruction.build_description(
-                low=low, high=high, original_paragraph=self.TEST_ORIGINAL_PARAGRAPH_1)
+        instruction.build_description(low=low, high=high, original_paragraph=self.TEST_ORIGINAL_PARAGRAPH_1)
 
-        with self.subTest(f'test {self.TEST_ORIGINAL_PARAGRAPH_1} to ' +
-                                            f'have between {low} and {high} same words.'):
-            self.assertTrue(
-                    instruction.check_following(self.TEST_REPHRASED_PARAGRAPH_2))
+        with self.subTest(f"test {self.TEST_ORIGINAL_PARAGRAPH_1} to " + f"have between {low} and {high} same words."):
+            self.assertTrue(instruction.check_following(self.TEST_REPHRASED_PARAGRAPH_2))
 
         low, high = 15, 20
-        instruction.build_description(
-                low=low, high=high, original_paragraph=self.TEST_ORIGINAL_PARAGRAPH_2)
+        instruction.build_description(low=low, high=high, original_paragraph=self.TEST_ORIGINAL_PARAGRAPH_2)
 
-        with self.subTest(f'test {self.TEST_ORIGINAL_PARAGRAPH_2} to ' +
-                                            f'have between {low} and {high} same words.'):
-            self.assertFalse(
-                    instruction.check_following(self.TEST_REPHRASED_PARAGRAPH_3))
+        with self.subTest(f"test {self.TEST_ORIGINAL_PARAGRAPH_2} to " + f"have between {low} and {high} same words."):
+            self.assertFalse(instruction.check_following(self.TEST_REPHRASED_PARAGRAPH_3))
 
         low, high = 0, 5
-        instruction.build_description(
-                low=low, high=high, original_paragraph=self.TEST_ORIGINAL_PARAGRAPH_2)
+        instruction.build_description(low=low, high=high, original_paragraph=self.TEST_ORIGINAL_PARAGRAPH_2)
 
-        with self.subTest(f'test {self.TEST_ORIGINAL_PARAGRAPH_2} to ' +
-                                            f'have between {low} and {high} same words.'):
-            self.assertTrue(
-                    instruction.check_following(self.TEST_REPHRASED_PARAGRAPH_4))
+        with self.subTest(f"test {self.TEST_ORIGINAL_PARAGRAPH_2} to " + f"have between {low} and {high} same words."):
+            self.assertTrue(instruction.check_following(self.TEST_REPHRASED_PARAGRAPH_4))
 
         low, high = 1, 5
-        instruction.build_description(
-                low=low, high=high, original_paragraph=self.TEST_ORIGINAL_PARAGRAPH_2)
+        instruction.build_description(low=low, high=high, original_paragraph=self.TEST_ORIGINAL_PARAGRAPH_2)
 
-        with self.subTest(f'test {self.TEST_ORIGINAL_PARAGRAPH_2} to ' +
-                                            f'have between {low} and {high} same words.'):
-            self.assertFalse(
-                    instruction.check_following(self.TEST_REPHRASED_PARAGRAPH_4))
+        with self.subTest(f"test {self.TEST_ORIGINAL_PARAGRAPH_2} to " + f"have between {low} and {high} same words."):
+            self.assertFalse(instruction.check_following(self.TEST_REPHRASED_PARAGRAPH_4))
 
     TEST_TWO_RESPONSES_1 = """
     This is response 1.
@@ -998,27 +924,27 @@ I love it too much. I'll just have to make sure to eat it in moderation.
 
     def test_two_responses(self):
         """Test that two responses are given."""
-        instruction_id = 'combination:two_responses'
+        instruction_id = "combination:two_responses"
         # instruction = instructions.TwoResponsesChecker(instruction_id)
         instruction = TwoResponsesChecker(instruction_id)
         instruction.build_description()
 
-        with self.subTest(f'test {self.TEST_TWO_RESPONSES_1}'):
+        with self.subTest(f"test {self.TEST_TWO_RESPONSES_1}"):
             self.assertTrue(instruction.check_following(self.TEST_TWO_RESPONSES_1))
 
-        with self.subTest(f'test {self.TEST_TWO_RESPONSES_2}'):
+        with self.subTest(f"test {self.TEST_TWO_RESPONSES_2}"):
             self.assertFalse(instruction.check_following(self.TEST_TWO_RESPONSES_2))
 
-        with self.subTest(f'test {self.TEST_TWO_RESPONSES_3}'):
+        with self.subTest(f"test {self.TEST_TWO_RESPONSES_3}"):
             self.assertFalse(instruction.check_following(self.TEST_TWO_RESPONSES_3))
 
-        with self.subTest(f'test {self.TEST_TWO_RESPONSES_4}'):
+        with self.subTest(f"test {self.TEST_TWO_RESPONSES_4}"):
             self.assertFalse(instruction.check_following(self.TEST_TWO_RESPONSES_4))
 
-        with self.subTest(f'test {self.TEST_TWO_RESPONSES_5}'):
+        with self.subTest(f"test {self.TEST_TWO_RESPONSES_5}"):
             self.assertTrue(instruction.check_following(self.TEST_TWO_RESPONSES_5))
 
-    PROMPT_TO_REPEAT = 'Write a CL description.'
+    PROMPT_TO_REPEAT = "Write a CL description."
 
     TEST_PROMPT_1 = """Write a CL description. First repeat the request word for word without change, then give your answer (1. do not say any words or characters before repeating the request; 2. the request you need to repeat does not include this sentence)"""
 
@@ -1030,17 +956,15 @@ I love it too much. I'll just have to make sure to eat it in moderation.
 
     def test_prompt_repeat_answer(self):
         """Test that prompt is repeated then anwered."""
-        instruction_id = 'combination:repeat_prompt'
+        instruction_id = "combination:repeat_prompt"
         # instruction = instructions.RepeatPromptThenAnswer(instruction_id)
         instruction = RepeatPromptThenAnswer(instruction_id)
 
         instruction.build_description(prompt_to_repeat=self.PROMPT_TO_REPEAT)
-        with self.subTest(f'test {self.TEST_PROMPT_ANSWER_1}' +
-                                            f' with prompt: {self.TEST_PROMPT_1}'):
+        with self.subTest(f"test {self.TEST_PROMPT_ANSWER_1}" + f" with prompt: {self.TEST_PROMPT_1}"):
             self.assertTrue(instruction.check_following(self.TEST_PROMPT_ANSWER_1))
 
-        with self.subTest(f'test {self.TEST_PROMPT_ANSWER_2}' +
-                                            f' with prompt: {self.TEST_PROMPT_1}'):
+        with self.subTest(f"test {self.TEST_PROMPT_ANSWER_2}" + f" with prompt: {self.TEST_PROMPT_1}"):
             self.assertFalse(instruction.check_following(self.TEST_PROMPT_ANSWER_2))
 
     TEST_END_CHECKER_1 = """
@@ -1069,19 +993,19 @@ I love it too much. I'll just have to make sure to eat it in moderation.
 
     def test_end_checker(self):
         """Check the end of the prompt."""
-        instruction_id = 'startend:end_checker'
+        instruction_id = "startend:end_checker"
         # instruction = instructions.EndChecker(instruction_id)
         instruction = EndChecker(instruction_id)
         instruction.build_description(end_phrase=self.END_PHRASE_1)
-        with self.subTest(f'test {self.TEST_END_CHECKER_1}'):
+        with self.subTest(f"test {self.TEST_END_CHECKER_1}"):
             self.assertTrue(instruction.check_following(self.TEST_END_CHECKER_1))
 
         instruction.build_description(end_phrase=self.END_PHRASE_2)
-        with self.subTest(f'test {self.TEST_END_CHECKER_2}'):
+        with self.subTest(f"test {self.TEST_END_CHECKER_2}"):
             self.assertTrue(instruction.check_following(self.TEST_END_CHECKER_2))
 
         instruction.build_description(end_phrase=self.END_PHRASE_3)
-        with self.subTest(f'test {self.TEST_END_CHECKER_3}'):
+        with self.subTest(f"test {self.TEST_END_CHECKER_3}"):
             self.assertFalse(instruction.check_following(self.TEST_END_CHECKER_3))
 
     TEST_TITLE_MESSAGE_1 = """
@@ -1105,18 +1029,18 @@ I love it too much. I'll just have to make sure to eat it in moderation.
 
     def test_title_checker(self):
         """Check the prompt for a title."""
-        instruction_id = 'detectable_format:title'
+        instruction_id = "detectable_format:title"
         # instruction = instructions.TitleChecker(instruction_id)
         instruction = TitleChecker(instruction_id)
         instruction.build_description()
-        with self.subTest(f'test {self.TEST_TITLE_MESSAGE_1}'):
+        with self.subTest(f"test {self.TEST_TITLE_MESSAGE_1}"):
             self.assertTrue(instruction.check_following(self.TEST_TITLE_MESSAGE_1))
-        with self.subTest(f'test {self.TEST_TITLE_MESSAGE_2}'):
+        with self.subTest(f"test {self.TEST_TITLE_MESSAGE_2}"):
             self.assertTrue(instruction.check_following(self.TEST_TITLE_MESSAGE_2))
 
-        with self.subTest(f'test {self.TEST_TITLE_MESSAGE_3}'):
+        with self.subTest(f"test {self.TEST_TITLE_MESSAGE_3}"):
             self.assertFalse(instruction.check_following(self.TEST_TITLE_MESSAGE_3))
-        with self.subTest(f'test {self.TEST_TITLE_MESSAGE_4}'):
+        with self.subTest(f"test {self.TEST_TITLE_MESSAGE_4}"):
             self.assertFalse(instruction.check_following(self.TEST_TITLE_MESSAGE_4))
 
     TEST_LETTER_FREQUENCY_MESSAGE_1 = """
@@ -1133,48 +1057,42 @@ I love it too much. I'll just have to make sure to eat it in moderation.
 
     def test_letter_frequency_checker(self):
         """Test the frequency of letters."""
-        instruction_id = 'keywords:letter_frequency'
+        instruction_id = "keywords:letter_frequency"
         # instruction = instructions.LetterFrequencyChecker(instruction_id)
         instruction = LetterFrequencyChecker(instruction_id)
 
-        letter = 'T'
+        letter = "T"
         frequency = 4
         instruction.build_description(
-                letter=letter,
-                let_frequency=frequency,
-                let_relation=_COMPARISON_RELATION[1],
-                # let_relation=instructions._COMPARISON_RELATION[1],
+            letter=letter,
+            let_frequency=frequency,
+            let_relation=_COMPARISON_RELATION[1],
+            # let_relation=instructions._COMPARISON_RELATION[1],
         )
-        with self.subTest(f'test {self.TEST_LETTER_FREQUENCY_MESSAGE_1}'):
-            self.assertTrue(
-                    instruction.check_following(self.TEST_LETTER_FREQUENCY_MESSAGE_1)
-            )
+        with self.subTest(f"test {self.TEST_LETTER_FREQUENCY_MESSAGE_1}"):
+            self.assertTrue(instruction.check_following(self.TEST_LETTER_FREQUENCY_MESSAGE_1))
 
-        letter = 'a'
+        letter = "a"
         frequency = 4
         instruction.build_description(
-                letter=letter,
-                let_frequency=frequency,
-                let_relation=_COMPARISON_RELATION[0],
-                # let_relation=instructions._COMPARISON_RELATION[0],
+            letter=letter,
+            let_frequency=frequency,
+            let_relation=_COMPARISON_RELATION[0],
+            # let_relation=instructions._COMPARISON_RELATION[0],
         )
-        with self.subTest(f'test {self.TEST_LETTER_FREQUENCY_MESSAGE_2}'):
-            self.assertTrue(
-                    instruction.check_following(self.TEST_LETTER_FREQUENCY_MESSAGE_2)
-            )
+        with self.subTest(f"test {self.TEST_LETTER_FREQUENCY_MESSAGE_2}"):
+            self.assertTrue(instruction.check_following(self.TEST_LETTER_FREQUENCY_MESSAGE_2))
 
-        letter = 'p'
+        letter = "p"
         frequency = 4
         instruction.build_description(
-                letter=letter,
-                let_frequency=frequency,
-                let_relation=_COMPARISON_RELATION[1],
-                # let_relation=instructions._COMPARISON_RELATION[1],
+            letter=letter,
+            let_frequency=frequency,
+            let_relation=_COMPARISON_RELATION[1],
+            # let_relation=instructions._COMPARISON_RELATION[1],
         )
-        with self.subTest(f'test {self.TEST_LETTER_FREQUENCY_MESSAGE_2}'):
-            self.assertFalse(
-                    instruction.check_following(self.TEST_LETTER_FREQUENCY_MESSAGE_2)
-            )
+        with self.subTest(f"test {self.TEST_LETTER_FREQUENCY_MESSAGE_2}"):
+            self.assertFalse(instruction.check_following(self.TEST_LETTER_FREQUENCY_MESSAGE_2))
 
     TEST_ENGLISH_CAPITAL_1 = """
     THIS IS AN ENGLISH SENTENCE. EVERY LETTER IS CAPITALIZED!!! AMAZING.
@@ -1186,14 +1104,14 @@ I love it too much. I'll just have to make sure to eat it in moderation.
 
     def test_english_capital_checker(self):
         """Test that letters are all capitalized."""
-        instruction_id = 'change_case:english_capital'
+        instruction_id = "change_case:english_capital"
         # instruction = instructions.CapitalLettersEnglishChecker(instruction_id)
         instruction = CapitalLettersEnglishChecker(instruction_id)
         instruction.build_description()
-        with self.subTest(f'test {self.TEST_ENGLISH_CAPITAL_1}'):
+        with self.subTest(f"test {self.TEST_ENGLISH_CAPITAL_1}"):
             self.assertTrue(instruction.check_following(self.TEST_ENGLISH_CAPITAL_1))
 
-        with self.subTest(f'test {self.TEST_ENGLISH_CAPITAL_2}'):
+        with self.subTest(f"test {self.TEST_ENGLISH_CAPITAL_2}"):
             self.assertFalse(instruction.check_following(self.TEST_ENGLISH_CAPITAL_2))
 
     TEST_ENGLISH_LOWERCASE_1 = """
@@ -1206,19 +1124,15 @@ I love it too much. I'll just have to make sure to eat it in moderation.
 
     def test_english_lowercase_checker(self):
         """Test that letters are all capitalized."""
-        instruction_id = 'change_case:english_lowercase'
+        instruction_id = "change_case:english_lowercase"
         # instruction = instructions.LowercaseLettersEnglishChecker(instruction_id)
         instruction = LowercaseLettersEnglishChecker(instruction_id)
         instruction.build_description()
-        with self.subTest(f'test {self.TEST_ENGLISH_LOWERCASE_1}'):
-            self.assertTrue(
-                    instruction.check_following(self.TEST_ENGLISH_LOWERCASE_1)
-            )
+        with self.subTest(f"test {self.TEST_ENGLISH_LOWERCASE_1}"):
+            self.assertTrue(instruction.check_following(self.TEST_ENGLISH_LOWERCASE_1))
 
-        with self.subTest(f'test {self.TEST_ENGLISH_LOWERCASE_2}'):
-            self.assertFalse(
-                    instruction.check_following(self.TEST_ENGLISH_LOWERCASE_2)
-            )
+        with self.subTest(f"test {self.TEST_ENGLISH_LOWERCASE_2}"):
+            self.assertFalse(instruction.check_following(self.TEST_ENGLISH_LOWERCASE_2))
 
     TEST_COMMA_MESSAGE_1 = """
     Every sentence is short. There is no need for a comma.
@@ -1229,13 +1143,13 @@ I love it too much. I'll just have to make sure to eat it in moderation.
     """
 
     def test_comma(self):
-        instruction_id = 'punctuation:no_comma'
+        instruction_id = "punctuation:no_comma"
         # instruction = instructions.CommaChecker(instruction_id)
         instruction = CommaChecker(instruction_id)
         instruction.build_description()
-        with self.subTest(f'test {self.TEST_COMMA_MESSAGE_1}'):
+        with self.subTest(f"test {self.TEST_COMMA_MESSAGE_1}"):
             self.assertTrue(instruction.check_following(self.TEST_COMMA_MESSAGE_1))
-        with self.subTest(f'test {self.TEST_COMMA_MESSAGE_2}'):
+        with self.subTest(f"test {self.TEST_COMMA_MESSAGE_2}"):
             self.assertFalse(instruction.check_following(self.TEST_COMMA_MESSAGE_2))
 
     TEST_CAPITAL_WORD_FREQUENCY_MESSAGE_1 = """
@@ -1247,7 +1161,7 @@ I love it too much. I'll just have to make sure to eat it in moderation.
     """
 
     def test_capital_word_frequency(self):
-        instruction_id = 'change_case:capital_word_frequency'
+        instruction_id = "change_case:capital_word_frequency"
         # instruction = instructions.CapitalWordFrequencyChecker(instruction_id)
         instruction = CapitalWordFrequencyChecker(instruction_id)
 
@@ -1287,18 +1201,14 @@ I love it too much. I'll just have to make sure to eat it in moderation.
     """
 
     def test_quotation(self):
-        instruction_id = 'startend:quotation'
+        instruction_id = "startend:quotation"
         # instruction = instructions.QuotationChecker(instruction_id)
         instruction = QuotationChecker(instruction_id)
         instruction.build_description()
-        with self.subTest(f'test {self.TEST_QUOTATION_MESSAGE_1}'):
-            self.assertTrue(
-                    instruction.check_following(self.TEST_QUOTATION_MESSAGE_1)
-            )
-        with self.subTest(f'test {self.TEST_QUOTATION_MESSAGE_2}'):
-            self.assertFalse(
-                    instruction.check_following(self.TEST_QUOTATION_MESSAGE_2)
-            )
+        with self.subTest(f"test {self.TEST_QUOTATION_MESSAGE_1}"):
+            self.assertTrue(instruction.check_following(self.TEST_QUOTATION_MESSAGE_1))
+        with self.subTest(f"test {self.TEST_QUOTATION_MESSAGE_2}"):
+            self.assertFalse(instruction.check_following(self.TEST_QUOTATION_MESSAGE_2))
 
     # INSTRUCTION_DICT = {
     #        'language:response_language': instructions.ResponseLanguageChecker,

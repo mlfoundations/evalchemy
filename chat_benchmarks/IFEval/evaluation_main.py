@@ -28,13 +28,9 @@ from absl import logging
 # from instruction_following_eval import instructions_registry
 from .instructions_registry import *
 
-_INPUT_DATA = flags.DEFINE_string(
-    "input_data", None, "path to input data", required=True
-)
+_INPUT_DATA = flags.DEFINE_string("input_data", None, "path to input data", required=True)
 
-_INPUT_RESPONSE_DATA = flags.DEFINE_string(
-    "input_response_data", None, "path to input response data", required=False
-)
+_INPUT_RESPONSE_DATA = flags.DEFINE_string("input_response_data", None, "path to input response data", required=False)
 
 _OUTPUT_DIR = flags.DEFINE_string(
     "output_dir",
@@ -68,10 +64,13 @@ def read_prompt_list(input_jsonl_filename):
         for l in f:
             example = json.loads(l)
             inputs.append(
-                    InputExample(key=example["key"],
-                                             instruction_id_list=example["instruction_id_list"],
-                                             prompt=example["prompt"],
-                                             kwargs=example["kwargs"]))
+                InputExample(
+                    key=example["key"],
+                    instruction_id_list=example["instruction_id_list"],
+                    prompt=example["prompt"],
+                    kwargs=example["kwargs"]
+                )
+            )
     return inputs
 
 
@@ -81,21 +80,21 @@ def write_outputs(output_jsonl_filename, outputs):
     with open(output_jsonl_filename, "w") as f:
         for o in outputs:
             f.write(
-                    json.dumps(
-                            {
-                                    attr_name: o.__getattribute__(attr_name)
-                                    for attr_name in [
-                                            name for name in dir(o) if not name.startswith("_")
-                                    ]
-                            }
-                    )
+                json.dumps(
+                    {
+                        attr_name: o.__getattribute__(attr_name)
+                        for attr_name in [
+                            name for name in dir(o) if not name.startswith("_")
+                        ]
+                    }
+                )
             )
             f.write("\n")
 
 
 def test_instruction_following_strict(
-        inp,
-        prompt_to_response,
+    inp,
+    prompt_to_response,
 ):
     """Tests response to see if instrutions are followed."""
     response = prompt_to_response[inp.prompt]
@@ -103,7 +102,7 @@ def test_instruction_following_strict(
     is_following_list = []
 
     for index, instruction_id in enumerate(instruction_list):
-        #instruction_cls = instructions_registry.INSTRUCTION_DICT[instruction_id]
+        # instruction_cls = instructions_registry.INSTRUCTION_DICT[instruction_id]
         instruction_cls = INSTRUCTION_DICT[instruction_id]
         instruction = instruction_cls(instruction_id)
 
@@ -118,11 +117,11 @@ def test_instruction_following_strict(
             is_following_list.append(False)
 
     return OutputExample(
-            instruction_id_list=inp.instruction_id_list,
-            prompt=inp.prompt,
-            response=response,
-            follow_all_instructions=all(is_following_list),
-            follow_instruction_list=is_following_list,
+        instruction_id_list=inp.instruction_id_list,
+        prompt=inp.prompt,
+        response=response,
+        follow_all_instructions=all(is_following_list),
+        follow_instruction_list=is_following_list,
     )
 
 
@@ -141,20 +140,20 @@ def test_instruction_following_loose(
     revised_response_remove_last = response_remove_last.replace("*", "")
     revised_response_remove_both = response_remove_both.replace("*", "")
     all_responses = [
-            response,
-            revised_response,
-            response_remove_first,
-            response_remove_last,
-            response_remove_both,
-            revised_response_remove_first,
-            revised_response_remove_last,
-            revised_response_remove_both,
+        response,
+        revised_response,
+        response_remove_first,
+        response_remove_last,
+        response_remove_both,
+        revised_response_remove_first,
+        revised_response_remove_last,
+        revised_response_remove_both,
     ]
     instruction_list = inp.instruction_id_list
     is_following_list = []
 
     for index, instruction_id in enumerate(instruction_list):
-        #instruction_cls = instructions_registry.INSTRUCTION_DICT[instruction_id]
+        # instruction_cls = instructions_registry.INSTRUCTION_DICT[instruction_id]
         instruction_cls = INSTRUCTION_DICT[instruction_id]
         instruction = instruction_cls(instruction_id)
 
@@ -172,11 +171,11 @@ def test_instruction_following_loose(
         is_following_list.append(is_following)
 
     return OutputExample(
-            instruction_id_list=inp.instruction_id_list,
-            prompt=inp.prompt,
-            response=response,
-            follow_all_instructions=all(is_following_list),
-            follow_instruction_list=is_following_list,
+        instruction_id_list=inp.instruction_id_list,
+        prompt=inp.prompt,
+        response=response,
+        follow_all_instructions=all(is_following_list),
+        follow_instruction_list=is_following_list,
     )
 
 
@@ -215,9 +214,7 @@ def print_report(outputs):
         instruction_total += len(instruction_id_list)
         instruction_correct += sum(follow_instruction_list)
 
-        for instruction_id, followed_or_not in zip(
-                instruction_id_list, follow_instruction_list
-        ):
+        for instruction_id, followed_or_not in zip(instruction_id_list, follow_instruction_list):
             instruction_id = instruction_id.split(":")[0]
             tier0_total[instruction_id] += 1
             if followed_or_not:
@@ -247,13 +244,12 @@ def main(argv):
         raise app.UsageError("Too many command-line arguments.")
 
     inputs = read_prompt_list(_INPUT_DATA.value)
-    prompt_to_response = read_prompt_to_response_dict(
-            _INPUT_RESPONSE_DATA.value)
+    prompt_to_response = read_prompt_to_response_dict(_INPUT_RESPONSE_DATA.value)
 
     # get instruction following results
     for func, output_file_name in [
-            (test_instruction_following_strict, "eval_results_strict"),
-            (test_instruction_following_loose, "eval_results_loose"),
+        (test_instruction_following_strict, "eval_results_strict"),
+        (test_instruction_following_loose, "eval_results_loose"),
     ]:
         logging.info("Generating %s...", output_file_name)
         outputs = []
@@ -263,9 +259,7 @@ def main(argv):
         accuracy = sum(follow_all_instructions) / len(outputs)
         logging.info("Accuracy: %f", accuracy)
 
-        output_file_name = os.path.join(
-                _OUTPUT_DIR.value, output_file_name + ".jsonl"
-        )
+        output_file_name = os.path.join(_OUTPUT_DIR.value, output_file_name + ".jsonl")
         write_outputs(output_file_name, outputs)
         logging.info("Generated: %s", output_file_name)
 

@@ -95,8 +95,7 @@ INSTRUCTION_DICT = {
     # TODO(jeffreyzhou): Pre-create paragraph or use prompt to replace
     # _CONTENT + "rephrase_paragraph": instructions.RephraseParagraph,
     _FORMAT + "constrained_response": ConstrainedResponseChecker,
-    _FORMAT + "number_highlighted_sections": (
-        HighlightSectionChecker),
+    _FORMAT + "number_highlighted_sections": (HighlightSectionChecker),
     _FORMAT + "multiple_sections": SectionChecker,
     # TODO(tianjianlu): Re-enable rephrasing with preprocessing the message.
     # _FORMAT + "rephrase": instructions.RephraseChecker,
@@ -107,12 +106,9 @@ INSTRUCTION_DICT = {
     _COMBINATION + "two_responses": TwoResponsesChecker,
     _COMBINATION + "repeat_prompt": RepeatPromptThenAnswer,
     _STARTEND + "end_checker": EndChecker,
-    _CHANGE_CASES
-    + "capital_word_frequency": CapitalWordFrequencyChecker,
-    _CHANGE_CASES
-    + "english_capital": CapitalLettersEnglishChecker,
-    _CHANGE_CASES
-    + "english_lowercase": LowercaseLettersEnglishChecker,
+    _CHANGE_CASES + "capital_word_frequency": CapitalWordFrequencyChecker,
+    _CHANGE_CASES + "english_capital": CapitalLettersEnglishChecker,
+    _CHANGE_CASES + "english_lowercase": LowercaseLettersEnglishChecker,
     _PUNCTUATION + "no_comma": CommaChecker,
     _STARTEND + "quotation": QuotationChecker,
 }
@@ -136,14 +132,16 @@ INSTRUCTION_CONFLICTS = {
         _CHANGE_CASES + "english_lowercase",
     },
     _LENGTH + "number_sentences": {_LENGTH + "number_sentences"},
-    _LENGTH + "number_paragraphs": {
+    _LENGTH
+    + "number_paragraphs": {
         _LENGTH + "number_paragraphs",
         _LENGTH + "nth_paragraph_first_word",
         _LENGTH + "number_sentences",
         _LENGTH + "nth_paragraph_first_word",
     },
     _LENGTH + "number_words": {_LENGTH + "number_words"},
-    _LENGTH + "nth_paragraph_first_word": {
+    _LENGTH
+    + "nth_paragraph_first_word": {
         _LENGTH + "nth_paragraph_first_word",
         _LENGTH + "number_paragraphs",
     },
@@ -153,8 +151,7 @@ INSTRUCTION_CONFLICTS = {
     # TODO(jeffreyzhou): Pre-create paragraph or use prompt to replace
     # _CONTENT + "rephrase_paragraph": instructions.RephraseParagraph,
     _FORMAT + "constrained_response": set(INSTRUCTION_DICT.keys()),
-    _FORMAT
-    + "number_highlighted_sections": {_FORMAT + "number_highlighted_sections"},
+    _FORMAT + "number_highlighted_sections": {_FORMAT + "number_highlighted_sections"},
     _FORMAT
     + "multiple_sections": {
         _FORMAT + "multiple_sections",
@@ -164,33 +161,33 @@ INSTRUCTION_CONFLICTS = {
     # TODO(tianjianlu): Re-enable rephrasing with preprocessing the message.
     # _FORMAT + "rephrase": instructions.RephraseChecker,
     _FORMAT
-    + "json_format": set(INSTRUCTION_DICT.keys()).difference(
-        {_KEYWORD + "forbidden_words", _KEYWORD + "existence"}
-    ),
+    + "json_format": set(INSTRUCTION_DICT.keys()).difference({_KEYWORD + "forbidden_words", _KEYWORD + "existence"}),
     _FORMAT + "title": {_FORMAT + "title"},
     # TODO(tianjianlu): Re-enable with specific prompts.
     # _MULTITURN + "constrained_start": instructions.ConstrainedStartChecker,
     _COMBINATION
-    + "two_responses": set(INSTRUCTION_DICT.keys()).difference({
-        _KEYWORD + "forbidden_words",
-        _KEYWORD + "existence",
-        _LANGUAGE + "response_language",
-        _FORMAT + "title",
-        _PUNCTUATION + "no_comma"
-    }),
-    _COMBINATION + "repeat_prompt": set(INSTRUCTION_DICT.keys()).difference({
-        _KEYWORD + "existence",
-        _FORMAT + "title",
-        _PUNCTUATION + "no_comma"
-    }),
+    + "two_responses": set(INSTRUCTION_DICT.keys()).difference(
+        {
+            _KEYWORD + "forbidden_words",
+            _KEYWORD + "existence",
+            _LANGUAGE + "response_language",
+            _FORMAT + "title",
+            _PUNCTUATION + "no_comma"
+        }
+    ),
+    _COMBINATION + "repeat_prompt": set(INSTRUCTION_DICT.keys()).difference(
+        {_KEYWORD + "existence", _FORMAT + "title", _PUNCTUATION + "no_comma"}
+    ),
     _STARTEND + "end_checker": {_STARTEND + "end_checker"},
-    _CHANGE_CASES + "capital_word_frequency": {
+    _CHANGE_CASES
+    + "capital_word_frequency": {
         _CHANGE_CASES + "capital_word_frequency",
         _CHANGE_CASES + "english_lowercase",
         _CHANGE_CASES + "english_capital",
     },
     _CHANGE_CASES + "english_capital": {_CHANGE_CASES + "english_capital"},
-    _CHANGE_CASES + "english_lowercase": {
+    _CHANGE_CASES
+    + "english_lowercase": {
         _CHANGE_CASES + "english_lowercase",
         _CHANGE_CASES + "english_capital",
     },

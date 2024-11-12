@@ -116,7 +116,7 @@ class InstructionsTest(parameterized.TestCase):
                         + "ascreating a contact list, sending out surveys, or creating "
                         + "a sign-up form."
                     ),
-                    5, 
+                    5,
                     True,
                 ),
                 (("My [adjective] [noun] is [adjective] [noun]. I [verb] and [verb]."), 7, False),

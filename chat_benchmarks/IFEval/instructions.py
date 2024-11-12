@@ -170,7 +170,7 @@ class ResponseLanguageChecker(Instruction):
             return langdetect.detect(value) == self._language
         except langdetect.LangDetectException as e:
             # Count as instruction is followed.
-            logging.error("Unable to detect language for text %s due to %s", value, e) # refex: disable=pytotw.037
+            logging.error("Unable to detect language for text %s due to %s", value, e)  # refex: disable=pytotw.037
             return True
 
 
@@ -206,7 +206,7 @@ class NumberOfSentences(Instruction):
         else:
             self._comparison_relation = relation
 
-        self._description_pattern = ("Your response should contain {relation} {num_sentences} sentences.")
+        self._description_pattern = "Your response should contain {relation} {num_sentences} sentences."
         return self._description_pattern.format(
             relation=self._comparison_relation, num_sentences=self._num_sentences_threshold
         )
@@ -256,9 +256,7 @@ class PlaceholderChecker(Instruction):
         self._num_placeholders = num_placeholders
         if self._num_placeholders is None or self._num_placeholders < 0:
             self._num_placeholders = random.randint(1, _NUM_PLACEHOLDERS)
-        self._description_pattern = (
-            "The response must contain at least {num_placeholders} placeholders represented by square brackets, such as [address]."
-        )
+        self._description_pattern = "The response must contain at least {num_placeholders} placeholders represented by square brackets, such as [address]."  
         return self._description_pattern.format(num_placeholders=self._num_placeholders)
 
     def get_instruction_args(self):
@@ -775,9 +773,7 @@ class KeywordFrequencyChecker(Instruction):
         else:
             self._comparison_relation = relation
 
-        self._description_pattern = (
-            "In your response, the word {keyword} should appear {relation} {frequency} times."
-        )
+        self._description_pattern = "In your response, the word {keyword} should appear {relation} {frequency} times."
 
         return self._description_pattern.format(
             keyword=self._keyword, relation=self._comparison_relation, frequency=self._frequency
@@ -987,7 +983,6 @@ class ParagraphFirstWordCheck(Instruction):
             first_word += letter.lower()
 
         return num_paragraphs == self._num_paragraphs and first_word == self._first_word
-        
 
 
 # TODO(jeffrey) add relation - at least/at most?
@@ -1172,10 +1167,7 @@ class TwoResponsesChecker(Instruction):
                     return False
             else:
                 valid_responses.append(response)
-        return (
-                len(valid_responses) == 2
-                and valid_responses[0].strip() != valid_responses[1].strip()
-        )
+        return len(valid_responses) == 2 and valid_responses[0].strip() != valid_responses[1].strip()
 
 
 class RepeatPromptThenAnswer(Instruction):
@@ -1227,14 +1219,11 @@ class EndChecker(Instruction):
         Returns:
             A string representing the instruction description.
         """
-        self._end_phrase = (
-            end_phrase.strip() if isinstance(end_phrase, str) else end_phrase
-        )
+        self._end_phrase = end_phrase.strip() if isinstance(end_phrase, str) else end_phrase
         if self._end_phrase is None:
             self._end_phrase = random.choice(_ENDING_OPTIONS)
         self._description_pattern = (
-            "Finish your response with this exact phrase {ender}. "
-            "No other words should follow this phrase."
+            "Finish your response with this exact phrase {ender}. " "No other words should follow this phrase."
         )
         return self._description_pattern.format(ender=self._end_phrase)
 
@@ -1247,7 +1236,7 @@ class EndChecker(Instruction):
 
     def check_following(self, value):
         """Checks if the response ends with the expected phrase."""
-        value = value.strip().strip("\"").lower()
+        value = value.strip().strip('"').lower()
         self._end_phrase = self._end_phrase.strip().lower()
         return value.endswith(self._end_phrase)
 
@@ -1258,8 +1247,7 @@ class TitleChecker(Instruction):
     def build_description(self):
         """Build the instruction description."""
         self._description_pattern = (
-            "Your answer must contain a title, wrapped in double angular brackets,"
-            " such as <<poem of joy>>."
+            "Your answer must contain a title, wrapped in double angular brackets," " such as <<poem of joy>>."
         )
         return self._description_pattern
 
@@ -1321,8 +1309,9 @@ class LetterFrequencyChecker(Instruction):
         else:
             self._comparison_relation = let_relation
 
-        self._description_pattern = "In your response, the letter {letter} should appear {let_relation} {let_frequency} times."
-        
+        self._description_pattern = (
+            "In your response, the letter {letter} should appear {let_relation} {let_frequency} times."
+        )
 
         return self._description_pattern.format(
             letter=self._letter,
@@ -1372,7 +1361,7 @@ class CapitalLettersEnglishChecker(Instruction):
             return value.isupper() and langdetect.detect(value) == "en"
         except langdetect.LangDetectException as e:
             # Count as instruction is followed.
-            logging.error("Unable to detect language for text %s due to %s", value, e) # refex: disable=pytotw.037
+            logging.error("Unable to detect language for text %s due to %s", value, e)  # refex: disable=pytotw.037
             return True
 
 
@@ -1402,7 +1391,7 @@ class LowercaseLettersEnglishChecker(Instruction):
             return value.islower() and langdetect.detect(value) == "en"
         except langdetect.LangDetectException as e:
             # Count as instruction is followed.
-            logging.error("Unable to detect language for text %s due to %s", value, e) # refex: disable=pytotw.037
+            logging.error("Unable to detect language for text %s due to %s", value, e)  # refex: disable=pytotw.037
             return True
 
 
@@ -1429,7 +1418,11 @@ class CommaChecker(Instruction):
 class CapitalWordFrequencyChecker(Instruction):
     """Checks frequency of words with all capital letters."""
 
-    def build_description(self, capital_frequency=None, capital_relation=None,):
+    def build_description(
+        self,
+        capital_frequency=None,
+        capital_relation=None,
+    ):
         """Build the instruction description.
 
         Args:
@@ -1454,7 +1447,9 @@ class CapitalWordFrequencyChecker(Instruction):
                 f"{_COMPARISON_RELATION}, but {capital_relation} is given."
             )
 
-        self._description_pattern = "In your response, words with all capital letters should appear {relation} {frequency} times."
+        self._description_pattern = (
+            "In your response, words with all capital letters should appear {relation} {frequency} times."
+        )
 
         return self._description_pattern.format(frequency=self._frequency, relation=self._comparison_relation)
 

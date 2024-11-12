@@ -256,7 +256,9 @@ class PlaceholderChecker(Instruction):
         self._num_placeholders = num_placeholders
         if self._num_placeholders is None or self._num_placeholders < 0:
             self._num_placeholders = random.randint(1, _NUM_PLACEHOLDERS)
-        self._description_pattern = "The response must contain at least {num_placeholders} placeholders represented by square brackets, such as [address].")
+        self._description_pattern = (
+            "The response must contain at least {num_placeholders} placeholders represented by square brackets, such as [address]."
+        )
         return self._description_pattern.format(num_placeholders=self._num_placeholders)
 
     def get_instruction_args(self):

@@ -18,21 +18,27 @@ from transformers.modeling_attn_mask_utils import _prepare_4d_causal_attention_m
 import torch.nn.functional as F
 
 
-def get_jacobian_trajectory(model, tokenizer, input_ids, attention_mask, max_new_tokens):
+def get_jacobian_trajectory(
+    model, tokenizer, input_ids, attention_mask, max_new_tokens
+):
     bsz = input_ids.shape[0]
     prompt_len = [torch.sum(t) for t in attention_mask]
     max_prompt_len = max(prompt_len)
     total_len = max_prompt_len + max_new_tokens
 
     # initialize the first point of jacobian trajectory
-    tokens = torch.full((bsz, total_len), tokenizer.pad_token_id, dtype=torch.long, device=model.device)
+    tokens = torch.full(
+        (bsz, total_len), tokenizer.pad_token_id, dtype=torch.long, device=model.device
+    )
     for i in range(bsz):
         tokens[i, :] = torch.tensor(
             random.choices(input_ids[i][attention_mask[i] == 1], k=total_len),
             dtype=torch.long,
             device=model.device,
         )
-        tokens[i, : prompt_len[i]] = input_ids[i][: prompt_len[i]].to(dtype=torch.long, device=model.device)
+        tokens[i, : prompt_len[i]] = input_ids[i][: prompt_len[i]].to(
+            dtype=torch.long, device=model.device
+        )
     itr = 0
     next_generation = tokens
     generate_attention_mask = torch.full_like(next_generation, 1).to(model.device)
@@ -42,7 +48,9 @@ def get_jacobian_trajectory(model, tokenizer, input_ids, attention_mask, max_new
         current_generation = next_generation
         with torch.no_grad():
             logits = model(current_generation, generate_attention_mask).logits
-        next_generation = torch.argmax(torch.nn.functional.softmax(logits, dim=-1) / 0.001, dim=-1)
+        next_generation = torch.argmax(
+            torch.nn.functional.softmax(logits, dim=-1) / 0.001, dim=-1
+        )
 
         # hold prompt unchanged and update generated tokens
         for i in range(bsz):
@@ -57,7 +65,13 @@ def get_jacobian_trajectory(model, tokenizer, input_ids, attention_mask, max_new
         if (
             torch.all(torch.eq(next_generation, current_generation)).item()
             and itr == max_new_tokens
-            or len(torch.where(current_generation[0, : accurate_lengths[0]] == tokenizer.eos_token_id)[0]) > 0
+            or len(
+                torch.where(
+                    current_generation[0, : accurate_lengths[0]]
+                    == tokenizer.eos_token_id
+                )[0]
+            )
+            > 0
         ):
             # forced exit due to max_new_tokens constraint or eos reached
             return next_generation, itr
@@ -67,9 +81,9 @@ def get_jacobian_trajectory(model, tokenizer, input_ids, attention_mask, max_new
             if torch.all(torch.eq(next_generation, current_generation)).item():
                 matched_position = total_len
             else:
-                matched_position = (torch.eq(current_generation, next_generation).squeeze(0) == False).nonzero(
-                    as_tuple=True
-                )[0][0]
+                matched_position = (
+                    torch.eq(current_generation, next_generation).squeeze(0) == False
+                ).nonzero(as_tuple=True)[0][0]
             fast_forward_cnt = matched_position - accurate_lengths[0]
 
             for i in range(bsz):
@@ -121,7 +135,10 @@ def generate_stream_cllm(
         else:
             input_masks = torch.ones_like(input_ids).to(device)
             for j in range(bsz):
-                input_masks[j][torch.sum(inputs["attention_mask"], dim=-1)[j] + itr * max_new_tokens :] = 0
+                input_masks[j][
+                    torch.sum(inputs["attention_mask"], dim=-1)[j]
+                    + itr * max_new_tokens :
+                ] = 0
 
         bsz = input_ids.shape[0]
         eos_reached = torch.tensor([False] * bsz, device=device)

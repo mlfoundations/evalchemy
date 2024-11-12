@@ -68,7 +68,9 @@ def load_log_files_parallel(log_files, num_threads=16):
 
 
 def get_anony_vote_df(df):
-    anony_vote_df = df[df["type"].isin(["leftvote", "rightvote", "tievote", "bothbad_vote"])]
+    anony_vote_df = df[
+        df["type"].isin(["leftvote", "rightvote", "tievote", "bothbad_vote"])
+    ]
     anony_vote_df = anony_vote_df[anony_vote_df["models"].apply(lambda x: x[0] == "")]
     return anony_vote_df
 
@@ -94,12 +96,16 @@ def report_basic_stats(log_files):
 
     # Chat trends
     chat_dates = [
-        datetime.datetime.fromtimestamp(x, tz=timezone("US/Pacific")).strftime("%Y-%m-%d")
+        datetime.datetime.fromtimestamp(x, tz=timezone("US/Pacific")).strftime(
+            "%Y-%m-%d"
+        )
         for x in df_all[df_all["type"] == "chat"]["tstamp"]
     ]
     chat_dates_counts = pd.value_counts(chat_dates)
     vote_dates = [
-        datetime.datetime.fromtimestamp(x, tz=timezone("US/Pacific")).strftime("%Y-%m-%d")
+        datetime.datetime.fromtimestamp(x, tz=timezone("US/Pacific")).strftime(
+            "%Y-%m-%d"
+        )
         for x in anony_vote_df_all["tstamp"]
     ]
     vote_dates_counts = pd.value_counts(vote_dates)
@@ -174,7 +180,9 @@ def report_basic_stats(log_files):
         num = ((chat_1_day["tstamp"] >= left) & (chat_1_day["tstamp"] < right)).sum()
         num_chats_last_24_hours.append(num)
     times = [
-        datetime.datetime.fromtimestamp(base + i * 3600, tz=timezone("US/Pacific")).strftime("%Y-%m-%d %H:%M:%S %Z")
+        datetime.datetime.fromtimestamp(
+            base + i * 3600, tz=timezone("US/Pacific")
+        ).strftime("%Y-%m-%d %H:%M:%S %Z")
         for i in range(24, 0, -1)
     ]
     last_24_hours_df = pd.DataFrame({"time": times, "value": num_chats_last_24_hours})
@@ -182,9 +190,9 @@ def report_basic_stats(log_files):
 
     # Last update datetime
     last_updated_tstamp = now_t
-    last_updated_datetime = datetime.datetime.fromtimestamp(last_updated_tstamp, tz=timezone("US/Pacific")).strftime(
-        "%Y-%m-%d %H:%M:%S %Z"
-    )
+    last_updated_datetime = datetime.datetime.fromtimestamp(
+        last_updated_tstamp, tz=timezone("US/Pacific")
+    ).strftime("%Y-%m-%d %H:%M:%S %Z")
 
     # code.interact(local=locals())
 

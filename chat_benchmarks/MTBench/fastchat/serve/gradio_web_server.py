@@ -11,6 +11,7 @@ import os
 import random
 import time
 import uuid
+from typing import List
 
 import gradio as gr
 import requests
@@ -33,6 +34,7 @@ from fastchat.model.model_adapter import (
 )
 from fastchat.model.model_registry import get_model_info, model_info
 from fastchat.serve.api_provider import get_api_provider_stream_iter
+from fastchat.serve.gradio_global_state import Context
 from fastchat.serve.remote_logger import get_remote_logger
 from fastchat.utils import (
     build_logger,
@@ -51,7 +53,9 @@ no_change_btn = gr.Button()
 enable_btn = gr.Button(interactive=True, visible=True)
 disable_btn = gr.Button(interactive=False)
 invisible_btn = gr.Button(interactive=False, visible=False)
-enable_text = gr.Textbox(interactive=True, visible=True, placeholder="👉 Enter your prompt and press ENTER")
+enable_text = gr.Textbox(
+    interactive=True, visible=True, placeholder="👉 Enter your prompt and press ENTER"
+)
 disable_text = gr.Textbox(
     interactive=False,
     visible=True,
@@ -72,7 +76,7 @@ It must not be used for any illegal, harmful, violent, racist, or sexual purpose
 Please do not upload any private information.
 The service collects user dialogue data, including both text and images, and reserves the right to distribute it under a Creative Commons Attribution (CC-BY) or a similar license.
 
-#### Please report any bug or issue to our [Discord](https://discord.gg/HSWAKCrnFx)/arena-feedback.
+#### Please report any bug or issue to our [Discord](https://discord.gg/6GXcFg3TH8)/arena-feedback.
 
 ### Acknowledgment
 We thank [UC Berkeley SkyLab](https://sky.cs.berkeley.edu/), [Kaggle](https://www.kaggle.com/), [MBZUAI](https://mbzuai.ac.ae/), [a16z](https://www.a16z.com/), [Together AI](https://www.together.ai/), [Hyperbolic](https://hyperbolic.xyz/), [RunPod](https://runpod.io), [Anyscale](https://www.anyscale.com/), [HuggingFace](https://huggingface.co/) for their generous [sponsorship](https://lmsys.org/donations/).
@@ -130,6 +134,12 @@ class State:
             return
         current_date = datetime.datetime.now().strftime("%Y-%m-%d")
         system_prompt = system_prompt.replace("{{currentDateTime}}", current_date)
+
+        current_date_v2 = datetime.datetime.now().strftime("%d %b %Y")
+        system_prompt = system_prompt.replace("{{currentDateTimev2}}", current_date_v2)
+
+        current_date_v3 = datetime.datetime.now().strftime("%B %Y")
+        system_prompt = system_prompt.replace("{{currentDateTimev3}}", current_date_v3)
         conv.set_system_message(system_prompt)
 
     def to_gradio_chatbot(self):
@@ -149,7 +159,11 @@ class State:
         return base
 
 
-def set_global_vars(controller_url_, enable_moderation_, use_remote_storage_):
+def set_global_vars(
+    controller_url_,
+    enable_moderation_,
+    use_remote_storage_,
+):
     global controller_url, enable_moderation, use_remote_storage
     controller_url = controller_url_
     enable_moderation = enable_moderation_
@@ -216,16 +230,23 @@ def get_model_list(controller_url, register_api_endpoint_file, vision_arena):
     return visible_models, models
 
 
-def load_demo_single(models, url_params):
+def load_demo_single(context: Context, query_params):
+    # default to text models
+    models = context.text_models
+
     selected_model = models[0] if len(models) > 0 else ""
-    if "model" in url_params:
-        model = url_params["model"]
+    if "model" in query_params:
+        model = query_params["model"]
         if model in models:
             selected_model = model
 
-    dropdown_update = gr.Dropdown(choices=models, value=selected_model, visible=True)
+    all_models = context.models
+
+    dropdown_update = gr.Dropdown(
+        choices=all_models, value=selected_model, visible=True
+    )
     state = None
-    return state, dropdown_update
+    return [state, dropdown_update]
 
 
 def load_demo(url_params, request: gr.Request):
@@ -235,7 +256,9 @@ def load_demo(url_params, request: gr.Request):
     logger.info(f"load_demo. ip: {ip}. params: {url_params}")
 
     if args.model_list_mode == "reload":
-        models, all_models = get_model_list(controller_url, args.register_api_endpoint_file, vision_arena=False)
+        models, all_models = get_model_list(
+            controller_url, args.register_api_endpoint_file, vision_arena=False
+        )
 
     return load_demo_single(models, url_params)
 
@@ -330,7 +353,9 @@ def add_text(state, model_selector, text, request: gr.Request):
     if (len(state.conv.messages) - state.conv.offset) // 2 >= CONVERSATION_TURN_LIMIT:
         logger.info(f"conversation turn limit. ip: {ip}. text: {text}")
         state.skip_next = True
-        return (state, state.to_gradio_chatbot(), CONVERSATION_LIMIT_MSG, None) + (no_change_btn,) * 5
+        return (state, state.to_gradio_chatbot(), CONVERSATION_LIMIT_MSG, None) + (
+            no_change_btn,
+        ) * 5
 
     text = text[:INPUT_CHAR_LEN_LIMIT]  # Hard cut-off
     state.conv.append_message(state.conv.roles[0], text)
@@ -384,7 +409,9 @@ def model_worker_stream_iter(
 def is_limit_reached(model_name, ip):
     monitor_url = "http://localhost:9090"
     try:
-        ret = requests.get(f"{monitor_url}/is_limit_reached?model={model_name}&user_id={ip}", timeout=1)
+        ret = requests.get(
+            f"{monitor_url}/is_limit_reached?model={model_name}&user_id={ip}", timeout=1
+        )
         obj = ret.json()
         return obj
     except Exception as e:
@@ -424,12 +451,16 @@ def bot_response(
             return
 
     conv, model_name = state.conv, state.model_name
-    model_api_dict = api_endpoint_info[model_name] if model_name in api_endpoint_info else None
+    model_api_dict = (
+        api_endpoint_info[model_name] if model_name in api_endpoint_info else None
+    )
     images = conv.get_images()
 
     if model_api_dict is None:
         # Query worker address
-        ret = requests.post(controller_url + "/get_worker_address", json={"model": model_name})
+        ret = requests.post(
+            controller_url + "/get_worker_address", json={"model": model_name}
+        )
         worker_addr = ret.json()["address"]
         logger.info(f"model_name: {model_name}, worker_addr: {worker_addr}")
 
@@ -478,7 +509,9 @@ def bot_response(
             if recommended_config is not None:
                 temperature = recommended_config.get("temperature", temperature)
                 top_p = recommended_config.get("top_p", top_p)
-                max_new_tokens = recommended_config.get("max_new_tokens", max_new_tokens)
+                max_new_tokens = recommended_config.get(
+                    "max_new_tokens", max_new_tokens
+                )
 
         stream_iter = get_api_provider_stream_iter(
             conv,
@@ -519,7 +552,10 @@ def bot_response(
         conv.update_last_message(output)
         yield (state, state.to_gradio_chatbot()) + (enable_btn,) * 5
     except requests.exceptions.RequestException as e:
-        conv.update_last_message(f"{SERVER_ERROR_MSG}\n\n" f"(error_code: {ErrorCode.GRADIO_REQUEST_ERROR}, {e})")
+        conv.update_last_message(
+            f"{SERVER_ERROR_MSG}\n\n"
+            f"(error_code: {ErrorCode.GRADIO_REQUEST_ERROR}, {e})"
+        )
         yield (state, state.to_gradio_chatbot()) + (
             disable_btn,
             disable_btn,
@@ -530,7 +566,8 @@ def bot_response(
         return
     except Exception as e:
         conv.update_last_message(
-            f"{SERVER_ERROR_MSG}\n\n" f"(error_code: {ErrorCode.GRADIO_STREAM_UNKNOWN_ERROR}, {e})"
+            f"{SERVER_ERROR_MSG}\n\n"
+            f"(error_code: {ErrorCode.GRADIO_STREAM_UNKNOWN_ERROR}, {e})"
         )
         yield (state, state.to_gradio_chatbot()) + (
             disable_btn,
@@ -544,9 +581,13 @@ def bot_response(
     finish_tstamp = time.time()
     logger.info(f"{output}")
 
-    conv.save_new_images(has_csam_images=state.has_csam_image, use_remote_storage=use_remote_storage)
+    conv.save_new_images(
+        has_csam_images=state.has_csam_image, use_remote_storage=use_remote_storage
+    )
 
-    filename = get_conv_log_filename(is_vision=state.is_vision, has_csam_image=state.has_csam_image)
+    filename = get_conv_log_filename(
+        is_vision=state.is_vision, has_csam_image=state.has_csam_image
+    )
 
     with open(filename, "a") as fout:
         data = {
@@ -642,6 +683,10 @@ a {
 a:hover {
     color: #63A4FF; /* This can be any color you choose for hover */
     text-decoration: underline; /* Adds underline on hover */
+}
+
+.block {
+  overflow-y: hidden !important;
 }
 """
 
@@ -750,19 +795,19 @@ def get_model_description_md(models):
 def build_about():
     about_markdown = """
 # About Us
-Chatbot Arena is an open-source research project developed by members from [LMSYS](https://lmsys.org) and UC Berkeley [SkyLab](https://sky.cs.berkeley.edu/). Our mission is to build an open platform to evaluate LLMs by human preference in the real-world.
-We open-source our [FastChat](https://github.com/lm-sys/FastChat) project at GitHub and release chat and human feedback dataset. We invite everyone to join us!
+Chatbot Arena ([lmarena.ai](https://lmarena.ai)) is an open-source platform for evaluating AI through human preference, developed by researchers at UC Berkeley [SkyLab](https://sky.cs.berkeley.edu/) and [LMSYS](https://lmsys.org). We open-source the [FastChat](https://github.com/lm-sys/FastChat) project at GitHub and release open datasets. We always welcome contributions from the community. If you're interested in getting involved, we'd love to hear from you!
 
 ## Open-source contributors
-- [Wei-Lin Chiang](https://infwinston.github.io/), [Lianmin Zheng](https://lmzheng.net/), [Ying Sheng](https://sites.google.com/view/yingsheng/home), [Lisa Dunlap](https://www.lisabdunlap.com/), [Anastasios Angelopoulos](https://people.eecs.berkeley.edu/~angelopoulos/), [Christopher Chou](https://www.linkedin.com/in/chrisychou), [Tianle Li](https://codingwithtim.github.io/), [Siyuan Zhuang](https://www.linkedin.com/in/siyuanzhuang)
+- Leads: [Wei-Lin Chiang](https://infwinston.github.io/), [Anastasios Angelopoulos](https://people.eecs.berkeley.edu/~angelopoulos/)
+- Contributors: [Lianmin Zheng](https://lmzheng.net/), [Ying Sheng](https://sites.google.com/view/yingsheng/home), [Lisa Dunlap](https://www.lisabdunlap.com/), [Christopher Chou](https://www.linkedin.com/in/chrisychou), [Tianle Li](https://codingwithtim.github.io/), [Evan Frick](https://efrick2002.github.io/), [Dacheng Li](https://dachengli1.github.io/), [Siyuan Zhuang](https://www.linkedin.com/in/siyuanzhuang)
 - Advisors: [Ion Stoica](http://people.eecs.berkeley.edu/~istoica/), [Joseph E. Gonzalez](https://people.eecs.berkeley.edu/~jegonzal/), [Hao Zhang](https://cseweb.ucsd.edu/~haozhang/), [Trevor Darrell](https://people.eecs.berkeley.edu/~trevor/)
 
 ## Learn more
-- Chatbot Arena [paper](https://arxiv.org/abs/2403.04132), [launch blog](https://lmsys.org/blog/2023-05-03-arena/), [dataset](https://github.com/lm-sys/FastChat/blob/main/docs/dataset_release.md), [policy](https://lmsys.org/blog/2024-03-01-policy/)
+- Chatbot Arena [paper](https://arxiv.org/abs/2403.04132), [launch blog](https://blog.lmarena.ai/blog/2023/arena/), [dataset](https://github.com/lm-sys/FastChat/blob/main/docs/dataset_release.md), [policy](https://blog.lmarena.ai/blog/2024/policy/)
 - LMSYS-Chat-1M dataset [paper](https://arxiv.org/abs/2309.11998), LLM Judge [paper](https://arxiv.org/abs/2306.05685)
 
 ## Contact Us
-- Follow our [X](https://x.com/lmsysorg), [Discord](https://discord.gg/HSWAKCrnFx) or email us at lmsys.org@gmail.com
+- Follow our [X](https://x.com/lmsysorg), [Discord](https://discord.gg/6GXcFg3TH8) or email us at `lmarena.ai@gmail.com`
 - File issues on [GitHub](https://github.com/lm-sys/FastChat)
 - Download our datasets and models on [HuggingFace](https://huggingface.co/lmsys)
 
@@ -788,7 +833,7 @@ We also thank [UC Berkeley SkyLab](https://sky.cs.berkeley.edu/), [Kaggle](https
 def build_single_model_ui(models, add_promotion_links=False):
     promotion = (
         f"""
-[Blog](https://lmsys.org/blog/2023-05-03-arena/) | [GitHub](https://github.com/lm-sys/FastChat) | [Paper](https://arxiv.org/abs/2403.04132) | [Dataset](https://github.com/lm-sys/FastChat/blob/main/docs/dataset_release.md) | [Twitter](https://twitter.com/lmsysorg) | [Discord](https://discord.gg/HSWAKCrnFx) | [Kaggle Competition](https://www.kaggle.com/competitions/lmsys-chatbot-arena)
+[Blog](https://blog.lmarena.ai/blog/2023/arena/) | [GitHub](https://github.com/lm-sys/FastChat) | [Paper](https://arxiv.org/abs/2403.04132) | [Dataset](https://github.com/lm-sys/FastChat/blob/main/docs/dataset_release.md) | [Twitter](https://twitter.com/lmsysorg) | [Discord](https://discord.gg/6GXcFg3TH8) | [Kaggle Competition](https://www.kaggle.com/competitions/lmsys-chatbot-arena)
 
 {SURVEY_LINK}
 
@@ -799,7 +844,7 @@ def build_single_model_ui(models, add_promotion_links=False):
     )
 
     notice_markdown = f"""
-# 🏔️ Chat with Large Language Models
+# 🏔️ Chatbot Arena (formerly LMSYS): Free AI Chat to Compare & Test Best AI Chatbots
 {promotion}
 """
 
@@ -923,7 +968,7 @@ def build_single_model_ui(models, add_promotion_links=False):
 
 def build_demo(models):
     with gr.Blocks(
-        title="Chat with Open Large Language Models",
+        title="Chatbot Arena (formerly LMSYS): Free AI Chat to Compare & Test Best AI Chatbots",
         theme=gr.themes.Default(),
         css=block_css,
     ) as demo:
@@ -1016,7 +1061,9 @@ if __name__ == "__main__":
 
     # Set global variables
     set_global_vars(args.controller_url, args.moderate, args.use_remote_storage)
-    models, all_models = get_model_list(args.controller_url, args.register_api_endpoint_file, vision_arena=False)
+    models, all_models = get_model_list(
+        args.controller_url, args.register_api_endpoint_file, vision_arena=False
+    )
 
     # Set authorization credentials
     auth = None

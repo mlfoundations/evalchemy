@@ -79,6 +79,7 @@ class MTBenchBenchmark(BaseBenchmark):
             print(f"Warning: Overwriting config.judge_model = {annotator_model} ")
             config.judge_model = annotator_model
         self.config = config or MTBenchConfig(judge_model=annotator_model)
+        print("self.config, self.config", self.config)
         self.debug = debug
 
         # Setup paths

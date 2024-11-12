@@ -2,7 +2,6 @@
 From colab:
 https://colab.research.google.com/drive/1oMdw_Lqgmd6DletSOLHsyD-Rc96cRShs?usp=sharing
 """
-
 import argparse
 import datetime
 import json
@@ -63,7 +62,10 @@ fig.update_layout(
 fig.show()
 fig.write_image("language_count.pdf")
 
-chat_dates = [datetime.datetime.fromtimestamp(x, tz=timezone("US/Pacific")).strftime("%Y-%m-%d") for x in df["tstamp"]]
+chat_dates = [
+    datetime.datetime.fromtimestamp(x, tz=timezone("US/Pacific")).strftime("%Y-%m-%d")
+    for x in df["tstamp"]
+]
 
 
 def to_remove(x):
@@ -91,7 +93,9 @@ fig.write_image("daily_conversation_count.pdf")
 
 import transformers
 
-tokenizer = transformers.AutoTokenizer.from_pretrained("lmsys/vicuna-7b-v1.5", use_fast=False)
+tokenizer = transformers.AutoTokenizer.from_pretrained(
+    "lmsys/vicuna-7b-v1.5", use_fast=False
+)
 
 prompts = []
 responses = []

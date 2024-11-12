@@ -4,7 +4,6 @@ Clean chatbot arena chat log.
 Usage:
 python3 clean_chat_data.py
 """
-
 import argparse
 import datetime
 import json
@@ -22,7 +21,9 @@ from fastchat.serve.monitor.clean_battle_data import (
 from fastchat.utils import detect_language
 
 
-NETWORK_ERROR_MSG = "NETWORK ERROR DUE TO HIGH TRAFFIC. PLEASE REGENERATE OR REFRESH THIS PAGE.".lower()
+NETWORK_ERROR_MSG = (
+    "NETWORK ERROR DUE TO HIGH TRAFFIC. PLEASE REGENERATE OR REFRESH THIS PAGE.".lower()
+)
 
 
 def get_log_files(max_num_files=None):
@@ -126,9 +127,9 @@ def clean_chat_data(log_files, action_type):
 
     chats.sort(key=lambda x: x["tstamp"])
     last_updated_tstamp = chats[-1]["tstamp"]
-    last_updated_datetime = datetime.datetime.fromtimestamp(last_updated_tstamp, tz=timezone("US/Pacific")).strftime(
-        "%Y-%m-%d %H:%M:%S %Z"
-    )
+    last_updated_datetime = datetime.datetime.fromtimestamp(
+        last_updated_tstamp, tz=timezone("US/Pacific")
+    ).strftime("%Y-%m-%d %H:%M:%S %Z")
 
     # Deduplication
     dedup_chats = []
@@ -139,8 +140,12 @@ def clean_chat_data(log_files, action_type):
         visited_conv_ids.add(chats[i]["conversation_id"])
         dedup_chats.append(chats[i])
 
-    print(f"#raw: {len(raw_data)}, #chat: {len(chats)}, #dedup_chat: {len(dedup_chats)}")
-    print(f"#invalid_conv_id: {ct_invalid_conv_id}, #network_error: {ct_network_error}, #invalid: {ct_invalid}")
+    print(
+        f"#raw: {len(raw_data)}, #chat: {len(chats)}, #dedup_chat: {len(dedup_chats)}"
+    )
+    print(
+        f"#invalid_conv_id: {ct_invalid_conv_id}, #network_error: {ct_network_error}, #invalid: {ct_invalid}"
+    )
     print(f"#models: {len(all_models)}, {all_models}")
     print(f"last-updated: {last_updated_datetime}")
 
@@ -156,7 +161,9 @@ if __name__ == "__main__":
     log_files = get_log_files(args.max_num_files)
     chats = clean_chat_data(log_files, args.action_type)
     last_updated_tstamp = chats[-1]["tstamp"]
-    cutoff_date = datetime.datetime.fromtimestamp(last_updated_tstamp, tz=timezone("US/Pacific")).strftime("%Y%m%d")
+    cutoff_date = datetime.datetime.fromtimestamp(
+        last_updated_tstamp, tz=timezone("US/Pacific")
+    ).strftime("%Y%m%d")
 
     output = f"clean_{args.action_type}_conv_{cutoff_date}.json"
     with open(output, "w") as fout:

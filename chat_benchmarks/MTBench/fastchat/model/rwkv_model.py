@@ -13,7 +13,9 @@ from rwkv.utils import PIPELINE, PIPELINE_ARGS
 
 class RwkvModel:
     def __init__(self, model_path):
-        warnings.warn("Experimental support. Please use ChatRWKV if you want to chat with RWKV")
+        warnings.warn(
+            "Experimental support. Please use ChatRWKV if you want to chat with RWKV"
+        )
         self.config = SimpleNamespace(is_encoder_decoder=False)
         self.model = RWKV(model=model_path, strategy="cuda fp16")
         # two GPUs
@@ -35,7 +37,9 @@ class RwkvModel:
         out = SimpleNamespace(logits=logits, past_key_values=state)
         return out
 
-    def generate(self, input_ids, do_sample, temperature, max_new_tokens, repetition_penalty=1.0):
+    def generate(
+        self, input_ids, do_sample, temperature, max_new_tokens, repetition_penalty=1.0
+    ):
         # This function is used by fastchat.llm_judge.
         # Because RWKV does not support huggingface generation API,
         # we reuse fastchat.serve.inference.generate_stream as a workaround.
@@ -45,7 +49,9 @@ class RwkvModel:
         from fastchat.conversation import get_conv_template
 
         if self.tokenizer is None:
-            self.tokenizer = AutoTokenizer.from_pretrained("EleutherAI/pythia-160m", use_fast=True)
+            self.tokenizer = AutoTokenizer.from_pretrained(
+                "EleutherAI/pythia-160m", use_fast=True
+            )
         prompt = self.tokenizer.decode(input_ids[0].tolist())
         conv = get_conv_template("rwkv")
 

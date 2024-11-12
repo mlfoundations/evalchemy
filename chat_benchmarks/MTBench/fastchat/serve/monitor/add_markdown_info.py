@@ -39,7 +39,9 @@ def remove_pattern(answer, pattern):
 def get_element_counts(df, column):
     pattern = re.compile("```([^`]*)```")
     answers = df[column].map(
-        lambda convo: "\n".join([turn["content"] for turn in convo if turn["role"] == "assistant"])
+        lambda convo: "\n".join(
+            [turn["content"] for turn in convo if turn["role"] == "assistant"]
+        )
     )
     results = answers.progress_map(
         lambda answer: count_markdown_elements(

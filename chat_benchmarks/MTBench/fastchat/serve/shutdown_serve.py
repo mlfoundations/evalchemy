@@ -9,7 +9,9 @@ import os
 import subprocess
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--down", choices=["all", "controller", "model_worker", "openai_api_server"])
+parser.add_argument(
+    "--down", choices=["all", "controller", "model_worker", "openai_api_server"]
+)
 args = parser.parse_args()
 base_shell = "ps -eo user,pid,cmd|grep fastchat.serve{}|grep -v grep|awk '{{print $2}}'|xargs kill -9"
 if args.down == "all":

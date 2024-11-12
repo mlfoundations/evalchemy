@@ -4,7 +4,6 @@ Make the delta weights by subtracting base weights.
 Usage:
 python3 -m fastchat.model.make_delta --base ~/model_weights/llama-13b --target ~/model_weights/vicuna-13b --delta ~/model_weights/vicuna-13b-delta --hub-repo-id lmsys/vicuna-13b-delta-v1.1
 """
-
 import argparse
 
 import torch
@@ -14,10 +13,14 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 
 def make_delta(base_model_path, target_model_path, delta_path):
     print(f"Loading the base model from {base_model_path}")
-    base = AutoModelForCausalLM.from_pretrained(base_model_path, torch_dtype=torch.float16, low_cpu_mem_usage=True)
+    base = AutoModelForCausalLM.from_pretrained(
+        base_model_path, torch_dtype=torch.float16, low_cpu_mem_usage=True
+    )
 
     print(f"Loading the target model from {target_model_path}")
-    target = AutoModelForCausalLM.from_pretrained(target_model_path, torch_dtype=torch.float16, low_cpu_mem_usage=True)
+    target = AutoModelForCausalLM.from_pretrained(
+        target_model_path, torch_dtype=torch.float16, low_cpu_mem_usage=True
+    )
     target_tokenizer = AutoTokenizer.from_pretrained(target_model_path, use_fast=False)
 
     print("Calculating the delta")

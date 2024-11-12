@@ -47,7 +47,7 @@ def set_global_vars_named(enable_moderation_):
 
 
 def load_demo_side_by_side_named(models, url_params):
-    states = (None,) * num_sides
+    states = [None] * num_sides
 
     model_left = models[0] if len(models) > 0 else ""
     if len(models) > 1:
@@ -57,10 +57,10 @@ def load_demo_side_by_side_named(models, url_params):
     else:
         model_right = model_left
 
-    selector_updates = (
+    selector_updates = [
         gr.Dropdown(choices=models, value=model_left, visible=True),
         gr.Dropdown(choices=models, value=model_right, visible=True),
-    )
+    ]
 
     return states + selector_updates
 
@@ -78,27 +78,43 @@ def vote_last_response(states, vote_type, model_selectors, request: gr.Request):
     get_remote_logger().log(data)
 
 
-def leftvote_last_response(state0, state1, model_selector0, model_selector1, request: gr.Request):
+def leftvote_last_response(
+    state0, state1, model_selector0, model_selector1, request: gr.Request
+):
     logger.info(f"leftvote (named). ip: {get_ip(request)}")
-    vote_last_response([state0, state1], "leftvote", [model_selector0, model_selector1], request)
+    vote_last_response(
+        [state0, state1], "leftvote", [model_selector0, model_selector1], request
+    )
     return ("",) + (disable_btn,) * 4
 
 
-def rightvote_last_response(state0, state1, model_selector0, model_selector1, request: gr.Request):
+def rightvote_last_response(
+    state0, state1, model_selector0, model_selector1, request: gr.Request
+):
     logger.info(f"rightvote (named). ip: {get_ip(request)}")
-    vote_last_response([state0, state1], "rightvote", [model_selector0, model_selector1], request)
+    vote_last_response(
+        [state0, state1], "rightvote", [model_selector0, model_selector1], request
+    )
     return ("",) + (disable_btn,) * 4
 
 
-def tievote_last_response(state0, state1, model_selector0, model_selector1, request: gr.Request):
+def tievote_last_response(
+    state0, state1, model_selector0, model_selector1, request: gr.Request
+):
     logger.info(f"tievote (named). ip: {get_ip(request)}")
-    vote_last_response([state0, state1], "tievote", [model_selector0, model_selector1], request)
+    vote_last_response(
+        [state0, state1], "tievote", [model_selector0, model_selector1], request
+    )
     return ("",) + (disable_btn,) * 4
 
 
-def bothbad_vote_last_response(state0, state1, model_selector0, model_selector1, request: gr.Request):
+def bothbad_vote_last_response(
+    state0, state1, model_selector0, model_selector1, request: gr.Request
+):
     logger.info(f"bothbad_vote (named). ip: {get_ip(request)}")
-    vote_last_response([state0, state1], "bothbad_vote", [model_selector0, model_selector1], request)
+    vote_last_response(
+        [state0, state1], "bothbad_vote", [model_selector0, model_selector1], request
+    )
     return ("",) + (disable_btn,) * 4
 
 
@@ -108,7 +124,9 @@ def regenerate(state0, state1, request: gr.Request):
     if state0.regen_support and state1.regen_support:
         for i in range(num_sides):
             states[i].conv.update_last_message(None)
-        return states + [x.to_gradio_chatbot() for x in states] + [""] + [disable_btn] * 6
+        return (
+            states + [x.to_gradio_chatbot() for x in states] + [""] + [disable_btn] * 6
+        )
     states[0].skip_next = True
     states[1].skip_next = True
     return states + [x.to_gradio_chatbot() for x in states] + [""] + [no_change_btn] * 6
@@ -116,16 +134,26 @@ def regenerate(state0, state1, request: gr.Request):
 
 def clear_history(request: gr.Request):
     logger.info(f"clear_history (named). ip: {get_ip(request)}")
-    return [None] * num_sides + [None] * num_sides + [""] + [invisible_btn] * 4 + [disable_btn] * 2
+    return (
+        [None] * num_sides
+        + [None] * num_sides
+        + [""]
+        + [invisible_btn] * 4
+        + [disable_btn] * 2
+    )
 
 
 def share_click(state0, state1, model_selector0, model_selector1, request: gr.Request):
     logger.info(f"share (named). ip: {get_ip(request)}")
     if state0 is not None and state1 is not None:
-        vote_last_response([state0, state1], "share", [model_selector0, model_selector1], request)
+        vote_last_response(
+            [state0, state1], "share", [model_selector0, model_selector1], request
+        )
 
 
-def add_text(state0, state1, model_selector0, model_selector1, text, request: gr.Request):
+def add_text(
+    state0, state1, model_selector0, model_selector1, text, request: gr.Request
+):
     ip = get_ip(request)
     logger.info(f"add_text (named). ip: {ip}. len: {len(text)}")
     states = [state0, state1]
@@ -152,7 +180,9 @@ def add_text(state0, state1, model_selector0, model_selector1, text, request: gr
     model_list = [states[i].model_name for i in range(num_sides)]
     all_conv_text_left = states[0].conv.get_prompt()
     all_conv_text_right = states[1].conv.get_prompt()
-    all_conv_text = all_conv_text_left[-1000:] + all_conv_text_right[-1000:] + "\nuser: " + text
+    all_conv_text = (
+        all_conv_text_left[-1000:] + all_conv_text_right[-1000:] + "\nuser: " + text
+    )
     flagged = moderation_filter(all_conv_text, model_list)
     if flagged:
         logger.info(f"violate moderation (named). ip: {ip}. text: {text}")
@@ -238,11 +268,16 @@ def bot_response_multi(
             token_per_yield = 30
         elif states[i].model_name in [
             "qwen-max-0428",
+            "qwen-vl-max-0809",
             "qwen1.5-110b-chat",
         ]:
             token_per_yield = 7
         elif states[i].model_name in [
+            "qwen2.5-72b-instruct",
             "qwen2-72b-instruct",
+            "qwen-plus-0828",
+            "qwen-max-0919",
+            "llama-3.1-405b-instruct-bf16",
         ]:
             token_per_yield = 4
         model_tpy.append(token_per_yield)
@@ -278,12 +313,12 @@ def flash_buttons():
 
 def build_side_by_side_ui_named(models):
     notice_markdown = f"""
-# ⚔️  LMSYS Chatbot Arena: Benchmarking LLMs in the Wild
-[Blog](https://lmsys.org/blog/2023-05-03-arena/) | [GitHub](https://github.com/lm-sys/FastChat) | [Paper](https://arxiv.org/abs/2403.04132) | [Dataset](https://github.com/lm-sys/FastChat/blob/main/docs/dataset_release.md) | [Twitter](https://twitter.com/lmsysorg) | [Discord](https://discord.gg/HSWAKCrnFx) | [Kaggle Competition](https://www.kaggle.com/competitions/lmsys-chatbot-arena)
+# ⚔️  Chatbot Arena (formerly LMSYS): Free AI Chat to Compare & Test Best AI Chatbots
+[Blog](https://blog.lmarena.ai/blog/2023/arena/) | [GitHub](https://github.com/lm-sys/FastChat) | [Paper](https://arxiv.org/abs/2403.04132) | [Dataset](https://github.com/lm-sys/FastChat/blob/main/docs/dataset_release.md) | [Twitter](https://twitter.com/lmsysorg) | [Discord](https://discord.gg/6GXcFg3TH8) | [Kaggle Competition](https://www.kaggle.com/competitions/lmsys-chatbot-arena)
 
 {SURVEY_LINK}
 
-## 📜 Rules
+## 📜 How It Works
 - Ask any question to two chosen models (e.g., ChatGPT, Gemini, Claude, Llama) and vote for the better one!
 - You can chat for multiple turns until you identify a winner.
 
@@ -308,7 +343,9 @@ def build_side_by_side_ui_named(models):
                         container=False,
                     )
         with gr.Row():
-            with gr.Accordion(f"🔍 Expand to see the descriptions of {len(models)} models", open=False):
+            with gr.Accordion(
+                f"🔍 Expand to see the descriptions of {len(models)} models", open=False
+            ):
                 model_description_md = get_model_description_md(models)
                 gr.Markdown(model_description_md, elem_id="model_description_markdown")
 
@@ -324,10 +361,16 @@ def build_side_by_side_ui_named(models):
                     )
 
     with gr.Row():
-        leftvote_btn = gr.Button(value="👈  A is better", visible=False, interactive=False)
-        rightvote_btn = gr.Button(value="👉  B is better", visible=False, interactive=False)
+        leftvote_btn = gr.Button(
+            value="👈  A is better", visible=False, interactive=False
+        )
+        rightvote_btn = gr.Button(
+            value="👉  B is better", visible=False, interactive=False
+        )
         tie_btn = gr.Button(value="🤝  Tie", visible=False, interactive=False)
-        bothbad_btn = gr.Button(value="👎  Both are bad", visible=False, interactive=False)
+        bothbad_btn = gr.Button(
+            value="👎  Both are bad", visible=False, interactive=False
+        )
 
     with gr.Row():
         textbox = gr.Textbox(
@@ -399,11 +442,15 @@ def build_side_by_side_ui_named(models):
         states + model_selectors,
         [textbox, leftvote_btn, rightvote_btn, tie_btn, bothbad_btn],
     )
-    regenerate_btn.click(regenerate, states, states + chatbots + [textbox] + btn_list).then(
+    regenerate_btn.click(
+        regenerate, states, states + chatbots + [textbox] + btn_list
+    ).then(
         bot_response_multi,
         states + [temperature, top_p, max_output_tokens],
         states + chatbots + btn_list,
-    ).then(flash_buttons, [], btn_list)
+    ).then(
+        flash_buttons, [], btn_list
+    )
     clear_btn.click(clear_history, None, states + chatbots + [textbox] + btn_list)
 
     share_js = """
@@ -429,7 +476,9 @@ function (a, b, c, d) {
     share_btn.click(share_click, states + model_selectors, [], js=share_js)
 
     for i in range(num_sides):
-        model_selectors[i].change(clear_history, None, states + chatbots + [textbox] + btn_list)
+        model_selectors[i].change(
+            clear_history, None, states + chatbots + [textbox] + btn_list
+        )
 
     textbox.submit(
         add_text,
@@ -439,7 +488,9 @@ function (a, b, c, d) {
         bot_response_multi,
         states + [temperature, top_p, max_output_tokens],
         states + chatbots + btn_list,
-    ).then(flash_buttons, [], btn_list)
+    ).then(
+        flash_buttons, [], btn_list
+    )
     send_btn.click(
         add_text,
         states + model_selectors + [textbox],
@@ -448,6 +499,8 @@ function (a, b, c, d) {
         bot_response_multi,
         states + [temperature, top_p, max_output_tokens],
         states + chatbots + btn_list,
-    ).then(flash_buttons, [], btn_list)
+    ).then(
+        flash_buttons, [], btn_list
+    )
 
     return states + model_selectors

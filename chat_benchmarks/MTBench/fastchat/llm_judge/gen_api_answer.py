@@ -3,7 +3,6 @@
 Usage:
 python3 gen_api_answer.py --model gpt-3.5-turbo
 """
-
 import argparse
 import json
 import os
@@ -25,8 +24,12 @@ from fastchat.llm_judge.gen_model_answer import reorg_answer_file
 from fastchat.model.model_adapter import get_conversation_template, ANTHROPIC_MODEL_LIST
 
 
-def get_answer(question: dict, model: str, num_choices: int, max_tokens: int, answer_file: str):
-    assert (args.force_temperature is not None and "required_temperature" in question.keys()) == False
+def get_answer(
+    question: dict, model: str, num_choices: int, max_tokens: int, answer_file: str
+):
+    assert (
+        args.force_temperature is not None and "required_temperature" in question.keys()
+    ) == False
     if args.force_temperature is not None:
         temperature = args.force_temperature
     elif "required_temperature" in question.keys():
@@ -49,7 +52,9 @@ def get_answer(question: dict, model: str, num_choices: int, max_tokens: int, an
             if model in ANTHROPIC_MODEL_LIST:
                 output = chat_completion_anthropic(model, conv, temperature, max_tokens)
             elif model == "palm-2-chat-bison-001":
-                chat_state, output = chat_completion_palm(chat_state, model, conv, temperature, max_tokens)
+                chat_state, output = chat_completion_palm(
+                    chat_state, model, conv, temperature, max_tokens
+                )
             else:
                 output = chat_completion_openai(model, conv, temperature, max_tokens)
 
@@ -88,7 +93,9 @@ if __name__ == "__main__":
         default=1,
         help="How many completion choices to generate.",
     )
-    parser.add_argument("--force-temperature", type=float, help="Forcibly set a sampling temperature.")
+    parser.add_argument(
+        "--force-temperature", type=float, help="Forcibly set a sampling temperature."
+    )
     parser.add_argument(
         "--max-tokens",
         type=int,
@@ -100,8 +107,12 @@ if __name__ == "__main__":
         type=int,
         help="A debug option. The begin index of questions.",
     )
-    parser.add_argument("--question-end", type=int, help="A debug option. The end index of questions.")
-    parser.add_argument("--parallel", type=int, default=1, help="The number of concurrent API calls.")
+    parser.add_argument(
+        "--question-end", type=int, help="A debug option. The end index of questions."
+    )
+    parser.add_argument(
+        "--parallel", type=int, default=1, help="The number of concurrent API calls."
+    )
     parser.add_argument("--openai-api-base", type=str, default=None)
     args = parser.parse_args()
 
@@ -130,7 +141,9 @@ if __name__ == "__main__":
             )
             futures.append(future)
 
-        for future in tqdm.tqdm(concurrent.futures.as_completed(futures), total=len(futures)):
+        for future in tqdm.tqdm(
+            concurrent.futures.as_completed(futures), total=len(futures)
+        ):
             future.result()
 
     reorg_answer_file(answer_file)

@@ -31,7 +31,9 @@ class CompressionConfig:
     enabled: bool = True
 
 
-default_compression_config = CompressionConfig(num_bits=8, group_size=256, group_dim=1, symmetric=True, enabled=True)
+default_compression_config = CompressionConfig(
+    num_bits=8, group_size=256, group_dim=1, symmetric=True, enabled=True
+)
 
 
 class CLinear(nn.Module):
@@ -72,7 +74,9 @@ def get_compressed_list(module, prefix=""):
     for attr_str in dir(module):
         target_attr = getattr(module, attr_str)
         if type(target_attr) == torch.nn.Linear:
-            full_name = f"{prefix}.{attr_str}.weight" if prefix else f"{attr_str}.weight"
+            full_name = (
+                f"{prefix}.{attr_str}.weight" if prefix else f"{attr_str}.weight"
+            )
             compressed_list.append(full_name)
     for name, child in module.named_children():
         child_prefix = f"{prefix}.{name}" if prefix else name
@@ -85,15 +89,21 @@ def apply_compressed_weight(module, compressed_state_dict, target_device, prefix
     for attr_str in dir(module):
         target_attr = getattr(module, attr_str)
         if type(target_attr) == torch.nn.Linear:
-            full_name = f"{prefix}.{attr_str}.weight" if prefix else f"{attr_str}.weight"
+            full_name = (
+                f"{prefix}.{attr_str}.weight" if prefix else f"{attr_str}.weight"
+            )
             setattr(
                 module,
                 attr_str,
-                CLinear(compressed_state_dict[full_name], target_attr.bias, target_device),
+                CLinear(
+                    compressed_state_dict[full_name], target_attr.bias, target_device
+                ),
             )
     for name, child in module.named_children():
         child_prefix = f"{prefix}.{name}" if prefix else name
-        apply_compressed_weight(child, compressed_state_dict, target_device, child_prefix)
+        apply_compressed_weight(
+            child, compressed_state_dict, target_device, child_prefix
+        )
 
 
 def load_compress_model(model_path, device, torch_dtype, use_fast, revision="main"):
@@ -121,7 +131,9 @@ def load_compress_model(model_path, device, torch_dtype, use_fast, revision="mai
         try:
             # google/flan-* models are based on an AutoModelForSeq2SeqLM.
             if "T5Config" in str(type(config)):
-                model = AutoModelForSeq2SeqLM.from_config(config, trust_remote_code=True)
+                model = AutoModelForSeq2SeqLM.from_config(
+                    config, trust_remote_code=True
+                )
             else:
                 model = AutoModelForCausalLM.from_config(config, trust_remote_code=True)
         except NameError:
@@ -163,7 +175,8 @@ def load_compress_model(model_path, device, torch_dtype, use_fast, revision="mai
         use_safetensors = True
     if len(files) == 0:
         raise ValueError(
-            f"Cannot find any model weight files. " f"Please check your (cached) weight path: {model_path}"
+            f"Cannot find any model weight files. "
+            f"Please check your (cached) weight path: {model_path}"
         )
 
     compressed_state_dict = {}
@@ -173,13 +186,19 @@ def load_compress_model(model_path, device, torch_dtype, use_fast, revision="mai
         if use_safetensors:
             tmp_state_dict = load_file(filename)
         else:
-            tmp_state_dict = torch.load(filename, map_location=lambda storage, loc: storage)
+            tmp_state_dict = torch.load(
+                filename, map_location=lambda storage, loc: storage
+            )
         for name in tmp_state_dict:
             if name in linear_weights:
                 tensor = tmp_state_dict[name].to(device, dtype=torch_dtype)
-                compressed_state_dict[name] = compress(tensor, default_compression_config)
+                compressed_state_dict[name] = compress(
+                    tensor, default_compression_config
+                )
             else:
-                compressed_state_dict[name] = tmp_state_dict[name].to(device, dtype=torch_dtype)
+                compressed_state_dict[name] = tmp_state_dict[name].to(
+                    device, dtype=torch_dtype
+                )
             tmp_state_dict[name] = None
             tensor = None
             gc.collect()
@@ -191,7 +210,9 @@ def load_compress_model(model_path, device, torch_dtype, use_fast, revision="mai
 
     for name in model.state_dict():
         if name not in linear_weights:
-            set_module_tensor_to_device(model, name, device, value=compressed_state_dict[name])
+            set_module_tensor_to_device(
+                model, name, device, value=compressed_state_dict[name]
+            )
     apply_compressed_weight(model, compressed_state_dict, device)
 
     if torch_dtype == torch.float16:
@@ -217,12 +238,18 @@ def compress(tensor, config):
 
     original_shape = tensor.shape
     num_groups = (original_shape[group_dim] + group_size - 1) // group_size
-    new_shape = original_shape[:group_dim] + (num_groups, group_size) + original_shape[group_dim + 1 :]
+    new_shape = (
+        original_shape[:group_dim]
+        + (num_groups, group_size)
+        + original_shape[group_dim + 1 :]
+    )
 
     # Pad
     pad_len = (group_size - original_shape[group_dim] % group_size) % group_size
     if pad_len != 0:
-        pad_shape = original_shape[:group_dim] + (pad_len,) + original_shape[group_dim + 1 :]
+        pad_shape = (
+            original_shape[:group_dim] + (pad_len,) + original_shape[group_dim + 1 :]
+        )
         tensor = torch.cat(
             [tensor, torch.zeros(pad_shape, dtype=tensor.dtype, device=tensor.device)],
             dim=group_dim,
@@ -274,7 +301,9 @@ def decompress(packed_data, config):
     pad_len = (group_size - original_shape[group_dim] % group_size) % group_size
     if pad_len:
         padded_original_shape = (
-            original_shape[:group_dim] + (original_shape[group_dim] + pad_len,) + original_shape[group_dim + 1 :]
+            original_shape[:group_dim]
+            + (original_shape[group_dim] + pad_len,)
+            + original_shape[group_dim + 1 :]
         )
         data = data.reshape(padded_original_shape)
         indices = [slice(0, x) for x in original_shape]

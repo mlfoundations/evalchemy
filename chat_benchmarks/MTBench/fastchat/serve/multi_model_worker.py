@@ -11,7 +11,6 @@ thus reports the combined queue lengths for health checks.
 We recommend using this with multiple Peft models (with `peft` in the name)
 where all Peft models are trained on the exact same base model.
 """
-
 import argparse
 import asyncio
 import dataclasses
@@ -163,7 +162,9 @@ def create_multi_model_worker():
     parser.add_argument("--host", type=str, default="localhost")
     parser.add_argument("--port", type=int, default=21002)
     parser.add_argument("--worker-address", type=str, default="http://localhost:21002")
-    parser.add_argument("--controller-address", type=str, default="http://localhost:21001")
+    parser.add_argument(
+        "--controller-address", type=str, default="http://localhost:21001"
+    )
     add_model_args(parser)
     # Override the model path to be repeated and align it with model names.
     parser.add_argument(
@@ -201,7 +202,9 @@ def create_multi_model_worker():
 
     if args.gpus:
         if len(args.gpus.split(",")) < args.num_gpus:
-            raise ValueError(f"Larger --num-gpus ({args.num_gpus}) than --gpus {args.gpus}!")
+            raise ValueError(
+                f"Larger --num-gpus ({args.num_gpus}) than --gpus {args.gpus}!"
+            )
         os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
 
     gptq_config = GptqConfig(
@@ -239,7 +242,9 @@ def create_multi_model_worker():
 
     # Launch all workers
     workers = []
-    for conv_template, model_path, model_names in zip(args.conv_template, args.model_path, args.model_names):
+    for conv_template, model_path, model_names in zip(
+        args.conv_template, args.model_path, args.model_names
+    ):
         w = ModelWorker(
             args.controller_address,
             args.worker_address,

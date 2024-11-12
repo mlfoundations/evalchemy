@@ -156,7 +156,13 @@ def find_required_tasks(row):
     cache_category = CACHE_DICT[id]["category_tag"] if id in CACHE_DICT else {}
     output_category = OUTPUT_DICT[id]["category_tag"] if id in OUTPUT_DICT else {}
 
-    return [name for name in TASKS if not (name in input_category or name in cache_category or name in output_category)]
+    return [
+        name
+        for name in TASKS
+        if not (
+            name in input_category or name in cache_category or name in output_category
+        )
+    ]
 
 
 if __name__ == "__main__":
@@ -165,7 +171,9 @@ if __name__ == "__main__":
     parser.add_argument("--testing", action="store_true")
     args = parser.parse_args()
 
-    enter = input("Make sure your config file is properly configured. Press enter to continue.")
+    enter = input(
+        "Make sure your config file is properly configured. Press enter to continue."
+    )
     if not enter == "":
         exit()
 
@@ -177,7 +185,9 @@ if __name__ == "__main__":
 
     categories = [Category.create_category(name) for name in config["task_name"]]
     TASKS = config["task_name"]
-    print(f"Following categories will be labeled:\n{[category.name_tag for category in categories]}")
+    print(
+        f"Following categories will be labeled:\n{[category.name_tag for category in categories]}"
+    )
 
     print("loading input data (might take min)")
     with open(config["input_file"], "rb") as f:
@@ -209,7 +219,9 @@ if __name__ == "__main__":
     if os.path.isfile(config["output_file"]):
         print("loading existing output")
         output_data = pd.read_json(config["output_file"], lines=True)
-        output_data["uid"] = output_data.question_id.map(str) + output_data.tstamp.map(str)
+        output_data["uid"] = output_data.question_id.map(str) + output_data.tstamp.map(
+            str
+        )
         assert len(output_data) == len(output_data.uid.unique())
 
         print(f"{len(output_data)}# of existing output just loaded")
@@ -221,21 +233,27 @@ if __name__ == "__main__":
     else:
         OUTPUT_DICT = {}
 
-    print("finding tasks needed to run... (should take around 1 minute or less on large dataset)")
+    print(
+        "finding tasks needed to run... (should take around 1 minute or less on large dataset)"
+    )
     input_data["required_tasks"] = input_data.apply(find_required_tasks, axis=1)
 
     not_labeled = input_data[input_data.required_tasks.map(lambda x: len(x) > 0)].copy()
 
     print(f"{len(not_labeled)} # of conversations needs to be labeled")
     for name in TASKS:
-        print(f"{name}: {len(not_labeled[not_labeled.required_tasks.map(lambda tasks: name in tasks)])}")
+        print(
+            f"{name}: {len(not_labeled[not_labeled.required_tasks.map(lambda tasks: name in tasks)])}"
+        )
 
     not_labeled["prompt"] = not_labeled.conversation_a.map(
         lambda convo: "\n".join([convo[i]["content"] for i in range(0, len(convo), 2)])
     )
     not_labeled["prompt"] = not_labeled.prompt.map(lambda x: x[:12500])
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=config["parallel"]) as executor:
+    with concurrent.futures.ThreadPoolExecutor(
+        max_workers=config["parallel"]
+    ) as executor:
         futures = []
         for index, row in tqdm.tqdm(not_labeled.iterrows()):
             future = executor.submit(
@@ -246,11 +264,17 @@ if __name__ == "__main__":
                 config["temperature"],
                 config["output_file"],
                 get_endpoint(config["endpoints"]),
-                [category for category in categories if category.name_tag in row["required_tasks"]],
+                [
+                    category
+                    for category in categories
+                    if category.name_tag in row["required_tasks"]
+                ],
                 args.testing,
             )
             futures.append(future)
-        for future in tqdm.tqdm(concurrent.futures.as_completed(futures), total=len(futures)):
+        for future in tqdm.tqdm(
+            concurrent.futures.as_completed(futures), total=len(futures)
+        ):
             future.result()
 
     if config["convert_to_json"]:
@@ -277,5 +301,9 @@ if __name__ == "__main__":
         input_data["category_tag"] = input_data.apply(category_merge, axis=1)
         print("merge completed")
 
-        final_data = input_data.drop(columns=["prompt", "uid", "required_tasks"], errors="ignore")
-        final_data.to_json(config["output_file"][:-1], orient="records", indent=4, force_ascii=False)
+        final_data = input_data.drop(
+            columns=["prompt", "uid", "required_tasks"], errors="ignore"
+        )
+        final_data.to_json(
+            config["output_file"][:-1], orient="records", indent=4, force_ascii=False
+        )

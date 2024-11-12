@@ -7,7 +7,6 @@ python3 -m fastchat.model.apply_lora --base ~/model_weights/llama-7b --target ~/
 Dependency:
 pip3 install git+https://github.com/huggingface/peft.git@2822398fbe896f25d4dac5e468624dc5fd65a51b
 """
-
 import argparse
 
 import torch
@@ -17,7 +16,9 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 
 def apply_lora(base_model_path, target_model_path, lora_path):
     print(f"Loading the base model from {base_model_path}")
-    base = AutoModelForCausalLM.from_pretrained(base_model_path, torch_dtype=torch.float16, low_cpu_mem_usage=True)
+    base = AutoModelForCausalLM.from_pretrained(
+        base_model_path, torch_dtype=torch.float16, low_cpu_mem_usage=True
+    )
     base_tokenizer = AutoTokenizer.from_pretrained(base_model_path, use_fast=False)
 
     print(f"Loading the LoRA adapter from {lora_path}")

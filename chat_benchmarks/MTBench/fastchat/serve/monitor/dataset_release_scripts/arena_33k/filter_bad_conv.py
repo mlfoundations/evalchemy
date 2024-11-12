@@ -3,7 +3,6 @@ Filter conversations for release.
 
 Usage: python3 filter_bad_conv.py --in clean_battle_conv_20230630_tagged_v1_pii.json
 """
-
 import argparse
 from collections import defaultdict
 from enum import Enum, auto
@@ -36,7 +35,9 @@ def detect_type(conv):
             if not isinstance(msg, str):
                 return TypeCode.BAD_FORMAT
 
-        user_prompts = [row["content"].lower().strip() for row in conv[key] if row["role"] == "user"]
+        user_prompts = [
+            row["content"].lower().strip() for row in conv[key] if row["role"] == "user"
+        ]
         if len(messages) <= 2 and all(len(x) < 16 for x in user_prompts):
             return TypeCode.TOO_SHORT
 

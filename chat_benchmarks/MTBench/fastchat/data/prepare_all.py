@@ -9,14 +9,20 @@ from fastchat.utils import run_cmd
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--prefix", type=str, default="~/datasets/sharegpt_20230521")
-    parser.add_argument("--model-name-or-path", type=str, default="meta-llama/Llama-2-7b-chat-hf")
+    parser.add_argument(
+        "--model-name-or-path", type=str, default="meta-llama/Llama-2-7b-chat-hf"
+    )
     parser.add_argument("--seq-len", type=int, default=4096)
     args = parser.parse_args()
 
     in_prefix = args.prefix
     model_path = args.model_name_or_path
     seq_len = args.seq_len
-    prefix = f"{in_prefix}_{seq_len}".replace("4096", "4k").replace("8192", "8k").replace("16384", "16k")
+    prefix = (
+        f"{in_prefix}_{seq_len}".replace("4096", "4k")
+        .replace("8192", "8k")
+        .replace("16384", "16k")
+    )
 
     cmd_list = [
         f"python3 -m fastchat.data.clean_sharegpt --in {in_prefix}_html.json --out {prefix}_clean.json",

@@ -39,7 +39,9 @@ def create_embedding_data_frame(data_path, model, max_tokens=500):
     df = pd.read_csv(data_path, index_col=0)
     df = df[["Time", "ProductId", "UserId", "Score", "Summary", "Text"]]
     df = df.dropna()
-    df["combined"] = "Title: " + df.Summary.str.strip() + "; Content: " + df.Text.str.strip()
+    df["combined"] = (
+        "Title: " + df.Summary.str.strip() + "; Content: " + df.Text.str.strip()
+    )
     top_n = 1000
     df = df.sort_values("Time").tail(top_n * 2)
     df.drop("Time", axis=1, inplace=True)
@@ -66,7 +68,9 @@ def train_random_forest(df):
 
 input_datapath = "amazon_fine_food_review.csv"
 if not os.path.exists(input_datapath):
-    raise Exception(f"Please download data from: https://www.kaggle.com/datasets/snap/amazon-fine-food-reviews")
+    raise Exception(
+        f"Please download data from: https://www.kaggle.com/datasets/snap/amazon-fine-food-reviews"
+    )
 
 df = create_embedding_data_frame(input_datapath, "vicuna-7b-v1.1")
 clf, accuracy, report = train_random_forest(df)

@@ -11,7 +11,9 @@ from transformers import AutoTokenizer
 class GptqConfig:
     ckpt: str = field(
         default=None,
-        metadata={"help": "Load quantized model. The path to the local GPTQ checkpoint."},
+        metadata={
+            "help": "Load quantized model. The path to the local GPTQ checkpoint."
+        },
     )
     wbits: int = field(default=16, metadata={"help": "#bits to use for quantization"})
     groupsize: int = field(

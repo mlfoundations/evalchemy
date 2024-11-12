@@ -8,7 +8,6 @@ The key mechanism behind this scripts is:
     2, check the log of controller/worker/openai-api-server to ensure that the serve is launched properly.
 Note that a few of non-critical `fastchat.serve` cmd options are not supported currently.
 """
-
 import sys
 import os
 
@@ -152,7 +151,9 @@ worker_args = [
 
 parser.add_argument("--server-host", type=str, default="localhost", help="host name")
 parser.add_argument("--server-port", type=int, default=8001, help="port number")
-parser.add_argument("--allow-credentials", action="store_true", help="allow credentials")
+parser.add_argument(
+    "--allow-credentials", action="store_true", help="allow credentials"
+)
 # parser.add_argument(
 #     "--allowed-origins", type=json.loads, default=["*"], help="allowed origins"
 # )
@@ -184,7 +185,9 @@ args = argparse.Namespace(
 
 if args.gpus:
     if len(args.gpus.split(",")) < args.num_gpus:
-        raise ValueError(f"Larger --num-gpus ({args.num_gpus}) than --gpus {args.gpus}!")
+        raise ValueError(
+            f"Larger --num-gpus ({args.num_gpus}) than --gpus {args.gpus}!"
+        )
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
 
 # 0,controller, model_worker, openai_api_server
@@ -216,7 +219,11 @@ def string_args(args, args_list):
         # 1==True ->  True
         elif isinstance(value, bool) and value == True:
             args_str += f" --{key} "
-        elif isinstance(value, list) or isinstance(value, tuple) or isinstance(value, set):
+        elif (
+            isinstance(value, list)
+            or isinstance(value, tuple)
+            or isinstance(value, set)
+        ):
             value = " ".join(value)
             args_str += f" --{key} {value} "
         else:
@@ -226,13 +233,21 @@ def string_args(args, args_list):
 
 
 def launch_worker(item):
-    log_name = item.split("/")[-1].split("\\")[-1].replace("-", "_").replace("@", "_").replace(".", "_")
+    log_name = (
+        item.split("/")[-1]
+        .split("\\")[-1]
+        .replace("-", "_")
+        .replace("@", "_")
+        .replace(".", "_")
+    )
 
     args.model_path, args.worker_host, args.worker_port = item.split("@")
     print("*" * 80)
     worker_str_args = string_args(args, worker_args)
     print(worker_str_args)
-    worker_sh = base_launch_sh.format("model_worker", worker_str_args, LOGDIR, f"worker_{log_name}")
+    worker_sh = base_launch_sh.format(
+        "model_worker", worker_str_args, LOGDIR, f"worker_{log_name}"
+    )
     worker_check_sh = base_check_sh.format(LOGDIR, f"worker_{log_name}", "model_worker")
     subprocess.run(worker_sh, shell=True, check=True)
     subprocess.run(worker_check_sh, shell=True, check=True)
@@ -240,7 +255,9 @@ def launch_worker(item):
 
 def launch_all():
     controller_str_args = string_args(args, controller_args)
-    controller_sh = base_launch_sh.format("controller", controller_str_args, LOGDIR, "controller")
+    controller_sh = base_launch_sh.format(
+        "controller", controller_str_args, LOGDIR, "controller"
+    )
     controller_check_sh = base_check_sh.format(LOGDIR, "controller", "controller")
     subprocess.run(controller_sh, shell=True, check=True)
     subprocess.run(controller_check_sh, shell=True, check=True)
@@ -253,8 +270,12 @@ def launch_all():
             launch_worker(item)
 
     server_str_args = string_args(args, server_args)
-    server_sh = base_launch_sh.format("openai_api_server", server_str_args, LOGDIR, "openai_api_server")
-    server_check_sh = base_check_sh.format(LOGDIR, "openai_api_server", "openai_api_server")
+    server_sh = base_launch_sh.format(
+        "openai_api_server", server_str_args, LOGDIR, "openai_api_server"
+    )
+    server_check_sh = base_check_sh.format(
+        LOGDIR, "openai_api_server", "openai_api_server"
+    )
     subprocess.run(server_sh, shell=True, check=True)
     subprocess.run(server_check_sh, shell=True, check=True)
 

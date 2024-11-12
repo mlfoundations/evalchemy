@@ -3,7 +3,6 @@
 Usage:
 python3 gen_model_answer.py --model-path lmsys/fastchat-t5-3b-v1.0 --model-id fastchat-t5-3b-v1.0
 """
-
 import argparse
 import json
 import os
@@ -43,7 +42,9 @@ def run_eval(
     use_ray = num_gpus_total // num_gpus_per_model > 1
 
     if use_ray:
-        get_answers_func = ray.remote(num_gpus=num_gpus_per_model)(get_model_answers).remote
+        get_answers_func = ray.remote(num_gpus=num_gpus_per_model)(
+            get_model_answers
+        ).remote
     else:
         get_answers_func = get_model_answers
 
@@ -132,7 +133,11 @@ def get_model_answers(
 
                     # be consistent with the template's stop_token_ids
                     if conv.stop_token_ids:
-                        stop_token_ids_index = [i for i, id in enumerate(output_ids) if id in conv.stop_token_ids]
+                        stop_token_ids_index = [
+                            i
+                            for i, id in enumerate(output_ids)
+                            if id in conv.stop_token_ids
+                        ]
                         if len(stop_token_ids_index) > 0:
                             output_ids = output_ids[: stop_token_ids_index[0]]
 
@@ -142,7 +147,11 @@ def get_model_answers(
                     )
                     if conv.stop_str and isinstance(conv.stop_str, list):
                         stop_str_indices = sorted(
-                            [output.find(stop_str) for stop_str in conv.stop_str if output.find(stop_str) > 0]
+                            [
+                                output.find(stop_str)
+                                for stop_str in conv.stop_str
+                                if output.find(stop_str) > 0
+                            ]
                         )
                         if len(stop_str_indices) > 0:
                             output = output[: stop_str_indices[0]]
@@ -203,7 +212,9 @@ if __name__ == "__main__":
         required=True,
         help="The path to the weights. This can be a local folder or a Hugging Face repo ID.",
     )
-    parser.add_argument("--model-id", type=str, required=True, help="A custom name for the model.")
+    parser.add_argument(
+        "--model-id", type=str, required=True, help="A custom name for the model."
+    )
     parser.add_argument(
         "--bench-name",
         type=str,
@@ -215,7 +226,9 @@ if __name__ == "__main__":
         type=int,
         help="A debug option. The begin index of questions.",
     )
-    parser.add_argument("--question-end", type=int, help="A debug option. The end index of questions.")
+    parser.add_argument(
+        "--question-end", type=int, help="A debug option. The end index of questions."
+    )
     parser.add_argument("--answer-file", type=str, help="The output answer file.")
     parser.add_argument(
         "--max-new-token",
@@ -235,7 +248,9 @@ if __name__ == "__main__":
         default=1,
         help="The number of GPUs per model.",
     )
-    parser.add_argument("--num-gpus-total", type=int, default=1, help="The total number of GPUs.")
+    parser.add_argument(
+        "--num-gpus-total", type=int, default=1, help="The total number of GPUs."
+    )
     parser.add_argument(
         "--max-gpu-memory",
         type=str,

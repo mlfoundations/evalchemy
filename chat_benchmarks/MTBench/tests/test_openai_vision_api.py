@@ -106,7 +106,9 @@ def test_chat_completion_stream(model):
             ],
         }
     ]
-    res = openai.chat.completions.create(model=model, messages=messages, stream=True, temperature=0)
+    res = openai.chat.completions.create(
+        model=model, messages=messages, stream=True, temperature=0
+    )
     for chunk in res:
         try:
             content = chunk.choices[0].delta.content

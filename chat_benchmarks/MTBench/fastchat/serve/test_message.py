@@ -1,5 +1,4 @@
 """Send a test message."""
-
 import argparse
 import json
 
@@ -21,7 +20,9 @@ def main():
         models.sort()
         print(f"Models: {models}")
 
-        ret = requests.post(controller_addr + "/get_worker_address", json={"model": model_name})
+        ret = requests.post(
+            controller_addr + "/get_worker_address", json={"model": model_name}
+        )
         worker_addr = ret.json()["address"]
         print(f"worker_addr: {worker_addr}")
 
@@ -65,12 +66,16 @@ def main():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--controller-address", type=str, default="http://localhost:21001")
+    parser.add_argument(
+        "--controller-address", type=str, default="http://localhost:21001"
+    )
     parser.add_argument("--worker-address", type=str)
     parser.add_argument("--model-name", type=str, required=True)
     parser.add_argument("--temperature", type=float, default=0.0)
     parser.add_argument("--max-new-tokens", type=int, default=32)
-    parser.add_argument("--message", type=str, default="Tell me a story with more than 1000 words.")
+    parser.add_argument(
+        "--message", type=str, default="Tell me a story with more than 1000 words."
+    )
     args = parser.parse_args()
 
     main()

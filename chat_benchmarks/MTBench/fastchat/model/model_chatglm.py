@@ -2,7 +2,6 @@
 Inference code for ChatGLM.
 Adapted from https://huggingface.co/THUDM/chatglm-6b/blob/main/modeling_chatglm.py.
 """
-
 import re
 
 import torch
@@ -10,7 +9,9 @@ from transformers.generation.logits_process import LogitsProcessor
 
 
 class InvalidScoreLogitsProcessor(LogitsProcessor):
-    def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor) -> torch.FloatTensor:
+    def __call__(
+        self, input_ids: torch.LongTensor, scores: torch.FloatTensor
+    ) -> torch.FloatTensor:
         if torch.isnan(scores).any() or torch.isinf(scores).any():
             scores.zero_()
             scores[..., 5] = 5e4
@@ -37,7 +38,9 @@ def process_response(response):
 
 
 def recover_message_list(prompt):
-    role_token_pattern = "|".join([re.escape(r) for r in ["<|system|>", "<|user|>", "<|assistant|>"]])
+    role_token_pattern = "|".join(
+        [re.escape(r) for r in ["<|system|>", "<|user|>", "<|assistant|>"]]
+    )
     role = None
     last_end_idx = -1
     message_list = []

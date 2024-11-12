@@ -1,5 +1,4 @@
 """Inference for FastChat models."""
-
 import abc
 import gc
 import json
@@ -87,7 +86,9 @@ def generate_stream(
     if tokenizer.eos_token_id not in stop_token_ids:
         stop_token_ids.append(tokenizer.eos_token_id)
 
-    logits_processor = prepare_logits_processor(temperature, repetition_penalty, top_p, top_k)
+    logits_processor = prepare_logits_processor(
+        temperature, repetition_penalty, top_p, top_k
+    )
     input_ids = tokenizer(prompt).input_ids
 
     if model.config.is_encoder_decoder:
@@ -102,7 +103,9 @@ def generate_stream(
     if model.config.is_encoder_decoder:
         if logprobs is not None:  # FIXME: Support logprobs for encoder-decoder models.
             raise NotImplementedError
-        encoder_output = model.encoder(input_ids=torch.as_tensor([input_ids], device=device))[0]
+        encoder_output = model.encoder(
+            input_ids=torch.as_tensor([input_ids], device=device)
+        )[0]
         start_ids = torch.as_tensor(
             [[model.generation_config.decoder_start_token_id]],
             dtype=torch.int64,
@@ -135,7 +138,9 @@ def generate_stream(
                 shift_input_ids = start_ids[..., 1:].contiguous()
                 shift_logits = logits[..., :-1, :].contiguous()
                 shift_logits = torch.log_softmax(shift_logits, dim=-1).tolist()
-                for label_id, logit in zip(shift_input_ids[0].tolist(), shift_logits[0]):
+                for label_id, logit in zip(
+                    shift_input_ids[0].tolist(), shift_logits[0]
+                ):
                     token_logprobs.append(logit[label_id])
         else:  # decoding
             if model.config.is_encoder_decoder:
@@ -188,7 +193,9 @@ def generate_stream(
         output_ids.append(token)
         if logprobs is not None:
             # Cannot use last_token_logits because logprobs is based on raw logits.
-            token_logprobs.append(torch.log_softmax(logits[0, -1, :], dim=-1)[token].tolist())
+            token_logprobs.append(
+                torch.log_softmax(logits[0, -1, :], dim=-1)[token].tolist()
+            )
 
         if token in stop_token_ids:
             stopped = True
@@ -215,10 +222,16 @@ def generate_stream(
                 ret_logprobs = {
                     "text_offset": [],
                     "tokens": [
-                        tokenizer.decode(token) for token in (output_ids if echo else output_ids[input_echo_len:])
+                        tokenizer.decode(token)
+                        for token in (
+                            output_ids if echo else output_ids[input_echo_len:]
+                        )
                     ],
-                    "token_logprobs": token_logprobs if echo else token_logprobs[input_echo_len:],
-                    "top_logprobs": [{}] * len(token_logprobs if echo else token_logprobs[input_echo_len:]),
+                    "token_logprobs": token_logprobs
+                    if echo
+                    else token_logprobs[input_echo_len:],
+                    "top_logprobs": [{}]
+                    * len(token_logprobs if echo else token_logprobs[input_echo_len:]),
                 }
                 # Compute text_offset
                 curr_pos = 0
@@ -469,7 +482,9 @@ def chat_loop(
 
             # Check if file exists and add .json if needed
             if not os.path.exists(filename):
-                if (not filename.endswith(".json")) and os.path.exists(filename + ".json"):
+                if (not filename.endswith(".json")) and os.path.exists(
+                    filename + ".json"
+                ):
                     filename += ".json"
                 else:
                     print("file not found:", filename)

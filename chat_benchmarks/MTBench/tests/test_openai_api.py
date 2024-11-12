@@ -4,7 +4,6 @@ Test the OpenAI compatible server
 Launch:
 python3 launch_openai_api_test_server.py
 """
-
 import warnings
 
 import openai
@@ -72,7 +71,9 @@ def test_chat_completion(model):
 
 def test_chat_completion_stream(model):
     messages = [{"role": "user", "content": "Hello! What is your name?"}]
-    res = openai.chat.completions.create(model=model, messages=messages, stream=True, temperature=0)
+    res = openai.chat.completions.create(
+        model=model, messages=messages, stream=True, temperature=0
+    )
     for chunk in res:
         try:
             content = chunk.choices[0].delta.content

@@ -5,7 +5,6 @@ Usage:
 python compute_agreement.py --judges gpt4-pair human --votefiles human_judgments.json gpt4_pair_judgments.json
 python compute_agreement.py --judges human human --votefiles human_judgments.json
 """
-
 import argparse
 import json
 import os
@@ -87,7 +86,10 @@ def get_mt_bench_agreement(data, judge1, judge2, ban):
                 continue
             for i in range(len(votes["human"]) - 1):
                 for j in range(i + 1, len(votes["human"])):
-                    if convertvote(votes["human"][i]) in ban or convertvote(votes["human"][j]) in ban:
+                    if (
+                        convertvote(votes["human"][i]) in ban
+                        or convertvote(votes["human"][j]) in ban
+                    ):
                         continue
                     stats[1] += 1
                     stats[0] += equalvote(votes["human"][i], votes["human"][j])
@@ -107,13 +109,21 @@ def run_mt_bench_agreement(judges, votefiles):
     data = get_mt_bench_votes_data(votes)
 
     agree, total = get_mt_bench_agreement(data[0], judges[0], judges[1], ban=[])
-    print(f"turn 1 with tie. #total: {total}, #agree: {agree}, ratio: {agree/total:.2f}")
+    print(
+        f"turn 1 with tie. #total: {total}, #agree: {agree}, ratio: {agree/total:.2f}"
+    )
     agree, total = get_mt_bench_agreement(data[0], judges[0], judges[1], ban=["tie"])
-    print(f"turn 1 without tie. #total: {total}, #agree: {agree}, ratio: {agree/total:.2f}")
+    print(
+        f"turn 1 without tie. #total: {total}, #agree: {agree}, ratio: {agree/total:.2f}"
+    )
     agree, total = get_mt_bench_agreement(data[1], judges[0], judges[1], ban=[])
-    print(f"turn 2 with tie. #total: {total}, #agree: {agree}, ratio: {agree/total:.2f}")
+    print(
+        f"turn 2 with tie. #total: {total}, #agree: {agree}, ratio: {agree/total:.2f}"
+    )
     agree, total = get_mt_bench_agreement(data[1], judges[0], judges[1], ban=["tie"])
-    print(f"turn 2 without tie. #total: {total}, #agree: {agree}, ratio: {agree/total:.2f}")
+    print(
+        f"turn 2 without tie. #total: {total}, #agree: {agree}, ratio: {agree/total:.2f}"
+    )
 
 
 if __name__ == "__main__":

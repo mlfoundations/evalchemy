@@ -1,5 +1,4 @@
 """Test command line interface for model inference."""
-
 import argparse
 import os
 
@@ -21,9 +20,14 @@ def test_single_gpu():
     ]
 
     for model_path in models:
-        if "model_weights" in model_path and not os.path.exists(os.path.expanduser(model_path)):
+        if "model_weights" in model_path and not os.path.exists(
+            os.path.expanduser(model_path)
+        ):
             continue
-        cmd = f"python3 -m fastchat.serve.cli --model-path {model_path} " f"--style programmatic < test_cli_inputs.txt"
+        cmd = (
+            f"python3 -m fastchat.serve.cli --model-path {model_path} "
+            f"--style programmatic < test_cli_inputs.txt"
+        )
         ret = run_cmd(cmd)
         if ret != 0:
             return

@@ -37,7 +37,7 @@ def setup_custom_parser():
 
     db_group.add_argument("--model_id", type=str, default=None, help="Model UUID for direct database tracking")
 
-    parser.add_argument("--use-database", action='store_true', help="Where to use DCFT Database to track results.")
+    parser.add_argument("--use-database", action="store_true", help="Where to use DCFT Database to track results.")
     parser.add_argument(
         "--model_name",
         type=str,
@@ -102,7 +102,7 @@ def evaluate(
 
     # Run benchmark evaluations - sequential generation, parallel evaluation
     if benchmark_tasks:
-       
+
         # Sequential generation since it's GPU-bound
         generate_methods = task_manager.get_list_generate_responses(benchmark_tasks)
         generation_results = []
@@ -124,9 +124,7 @@ def evaluate(
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
             evaluate_results = list(
-                executor.map(
-                    lambda func_args: func_args[0](func_args[1]), zip(evaluate_methods, generation_results)
-                )
+                executor.map(lambda func_args: func_args[0](func_args[1]), zip(evaluate_methods, generation_results))
             )
 
         # Store results using valid tasks for correct mapping

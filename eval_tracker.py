@@ -230,11 +230,13 @@ class DCFTEvaluationTracker:
             config = self._prepare_config(config)
             eval_setting = session.query(EvalSetting).filter_by(name=name, parameters=config).first()
             if not eval_setting:
+                display_order = EvalSetting.determine_display_order(session, name)
                 eval_setting = EvalSetting(
                     id=uuid.uuid4(),
                     name=name,
                     parameters=config,
                     eval_version_hash=git_hash,
+                    display_order=display_order,
                 )
                 session.add(eval_setting)
                 session.commit()

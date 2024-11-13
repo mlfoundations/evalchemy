@@ -3,12 +3,82 @@
 We adopt a lot from the amazing LM-Eval-Harness [https://github.com/EleutherAI/lm-evaluation-harness]. We accept the whole model interface from lm-eval-harness.
 
 Evaluation is as simple as 
-
+Note: Please make sure OPENAI_API_KEY is set!
 ```bash
-python -m eval.eval --model hf  --tasks HumanEval --model_args 'pretrained=meta-llama/Meta-Llama-3-8B-Instruct' --batch_size auto --output_path logs
+python -m eval.eval 
+    --model hf  \
+    --tasks HumanEval \
+    --model_args "pretrained=meta-llama/Meta-Llama-3-8B-Instruct" \
+    --batch_size auto \
+    --output_path logs
 ```
 
-The "auto" batch-size significantly improves speed. The output will be placed in the logs file. 
+The output will be placed in the logs file after.
+
+The list of tasks is a comma separated list of tasks. The list of instruction based tasks can be seen under "eval/chat_benchmarks". All pretrained tasks in [LM-Eval-Harness repository](https://github.com/EleutherAI/lm-evaluation-harness) are also available in this framework. To utilize data-parallelism (faster and what we recommend), we suggest using accelerate 
+
+```bash
+accelerate launch --num-processes <num-gpus> --num-machines <num-nodes> \
+    --multi-gpu -m eval.eval \
+    --model hf \
+    --task MTBench,alpaca_eval \
+    --model_args 'pretrained=meta-llama/Llama-3.1-8B-Instruct' \
+    --batch_size 2 \
+    --output_path logs
+```
+
+If your model cannot fit on one single GPU, we suggest using model-parallelism (slower and less recommended)
+```bash
+python -m eval.eval \
+    --model hf \
+    --task MTBench,alpaca_eval \
+    --model_args 'pretrained=meta-llama/Llama-3.1-8B-Instruct,parallelize=True' \
+    --batch_size 2 \
+    --output_path logs
+```
+While we do support "auto" batch_size, we do recommend playing with the batch_size yourself as it is fairly conservative. 
+
+## Annotator changes
+To change the annotator for all judges, please use 
+```bash
+    --annotator_model gpt-4o
+```
+
+## Logging to the leaderboard
+
+We also support automatically logging to our leaderboard!
+
+```bash
+python -m eval.eval \
+    --model hf \
+    --task MTBench,alpaca_eval \
+    --model_args 'pretrained=meta-llama/Llama-3.1-8B-Instruct,parallelize=True' \
+    --batch_size 2 \
+    --output_path logs \
+    --use-database
+```
+
+
+
+
+You can optionally pass in the following flags to add information to your uploaded result: 
+
+```bash
+    --model_name <name of your model in database> \
+    --creation_location <where this model was created> \
+    --created_by <who created this model> \
+```
+
+The model will appear here at the [leaderboard](https://llm-leaderboard-319533213591.us-central1.run.app/).
+
+To log into this database, please set this environmental variables
+```bash
+export DB_PASSWORD='t}LQ7ZL]3$x~I8ye'
+export DB_HOST='35.225.163.235'
+export DB_PORT='5432'
+export DB_NAME="postgres"
+export DB_USER='postgres'
+```
 
 # Installation instructions
 

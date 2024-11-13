@@ -398,16 +398,16 @@ def chat_completion_openai(model, conv, temperature, max_tokens, api_dict=None):
     for _ in range(API_MAX_RETRY):
         try:
             messages = conv.to_openai_api_messages()
-            response = openai.ChatCompletion.create(
+            response = openai.chat.completions.create(
                 model=model,
                 messages=messages,
                 n=1,
                 temperature=temperature,
                 max_tokens=max_tokens,
             )
-            output = response["choices"][0]["message"]["content"]
+            output = response.choices[0].message.content
             break
-        except openai.error.OpenAIError as e:
+        except openai.OpenAIError as e:
             print(type(e), e)
             time.sleep(API_RETRY_SLEEP)
 
@@ -438,12 +438,12 @@ def chat_completion_openai_azure(model, conv, temperature, max_tokens, api_dict=
                 temperature=temperature,
                 max_tokens=max_tokens,
             )
-            output = response["choices"][0]["message"]["content"]
+            output = response.choices[0].message.content
             break
-        except openai.error.OpenAIError as e:
+        except openai.OpenAIError as e:
             print(type(e), e)
             time.sleep(API_RETRY_SLEEP)
-        except openai.error.InvalidRequestError as e:
+        except openai.InvalidRequestError as e:
             print(type(e), e)
             break
         except KeyError:

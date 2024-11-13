@@ -27,7 +27,7 @@ from reka.client import Reka
 
 from datasets import load_dataset
 from tqdm import tqdm
-from src.fastchat_conversation import map_to_conv, HF_Conversation
+from .fastchat_conversation import map_to_conv, HF_Conversation
 import json
 from together import Together
 

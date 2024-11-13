@@ -14,8 +14,8 @@ from lm_eval.api.model import LM
 from eval.task import BaseBenchmark
 
 # Import WildBench utilities
-from src.unified_utils import save_outputs
-from src.eval import (
+from .src.unified_utils import save_outputs
+from .src.eval import (
     compose_eval_item,
     batch_eval_generate,
     placeholder_generation,
@@ -30,17 +30,24 @@ class WildBenchConfig:
     data_name: str = "wild_bench"
     dataset_version: str = "v2"
     split: str = "test"
-    start_index: int = 0
-    end_index: int = -1
+    start_idx: int = 0
+    end_idx: int = -1
 
     # Model configuration
     max_tokens: int = 1024
     temperature: float = 0.0
     do_sample: bool = False
+    engine: str = None
+    model_name: str = None
+    max_words_to_eval: int = 1000
+    repetition_penalty: float = 1.0
+    top_p: float = 1.0
 
     # Evaluation configuration
+    model: str = None
     eval_template: str = "eval/chat_benchmarks/WildBench/evaluation/eval_template.score.v2.md"
     judge_model: str = "gpt-4o-mini-2024-07-18"
+    mode: str = "score"
     batch_mode: bool = True
 
     # Task weights
@@ -66,7 +73,7 @@ class WildBenchBenchmark(BaseBenchmark):
         self,
         config: Optional[WildBenchConfig] = None,
         annotator_model: str = "gpt-4o-mini-2024-07-18",
-        debug: bool = False,
+        debug: bool = True,
         logger: Optional[logging.Logger] = None,
     ):
         """
@@ -81,7 +88,8 @@ class WildBenchBenchmark(BaseBenchmark):
         if config:
             self.logger.warning(f"Overwriting config.judge_model = {annotator_model} ")
             config.judge_model = annotator_model
-        self.config = config or WildBenchConfig(judge_model=annotator_model)
+            config.model = annotator_model
+        self.config = config or WildBenchConfig(judge_model=annotator_model, model=annotator_model)
         self.debug = debug
 
         # Task category mapping
@@ -125,10 +133,10 @@ class WildBenchBenchmark(BaseBenchmark):
                     metadata[key].append(item[key])
 
             # Apply index limits
-            if self.config.end_index < 0:
-                self.config.end_index = len(id_strs)
+            if self.config.end_idx < 0:
+                self.config.end_idx = len(id_strs)
 
-            slice_range = slice(self.config.start_index, self.config.end_index)
+            slice_range = slice(self.config.start_idx, self.config.end_idx)
             return (
                 id_strs[slice_range],
                 chat_history[slice_range],

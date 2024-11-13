@@ -14,8 +14,8 @@ from lm_eval.api.model import LM
 from eval.task import BaseBenchmark
 
 # Import WildBench utilities
-from src.unified_utils import save_outputs
-from src.eval import (
+from .src.unified_utils import save_outputs
+from .src.eval import (
     compose_eval_item,
     batch_eval_generate,
     placeholder_generation,

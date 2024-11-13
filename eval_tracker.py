@@ -85,6 +85,7 @@ class DCFTEvaluationTracker:
     def __init__(
         self,
         output_path: str = None,
+        use_database: bool = False,
     ) -> None:
         """
         Initialize the evaluation tracker.
@@ -92,10 +93,13 @@ class DCFTEvaluationTracker:
         Args:
             output_path: Directory path where evaluation results will be saved.
                        If None, results will not be saved to disk.
+            use_database: Whether logging to the database is enabled
         """
         self.general_config_tracker = GeneralConfigTracker()
         self.output_path = output_path
-        self.engine, self.SessionMaker = create_db_engine()
+        self.use_database = use_database
+        if self.use_database:
+            self.engine, self.SessionMaker = create_db_engine()
 
     @contextmanager
     def session_scope(self):

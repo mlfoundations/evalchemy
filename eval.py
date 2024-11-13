@@ -37,6 +37,7 @@ def setup_custom_parser():
 
     db_group.add_argument("--model_id", type=str, default=None, help="Model UUID for direct database tracking")
 
+    parser.add_argument("--use-database", action='store_true', help="Where to use DCFT Database to track results.")
     parser.add_argument(
         "--model_name",
         type=str,
@@ -101,39 +102,36 @@ def evaluate(
 
     # Run benchmark evaluations - sequential generation, parallel evaluation
     if benchmark_tasks:
-        try:
-            # Sequential generation since it's GPU-bound
-            generate_methods = task_manager.get_list_generate_responses(benchmark_tasks)
-            generation_results = []
-            valid_tasks = []  # Keep track of valid tasks
+       
+        # Sequential generation since it's GPU-bound
+        generate_methods = task_manager.get_list_generate_responses(benchmark_tasks)
+        generation_results = []
+        valid_tasks = []  # Keep track of valid tasks
 
-            for method, task in zip(generate_methods, benchmark_tasks):
-                try:
-                    result = method(lm)
-                    if result is not None:  # Only keep valid results and their corresponding tasks
-                        generation_results.append(result)
-                        valid_tasks.append(task)
-                except Exception as e:
-                    eval_logger.error(f"Error in generate_responses for {task}: {str(e)}")
+        for method, task in zip(generate_methods, benchmark_tasks):
+            try:
+                result = method(lm)
+                if result is not None:  # Only keep valid results and their corresponding tasks
+                    generation_results.append(result)
+                    valid_tasks.append(task)
+            except Exception as e:
+                eval_logger.error(f"Error in generate_responses for {task}: {str(e)}")
 
-            # Get evaluation methods only for valid tasks
-            evaluate_methods = task_manager.get_list_evaluates(valid_tasks)
-            cpu_count = os.cpu_count()
-            max_workers = min(len(valid_tasks), cpu_count * 2)
+        # Get evaluation methods only for valid tasks
+        evaluate_methods = task_manager.get_list_evaluates(valid_tasks)
+        cpu_count = os.cpu_count()
+        max_workers = min(len(valid_tasks), cpu_count * 2)
 
-            with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-                evaluate_results = list(
-                    executor.map(
-                        lambda func_args: func_args[0](func_args[1]), zip(evaluate_methods, generation_results)
-                    )
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+            evaluate_results = list(
+                executor.map(
+                    lambda func_args: func_args[0](func_args[1]), zip(evaluate_methods, generation_results)
                 )
+            )
 
-            # Store results using valid tasks for correct mapping
-            for task, result in zip(valid_tasks, evaluate_results):
-                results["results"][task] = result
-
-        except Exception as e:
-            eval_logger.error(f"Error in benchmark evaluation: {str(e)}")
+        # Store results using valid tasks for correct mapping
+        for task, result in zip(valid_tasks, evaluate_results):
+            results["results"][task] = result
 
     # Run pretrain evaluations if any exist
     if pretrain_tasks and args is not None:
@@ -208,6 +206,8 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
 
     # If model_id is provided, lookup model name from database
     if args.model_id:
+        if not args.use_database:
+            raise ValueError("--use-database must be set to use --model-id.")
         try:
             model_name = evaluation_tracker.get_model_name_from_db(args.model_id)
             args.model_args = update_model_args_with_name(args.model_args or "", model_name)
@@ -287,7 +287,7 @@ def setup_evaluation_tracker(args: argparse.Namespace) -> DCFTEvaluationTracker:
     """Set up the evaluation tracker with proper arguments."""
     if args.output_path:
         args.hf_hub_log_args += f",output_path={args.output_path}"
-    return DCFTEvaluationTracker(args.output_path)
+    return DCFTEvaluationTracker(args.output_path, args.use_database)
 
 
 def initialize_model(args: argparse.Namespace) -> LM:
@@ -369,14 +369,15 @@ def handle_evaluation_output(
             eval_logger.info(f"Logging to Weights and Biases failed due to {e}")
 
     evaluation_tracker.save_results_aggregated(results=results, samples=samples if args.log_samples else None)
-    evaluation_tracker.update_evalresults_db(
-        results,
-        args.model_id,
-        args.model_name,
-        args.creation_location,
-        args.created_by,
-        args.is_external_model,
-    )
+    if args.use_database:
+        evaluation_tracker.update_evalresults_db(
+            results,
+            args.model_id,
+            args.model_name,
+            args.creation_location,
+            args.created_by,
+            args.is_external_model,
+        )
 
     if args.log_samples:
         for task_name, config in results["configs"].items():

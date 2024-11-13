@@ -6,9 +6,9 @@ import urllib.request
 from tqdm import tqdm
 import json
 import os
-from unified_utils import load_eval_data, save_outputs
-from global_configs import HF_TEMPLATED_MODELS, IM_END_MODELS
-from unified_utils import (
+from src.unified_utils import load_eval_data, save_outputs
+from src.global_configs import HF_TEMPLATED_MODELS, IM_END_MODELS
+from src.unified_utils import (
     openai_chat_request,
     retry_handler,
     google_chat_request,

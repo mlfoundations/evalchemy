@@ -10,6 +10,16 @@ python -m eval.eval --model hf  --tasks HumanEval --model_args 'pretrained=meta-
 
 The "auto" batch-size significantly improves speed. The output will be placed in the logs file. 
 
+# Installation instructions
+
+To install, please follow the following steps:
+```bash
+conda create --name dcft python=3.10
+conda activate dcft      
+pip install -e ".[eval]"
+pip install -r requirements.txt
+```
+
 ### Database Updates for Evaluation Results
 
 You can update the database using either:

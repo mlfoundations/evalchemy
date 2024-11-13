@@ -5,7 +5,6 @@ import random
 
 from mistralai.client import MistralClient
 
-# from mistralai.models.chat_completion import ChatMessage
 from httpx import Timeout
 
 from mix_eval.models.base_api import APIModelBase

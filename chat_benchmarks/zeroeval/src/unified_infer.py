@@ -21,10 +21,6 @@ from src.unified_utils import (
 from hf_models import DecoderOnlyModelManager
 from transformers import AutoTokenizer
 
-# import multiprocessing as mp
-# mp.set_start_method('spawn', force=True)
-
-
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--engine", default="vllm", type=str)

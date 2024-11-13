@@ -809,7 +809,7 @@ def ai2_api_stream_iter(
 
 def mistral_api_stream_iter(model_name, messages, temperature, top_p, max_new_tokens, api_key=None):
     # from mistralai.client import MistralClient
-    # from mistralai.models.chat_completion import ChatMessage
+    
     from mistralai import Mistral
 
     if api_key is None:

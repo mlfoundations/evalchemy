@@ -21,26 +21,16 @@ class BaseBenchmark(ABC):
     def compute(
         self, model: LM, inputs: List[Instance], gather_to_rank: Optional[int] = 0, do_slice: bool = True
     ) -> List[str]:
-        if do_slice:
+        if model.world_size > 1 and do_slice:
             prompts = list(islice(inputs, model.rank, len(inputs), model.world_size))
         else:
             prompts = inputs
         results = model.generate_until(prompts)
         if model.world_size > 1:
             all_results = [None for _ in range(model.world_size)]
-            if gather_to_rank is None:
-                # Gather results from all ranks to all ranks
-                dist.all_gather_object(all_results, results)
-            else:
-                # Gather results from all ranks to gather rank
-                if model.rank == gather_to_rank:
-                    dist.gather_object(results, all_results, dst=gather_to_rank)
-                else:
-                    dist.gather_object(results, None, dst=gather_to_rank)
-                    return None
 
-            if model.rank != gather_to_rank:
-                return None
+            dist.all_gather_object(all_results, results)
+
             # Merge results from all ranks
             length = sum(len(res) for res in all_results if res is not None)
             merged = [None] * length

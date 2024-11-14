@@ -141,13 +141,7 @@ class MTBenchBenchmark(BaseBenchmark):
 
             # Generate responses
             if batch_instances:
-                if model.world_size > 1:
-                    dist.broadcast_object_list(batch_instances, src=0)
                 outputs = self.compute(model, batch_instances, gather_to_rank=0)
-
-                # If not primary rank, return None early
-                if outputs is None:
-                    continue
 
                 # Process outputs
                 for q_idx, output in enumerate(outputs):

@@ -91,7 +91,7 @@ class RepoBenchmark(BaseBenchmark):
                             idx,
                         )
                     )
-                outputs = self.compute(model, all_instances, gather_to_rank=0, do_slice=False)
+                outputs = self.compute(model, all_instances)
 
                 # Only rank 0 should save the results
                 if model.rank != 0:

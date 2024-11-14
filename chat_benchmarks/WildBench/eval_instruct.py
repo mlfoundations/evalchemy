@@ -180,7 +180,7 @@ class WildBenchBenchmark(BaseBenchmark):
                     (
                         inputs,
                         {
-                            "max_new_tokens": self.config.max_tokens,
+                            "max_gen_toks": self.config.max_tokens,
                             "do_sample": self.config.do_sample,
                             "temperature": self.config.temperature,
                         },

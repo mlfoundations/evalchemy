@@ -86,7 +86,7 @@ class RepoBenchmark(BaseBenchmark):
                             example,
                             (
                                 prompt,
-                                {"max_new_tokens": 64, "temperature": 0.2, "top_p": 0.95, "do_sample": True},
+                                {"max_gen_toks": 64, "temperature": 0.2, "top_p": 0.95, "do_sample": True},
                             ),
                             idx,
                         )

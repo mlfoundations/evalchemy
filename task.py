@@ -25,6 +25,7 @@ class BaseBenchmark(ABC):
             prompts = list(islice(inputs, model.rank, len(inputs), model.world_size))
         else:
             prompts = inputs
+
         results = model.generate_until(prompts)
         if model.world_size > 1:
             all_results = [None for _ in range(model.world_size)]

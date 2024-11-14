@@ -130,7 +130,7 @@ class MTBenchBenchmark(BaseBenchmark):
                             (
                                 prompt,
                                 {
-                                    "max_new_tokens": self.config.max_new_token,
+                                    "max_gen_toks": self.config.max_new_token,
                                     "do_sample": temperature >= 1e-4,
                                     "temperature": temperature,
                                 },

@@ -3,7 +3,6 @@ import json
 import logging
 import os
 import sys
-import time
 from typing import Optional, List, Dict 
 
 import concurrent.futures
@@ -98,7 +97,6 @@ def evaluate(
 
     results = {"results": {}}
 
-    starting_time = time.time()
     # Run benchmark evaluations - sequential generation, parallel evaluation
     if benchmark_tasks:
         # Sequential generation since it's GPU-bound
@@ -126,8 +124,6 @@ def evaluate(
             # Store results using valid tasks for correct mapping
             for task, result in zip(valid_tasks, evaluate_results):
                 results["results"][task] = result
-    ending_time = time.time()
-    results['Total Time Taken'] = ending_time - starting_time
 
     # Run pretrain evaluations if any exist
     if pretrain_tasks and args is not None:

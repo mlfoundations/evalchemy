@@ -65,6 +65,8 @@ class MixEvalBenchmark(BaseBenchmark):
         """
         super().__init__(logger)
         os.makedirs(output_dir, exist_ok=True)
+        if annotator_model == "auto":
+            annotator_model = "gpt-3.5-turbo-0125"
         self.multichoice_judge = annotator_model
         self.freeform_judge = annotator_model
         self.args = self._get_args(

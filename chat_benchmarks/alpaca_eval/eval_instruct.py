@@ -8,6 +8,7 @@ import pandas as pd
 from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
 from alpaca_eval.main import evaluate as alpaca_eval_evaluate
+from alpaca_eval.constants import DEFAULT_ANNOTATOR_CONFIG
 from eval.task import BaseBenchmark
 
 
@@ -16,7 +17,9 @@ class AlpacaBenchmark(BaseBenchmark):
     Alpaca benchmark for evaluating language model responses on instruction following.
     """
 
-    ANNOTATOR_CONFIG_MAP = {"gpt-4o-mini-2024-07-18": "weighted_alpaca_eval_gpt-4o-mini-2024-07-18"}
+    ANNOTATOR_CONFIG_MAP = {
+        "gpt-4o-mini-2024-07-18": "weighted_alpaca_eval_gpt-4o-mini-2024-07-18",
+        "auto": DEFAULT_ANNOTATOR_CONFIG}
 
     def __init__(
         self,

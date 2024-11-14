@@ -171,6 +171,8 @@ class DCFTEvaluationTracker:
                 file_results_aggregated = path.joinpath(f"results_{self.date_id}.json")
                 file_results_aggregated.open("w", encoding="utf-8").write(dumped)
 
+                eval_logger.info(f"Wrote aggregated results to: {file_results_aggregated}")
+
             except Exception as e:
                 eval_logger.warning("Could not save results aggregated")
                 eval_logger.info(repr(e))

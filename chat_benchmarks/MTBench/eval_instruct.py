@@ -82,6 +82,8 @@ class MTBenchBenchmark(BaseBenchmark):
         """
         super().__init__(logger)
         self.base_path = Path(base_path)
+        if annotator_model == "auto":
+            annotator_model = "gpt-4"
         if config:
             print(f"Warning: Overwriting config.judge_model = {annotator_model} ")
             config.judge_model = annotator_model

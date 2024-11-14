@@ -69,8 +69,8 @@ def setup_custom_parser():
     parser.add_argument(
         "--annotator_model",
         type=str,
-        default="gpt-4o-mini-2024-07-18",
-        help="Judge model used to evaluate generations.",
+        default="auto",
+        help="Judge model used to evaluate generations. Example: gpt-4o-mini-2024-07-18",
     )
     return parser
 
@@ -377,11 +377,8 @@ def handle_evaluation_output(
         for task_name, config in results["configs"].items():
             evaluation_tracker.save_results_samples(task_name=task_name, samples=samples[task_name])
 
-    print(
-        f"{args.model} ({args.model_args}), gen_kwargs: ({args.gen_kwargs}), "
-        f"limit: {args.limit}, num_fewshot: {args.num_fewshot}, annotator_model: {args.annotator_model}, "
-        f"batch_size: {args.batch_size}{f' ({batch_sizes})' if batch_sizes else ''}"
-    )
+    params_str = ', '.join(f"{k}: {v}" for k, v in eval_params.items())
+    utils.eval_logger.info(f"Eval configs: {params_str}")
 
     if wandb_logger:
         wandb_logger.run.finish()

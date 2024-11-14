@@ -46,7 +46,7 @@ class WildBenchConfig:
     # Evaluation configuration
     model: str = None
     eval_template: str = "eval/chat_benchmarks/WildBench/evaluation/eval_template.score.v2.md"
-    judge_model: str = "gpt-4o-mini-2024-07-18"
+    model: str = "gpt-4o-mini-2024-07-18"
     mode: str = "score"
     batch_mode: bool = True
 
@@ -85,11 +85,12 @@ class WildBenchBenchmark(BaseBenchmark):
             logger: Optional logger instance
         """
         super().__init__(logger)
+        if annotator_model == "auto":
+            annotator_model = "gpt-4-1106-preview"
         if config:
             self.logger.warning(f"Overwriting config.judge_model = {annotator_model} ")
-            config.judge_model = annotator_model
             config.model = annotator_model
-        self.config = config or WildBenchConfig(judge_model=annotator_model, model=annotator_model)
+        self.config = config or WildBenchConfig(model=annotator_model)
         self.debug = debug
 
         # Task category mapping

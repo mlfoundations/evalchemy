@@ -4,14 +4,10 @@ import logging
 import os
 import sys
 import time
-from typing import Optional, List, Dict, Type, Any
-import random
-import concurrent.futures
-from abc import ABC, abstractmethod
-import torch.distributed as dist
+from typing import Optional, List, Dict 
 
-import numpy as np
-import torch
+import concurrent.futures
+import torch.distributed as dist
 
 from lm_eval import utils
 from lm_eval import evaluator as pretrain_evaluator
@@ -25,6 +21,7 @@ import lm_eval.api.metrics
 import lm_eval.api.registry
 import lm_eval.api.task
 import lm_eval.models
+
 from eval.task import TaskManager as InstructTaskManager
 from eval.eval_tracker import DCFTEvaluationTracker
 
@@ -101,6 +98,7 @@ def evaluate(
 
     results = {"results": {}}
 
+    starting_time = time.time()
     # Run benchmark evaluations - sequential generation, parallel evaluation
     if benchmark_tasks:
         # Sequential generation since it's GPU-bound
@@ -128,6 +126,8 @@ def evaluate(
             # Store results using valid tasks for correct mapping
             for task, result in zip(valid_tasks, evaluate_results):
                 results["results"][task] = result
+    ending_time = time.time()
+    results['Total Time Taken'] = ending_time - starting_time
 
     # Run pretrain evaluations if any exist
     if pretrain_tasks and args is not None:

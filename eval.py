@@ -108,13 +108,10 @@ def evaluate(
         generation_results = []
         valid_tasks = []  # Keep track of valid tasks
         for method, task in zip(generate_methods, benchmark_tasks):
-            # try:
             result = method(lm)
             if result is not None:  # Only keep valid results and their corresponding tasks
                 generation_results.append(result)
                 valid_tasks.append(task)
-            # except Exception as e:
-            #     eval_logger.error(f"Error in generate_responses for {task}: {str(e)}")
         # Get evaluation methods only for valid tasks
         evaluate_methods = task_manager.get_list_evaluates(valid_tasks)
         cpu_count = os.cpu_count()

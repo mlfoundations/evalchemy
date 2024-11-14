@@ -73,7 +73,7 @@ class WildBenchBenchmark(BaseBenchmark):
         self,
         config: Optional[WildBenchConfig] = None,
         annotator_model: str = "gpt-4o-mini-2024-07-18",
-        debug: bool = True,
+        debug: bool = False,
         logger: Optional[logging.Logger] = None,
     ):
         """

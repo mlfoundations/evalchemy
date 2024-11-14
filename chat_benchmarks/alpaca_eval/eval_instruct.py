@@ -19,7 +19,8 @@ class AlpacaBenchmark(BaseBenchmark):
 
     ANNOTATOR_CONFIG_MAP = {
         "gpt-4o-mini-2024-07-18": "weighted_alpaca_eval_gpt-4o-mini-2024-07-18",
-        "auto": DEFAULT_ANNOTATOR_CONFIG}
+        "auto": DEFAULT_ANNOTATOR_CONFIG,
+    }
 
     def __init__(
         self,

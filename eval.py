@@ -3,7 +3,7 @@ import json
 import logging
 import os
 import sys
-from typing import Optional, List, Dict 
+from typing import Optional, List, Dict
 
 import concurrent.futures
 import torch.distributed as dist

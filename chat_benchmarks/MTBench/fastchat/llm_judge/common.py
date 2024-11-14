@@ -663,7 +663,7 @@ def get_single_judge_explanation(gamekey, judgment_dict):
         return "N/A"
 
 
-def check_data(questions, model_answers, ref_answers, models, judges):
+def check_data(questions, model_answers, ref_answers, models, judges, ref_model="gpt-4"):
     # check model answers
     for m in models:
         assert m in model_answers, f"Missing model answer for {m}"
@@ -678,7 +678,7 @@ def check_data(questions, model_answers, ref_answers, models, judges):
             if q["category"] not in NEED_REF_CATS:
                 continue
             assert (
-                q["question_id"] in ref_answers["gpt-4"]
+                q["question_id"] in ref_answers[ref_model]
             ), f"Missing reference answer to Question {q['question_id']} for judge {jg.model_name}"
 
 

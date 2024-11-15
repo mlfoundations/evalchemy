@@ -1,0 +1,83 @@
+apiVersion: ray.io/v1
+kind: RayCluster
+metadata:
+  name: raycluster-autoscaler
+spec:
+  rayVersion: '2.36.0'
+  enableInTreeAutoscaling: true
+  autoscalerOptions:
+    idleTimeoutSeconds: 300
+    imagePullPolicy: IfNotPresent
+    securityContext: {}
+    env: []
+    envFrom: []
+    resources:
+      limits:
+        cpu: "750m"
+        memory: "1Gi"
+      requests:
+        cpu: "500m"
+        memory: "1Gi"
+  headGroupSpec:
+    rayStartParams:
+      num-cpus: "0"
+    template:
+      spec:
+        nodeSelector:
+          head: "true"
+        containers:
+        - name: ray-head
+          image: rayproject/ray:2.36.0-py310-cpu
+          ports:
+          - containerPort: 6379
+            name: gcs
+          - containerPort: 8265
+            name: dashboard
+          - containerPort: 10001
+            name: client
+          - containerPort: 44217
+            name: as-metrics 
+          - containerPort: 44227
+            name: dash-metrics 
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh","-c","ray stop"]
+          resources:
+            limits:
+              cpu: "1"
+              memory: "7Gi"
+            requests:
+              cpu: "1"
+              memory: "7Gi"
+          env:
+            - name: RAY_GRAFANA_IFRAME_HOST
+              value: http://127.0.0.1:3000
+            - name: RAY_GRAFANA_HOST
+              value: http://prometheus-grafana.prometheus-system.svc:80
+            - name: RAY_PROMETHEUS_HOST
+              value: http://prometheus-kube-prometheus-prometheus.prometheus-system.svc:9090
+  workerGroupSpecs:
+  - replicas: 0
+    minReplicas: 1
+    maxReplicas: 10
+    groupName: workers
+    rayStartParams: {}
+    template:
+      spec:
+        nodeSelector:
+          worker: "true"
+        containers:
+        - name: echoer
+          image: rayproject/ray:2.36.0-py310-cpu
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh","-c","ray stop"]
+          resources:
+            limits:
+              cpu: "94"
+              memory: "752G"
+            requests:
+              cpu: "94"
+              memory: "752G"

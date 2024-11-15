@@ -1,0 +1,35 @@
+### train 
+stage: dpo
+do_train: true
+finetuning_type: full
+pref_beta: 10
+simpo_gamma: 5
+pref_loss: simpo  
+deepspeed: dcft/train/zero3.json
+enable_liger_kernel: false
+
+### dataset
+cutoff_len: 2048
+overwrite_cache: true
+preprocessing_num_workers: 16
+
+### output
+save_strategy: epoch
+logging_steps: 1
+plot_loss: true
+overwrite_output_dir: true
+
+### train
+optim: adamw_torch 
+global_batch_size: 128
+gradient_checkpointing: true
+learning_rate:  8.0e-7
+num_train_epochs: 1.0
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+ddp_timeout: 180000000
+
+### eval
+val_size: 0.05
+eval_strategy: epoch

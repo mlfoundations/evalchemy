@@ -1,0 +1,40 @@
+operators:
+  - id: link_generation
+    config:
+      type: function
+      function: data_strategies.OpenGPT.utils.get_health_az_links
+  - id: create_health_az_table
+    config:
+      type: function
+      sharded: True
+      function: data_strategies.OpenGPT.utils.create_health_az_table
+    input_ids:
+      - link_generation
+  - id: add_annotations
+    config:
+      type: function
+      sharded: True
+      function: data_strategies.OpenGPT.utils.add_annotations
+      function_config:
+        config_path: "dcft/external_repositories/OpenGPT/configs/openhermes_regneration.yaml"
+    input_ids:
+      - create_health_az_table
+  - id: parse_outputs
+    config:
+      type: function
+      sharded: True
+      function: data_strategies.OpenGPT.utils.parse_data
+      function_config:
+        instruction_column: "prompt"
+        completion_column: "completion"
+    input_ids:
+      - add_annotations
+  - id: remove_columns
+    config: 
+      type: remove_columns
+      sharded: true
+      columns_to_keep:
+        - prompt
+        - completion
+    input_ids:
+      - parse_outputs

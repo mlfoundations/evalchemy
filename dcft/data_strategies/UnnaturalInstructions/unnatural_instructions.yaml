@@ -1,0 +1,39 @@
+operators:  
+  - id: load_seed_instructions
+    config:
+      type: function
+      function: data_strategies.UnnaturalInstructions.utils.load_seed_instructions
+      function_config:
+        seed_tasks_path: "dcft/data_strategies/UnnaturalInstructions/seed_tasks"
+    
+  - id: generate_instrcutions
+    config:
+      type: function
+      function: data_strategies.UnnaturalInstructions.utils.generate_instructions
+      function_config:
+        num_instructions_to_generate: 100_000
+    input_ids:
+      - load_seed_instructions
+
+  - id: filter_and_dedup
+    config:
+      type: function
+      function: data_strategies.UnnaturalInstructions.utils.filter_and_dedup
+      function_config:
+        seed_tasks_path: "dcft/data_strategies/UnnaturalInstructions/seed_tasks"
+    input_ids:
+      - generate_instrcutions
+
+  - id: generate_instruction_output
+    config:
+      type: function
+      function: data_strategies.UnnaturalInstructions.utils.generate_instruction_output
+    input_ids:
+      - filter_and_dedup
+
+  - id: rephrase_dataset
+    config:
+      type: function
+      function: data_strategies.UnnaturalInstructions.utils.rephrase_dataset
+    input_ids:
+      - generate_instruction_output

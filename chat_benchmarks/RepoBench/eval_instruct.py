@@ -70,7 +70,7 @@ class RepoBenchmark(BaseBenchmark):
             for subset, dataset in datasets.items():
                 if subset not in self.subsets:
                     continue
-                
+
                 if self.debug:
                     dataset = dataset.select(range(2))
                     self.logger.info(f"Debug mode: using 2 examples")

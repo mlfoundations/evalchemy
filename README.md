@@ -1,8 +1,22 @@
-# DCFT Evaluation Framework
+#  🧪 DCFT Evaluation Framework
 
-This evaluation framework builds upon the [LM-Eval-Harness](https://github.com/EleutherAI/lm-evaluation-harness) and provides additional capabilities for evaluating language models. The framework supports both standard benchmarks and custom evaluation tasks.
+This evaluation framework builds upon the [LM-Eval-Harness](https://github.com/EleutherAI/lm-evaluation-harness) to provide a unified, easy-to-use platform for language model evaluation. We've streamlined the process by:
 
-## Quick Start
+- Integrating multiple popular evaluation repositories into a single, cohesive framework
+- Providing simple installation and unified dependencies
+- Supporting both data-parallel and model-parallel evaluation strategies
+- Offering consistent interfaces across different benchmarks
+
+### Key Features
+
+- **Unified Installation**: One-step setup for all benchmarks, eliminating dependency conflicts
+- **Parallel Evaluation**:
+  - Data-Parallel: Distribute evaluations across multiple GPUs for faster results
+  - Model-Parallel: Handle large models that don't fit on a single GPU
+- **Simplified Usage**: Run any benchmark with consistent command-line interface
+- **Integrated Reporting**: Unified output format and leaderboard submission
+
+## ⚡ Quick Start
 
 ### Installation
 
@@ -29,7 +43,7 @@ python -m eval.eval \
     --output_path logs
 ```
 
-## Advanced Usage
+## 🔧 Advanced Usage
 
 ### Multi-GPU Evaluation
 
@@ -58,18 +72,18 @@ python -m eval.eval \
     --output_path logs
 ```
 
-> **Note**: While "auto" batch size is supported, we recommend manually tuning the batch size for optimal performance.
+> **💡 Note**: While "auto" batch size is supported, we recommend manually tuning the batch size for optimal performance.
 
 ### Customizing Evaluation
 
-#### Change Annotator Model
+#### 🤖 Change Annotator Model
 ```bash
 --annotator_model gpt-4o-mini-2024-07-18
 ```
 
-## Leaderboard Integration
+## 🏆 Leaderboard Integration
 
-### Database Configuration
+### 🗄️ Database Configuration
 
 Set the following environment variables to enable database logging:
 
@@ -81,7 +95,7 @@ export DB_NAME=<DB_NAME>
 export DB_USER=<DB_USER>
 ```
 
-### Submit Results to Leaderboard
+### 📊 Submit Results to Leaderboard
 
 ```bash
 python -m eval.eval \
@@ -98,7 +112,7 @@ python -m eval.eval \
 
 View results on the [leaderboard](https://llm-leaderboard-319533213591.us-central1.run.app/).
 
-### Updating Database Results
+### 🔄 Updating Database Results
 
 You can update existing results using either:
 
@@ -107,7 +121,7 @@ You can update existing results using either:
 
 Note: If both are provided, model_id takes precedence.
 
-## Implementing Custom Evaluations
+## 🛠️ Implementing Custom Evaluations
 
 To add a new evaluation system:
 
@@ -131,7 +145,7 @@ git subtree pull --prefix=eval/chat_benchmarks/new_eval https://github.com/origi
 git subtree push --prefix=eval/chat_benchmarks/new_eval https://github.com/original/repo.git contribution-branch
 ```
 
-### Debug Mode
+### 🔍 Debug Mode
 
 To run evaluations in debug mode, add the `--debug` flag:
 
@@ -148,7 +162,7 @@ python -m eval.eval \
 Debug mode provides:
 This is particularly useful when testing new evaluation implementations, debugging model configurations, verifying dataset access, and testing database connectivity.
 
-### Performance Tips
+### 🚀 Performance Tips
 
 1. Utilize batch processing for faster evaluation:
 ```python
@@ -172,15 +186,15 @@ outputs = model.generate_until(all_instances)
 
 2. Use the LM-eval logger for consistent logging across evaluations
 
-## Available Tasks
+## 📚 Available Tasks
 
 ### Built-in Benchmarks
 - All tasks from [LM-Eval-Harness](https://github.com/EleutherAI/lm-evaluation-harness)
 - Custom instruction-based tasks (found in `eval/chat_benchmarks/`):
-  - **MTBench**: Multi-turn dialogue evaluation benchmark for assessing chat capabilities
-  - **WildBench**: Real-world task evaluation across diverse domains and scenarios
-  - **RepoBench**: Code understanding and repository-level programming tasks
-  - **MixEval**: Comprehensive evaluation across multiple domains including reasoning, math, and coding
+  - **MTBench**: Multi-turn dialogue evaluation benchmark
+  - **WildBench**: Real-world task evaluation
+  - **RepoBench**: Code understanding and repository-level tasks
+  - **MixEval**: Comprehensive evaluation across domains
   - **AlpacaEval**: Instruction following evaluation
   - **HumanEval**: Code generation and problem solving
   - **ZeroEval**: Logical reasoning and problem solving
@@ -196,7 +210,7 @@ python -m eval.eval \
     --output_path logs
 ```
 
-### Special Access Requirements
+### 🔐 Special Access Requirements
 
 #### ZeroEval Access
 To run ZeroEval benchmarks, you need to:

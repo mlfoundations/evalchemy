@@ -1,0 +1,46 @@
+name: Format leaderboard
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/alpaca_eval/leaderboards/**'
+      - 'results/**'
+  workflow_dispatch:
+
+jobs:
+  format_leaderboard:
+    runs-on: "ubuntu-20.04"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install .
+
+      - name: Format sample sheets
+        run: python docs/format_sample_sheets.py
+
+      - name: Update leaderboard
+        run: python docs/format_export_leaderboards.py
+
+      - name: Configure Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+      - name: Commit and push if changed
+        run: |
+          git diff
+          git diff --quiet || (git add . && git commit -m 'Automated leaderboard update')
+          git push https://${{secrets.GITHUB_TOKEN}}@github.com/tatsu-lab/alpaca_eval.git HEAD:main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

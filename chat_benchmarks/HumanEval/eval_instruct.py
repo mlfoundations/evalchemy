@@ -109,7 +109,7 @@ Please continue to complete the function. You are not allowed to modify the give
                             idx,
                         )
                     )
-
+                self.logger.info("Genearting responses for Human Eval...")
                 outputs = self.compute(model, all_instances, gather_to_rank=0)
 
                 if outputs is None:

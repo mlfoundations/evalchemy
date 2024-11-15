@@ -26,6 +26,7 @@ class RepoBenchmark(BaseBenchmark):
         languages: List[str] = ["python", "java"],
         subsets: List[str] = ["cross_file_first", "cross_file_random", "in_file"],
         max_tokens: int = 2000,
+        debug: bool = False,
         legacy_mode: bool = False,
     ):
         """
@@ -35,12 +36,14 @@ class RepoBenchmark(BaseBenchmark):
             languages: List of programming languages to evaluate
             subsets: List of dataset subsets to use
             max_tokens: Maximum number of tokens for generation
+            debug: If true, run on debug mode using 2 samples
             legacy_mode: Whether to use legacy (v0) evaluation
         """
         super().__init__()
         self.languages = languages
         self.subsets = subsets
         self.max_tokens = max_tokens
+        self.debug = debug
         self.legacy_mode = legacy_mode
 
     def generate_responses(self, model: LM) -> Dict[str, Any]:
@@ -68,6 +71,10 @@ class RepoBenchmark(BaseBenchmark):
                 if subset not in self.subsets:
                     continue
 
+                if self.debug:
+                    dataset = dataset.select(range(2))
+                    self.logger.info(f"Debug mode: using 2 examples")
+
                 all_instances = []
                 time_start = time.time()
                 # Split dataset across ranks for parallel construction
@@ -92,6 +99,7 @@ class RepoBenchmark(BaseBenchmark):
                         )
                     )
                 outputs = self.compute(model, all_instances)
+                self.logger.info("Genearting responses for RepoBench...")
 
                 # Only rank 0 should save the results
                 if model.rank != 0:

@@ -19,6 +19,8 @@ class AlpacaBenchmark(BaseBenchmark):
 
     ANNOTATOR_CONFIG_MAP = {
         "gpt-4o-mini-2024-07-18": "weighted_alpaca_eval_gpt-4o-mini-2024-07-18",
+        "gpt-4-1106-preview": "weighted_alpaca_eval_gpt4_turbo",
+        "gpt-4": "alpaca_eval_gpt4_0613",
         "auto": DEFAULT_ANNOTATOR_CONFIG,
     }
 
@@ -30,7 +32,7 @@ class AlpacaBenchmark(BaseBenchmark):
         max_tokens: int = 1024,
         temperature: float = 0.5,
         do_sample: bool = True,
-        debug_size: Optional[int] = None,
+        debug: bool = False,
         annotator_model: str = "gpt-4o-mini-2024-07-18",
         logger: Optional[logging.Logger] = None,
     ):
@@ -44,7 +46,7 @@ class AlpacaBenchmark(BaseBenchmark):
             max_tokens: Maximum number of tokens for generation
             temperature: Sampling temperature
             do_sample: Whether to use sampling for generation
-            debug_size: If set, only evaluate this many examples
+            debug: debug: If True, only evaluate first 2 examples
             logger: Optional logger instance
         """
         super().__init__(logger)
@@ -54,7 +56,7 @@ class AlpacaBenchmark(BaseBenchmark):
         self.max_tokens = max_tokens
         self.temperature = temperature
         self.do_sample = do_sample
-        self.debug_size = debug_size
+        self.debug = debug
         self.annotator_conf = self.ANNOTATOR_CONFIG_MAP[annotator_model]
 
     def load_dataset(self) -> datasets.Dataset:
@@ -62,9 +64,9 @@ class AlpacaBenchmark(BaseBenchmark):
         try:
             dataset = datasets.load_dataset(self.dataset_name, self.subset, trust_remote_code=True)[self.split]
 
-            if self.debug_size:
-                dataset = dataset.select(range(self.debug_size))
-                self.logger.info(f"Debug mode: using {self.debug_size} examples")
+            if self.debug:
+                dataset = dataset.select(range(2))
+                self.logger.info(f"Debug mode: using 2 examples")
 
             self.logger.info(f"Loaded {len(dataset)} examples for evaluation")
             return dataset
@@ -112,7 +114,7 @@ class AlpacaBenchmark(BaseBenchmark):
                     continue
 
             with torch.no_grad():
-                self.logger.info("Generating responses...")
+                self.logger.info("Generating responses for Alpaca Eval...")
                 outputs = self.compute(model, all_instances, gather_to_rank=0)
 
             if outputs is None:

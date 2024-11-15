@@ -77,7 +77,7 @@ class MTBenchBenchmark(BaseBenchmark):
         Args:
             base_path: Base directory for MTBench data and outputs
             config: MTBench configuration object
-            debug: If True, run in debug mode
+            debug: If True, run in debug mode on 2 samples
             logger: Optional logger instance
         """
         super().__init__(logger)
@@ -116,6 +116,7 @@ class MTBenchBenchmark(BaseBenchmark):
             batch_instances = []
 
             # Prepare instances for current turn
+            self.logger.info("Genearting responses for MTBench...")
             for q_idx, question in enumerate(questions):
                 if turn_num < len(question["turns"]):
                     temperature = temperature_config.get(question["category"], 0.7)
@@ -212,6 +213,7 @@ class MTBenchBenchmark(BaseBenchmark):
         questions = load_questions(self.question_file, None, None)
         if self.debug:
             questions = questions[:2]
+            self.logger.info(f"Debug mode: using 2 examples")
 
         model_answers = load_model_answers(self.answer_dir)
         ref_answers = load_model_answers(self.ref_answer_dir)

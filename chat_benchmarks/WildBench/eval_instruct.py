@@ -81,7 +81,7 @@ class WildBenchBenchmark(BaseBenchmark):
 
         Args:
             config: WildBench configuration
-            debug: If True, run in debug mode
+            debug: If True, run in debug mode on 2 samples
             logger: Optional logger instance
         """
         super().__init__(logger)
@@ -115,7 +115,7 @@ class WildBenchBenchmark(BaseBenchmark):
             dataset = load_dataset("allenai/WildBench", self.config.dataset_version, split=self.config.split)
 
             if self.debug:
-                dataset = dataset.select(range(min(5, len(dataset))))
+                dataset = dataset.select(range(min(2, len(dataset))))
                 self.logger.info(f"Debug mode: using {len(dataset)} examples")
 
             # Initialize data structures
@@ -192,6 +192,7 @@ class WildBenchBenchmark(BaseBenchmark):
             ]
 
             outputs = self.compute(model, all_instances, gather_to_rank=0)
+            self.logger.info("Genearting responses for WildBench...")
 
             # Return None early for non-primary ranks
             if outputs is None:

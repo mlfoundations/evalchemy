@@ -26,7 +26,7 @@ class MBPPBenchmark(BaseBenchmark):
         num_examples: int = 3,
         start_idx: int = 10,
         end_idx: int = 510,
-        debug_size: Optional[int] = None,
+        debug: bool = False,
         logger: Optional[logging.Logger] = None,
     ):
         """
@@ -38,7 +38,7 @@ class MBPPBenchmark(BaseBenchmark):
             num_examples: Number of examples to show in few-shot prompt
             start_idx: Start index for evaluation examples
             end_idx: End index for evaluation examples
-            debug_size: If set, only evaluate this many examples
+            debug: If set, only evaluate on 2 examples
             logger: Optional logger instance
         """
         super().__init__(logger)
@@ -47,7 +47,7 @@ class MBPPBenchmark(BaseBenchmark):
         self.num_examples = num_examples
         self.start_idx = start_idx
         self.end_idx = end_idx
-        self.debug_size = debug_size
+        self.debug = debug
 
     def format_test_example(self, question: str, tests: List[str], code: Optional[str] = None) -> str:
         """Format a single test example."""
@@ -81,9 +81,9 @@ class MBPPBenchmark(BaseBenchmark):
                 examples_str.append(example_prompt)
 
             eval_range = range(self.start_idx, min(self.end_idx, len(examples)))
-            if self.debug_size:
-                eval_range = list(eval_range)[: self.debug_size]
-                self.logger.info(f"Debug mode: using {self.debug_size} examples")
+            if self.debug:
+                eval_range = list(eval_range)[:2]
+                self.logger.info(f"Debug mode: using 2 examples")
 
             for i in eval_range:
                 ex = examples[i]
@@ -157,7 +157,7 @@ Here is my problem:
                     self.logger.error(f"Error preparing instance {idx}: {str(e)}")
                     continue
 
-            self.logger.info("Generating responses...")
+            self.logger.info("Generating responses for MBPP...")
             outputs = self.compute(model, all_instances, gather_to_rank=0)
 
             # Return None early for non-primary ranks

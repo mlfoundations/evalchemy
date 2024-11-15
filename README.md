@@ -1,150 +1,220 @@
-# How to run existing evaluation frameworks?
+#  🧪 DCFT Evaluation Framework
 
-We adopt a lot from the amazing LM-Eval-Harness [https://github.com/EleutherAI/lm-evaluation-harness]. We accept the whole model interface from lm-eval-harness.
+This evaluation framework builds upon the [LM-Eval-Harness](https://github.com/EleutherAI/lm-evaluation-harness) to provide a unified, easy-to-use platform for language model evaluation. We've streamlined the process by:
 
-Evaluation is as simple as 
-Note: Please make sure OPENAI_API_KEY is set!
+- Integrating multiple popular evaluation repositories into a single, cohesive framework
+- Providing simple installation and unified dependencies
+- Supporting both data-parallel and model-parallel evaluation strategies
+- Offering consistent interfaces across different benchmarks
+
+### Key Features
+
+- **Unified Installation**: One-step setup for all benchmarks, eliminating dependency conflicts
+- **Parallel Evaluation**:
+  - Data-Parallel: Distribute evaluations across multiple GPUs for faster results
+  - Model-Parallel: Handle large models that don't fit on a single GPU
+- **Simplified Usage**: Run any benchmark with consistent command-line interface
+- **Integrated Reporting**: Unified output format and leaderboard submission
+
+## ⚡ Quick Start
+
+### Installation
+
 ```bash
-python -m eval.eval 
-    --model hf  \
+# Create and activate conda environment
+conda create --name dcft python=3.10
+conda activate dcft      
+
+# Install dependencies
+pip install -e ".[eval]"
+pip install -r requirements.txt
+```
+
+### Basic Usage
+
+Make sure your `OPENAI_API_KEY` is set in your environment before running evaluations.
+
+```bash
+python -m eval.eval \
+    --model hf \
     --tasks HumanEval \
     --model_args "pretrained=meta-llama/Meta-Llama-3-8B-Instruct" \
     --batch_size auto \
     --output_path logs
 ```
 
-The output will be placed in the logs file after.
+## 🔧 Advanced Usage
 
-The list of tasks is a comma separated list of tasks. The list of instruction based tasks can be seen under "eval/chat_benchmarks". All pretrained tasks in [LM-Eval-Harness repository](https://github.com/EleutherAI/lm-evaluation-harness) are also available in this framework. To utilize data-parallelism (faster and what we recommend), we suggest using accelerate 
+### Multi-GPU Evaluation
+
+For faster evaluation using data parallelism (recommended):
 
 ```bash
 accelerate launch --num-processes <num-gpus> --num-machines <num-nodes> \
     --multi-gpu -m eval.eval \
     --model hf \
-    --task MTBench,alpaca_eval \
-    --model_args 'pretrained=meta-llama/Llama-3.1-8B-Instruct' \
+    --tasks MTBench,alpaca_eval \
+    --model_args 'pretrained=meta-llama/Llama-3-8B-Instruct' \
     --batch_size 2 \
     --output_path logs
 ```
 
-If your model cannot fit on one single GPU, we suggest using model-parallelism (slower and less recommended)
+### Large Model Evaluation
+
+For models that don't fit on a single GPU, use model parallelism:
+
 ```bash
 python -m eval.eval \
     --model hf \
-    --task MTBench,alpaca_eval \
-    --model_args 'pretrained=meta-llama/Llama-3.1-8B-Instruct,parallelize=True' \
+    --tasks MTBench,alpaca_eval \
+    --model_args 'pretrained=meta-llama/Llama-3-8B-Instruct,parallelize=True' \
     --batch_size 2 \
     --output_path logs
 ```
-While we do support "auto" batch_size, we do recommend playing with the batch_size yourself as it is fairly conservative. 
 
-## Annotator changes
-To change the annotator for all judges, please use 
+> **💡 Note**: While "auto" batch size is supported, we recommend manually tuning the batch size for optimal performance.
+
+### Customizing Evaluation
+
+#### 🤖 Change Annotator Model
 ```bash
-    --annotator_model gpt-4o
+--annotator_model gpt-4o-mini-2024-07-18
 ```
 
-## Logging to the leaderboard
+## 🏆 Leaderboard Integration
 
-We also support automatically logging to our leaderboard!
+### 🗄️ Database Configuration
+
+Set the following environment variables to enable database logging:
+
+```bash
+export DB_PASSWORD=<DB_PASSWORD>
+export DB_HOST=<DB_HOST>
+export DB_PORT=<DB_PORT>
+export DB_NAME=<DB_NAME>
+export DB_USER=<DB_USER>
+```
+
+### 📊 Submit Results to Leaderboard
 
 ```bash
 python -m eval.eval \
     --model hf \
-    --task MTBench,alpaca_eval \
-    --model_args 'pretrained=meta-llama/Llama-3.1-8B-Instruct,parallelize=True' \
+    --tasks MTBench,alpaca_eval \
+    --model_args 'pretrained=meta-llama/Llama-3-8B-Instruct' \
     --batch_size 2 \
     --output_path logs \
-    --use-database
+    --use-database \
+    --model_name "My Model Name" \
+    --creation_location "Lab Name" \
+    --created_by "Researcher Name"
 ```
 
+View results on the [leaderboard](https://llm-leaderboard-319533213591.us-central1.run.app/).
 
+### 🔄 Updating Database Results
 
+You can update existing results using either:
 
-You can optionally pass in the following flags to add information to your uploaded result: 
+1. Model ID: `--model_id <YOUR_MODEL_ID>`
+2. Model Name: `--model-name <MODEL_NAME_IN_DB>`
+
+Note: If both are provided, model_id takes precedence.
+
+## 🛠️ Implementing Custom Evaluations
+
+To add a new evaluation system:
+
+1. Create a new directory under `eval/chat_benchmarks/`
+2. Implement `eval_instruct.py` with two required functions:
+   - `eval_instruct(model)`: Takes an LM Eval Model, returns results dict
+   - `evaluate(results)`: Takes results dict, returns evaluation metrics
+
+### Adding External Evaluation Repositories
+
+Use git subtree to manage external evaluation code:
 
 ```bash
-    --model_name <name of your model in database> \
-    --creation_location <where this model was created> \
-    --created_by <who created this model> \
+# Add external repository
+git subtree add --prefix=eval/chat_benchmarks/new_eval https://github.com/original/repo.git main --squash
+
+# Pull updates
+git subtree pull --prefix=eval/chat_benchmarks/new_eval https://github.com/original/repo.git main --squash
+
+# Push contributions back
+git subtree push --prefix=eval/chat_benchmarks/new_eval https://github.com/original/repo.git contribution-branch
 ```
 
-The model will appear here at the [leaderboard](https://llm-leaderboard-319533213591.us-central1.run.app/).
+### 🔍 Debug Mode
 
-To log into this database, please set this environmental variables
+To run evaluations in debug mode, add the `--debug` flag:
+
 ```bash
-export DB_PASSWORD='t}LQ7ZL]3$x~I8ye'
-export DB_HOST='35.225.163.235'
-export DB_PORT='5432'
-export DB_NAME="postgres"
-export DB_USER='postgres'
+python -m eval.eval \
+    --model hf \
+    --tasks MTBench \
+    --model_args "pretrained=meta-llama/Llama-3-8B-Instruct" \
+    --batch_size 2 \
+    --output_path logs \
+    --debug
 ```
 
-# Installation instructions
+Debug mode provides:
+This is particularly useful when testing new evaluation implementations, debugging model configurations, verifying dataset access, and testing database connectivity.
 
-To install, please follow the following steps:
-```bash
-conda create --name dcft python=3.10
-conda activate dcft      
-pip install -e ".[eval]"
-pip install -r requirements.txt
-```
+### 🚀 Performance Tips
 
-### Database Updates for Evaluation Results
-
-You can update the database using either:
-1. Search by Model ID
-Use the model's unique identifier: ``` --model_id <YOUR_MODEL_ID> ```
-
-2. Search by Model Name
-To search using the model's name instead: ``` --model-name <MODEL_NAME_IN_DB> ```
-
-If both model_name and model_id are supplied, then model_id will take precedence.
-
-## Implementing a new evaluation system
-
-1. Add the relevant repository with code for your evaluation system in a folder under eval/chat_benchmarks. If it is a git repository that is maintained, I recommend using 
-```bash
-    git subtree add --prefix=eval/chat_benchmarks/alpaca_eval https://github.com/original/repo.git main --squash
-
-    # Make changes in the eval/chat_benchmarks/alpaca_eval directory
-
-    # Commit changes to your main repository
-    git add eval/chat_benchmarks/alpaca_eval
-    git commit -m "Update library-name with custom changes"
-
-    # To pull updates from the original repository
-    git subtree pull --prefix=eval/chat_benchmarks/alpaca_eval https://github.com/original/repo.git main --squash
-
-    # If you want to contribute back to the original repository
-    git subtree push --prefix=eval/chat_benchmarks/alpaca_eval https://github.com/original/repo.git contribution-branch
-```
-
-
-2. Inside the folder, please create a file eval_instruct.py that has two functions: 1. eval_instruct(model) which takes a LM Eval Model and outputs a results dict and 2. evaluate which takes in results dict and outputs another results dict with the evaluation results. For example, see eval/chat_benchmarks/MBPP/eval_instruct.py
-
-It's that easy. 
-
-Some tips to make this faster. 
-
-1. Utilizing the automatic batching from lm-eval-harness is best for improving speed. Put all the generation instances into a list and then pass this off to lm-eval-harness and it will generate all. 
+1. Utilize batch processing for faster evaluation:
 ```python
 all_instances.append(
-        Instance(
-            "generate_until",
-            example,
-            (
-                inputs,
-                {
-                    "max_new_tokens": 1024,
-                    "do_sample": False,
-                },
-            ),
-            idx,
-        )
+    Instance(
+        "generate_until",
+        example,
+        (
+            inputs,
+            {
+                "max_new_tokens": 1024,
+                "do_sample": False,
+            },
+        ),
+        idx,
+    )
 )
 
 outputs = model.generate_until(all_instances)
 ```
 
-2. Try to use lm-eval logger as much as possible.
+2. Use the LM-eval logger for consistent logging across evaluations
+
+## 📚 Available Tasks
+
+### Built-in Benchmarks
+- All tasks from [LM-Eval-Harness](https://github.com/EleutherAI/lm-evaluation-harness)
+- Custom instruction-based tasks (found in `eval/chat_benchmarks/`):
+  - **MTBench**: Multi-turn dialogue evaluation benchmark
+  - **WildBench**: Real-world task evaluation
+  - **RepoBench**: Code understanding and repository-level tasks
+  - **MixEval**: Comprehensive evaluation across domains
+  - **AlpacaEval**: Instruction following evaluation
+  - **HumanEval**: Code generation and problem solving
+  - **ZeroEval**: Logical reasoning and problem solving
+  - **MBPP**: Python programming benchmark
+
+Example running multiple benchmarks:
+```bash
+python -m eval.eval \
+    --model hf \
+    --tasks MTBench,WildBench,RepoBench,MixEval \
+    --model_args "pretrained=meta-llama/Llama-3-8B-Instruct" \
+    --batch_size auto \
+    --output_path logs
+```
+
+### 🔐 Special Access Requirements
+
+#### ZeroEval Access
+To run ZeroEval benchmarks, you need to:
+
+1. Request access to the [ZebraLogicBench-private dataset](https://huggingface.co/datasets/allenai/ZebraLogicBench-private) on Hugging Face
+2. Accept the terms and conditions
+3. Log in to your Hugging Face account when running evaluations

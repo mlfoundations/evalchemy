@@ -38,12 +38,13 @@ class ZeroEvalBenchmark(BaseBenchmark):
         self,
         tasks: List[str] = ["zebra-grid", "numersense-v2", "crux", "math-l5"],
         config: Optional[ZeroEvalConfig] = None,
+        debug: bool = False,
         logger: Optional[logging.Logger] = None,
     ):
         super().__init__(logger)
         self.tasks = tasks
         self.config = config or ZeroEvalConfig()
-        self.debug = False
+        self.debug = debug
 
     def load_dataset(self, data_name: str) -> Tuple[List[str], List[str], List[Dict[str, Any]], Dict[str, Any]]:
         """
@@ -128,7 +129,7 @@ class ZeroEvalBenchmark(BaseBenchmark):
             results[task] = output_path
 
             # Generate responses
-            self.logger.info("Generating responses...")
+            self.logger.info("Generating responses for Zero Eval...")
             all_instances = [
                 Instance(
                     "generate_until",
@@ -186,17 +187,17 @@ class ZeroEvalBenchmark(BaseBenchmark):
                 if task == "zebra-grid":
                     load_private_solutions()
                     result, _ = zebra_grid_eval_model("%", filepath)
-                    eval_results[task] = result["Puzzle Acc"]
-                    eval_results[f"{task}_cell_acc"] = result["Cell Acc"]
+                    eval_results[task] = float(result["Puzzle Acc"])
+                    eval_results[f"{task}_cell_acc"] = float(result["Cell Acc"])
                 else:
                     # Handle other tasks (numersense-v2, crux, math-l5)
                     eval_func = math_eval_model if task in ["numersense-v2", "math-l5"] else crux_eval_model
                     result, _ = eval_func("%", filepath)
-                    eval_results[task] = result["Acc"]
+                    eval_results[task] = float(result["Acc"])
 
                 # Common metrics for all tasks
-                eval_results[f"{task}_no_answer"] = result["No answer"]
-                eval_results[f"{task}_reason_lens"] = result["Reason Lens"]
+                eval_results[f"{task}_no_answer"] = float(result["No answer"])
+                eval_results[f"{task}_reason_lens"] = float(result["Reason Lens"])
 
             except Exception as e:
                 self.logger.error(f"Error evaluating responses for task {task}: {e}")

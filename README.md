@@ -1,4 +1,6 @@
-#  🧪 DCFT Evaluation Framework
+# 🧪 EvalChemy
+
+> Transforming Language Model Evaluation into Gold Standard
 
 This evaluation framework builds upon the [LM-Eval-Harness](https://github.com/EleutherAI/lm-evaluation-harness) to provide a unified, easy-to-use platform for language model evaluation. We've streamlined the process by:
 
@@ -72,7 +74,7 @@ python -m eval.eval \
     --output_path logs
 ```
 
-> **💡 Note**: While "auto" batch size is supported, we recommend manually tuning the batch size for optimal performance.
+> **💡 Note**: While "auto" batch size is supported, we recommend manually tuning the batch size for optimal performance. The optimal batch size depends on the model size, GPU memory, and the specific benchmark. We used a maximum of 32 and a minimum of 4 (for RepoBench) evaluating Llama-3-8B-Instruct on 8xH100 GPUs.
 
 ### Customizing Evaluation
 
@@ -195,6 +197,7 @@ outputs = model.generate_until(all_instances)
   - **WildBench**: Real-world task evaluation
   - **RepoBench**: Code understanding and repository-level tasks
   - **MixEval**: Comprehensive evaluation across domains
+  - **IFEval**: Instruction following capability evaluation with diverse prompts
   - **AlpacaEval**: Instruction following evaluation
   - **HumanEval**: Code generation and problem solving
   - **ZeroEval**: Logical reasoning and problem solving
@@ -204,11 +207,37 @@ Example running multiple benchmarks:
 ```bash
 python -m eval.eval \
     --model hf \
-    --tasks MTBench,WildBench,RepoBench,MixEval \
+    --tasks MTBench,WildBench,alpaca_eval \
     --model_args "pretrained=meta-llama/Llama-3-8B-Instruct" \
     --batch_size auto \
     --output_path logs
 ```
+
+### ⏱️ Runtime and Cost Analysis
+
+| Benchmark | Runtime (8xH100) | Batch Size | Total Tokens | API Cost | Notes |
+|-----------|------------------|------------|--------------|-----------|--------|
+| MTBench | 840s | 32 | ~196K | $0.05-6.40 | Varies by judge (GPT-4 vs GPT-4-mini) |
+| WildBench | 2280s | 32 | ~2.2M | $0.43 | Using GPT-4-mini judge |
+| RepoBench | 2760s | 4 | - | - | Lower batch size due to memory |
+| MixEval | 780s | 32 | ~4-6M | $0.76-3.36 | Varies by judge model |
+| AlpacaEval | 960s | 32 | ~936K | $0.14-9.40 | Varies by judge (GPT-4 vs GPT-4-mini) |
+| HumanEval | 240s | 32 | - | - | No API costs |
+| ZeroEval | 6240s | 32 | - | - | Longest runtime |
+| MBPP | 360s | 32 | - | - | No API costs |
+| MMLU | 420s | 32 | - | - | No API costs |
+| ARC | 240s | 32 | - | - | No API costs |
+| Drop | 1200s | 32 | - | - | No API costs |
+
+**Notes:**
+- Runtimes measured using 8x H100 GPUs with Llama-3 8B Instruct model
+- Batch sizes optimized for memory and speed
+- API costs vary based on judge model choice
+
+**Cost-Saving Tips:**
+- Use GPT-4-mini judge when possible for significant cost savings
+- Adjust batch size based on available memory
+- Consider using data-parallel evaluation for faster results
 
 ### 🔐 Special Access Requirements
 

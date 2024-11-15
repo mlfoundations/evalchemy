@@ -131,6 +131,23 @@ git subtree pull --prefix=eval/chat_benchmarks/new_eval https://github.com/origi
 git subtree push --prefix=eval/chat_benchmarks/new_eval https://github.com/original/repo.git contribution-branch
 ```
 
+### Debug Mode
+
+To run evaluations in debug mode, add the `--debug` flag:
+
+```bash
+python -m eval.eval \
+    --model hf \
+    --tasks MTBench \
+    --model_args "pretrained=meta-llama/Llama-3-8B-Instruct" \
+    --batch_size 2 \
+    --output_path logs \
+    --debug
+```
+
+Debug mode provides:
+This is particularly useful when testing new evaluation implementations, debugging model configurations, verifying dataset access, and testing database connectivity.
+
 ### Performance Tips
 
 1. Utilize batch processing for faster evaluation:
@@ -187,26 +204,3 @@ To run ZeroEval benchmarks, you need to:
 1. Request access to the [ZebraLogicBench-private dataset](https://huggingface.co/datasets/allenai/ZebraLogicBench-private) on Hugging Face
 2. Accept the terms and conditions
 3. Log in to your Hugging Face account when running evaluations
-
-#### WildBench Access
-WildBench requires:
-1. Access to the WildBench dataset
-2. Acceptance of usage terms
-
-#### MTBench Details
-MTBench evaluates multi-turn conversations and requires:
-1. OpenAI API access for the judge model
-2. Supports both single-turn and multi-turn dialogue evaluation
-
-#### RepoBench Details
-RepoBench focuses on repository-level code understanding and requires:
-1. Access to the RepoBench dataset
-2. Sufficient compute resources for processing large codebases
-
-#### MixEval Details
-MixEval provides a comprehensive evaluation suite that includes:
-1. Mathematical reasoning tasks
-2. Code generation and understanding
-3. Logical reasoning problems
-4. Multi-step problem solving
-5. Real-world application scenarios

@@ -1,0 +1,54 @@
+### model
+model_name_or_path: "meta-llama/Meta-Llama-3-8B"
+
+### method
+stage: sft
+do_train: true
+finetuning_type: full
+deepspeed: dcft/train/zero2.json
+packing: true
+neat_packing: true
+enable_liger_kernel: true
+
+### dataset
+dataset: TIGER-Lab/WebInstructFull
+dataset_dir: ONLINE
+template: llama3
+messages: sample
+formatting: sharegpt
+cutoff_len: 2048
+overwrite_cache: true
+preprocessing_num_workers: 16
+
+### output
+save_strategy: epoch
+output_dir: "/data4/dcft/experiments/train/checkpoints/llama3_8b_baseline_mammoth"
+logging_steps: 10
+plot_loss: true
+overwrite_output_dir: true
+
+### train
+adam_beta1: 0.9
+adam_beta2: 0.999
+max_grad_norm: 1
+
+global_batch_size: 512              # Do not change this
+per_device_train_batch_size: 8      # Can change depending on hardware
+gradient_accumulation_steps: 8      # Can change depending on number of GPUs
+gradient_checkpointing: true
+learning_rate: 5.0e-6
+num_train_epochs: 3.0
+lr_scheduler_type: constant
+warmup_ratio: 0.1
+bf16: true
+weight_decay: 0.1
+warmup_steps: 1738
+ddp_timeout: 180000000
+report_to: wandb
+run_name: llama3_8b_baseline_mammoth
+### eval
+val_size: 0.05
+eval_strategy: epoch
+push_to_db: true
+push_to_hub: true
+hub_model_id: mlfoundations-dev/llama3_8b_baseline_mammoth

@@ -1,0 +1,65 @@
+operators:
+  - id: load_alpaca
+    config:
+      type: hf_source
+      dataset: yahma/alpaca-cleaned
+      split: train
+      columns: 
+        - instruction
+        - output
+      num_truncate: 1000
+
+  - id: instruction_generation
+    config:
+      type: function
+      sharded: true
+      function: data_strategies.WizardLM.utils.instruction_generation
+      function_config:
+        input_column: instruction
+        output_column: evol_instruction
+    input_ids:
+      - load_alpaca
+    
+  - id: dedup_evol_instructions
+    config:
+      type: function
+      function: data_strategies.WizardLM.utils.dedup
+      function_config:
+        input_column: evol_instruction
+    input_ids:
+      - instruction_generation
+
+  - id: annotate
+    config:
+      type: function
+      sharded: true
+      function: data_strategies.WizardLM.utils.annotate
+      function_config:
+        input_column: evol_instruction
+        output_column: completion
+    input_ids:
+      - dedup_evol_instructions
+
+  - id: rename_prompt
+    config:
+      type: function
+      sharded: true
+      function: data_strategies.WizardLM.utils.force_rename_column
+      function_config:
+        old_name: evol_instruction
+        new_name: prompt
+    input_ids:
+      - annotate
+  
+  - id: remove_other_columns
+    config:
+      type: function
+      sharded: true
+      function: data_strategies.WizardLM.utils.remove_other_columns
+      function_config:
+        columns_to_keep:
+            - prompt
+            - completion
+    input_ids:
+      - rename_prompt
+

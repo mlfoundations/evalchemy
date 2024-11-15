@@ -1,0 +1,15 @@
+{instruction}
+
+{flesch}
+
+All output text must be in {language}.
+
+The total output will be {word_count} words, but you will only output the first third, i.e. {third} words, and those {third} words need not satisfy all requirements - additional prompts will be made to complete the task with the previously generated content.
+
+Write the first third of the response, which must contain a minimum of {third} words.
+
+Remember, this is only the first third, and the remaining sections will be asked for later.
+
+Don't try to add some sort of conclusion or wrap-up sentence or paragraph, because this is only the first third. The output should end in such a way as to be easily and fluidly continued by a subsequent prompt, i.e. don't end with "And so, ..."
+
+Don't include any indication that this is only one third, e.g. 'to be continued..', etc., just output the first third.

@@ -1,0 +1,8 @@
+operators:
+  - id: instruction_generation
+    config:
+      type: function
+      function: data_strategies.Airoboros.utils.generate_instructions
+
+
+    

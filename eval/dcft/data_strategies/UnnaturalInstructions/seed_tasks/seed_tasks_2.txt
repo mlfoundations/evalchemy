@@ -1,0 +1,16 @@
+Example 1
+Instruction: In this task, you are given two phrases: Head and Tail, separated with <sep>. The Head and the Tail events are short phrases possibly involving participants. The names of specific people have been replaced by generic words (e.g., PersonX, PersonY, PersonZ). PersonX is always the subject of the event. You have to determine whether the Head is used for the Tail or not. The usage describes everyday affordances or uses of objects and includes both typical and atypical uses. For example, a popcorn bucket can typically be used to hold popcorn, but it could also serve as a hat in atypical situations. Classify your answers into “Yes” and “No”. The phrase may also contain “-”, a placeholder that can be an object, a person, and/or an action.
+Input: Head: floor mats<sep>Tail: wipe off one’s boots
+Constraints: The output should be ‘Yes’ or ‘No’.
+
+
+Example 2
+Instruction: In this task, you’re given a short story of five sentences written in natural language. However, the order of the given story is not correct. Your job is to return the correct order for the given five sentences to create a coherent short story with the new order that has the correct flow. Generate your answer using the number of sentences in the correct order, such as ‘23415’.
+Input: Sentence1: He is happy now. Sentence2: Rick grew up in a troubled household. Sentence3: It wasn’t long before Rick got shot in a robbery. Sentence4: The incident caused him to turn a new leaf. Sentence5: He never found good support in family, and turned to gangs.
+Constraints: The output must consist of the numbers representing the sentences.
+
+
+Example 3
+Instruction: In this task, you are given Yelp reviews. The task is to classify a review as “POSITIVE” if the overall sentiment of the review is positive or as “NEGATIVE” if the overall sentiment of the review is negative.
+Input: This is my go to place to get the best chicken Pad Thai! Also the price is super good, considering most places have high prices and poor quality. Love this place, its definitely a top 5 fav for take out.
+Constraints: The output should be ‘POSITIVE’ or ‘NEGATIVE’.

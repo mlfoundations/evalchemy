@@ -1,0 +1,32 @@
+[
+    {
+        "question": "My school's math club has 6 boys and 8 girls.  I need to select a team to send to the state math competition.  We want 6 people on the team.  In how many ways can I select the team without restrictions?",
+        "answer": "3003",
+        "answer_detail": "With no restrictions, we are merely picking 6 students out of 14.  This is $\\binom{14}{6} = \\boxed{3003}$.",
+        "level": "Level 2",
+        "type": "Counting & Probability",
+        "question_id": "683",
+        "inverse_question": "My school's math club has X boys and 8 girls.  I need to select a team to send to the state math competition.  We want 6 people on the team.  In how many ways can I select the team without restrictions?",
+        "inverse_question_answer": "6"
+    },
+    {
+        "question": "My school's math club has 6 boys and 8 girls.  I need to select a team to send to the state math competition.  We want 6 people on the team.  In how many ways can I select the team without restrictions?",
+        "answer": "3003",
+        "answer_detail": "With no restrictions, we are merely picking 6 students out of 14.  This is $\\binom{14}{6} = \\boxed{3003}$.",
+        "level": "Level 2",
+        "type": "Counting & Probability",
+        "question_id": "683",
+        "inverse_question": "My school's math club has 6 boys and X girls.  I need to select a team to send to the state math competition.  We want 6 people on the team.  In how many ways can I select the team without restrictions?",
+        "inverse_question_answer": "8"
+    },
+    {
+        "question": "My school's math club has 6 boys and 8 girls.  I need to select a team to send to the state math competition.  We want 6 people on the team.  In how many ways can I select the team without restrictions?",
+        "answer": "3003",
+        "answer_detail": "With no restrictions, we are merely picking 6 students out of 14.  This is $\\binom{14}{6} = \\boxed{3003}$.",
+        "level": "Level 2",
+        "type": "Counting & Probability",
+        "question_id": "683",
+        "inverse_question": "My school's math club has 6 boys and 8 girls.  I need to select a team to send to the state math competition.  We want X people on the team.  In how many ways can I select the team without restrictions?",
+        "inverse_question_answer": "6"
+    }
+]

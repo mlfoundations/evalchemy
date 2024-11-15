@@ -1,0 +1,20 @@
+operators:
+  - id: load_open_orca_t0
+    config:
+      type: hf_source
+      dataset: mlfoundations-dev/open-orca-t0
+      split: train
+      num_truncate: 100
+  
+  - id: llm_judge_filter_open_orca_t0
+    input_ids:
+      - load_open_orca_t0
+    config:
+      type: function
+      function: utils.completions.llm_judge_filter
+      function_config:
+        instruction_column: inputs
+        golden_answer_column: targets
+        attempt_answer_column: model_response
+        model: gpt-4o-mini
+        working_dir: ./data/open-orca-t0-judged-test

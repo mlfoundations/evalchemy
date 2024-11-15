@@ -1,0 +1,42 @@
+operators:
+  # I suggest using dcft/slimorca/mix_slim_orca.py instead
+  - id: load_and_filter_open_orca_niv2_judged
+    config:
+      type: function
+      function: data_strategies.SlimOrca.utils.load_and_filter_dataset
+      function_config:
+        dataset_name: mlfoundations-dev/open-orca-niv2-judged
+        filter_column: model_judgement
+
+  - id: load_and_filter_open_orca_cot_judged
+    config:
+      type: function
+      function: data_strategies.SlimOrca.utils.load_and_filter_dataset
+      function_config:
+        dataset_name: mlfoundations-dev/open-orca-cot-judged
+        filter_column: model_judgement
+
+  - id: load_and_filter_open_orca_flan_judged
+    config:
+      type: function
+      function: data_strategies.SlimOrca.utils.load_and_filter_dataset
+      function_config:
+        dataset_name: mlfoundations-dev/open-orca-flan-judged
+        filter_column: model_judgement
+
+  - id: load_and_filter_open_orca_t0_judged
+    config:
+      type: function
+      function: data_strategies.SlimOrca.utils.load_and_filter_dataset
+      function_config:
+        dataset_name: mlfoundations-dev/open-orca-t0-judged
+        filter_column: model_judgement
+
+  - id: slim_orca_mix
+    input_ids:
+      - load_and_filter_open_orca_niv2_judged
+      - load_and_filter_open_orca_cot_judged
+      - load_and_filter_open_orca_flan_judged
+      - load_and_filter_open_orca_t0_judged
+    config:
+      type: mix

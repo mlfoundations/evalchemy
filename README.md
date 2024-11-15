@@ -157,15 +157,56 @@ outputs = model.generate_until(all_instances)
 
 ## Available Tasks
 
+### Built-in Benchmarks
 - All tasks from [LM-Eval-Harness](https://github.com/EleutherAI/lm-evaluation-harness)
-- Custom instruction-based tasks (found in `eval/chat_benchmarks/`)
+- Custom instruction-based tasks (found in `eval/chat_benchmarks/`):
+  - **MTBench**: Multi-turn dialogue evaluation benchmark for assessing chat capabilities
+  - **WildBench**: Real-world task evaluation across diverse domains and scenarios
+  - **RepoBench**: Code understanding and repository-level programming tasks
+  - **MixEval**: Comprehensive evaluation across multiple domains including reasoning, math, and coding
+  - **AlpacaEval**: Instruction following evaluation
+  - **HumanEval**: Code generation and problem solving
+  - **ZeroEval**: Logical reasoning and problem solving
+  - **MBPP**: Python programming benchmark
 
-### ZeroEval Access Requirements
+Example running multiple benchmarks:
+```bash
+python -m eval.eval \
+    --model hf \
+    --tasks MTBench,WildBench,RepoBench,MixEval \
+    --model_args "pretrained=meta-llama/Llama-3-8B-Instruct" \
+    --batch_size auto \
+    --output_path logs
+```
 
+### Special Access Requirements
+
+#### ZeroEval Access
 To run ZeroEval benchmarks, you need to:
 
 1. Request access to the [ZebraLogicBench-private dataset](https://huggingface.co/datasets/allenai/ZebraLogicBench-private) on Hugging Face
 2. Accept the terms and conditions
 3. Log in to your Hugging Face account when running evaluations
 
-Without proper dataset access, ZeroEval tasks will fail to run. Make sure you have completed these steps before attempting to evaluate models on ZeroEval benchmarks.
+#### WildBench Access
+WildBench requires:
+1. Access to the WildBench dataset
+2. Acceptance of usage terms
+
+#### MTBench Details
+MTBench evaluates multi-turn conversations and requires:
+1. OpenAI API access for the judge model
+2. Supports both single-turn and multi-turn dialogue evaluation
+
+#### RepoBench Details
+RepoBench focuses on repository-level code understanding and requires:
+1. Access to the RepoBench dataset
+2. Sufficient compute resources for processing large codebases
+
+#### MixEval Details
+MixEval provides a comprehensive evaluation suite that includes:
+1. Mathematical reasoning tasks
+2. Code generation and understanding
+3. Logical reasoning problems
+4. Multi-step problem solving
+5. Real-world application scenarios

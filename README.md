@@ -64,7 +64,7 @@ python -m eval.eval \
 
 #### Change Annotator Model
 ```bash
---annotator_model gpt-4
+--annotator_model gpt-4o-mini-2024-07-18
 ```
 
 ## Leaderboard Integration
@@ -159,3 +159,13 @@ outputs = model.generate_until(all_instances)
 
 - All tasks from [LM-Eval-Harness](https://github.com/EleutherAI/lm-evaluation-harness)
 - Custom instruction-based tasks (found in `eval/chat_benchmarks/`)
+
+### ZeroEval Access Requirements
+
+To run ZeroEval benchmarks, you need to:
+
+1. Request access to the [ZebraLogicBench-private dataset](https://huggingface.co/datasets/allenai/ZebraLogicBench-private) on Hugging Face
+2. Accept the terms and conditions
+3. Log in to your Hugging Face account when running evaluations
+
+Without proper dataset access, ZeroEval tasks will fail to run. Make sure you have completed these steps before attempting to evaluate models on ZeroEval benchmarks.

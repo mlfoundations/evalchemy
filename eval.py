@@ -309,7 +309,21 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
 
 
 def setup_evaluation_tracker(output_path: str, use_database: bool) -> DCFTEvaluationTracker:
-    """Set up the evaluation tracker with proper arguments."""
+    """
+    This function initializes a DCFTEvaluationTracker instance with the specified
+    configuration for either file-based or database storage of evaluation results.
+
+    Args:
+        output_path (str): The file system path where evaluation results will be saved.
+            For file-based storage, this will be the directory path. For database
+            storage, this could be the connection string or database path.
+        use_database (bool): If True, uses database storage for results.
+            If False, uses file-based storage.
+
+    Returns:
+        DCFTEvaluationTracker: A configured instance of the evaluation tracker
+            ready to record and manage DCF evaluation results
+    """
     return DCFTEvaluationTracker(output_path, use_database)
 
 

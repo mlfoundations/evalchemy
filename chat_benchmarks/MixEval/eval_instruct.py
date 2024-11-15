@@ -13,6 +13,7 @@ from torch.nn.parallel import DistributedDataParallel
 from torch.utils.data.distributed import DistributedSampler
 
 from lm_eval.api.model import LM
+from lm_eval.api.instance import Instance
 from lm_eval.models.dummy import DummyLM
 from eval.task import BaseBenchmark
 
@@ -130,7 +131,7 @@ class MixEvalBenchmark(BaseBenchmark):
         splits = ["close_freeform", "close_multichoice"]
         out_dict = {}
 
-        self.logger.info("Genearting responses for MixEval...")
+        self.logger.info("Generating responses for MixEval...")
         for split in splits:
             results = self._eval_split(model, split)
             if model.world_size > 1:
@@ -177,52 +178,40 @@ class MixEvalBenchmark(BaseBenchmark):
             # Add GPU rank to filename to avoid conflicts
             response_file = response_file.replace(".jsonl", f"_rank{model.rank}.jsonl")
 
-        resume_info = self._check_resume(response_file)
-
-        chat_model = self._get_model(model)
         eval_dataset = get_eval_dataset(self.args)
 
         if self.args.debug:
             eval_dataset = Subset(eval_dataset, range(2))
             self.logger.info(f"Debug mode: using 2 examples")
 
-        if model.world_size > 1:
-            sampler = DistributedSampler(eval_dataset, num_replicas=model.world_size, rank=model.rank)
-            shuffle = False
-        else:
-            sampler = None
-            shuffle = False
+        all_prompts = [inp["formated_input"] for inp in eval_dataset.raw_inputs]
+        all_instances = []
 
-        dataloader = DataLoader(
-            eval_dataset,
-            batch_size=self.args.batch_size,
-            shuffle=shuffle,
-            num_workers=32,
-            collate_fn=lambda x: x,
-            sampler=sampler,
-        )
+        for idx, instruction in enumerate(all_prompts):
+            formatted_instruction = model.apply_chat_template([{"role": "user", "content": instruction}])
 
-        time_elapsed = resume_info["time_elapsed"]
-        start_time = time.time()
+            all_instances.append(
+                Instance(
+                    "generate_until",
+                    instruction,
+                    (
+                        formatted_instruction,
+                        {
+                            "temperature": 1.0,
+                        },
+                    ),
+                    idx,
+                )
+            )
+        all_responses = self.compute(model, all_instances)
+        for idx in list(range(len(eval_dataset.raw_inputs))):
+            eval_dataset.raw_inputs[idx]["response"] = all_responses[idx]
 
-        with torch.no_grad():
-            for b_id, batch in enumerate(tqdm(dataloader, desc=f"Evaluating {split}", unit="batch")):
-                if resume_info["resume"] and resume_info["status"]["batch_id"] >= b_id:
-                    continue
-
-                chat_model.get_responses(batch, response_file)
-
-                time_elapsed += time.time() - start_time
-                start_time = time.time()
-
-                self._update_status(b_id, time_elapsed, "in progress")
-
-        self._update_status(b_id, time_elapsed, "complete")
-        self.logger.info(
-            f"Finished evaluating {self.args.model_name}'s {split} split. Used {round(time_elapsed / 60, 2)} minutes."
-        )
-
-        return self._load_results(response_file)
+        with open(response_file, "w") as f:
+            for item in eval_dataset.raw_inputs:
+                json_line = json.dumps(item)
+                f.write(json_line + "\n")
+        return eval_dataset.raw_inputs
 
     def evaluate_responses(self, results: Dict[str, Any]) -> Dict[str, Any]:
         """

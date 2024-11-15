@@ -69,6 +69,12 @@ def setup_custom_parser():
         default="auto",
         help="Judge model used to evaluate generations. Example: gpt-4o-mini-2024-07-18",
     )
+
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Run evalutaions in debug mode on a few examples",
+    )
     return parser
 
 
@@ -243,7 +249,7 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
 
     # Initialize tasks
     task_list = args.tasks.split(",")
-    task_manager = InstructTaskManager(annotator_model=args.annotator_model)
+    task_manager = InstructTaskManager(annotator_model=args.annotator_model, debug=args.debug)
     pretrain_task_manager = PretrainTaskManager(args.verbosity, include_path=args.include_path)
 
     utils.eval_logger.info(f"Selected Tasks: {[task for task in task_list]}")
@@ -454,7 +460,7 @@ def handle_evaluation_output(
             utils.eval_logger.info(f"Logging to Weights and Biases failed due to {e}")
 
     evaluation_tracker.save_results_aggregated(results=results, samples=samples if args.log_samples else None)
-    if args.use_database:
+    if args.use_database and not args.debug:
         evaluation_tracker.update_evalresults_db(
             results,
             args.model_id,

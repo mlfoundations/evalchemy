@@ -38,12 +38,13 @@ class ZeroEvalBenchmark(BaseBenchmark):
         self,
         tasks: List[str] = ["zebra-grid", "numersense-v2", "crux", "math-l5"],
         config: Optional[ZeroEvalConfig] = None,
+        debug: bool = False,
         logger: Optional[logging.Logger] = None,
     ):
         super().__init__(logger)
         self.tasks = tasks
         self.config = config or ZeroEvalConfig()
-        self.debug = False
+        self.debug = debug
 
     def load_dataset(self, data_name: str) -> Tuple[List[str], List[str], List[Dict[str, Any]], Dict[str, Any]]:
         """
@@ -128,7 +129,7 @@ class ZeroEvalBenchmark(BaseBenchmark):
             results[task] = output_path
 
             # Generate responses
-            self.logger.info("Generating responses...")
+            self.logger.info("Generating responses for Zero Eval...")
             all_instances = [
                 Instance(
                     "generate_until",

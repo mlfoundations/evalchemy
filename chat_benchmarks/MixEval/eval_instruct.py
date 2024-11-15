@@ -6,7 +6,7 @@ import json
 import time
 import warnings
 from argparse import Namespace
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Subset
 from tqdm import tqdm
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel
@@ -46,6 +46,7 @@ class MixEvalBenchmark(BaseBenchmark):
         api_parallel_num: int = 32,
         annotator_model: str = "gpt-4o-mini-2024-07-18",
         verbose: bool = False,
+        debug: bool = False,
         logger: Optional[logging.Logger] = None,
     ):
         """
@@ -61,6 +62,7 @@ class MixEvalBenchmark(BaseBenchmark):
             api_parallel_num: Number of parallel API calls
             annotator_model: Model to use for multichoice judging and freeform judging
             verbose: Whether to print verbose output
+            debug: If set, only evaluate on 2 examples
             logger: Optional logger instance
         """
         super().__init__(logger)
@@ -80,6 +82,7 @@ class MixEvalBenchmark(BaseBenchmark):
                 "api_parallel_num": api_parallel_num,
                 "multichoice_judge": self.multichoice_judge,
                 "freeform_judge": self.freeform_judge,
+                "debug": debug,
                 "verbose": verbose,
             }
         )
@@ -127,6 +130,7 @@ class MixEvalBenchmark(BaseBenchmark):
         splits = ["close_freeform", "close_multichoice"]
         out_dict = {}
 
+        self.logger.info("Genearting responses for MixEval...")
         for split in splits:
             results = self._eval_split(model, split)
             if model.world_size > 1:
@@ -177,6 +181,10 @@ class MixEvalBenchmark(BaseBenchmark):
 
         chat_model = self._get_model(model)
         eval_dataset = get_eval_dataset(self.args)
+
+        if self.args.debug:
+            eval_dataset = Subset(eval_dataset, range(2))
+            self.logger.info(f"Debug mode: using 2 examples")
 
         if model.world_size > 1:
             sampler = DistributedSampler(eval_dataset, num_replicas=model.world_size, rank=model.rank)

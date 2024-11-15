@@ -3,7 +3,8 @@ import json
 import logging
 import os
 import sys
-from typing import Optional, List, Dict
+import time
+from typing import Optional, List, Dict, Union
 
 import concurrent.futures
 import torch.distributed as dist
@@ -82,13 +83,39 @@ def evaluate(
 ) -> Dict[str, Dict]:
     """
     Evaluate the language model on the given tasks.
+
+    Args:
+        lm (LM):
+            Language model instance to evaluate.
+        task_manager (InstructTaskManager):
+            Manager for instruction-based evaluation tasks.
+        pretrain_task_manager (PretrainTaskManager):
+            Manager for pre-training evaluation tasks.
+        task_list (List[str]):
+            List of task names to evaluate the model on.
+        verbosity (str, optional):
+            Logging verbosity level. Defaults to "INFO".
+        args (Any, optional):
+            Additional arguments to pass to the evaluation. Defaults to None.
+        **eval_kwargs:
+            Additional keyword arguments for evaluation configuration.
+
+    Returns:
+        Dict[str, Dict]:
+            Dictionary mapping task names to their evaluation results.
+            Each result dictionary contains metrics specific to that task.
     """
     eval_logger = utils.eval_logger
     eval_logger.setLevel(getattr(logging, f"{verbosity}"))
 
     # Split tasks between benchmark and pretrain
     benchmark_tasks = [t for t in task_list if t in task_manager.tasks]
-    pretrain_tasks = [t for t in task_list if t not in task_manager.tasks]
+    pretrain_tasks = [t for t in task_list if t in pretrain_task_manager.all_tasks]
+
+    unknown_tasks = set(task_list).difference(set(benchmark_tasks)).difference(set(pretrain_tasks))
+
+    if len(unknown_tasks) > 0:
+        raise ValueError(f"Tasks {unknown_tasks} are not recognized.")
 
     if benchmark_tasks:
         eval_logger.info(f"Benchmark tasks to evaluate: {benchmark_tasks}")
@@ -195,7 +222,9 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
         args = parse_eval_args(parser)
 
     # Initialize evaluation tracker
-    evaluation_tracker = setup_evaluation_tracker(args)
+    if args.output_path:
+        args.hf_hub_log_args += f",output_path={args.output_path}"
+    evaluation_tracker = setup_evaluation_tracker(args.output_path, args.use_database)
 
     # If model_id is provided, lookup model name from database
     if args.model_id:
@@ -221,7 +250,7 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
 
     # Initialize model
     try:
-        lm = initialize_model(args)
+        lm = initialize_model(args.model, args.model_args, args.batch_size, args.max_batch_size)
     except Exception as e:
         utils.eval_logger.error(f"Failed to initialize model: {str(e)}")
         sys.exit(1)
@@ -273,36 +302,81 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
         dist.destroy_process_group()
 
 
-def setup_evaluation_tracker(args: argparse.Namespace) -> DCFTEvaluationTracker:
+def setup_evaluation_tracker(output_path: str, use_database: bool) -> DCFTEvaluationTracker:
     """Set up the evaluation tracker with proper arguments."""
-    if args.output_path:
-        args.hf_hub_log_args += f",output_path={args.output_path}"
-    return DCFTEvaluationTracker(args.output_path, args.use_database)
+    return DCFTEvaluationTracker(output_path, use_database)
 
 
-def initialize_model(args: argparse.Namespace) -> LM:
-    """Initialize the language model based on arguments."""
-    if isinstance(args.model, str):
-        if args.model_args is None:
-            args.model_args = ""
+def initialize_model(
+    model: Union[str, LM],
+    model_args: Optional[str] = None,
+    batch_size: int = None,
+    max_batch_size: Optional[int] = None,
+    device: Optional[str] = None,
+) -> LM:
+    """
+    Initialize the language model based on provided configuration.
 
-        lm = lm_eval.api.registry.get_model(args.model).create_from_arg_string(
-            args.model_args,
-            {
-                "batch_size": args.batch_size,
-                "max_batch_size": args.max_batch_size,
-                "device": args.device,
-            },
+    Args:
+        model (Union[str, LM]):
+            Either a string identifier for the model to load from registry,
+            or an already instantiated LM object.
+        model_args (Optional[str], optional):
+            Additional arguments for model initialization as a string.
+            Only used if model is provided as a string. Defaults to None.
+        batch_size (Optional[int], optional):
+            Batch size for model inference. Defaults to None.
+        max_batch_size (Optional[int], optional):
+            Maximum allowed batch size. Defaults to None.
+        device (Optional[str], optional):
+            Device to load the model on (e.g., 'cuda', 'cpu'). Defaults to None.
+
+    Returns:
+        LM:
+            Initialized language model instance with configured parameters
+            and a sanitized model identifier.
+    """
+    if isinstance(model, str):
+        if model_args is None:
+            model_args = ""
+
+        config = {
+            "batch_size": batch_size,
+            "max_batch_size": max_batch_size,
+            "device": device,
+        }
+
+        lm = lm_eval.api.registry.get_model(model).create_from_arg_string(
+            model_args,
+            config,
         )
     else:
-        lm = args.model
+        lm = model
 
-    lm.model_identifier = sanitize_model_name(f"model_{args.model}_model_args_{args.model_args}")
+    lm.model_identifier = sanitize_model_name(f"model_{model}_model_args_{model_args}")
     return lm
 
 
 def add_results_metadata(results: Dict, args: argparse.Namespace, lm: LM) -> None:
-    """Add metadata and configuration to results."""
+    """
+    Add metadata and configuration to results.
+
+    Args:
+        results (Dict):
+            Dictionary of evaluation results to be augmented with metadata.
+            The function will modify this dictionary in-place to add
+            configuration and runtime information.
+        args (argparse.Namespace):
+            Command line arguments containing runtime configuration
+            and parameters used during evaluation.
+        lm (LM):
+            Language model instance, used to extract model-specific
+            configuration and parameters.
+
+    Returns:
+        None:
+            The function modifies the results dictionary in-place.
+    """
     results["config"] = {
         "model": (
             args.model
@@ -339,7 +413,28 @@ def handle_evaluation_output(
     evaluation_tracker: EvaluationTracker,
     wandb_logger: Optional[WandbLogger] = None,
 ) -> None:
-    """Handle evaluation output, including logging and saving results."""
+    """
+    Handle evaluation output, including logging and saving results.
+
+    Args:
+        results (Dict):
+            Dictionary containing evaluation results for different tasks.
+            Expected to map task names to their respective metric dictionaries.
+        args (argparse.Namespace):
+            Command line arguments containing configuration settings like
+            output paths and logging preferences.
+        evaluation_tracker (EvaluationTracker):
+            Tracker object that maintains state and history of evaluation runs,
+            used for metrics aggregation and progress monitoring.
+        wandb_logger (Optional[WandbLogger], optional):
+            Weights & Biases logger instance for experiment tracking and
+            visualization. If None, W&B logging is disabled. Defaults to None.
+
+    Returns:
+        None:
+            Function handles outputs via side effects (logging, saving files)
+            rather than returning values.
+    """
     if args.log_samples:
         samples = results.pop("samples")
 

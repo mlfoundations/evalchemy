@@ -29,7 +29,6 @@ conda activate dcft
 
 # Install dependencies
 pip install -e ".[eval]"
-pip install -r requirements.txt
 ```
 
 ### Basic Usage

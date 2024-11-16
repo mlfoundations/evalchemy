@@ -20,20 +20,95 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
 ]
+
+# Core dependencies grouped by functionality
 dependencies = [
-    # Core ML dependencies
+    # ML and Deep Learning
     "torch",
     "torchvision",
-    "transformers",
-    "wandb",
-    "datasets",
-    "accelerate",
+    "transformers>=4.0.0",
+    "accelerate[sagemaker]",
     "peft",
     "trl",
     "bitsandbytes",
-    "sentencepiece",
+    "deepspeed",
+    "optimum==1.12.0",
+    "scikit-learn",
+    "scipy",
+    "faiss-cpu==1.7.4",
+    "sentence-transformers>=2.2.2",
+    "lm-eval",  # Added the missing dependency
+    
+    # Data Processing
+    "pandas",
+    "numpy",
+    "jsonpickle",
     "protobuf",
-    "tensorboard",
+    "beautifulsoup4",
+    "python-box",
+    "fastavro",
+    "lxml",
+    
+    # AI Services and APIs
+    "openai",
+    "anthropic",
+    "cohere",
+    "google-generativeai",
+    "mistralai",
+    "google-cloud-aiplatform",
+    "sagemaker",
+    
+    # Cloud and Storage
+    "boto3",
+    "botocore",
+    "gcsfs",
+    "fsspec==2024.6.1",
+    "google-auth==2.25.1",
+    
+    # Web and API
+    "fastapi>=0.101.0",
+    "uvicorn>=0.23.0",
+    "aiohttp[speedups]>=3.8",
+    "requests>=2.28",
+    "httpx",
+    "httpx-sse",
+    
+    # Database
+    "sqlalchemy",
+    "psycopg[binary]",
+    "psycopg2-binary",
+    "sqlitedict",
+    
+    # Utilities
+    "tqdm",
+    "loguru>=0.7",
+    "python-dotenv",
+    "shortuuid",
+    "tenacity",
+    "backoff>=2.2",
+    "colorama",
+    "joblib",
+    
+    # Text Processing
+    "tiktoken",
+    "nltk",
+    "sentencepiece",
+    "fuzzywuzzy",
+    "python-Levenshtein",
+    "langdetect",
+    
+    # Evaluation and Metrics
+    "evaluate",
+    "codebleu",
+    "sacrebleu",
+    
+    # Development
+    "black",
+    "fire",
+    "asttokens",
+    
+    # Custom and External
+    "bespokelabs-curator@git+https://github.com/bespokelabsai/curator.git@d9ea8c56cb051a5e2417494ef447e641ee966a3a"
 ]
 
 [project.urls]
@@ -48,9 +123,8 @@ dev = [
     "flake8",
 ]
 eval = [
-    # Using exact package names from their setup files
     "alpaca_eval @ file:eval/chat_benchmarks/alpaca_eval",
-    "fschat @ file:eval/chat_benchmarks/MTBench",  # Changed to match the likely package name
+    "fschat @ file:eval/chat_benchmarks/MTBench",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -72,10 +146,7 @@ profile = "black"
 multi_line_output = 3
 
 [project.scripts]
-# DCFT scripts
 dcft-train = "dcft.train.llamafactory.src.train:main"
-
-# Database scripts
 db-model-register = "database.cli:model_register_cli"
 db-model-get-uuid = "database.cli:model_get_uuid_cli"
 db-model-get-metadata = "database.cli:model_get_metadata_cli"
@@ -88,9 +159,3 @@ packages = ["dcft"]
 
 [tool.setuptools.package-dir]
 dcft = "dcft"
-
-[tool.setuptools.package-data]
-dcft = [
-    "external_repositories/code2flow/**/*",
-    "external_repositories/airoboros/**/*",
-]

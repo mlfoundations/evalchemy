@@ -1,6 +1,6 @@
-# DCFT MixEval usage
+# MixEval usage
 
-This is the DCFT fork of the MixEval project, which is a quick evaluation suite for Large Language Models (LLMs). MixEval provides a standardized way to evaluate and compare the performance of various LLMs across a wide range of tasks and benchmarks that should correlate with Arena Elo.
+This is a fork of the MixEval project, which is a quick evaluation suite for Large Language Models (LLMs). MixEval provides a standardized way to evaluate and compare the performance of various LLMs across a wide range of tasks and benchmarks that should correlate with Arena Elo.
 
 To reproduce MixEval results, run `python -m eval.eval --model dummy --tasks MixEval --model_args 'pretrained=llama_3_8b_instruct'  --output_path logs` to evaluate the llama_3_8b_instruct model. By default, the model will be evaluated on all tasks in MixEval and use gpt-3.5-turbo-0125 as the judge.
 Other supported models are in `mix_eval/models`

@@ -84,7 +84,7 @@ Example running multiple benchmarks:
 python -m eval.eval \
     --model hf \
     --tasks MTBench,WildBench,alpaca_eval \
-    --model_args "pretrained=meta-llama/Llama-3-8B-Instruct" \
+    --model_args "pretrained=meta-llama/Meta-Llama-3-8B-Instruct" \
     --batch_size 16 \
     --output_path logs
 ```
@@ -106,7 +106,7 @@ accelerate launch --num-processes <num-gpus> --num-machines <num-nodes> \
     --multi-gpu -m eval.eval \
     --model hf \
     --tasks MTBench,alpaca_eval \
-    --model_args 'pretrained=meta-llama/Llama-3-8B-Instruct' \
+    --model_args 'pretrained=meta-llama/Meta-Llama-3-8B-Instruct' \
     --batch_size 2 \
     --output_path logs
 ```
@@ -119,7 +119,7 @@ For models that don't fit on a single GPU, use model parallelism:
 python -m eval.eval \
     --model hf \
     --tasks MTBench,alpaca_eval \
-    --model_args 'pretrained=meta-llama/Llama-3-8B-Instruct,parallelize=True' \
+    --model_args 'pretrained=meta-llama/Meta-Llama-3-8B-Instruct,parallelize=True' \
     --batch_size 2 \
     --output_path logs
 ```
@@ -210,7 +210,7 @@ To run evaluations in debug mode, add the `--debug` flag:
 python -m eval.eval \
     --model hf \
     --tasks MTBench \
-    --model_args "pretrained=meta-llama/Llama-3-8B-Instruct" \
+    --model_args "pretrained=meta-llama/Meta-Llama-3-8B-Instruct" \
     --batch_size 2 \
     --output_path logs \
     --debug
@@ -262,7 +262,7 @@ We support automatically logging evaluation results to a unified PostgreSQL data
 python -m eval.eval \
     --model hf \
     --tasks MTBench,alpaca_eval \
-    --model_args 'pretrained=meta-llama/Llama-3-8B-Instruct' \
+    --model_args 'pretrained=meta-llama/Meta-Llama-3-8B-Instruct' \
     --batch_size 2 \
     --output_path logs \
     --use_database
@@ -352,7 +352,7 @@ export DB_USER=<DB_USER>
 python -m eval.eval \
     --model hf \
     --tasks MTBench,alpaca_eval \
-    --model_args 'pretrained=meta-llama/Llama-3-8B-Instruct' \
+    --model_args 'pretrained=meta-llama/Meta-Llama-3-8B-Instruct' \
     --batch_size 2 \
     --output_path logs \
     --use_database \

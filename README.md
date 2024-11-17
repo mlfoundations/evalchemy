@@ -4,11 +4,6 @@
 
 This evaluation framework builds upon the [LM-Eval-Harness](https://github.com/EleutherAI/lm-evaluation-harness) to provide a unified, easy-to-use platform for language model evaluation. We've streamlined the process by:
 
-- Integrating multiple popular evaluation repositories into a single, cohesive framework.
-- Providing simple installation and unified dependencies.
-- Supporting both data-parallel and model-parallel evaluation strategies.
-- Offering consistent interfaces across different benchmarks.
-
 ### Key Features
 
 - **Unified Installation**: One-step setup for all benchmarks, eliminating dependency conflicts

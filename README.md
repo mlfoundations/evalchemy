@@ -70,6 +70,8 @@ python -m eval.eval \
     --output_path logs
 ```
 
+The results will be written out in `output_path`. If you have `jq` [installed](https://jqlang.github.io/jq/download/) you can view the results by easily after evaluation. Example: `jq '.results' logs/Qwen__Qwen2.5-7B-Instruct/results_2024-11-17T17-12-28.668908.json`
+
 **Args**: 
 - `--model`: Model type (example: hf, vllm)
 - `--tasks`: Comma-separated list of benchmarks to run

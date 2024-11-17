@@ -27,6 +27,8 @@ Additional Features:
 
 ### Installation
 
+We suggest using conda ([installation instructions](https://docs.anaconda.com/miniconda/#quick-command-line-install)). 
+
 ```bash
 # Create and activate conda environment
 conda create --name evalchemy python=3.10

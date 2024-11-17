@@ -1,5 +1,0 @@
-operators:
-  - id: openhermesoriginal_load
-    config:
-      type: function
-      function: data_strategies.OpenHermesOriginal.utils.process_dataset

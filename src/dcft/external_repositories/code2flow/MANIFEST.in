@@ -1,3 +1,0 @@
-include LICENSE, CHANGELOG.md
-include code2flow/get_ast.js
-include code2flow/get_ast.php

@@ -361,8 +361,6 @@ python -m eval.eval \
     --created_by "Researcher Name"
 ```
 
-View results on the [leaderboard](https://llm-leaderboard-319533213591.us-central1.run.app/).
-
 ### 🔄 Updating Database Results
 
 You can update existing results using either:

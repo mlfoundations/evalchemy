@@ -73,8 +73,9 @@ python -m eval.eval \
 The results will be written out in `output_path`. If you have `jq` [installed](https://jqlang.github.io/jq/download/) you can view the results by easily after evaluation. Example: `jq '.results' logs/Qwen__Qwen2.5-7B-Instruct/results_2024-11-17T17-12-28.668908.json`
 
 **Args**: 
-- `--model`: Model type (one of `hf`, `vllm`). 
-- `--tasks`: Comma-separated list of benchmarks to run
+
+- `--model`: Which model type or provider is evaluated (example: hf, vllm)
+- `--tasks`: Comma-separated list of parameters passed to the model constructor. Accepts a string of the format `"arg1=val1,arg2=val2,..."`. You can find the list supported arguments [here](https://github.com/EleutherAI/lm-evaluation-harness/blob/365fcda9b85bbb6e0572d91976b8daf409164500/lm_eval/models/huggingface.py#L66).
 - `--model_args`: Model path and parameters
 - `--batch_size`: Batch size for inference
 - `--output_path`: Directory to save evaluation results

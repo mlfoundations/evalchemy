@@ -66,7 +66,7 @@ def check_hf_model_exists(model_id: str) -> bool:
         return False
 
 
-class DCFTEvaluationTracker:
+class DCEvaluationTracker:
     """
     Tracks and saves evaluation information for language models.
 

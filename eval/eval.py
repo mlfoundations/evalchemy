@@ -23,7 +23,7 @@ import lm_eval.api.task
 import lm_eval.models
 
 from eval.task import TaskManager as InstructTaskManager
-from eval.eval_tracker import DCFTEvaluationTracker
+from eval.eval_tracker import DCEvaluationTracker
 
 
 def setup_custom_parser():
@@ -308,9 +308,9 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
         dist.destroy_process_group()
 
 
-def setup_evaluation_tracker(output_path: str, use_database: bool) -> DCFTEvaluationTracker:
+def setup_evaluation_tracker(output_path: str, use_database: bool) -> DCEvaluationTracker:
     """
-    This function initializes a DCFTEvaluationTracker instance with the specified
+    This function initializes a DCEvaluationTracker instance with the specified
     configuration for either file-based or database storage of evaluation results.
 
     Args:
@@ -321,10 +321,10 @@ def setup_evaluation_tracker(output_path: str, use_database: bool) -> DCFTEvalua
             If False, uses file-based storage.
 
     Returns:
-        DCFTEvaluationTracker: A configured instance of the evaluation tracker
+        DCEvaluationTracker: A configured instance of the evaluation tracker
             ready to record and manage DCF evaluation results
     """
-    return DCFTEvaluationTracker(output_path, use_database)
+    return DCEvaluationTracker(output_path, use_database)
 
 
 def initialize_model(

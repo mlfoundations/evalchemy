@@ -2,7 +2,7 @@
 
 > *A framework for Gold Standard Language Model Evaluations*
 
-The Datacomp community and [Bespoke Labs](https://bespokelabs.ai) are excited to introduce Evalchemy, a unified and easy-to-use platform for evaluating Language models. Evalchemy builds upon the [LM-Eval-Harness](https://github.com/EleutherAI/lm-evaluation-harness) to provide a unified, easy-to-use platform for language model evaluation. We've streamlined the process by:
+The [Datacomp community](https://datacomp.ai) and [Bespoke Labs](https://bespokelabs.ai) are excited to introduce Evalchemy, a unified and easy-to-use platform for evaluating Language models. Evalchemy builds upon the [LM-Eval-Harness](https://github.com/EleutherAI/lm-evaluation-harness) to provide a unified, easy-to-use platform for language model evaluation. We've streamlined the process by:
 
 ### Key Features
 

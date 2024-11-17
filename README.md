@@ -86,7 +86,7 @@ python -m eval.eval \
     --output_path logs
 ```
 
-We add several examples in `eval/examples` of sample scripts in different use cases for our evaluation framework. 
+We add several examples in `[eval/examples](https://github.com/mlfoundations/Evalchemy/tree/main/eval/examples)` of scripts in different use cases for our evaluation framework. 
 
 ## 🔧 Advanced Usage
 

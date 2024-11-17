@@ -156,7 +156,6 @@ dev = [
 ]
 eval = [
     # Using exact package names from their setup files
-    "alpaca_eval @ file:eval/chat_benchmarks/alpaca_eval",
     "fschat @ file:eval/chat_benchmarks/MTBench",  # Changed to match the likely package name
 ]
 

@@ -31,6 +31,7 @@ conda activate evalchemy
 
 # Install dependencies
 pip install -e ".[eval]"
+pip install -e eval/chat_benchmarks/alpaca_eval
 
 # Log into HuggingFace for datasets and models.
 huggingface-cli login

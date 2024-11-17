@@ -29,8 +29,8 @@ Additional Features:
 
 ```bash
 # Create and activate conda environment
-conda create --name dcft python=3.10
-conda activate dcft      
+conda create --name evalchemy python=3.10
+conda activate evalchemy      
 
 # Install dependencies
 pip install -e ".[eval]"

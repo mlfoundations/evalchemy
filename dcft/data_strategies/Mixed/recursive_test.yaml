@@ -1,0 +1,5 @@
+operators:
+- id: load_mix_test
+  config:
+    type: load_preexisting
+    framework_name: mix_test

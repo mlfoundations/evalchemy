@@ -1,0 +1,16 @@
+operators:
+- id: load_oh_preferences
+  config:
+    type: hf_source
+    dataset: argilla/OpenHermesPreferences
+    split: train
+    columns: 
+      - prompt
+      - chosen
+      - rejected
+- id: format_oh_pref
+  config:
+    type: function
+    function: dcft.data_strategies.OH_preferences.utils.parse_oh_pref
+  input_ids:
+    - load_oh_preferences

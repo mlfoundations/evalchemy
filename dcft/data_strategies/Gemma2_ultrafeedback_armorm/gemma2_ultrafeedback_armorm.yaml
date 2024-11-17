@@ -1,0 +1,15 @@
+operators:
+  - id: load_ultrafeedback_armorm
+    config:
+      type: hf_source
+      dataset: princeton-nlp/gemma2-ultrafeedback-armorm
+      split: train
+      columns: 
+        - chosen
+        - rejected
+  - id: convert
+    config:
+      type: function
+      function: dcft.data_strategies.Gemma2_ultrafeedback_armorm.utils.convert
+    input_ids:
+      - load_ultrafeedback_armorm

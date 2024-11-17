@@ -1,0 +1,36 @@
+name: 'camel_install'
+description: 'Setup python environment and install dependencies for CAMEL by poetry.'
+inputs:
+  python-version:
+    description: 'Python version.'
+    required: true
+    default: '3.10'
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '${{ inputs.python-version }}'
+    - name: Install poetry
+      uses: abatilo/actions-poetry@v2
+    - name: Setup poetry virtual environment
+      run: |
+        poetry config virtualenvs.create true --local
+        poetry config virtualenvs.in-project true --local
+      shell: bash
+    - uses: actions/cache/restore@v3
+      id: cache-restore
+      name: Restore caches for the virtual environment based on poetry.lock
+      with:
+        path: ./.venv
+        key: venv-${{ hashFiles('poetry.lock') }}
+    - name: Install the project dependencies
+      run: poetry install --with dev,docs -E all
+      shell: bash
+    - uses: actions/cache/save@v3
+      name: Save caches based on poetry.lock 
+      if: ${{ !steps.cache-restore.outputs.cache-hit }}
+      with:
+        path: ./.venv
+        key: venv-${{ hashFiles('poetry.lock') }}

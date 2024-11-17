@@ -1,0 +1,16 @@
+Example 1
+Instruction: In this task, you are given Wikipedia articles on a range of topics as passages and a question from the passage. We ask you to answer the question by classifying the answer as 0 (False) or 1 (True).
+Input: Passage: Property tax – Property tax or ‘house tax’ is a local tax on buildings, along with appurtenant land. It is and imposed on the Possessor (not the custodian of property as per 1978, 44th amendment of constitution). It resembles the US-type wealth tax and differs from the excise-type UK rate. The tax power is vested in the states and is delegated to local bodies, specifying the valuation method, rate band, and collection procedures. The tax base is the annual rental value (ARV) or area-based rating. Owner-occupied and other properties not producing rent are assessed on cost and then converted into ARV by applying a percentage of cost, usually four percent. Vacant land is generally exempt. Central government properties are exempt. Instead a ‘service charge’ is permissible under executive order. Properties of foreign missions also enjoy tax exemption without requiring reciprocity. The tax is usually accompanied by service taxes, e.g., water tax, drainage tax, conservancy (sanitation) tax, lighting tax, all using the same tax base. The rate structure is flat on rural (panchayat) properties, but in the urban (municipal) areas it is mildly progressive with about 80% of assessments falling in the first two brackets. Question: is house tax and property tax are same.
+Constraints: The output should be 0 or 1.
+
+
+Example 2
+Instruction: Rewrite each original sentence in order to make it easier to understand by non-native speakers of English. You can do so by replacing complex words with simpler synonyms (i.e. paraphrasing), deleting unimportant information (i.e. compression), and/or splitting a long complex sentence into several simpler ones. The final simplified sentences need to be grammatical, fluent, and retain the main ideas of their original counterparts without altering their meanings.
+Input: From its inception, it was designated a duty-free port and vied with the neighboring Sultanate of Pattani for trade.
+Constraints: None.
+
+
+Example 3
+Instruction: You are provided with an arithmetic question. Your task is to compute the solution using the given arithmetic operations. The only arithmetic operators needed to answer the questions are’+’(addition) and’-’(subtraction). The answer should be correct to one decimal place.
+Input: Joan found 70 seashells on the beach. She gave Sam some of her seashells, after which she has 27 seashell left. How many seashells did she give to Sam?
+Constraints: None.

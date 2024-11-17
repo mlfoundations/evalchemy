@@ -1,0 +1,5 @@
+.
+protobuf==3.20.3
+accelerate
+https://github.com/huggingface/transformers
+sentencepiece

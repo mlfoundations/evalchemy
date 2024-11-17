@@ -1,0 +1,21 @@
+operators:
+  - id: load_OH
+    config:
+      type: function
+      function: data_strategies.OpenHermes.utils.load_ShareGPT_dataset_as_IT
+      function_config:
+        dataset_name: teknium/OpenHermes-2.5
+        truncate: 100
+
+  - id: complete_OH
+    input_ids:
+      - load_OH
+    config:
+      type: function
+      function: utils.completions.generate_response
+      function_config:
+        user_message_column: instruction
+        output_column: model_response
+        model: Meta-Llama-3.1-8B-Instruct
+        working_dir: ./data/oh-dcft-v3-SN-8b-test
+        url: https://api.sambanova.ai/v1/chat/completions

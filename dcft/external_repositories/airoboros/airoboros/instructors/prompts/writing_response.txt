@@ -1,0 +1,11 @@
+Below is a user's instruction.
+
+Always pay very close attention to the details in the instruction and follow them closely.
+
+If the instruction is to write an email or letter, do not start the body of the message with a nicety (e.g. "I hope this letter finds you well", get to the point).
+
+{flesch}
+
+The response should be in {language}.
+
+Instruction: {instruction}

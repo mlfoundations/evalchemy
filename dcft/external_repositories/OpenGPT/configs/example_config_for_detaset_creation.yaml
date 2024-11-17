@@ -1,0 +1,37 @@
+#If starting a new project, please copy this config and change the `name` and set the `base_path`. 
+# You can also remove things that you do not need or just leave them blank.
+#If you are using this to generate a dataset, then configure the `datasets`, `openai`and `prompts` parameters.
+name: 'example_project_data'
+base_path: '../data/' # Where the new created datasets, interim files and everything else will be saved
+to_box: True # Should all properities of the config class be coverted to Box, box makes properties accessible with a . (e.g. config.name, instead of config['name'])
+special_tokens:
+  user: "<|user|>" # For chat like interactions we want to have a <user> and <ai> token
+  ai: "<|ai|>" # See above
+  eos: "<|eos|>" # End of stream (one question, or one answer, or one message)
+  eod: "<|eod|>" # End of document, or conversation - in other words the text that comes after this token is not related to the text before it
+  pad: "<|pad|>" # Padding 
+teacher:
+  name: 'openai' # Has to be one of the available teachers in opengpt/teachers.py
+  max_len: 2560 # Max length of text in tokens (by tiktoken) to send to OpenAI, usually 3/4 of the max length, longer sequences will be split
+  min_len: 10 # The minimum length of the context in words, if less an example will be skipped
+  model: 'gpt-3.5-turbo' # Model to be used as teacher (gpt-4 or gpt-3.5-turbo for openai)
+static_paths:
+  prompt_db: "../data/prompts.json" # Where is the propmpt database located
+data_generation_checkpoint_every: 5 # When querying the teacher, after this many queries a checkpoint will be saved on disk
+datasets: 
+  # All datasets to be used to generate grounded instruction-based datasets. Every dataset (CSV) has to have a `text` column that 
+  # will be sent to the Teacher as contex (chatgpt, gpt-4, ...):
+  #   name - the name to be used for this dataset, this name is used to reference this dataset in prompts
+  #   path - where is the csv
+  #   nrows - how many rows from the csv should be processed, usually used for testing only, -1 or None if all rows should be processed
+  - name: "nhs_conditions_small_sample"
+    path: "../data/nhs_conditions_small_sample/original_data.csv"
+    nrows: -1
+prompts:
+  - hashes: [f53cf99826, f4df95ec69] # Hashes of prompts to be used
+    languages: ["English", "French"] # Some prompts have a {language} field, so this wil lbe used to populate it
+    random_prompt: True # If True, for each example in the datasets a random prompt will be picked from `hashes`, otherwise all prompts will be used sequentially
+    datasets: ["nhs_conditions_small_sample"] # Datasets to be used with the prompt hashes above, name of the dataset has to match what is defined in `datasets`
+    runs: 2 # How many iterrations to do, so if we put 5 we will send each document from the `datasets` 5 times to the Teacher (e.g. ChatGPT)
+    extra_parameters: # Extra paramters that the prompt might require
+     quantity: 10

@@ -1,0 +1,31 @@
+operators:
+  - id: load_and_sample_niv2
+    config:
+      type: function
+      function: data_strategies.SlimOrca.utils.load_and_sample_dataset
+      function_config:
+        dataset_name: Open-Orca/FLAN
+        data_dir: niv2_zsopt_data
+        strategy: num_queries_per_task
+        num_queries: 300
+
+  - id: add_system_instructions_niv2
+    input_ids:
+      - load_and_sample_niv2
+    config:
+      type: function
+      function: data_strategies.SlimOrca.utils.add_system_instructions
+      function_config:
+        mixture_name: niv2
+
+  - id: generate_responses_niv2
+    input_ids:
+      - add_system_instructions_niv2
+    config:
+      type: function
+      function: utils.completions.generate_response
+      function_config:
+        system_message_column: system_instruction
+        user_message_column: inputs
+        output_column: model_response
+        model: gpt-4o-mini

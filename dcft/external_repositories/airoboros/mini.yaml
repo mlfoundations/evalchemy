@@ -1,0 +1,452 @@
+# The model to use in generation.  Available models: https://platform.openai.com/docs/models/continuous-model-upgrades
+model: "gpt-4o-mini"
+  
+# To use VertexAI (e.g. chat-bison or soon hopefully gemini):
+# model: "chat-bison"
+# vertexai_credentials_path: creds.json
+# vertexai_project_id: replace-project-id
+# vertexai_publisher: google
+
+# OpenAI API key (if null, uses environment variable OPENAI_API_KEY)
+openai_api_key:
+
+# Optionally configure the OpenAI organization ID.
+organization_id:
+
+# Combined output file path.
+
+# Path to the default topics file.
+topics_path: topics.txt
+
+# Overwrite the output file, use with care!
+overwrite: false
+
+# Append to the output file.
+append: true
+
+# Embedding model, for calculating similarity between documents; probably best left as-is since the code is fairly specific to this one.
+embedding_model: thenlper/gte-small
+embedding_device: cpu
+# If you have a GPU, set this to "cuda", e.g.:
+# embedding_device: cuda
+
+# Topic avoidance prompt string.
+topic_avoidance: Avoid any tasks that would be related to climate change, green tech, renewable energy, DEI (diversity, equity, inclusion), sex and/or gender, religion, politics, social issues, race, ethnicity, artificial intelligence, baking/cooking, urban development, or any topic that you would likely not respond to, or any task which a language model would not be able to respond to, e.g. tasks about emotions, feelings, physical senses, etc.
+
+# Regexes used to filter responses, mostly common words and phrases used in refusals.
+response_filters:
+  - "my programming"
+  - "openai"
+  - "language model"
+  - "large language"
+  - "as an? (ai|generative language|gpt|bot)"
+  - "illegal and dangerous"
+  - "i do(n't| not) (possess|have|exhibit) (personal|consciousness|subjective)"
+  - "personal (feelings|thoughts|emotions|desires|experiences|goals|objective|belief)"
+  - "(can('t| ?not)|w(on't|will not)|unable.?) (\\w+\\s)+(with (that|your)|your \\w+|provide)"
+  - "my limitations"
+  - "the limitations of my"
+  - "my abilities"
+  - "violates my"
+  - "i (can('t| ?not)|w(on't|will not)|am (not |un)able.?).{0,30}(you are|you're|your )"
+  - "please note that"
+  - "flesch"
+
+# Optionally limit the maximum number of tokens to use when generating instructions.
+max_tokens:
+
+# Minimum similarity score when checking for duplicates.
+min_docsearch_score: 0.07
+
+# Default OpenAI API request parameters.
+api_params:
+  temperature: 1.0
+  top_p: 1.0
+  frequency_penalty: 0.0
+  presence_penalty: 0.0
+
+# Topic generation prompt.
+topic_prompt: Give me a numbered list of 20 completely random topics. {topic_avoidance}
+topic_request_count: 20
+
+# Default count per generator, if not specified.
+default_count: 100
+
+# Default batch size, if not specified.
+default_batch_size: 10
+
+# Default readability score hint: https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests
+default_flesch: The output should be written in such a way as to have a Flesch-Kincaid readability score of 30 or lower - best understood by those with college education.  The response must not contain any notes or information about Flesch-Kincaid scores.
+
+# Language.
+language: English
+
+# Individual instructor configurations.
+instructors:
+
+  ##################################################################################
+  # Generic/general prompt configuration.
+  general:
+
+    # Number of instructions to generate.
+    count: 100
+
+    # Batch size/number of instructions to generate per request.
+    batch_size: 10
+
+    # Path to prompt to use in generating instructions.
+    prompt_path: general.txt
+
+    # Optionally override the default topics path for general prompts.
+    topics_path:
+
+    # Optionally override the min similarity score.
+    min_docsearch_score: 
+
+    # Optionally override language.
+    language:
+
+
+  ##################################################################################
+  # Contextual, e.g. closed-context question answering/summarization/etc.
+  contextual:
+    api_params:
+      temperature: 0.5
+    count: 70
+
+    # Writing styles to use for the context being generated.
+    context_styles:
+      - news article
+      - blog post
+      - slack conversation
+      - text messages
+      - fictional short story
+      - video transcript
+      - song
+      - poem
+      - scientific study
+      - medical report
+      - reddit post with replies
+      - email
+      - tweet
+      - jira ticket
+      - github merge request
+      - gitlab issue
+      - how-to article
+
+    # Output formatting options.
+    formatting_options:
+      - JSON
+      - YAML
+      - CSV
+      - markdown
+      - markdown table
+      - bullet list
+      - numbered list
+      - python dict
+      - php associative array
+      - JSONL
+      - javascript object
+      - XML
+
+    # Prompt path.
+    prompt_path: contextual.txt
+
+    # Path to prompt used to generate responses.
+    response_prompt_path: contextual_response.txt
+
+    # Optionally override the topics to use for contextual prompts.
+    topics_path:
+
+  ##################################################################################
+  # Counterfactual contextual prompts, used to de-hallucinate Q&A a bit.
+  counterfactual_contextual:
+    count: 30
+    batch_size: 10
+    prompt_path: counterfactual_contextual.txt
+    response_prompt_path: counterfactual_contextual_response.txt
+    topics_path:
+
+  ##################################################################################
+  # Coding tasks.
+  coding:
+    count: 100
+    batch_size: 10
+
+    # Ratio of prompts that should be "plain", i.e. without explanations, backticks, etc.
+    plain_ratio: 0.5
+
+    # Limit programming languages.
+    coding_languages:
+      - python
+      - javascript
+      - java
+      - c
+      - c++
+      - golang
+      - C#
+      - bash
+      - powershell
+      - SQL
+
+    # Additional related software to (randomly) reference in tasks.
+    related_software:
+      - elasticsearch
+      - opensearch
+      - mongodb
+      - cassandra
+      - redis
+      - memcached
+      - postgresql
+      - mariadb
+      - mysql
+      - aws s3
+      - gcs cloud storage
+      - azure storage
+      - aws lambda
+      - kubernetes
+      - pytorch
+      - pandas
+      - numpy
+      - keras
+      - tensorflow
+      - scipy
+      - matplotlib
+      - django
+      - cherrypy
+      - swagger/openapi
+      - pyramid web framework
+
+    # Min docsearch score.
+    min_docsearch_score: 0.02
+
+    # The prompt used to generate the instructions.
+    prompt_path: coding.txt
+
+  ##################################################################################
+  # Trivia tasks.
+  trivia:
+    count: 100
+    batch_size: 20
+    min_docsearch_score: 0.035
+    prompt_path: trivia.txt
+
+  ##################################################################################
+  # Guided experiences, e.g. meditation.
+  experience:
+    api_params:
+      temperature: 0.9
+      top_p: 0.4
+    word_count: 1000
+    count: 100
+    batch_size: 3
+    min_docsearch_score: 0.1
+    prompt_path: experience.txt
+
+  ##################################################################################
+  # Orca style reasoning/math prompts.
+  orca:
+    count: 100
+    batch_size: 10
+    min_docsearch_score: 0.02
+    prompt_path: orca.txt
+
+  ##################################################################################
+  # Orca style reasoning/math prompts.
+  riddle:
+    api_params:
+      temperature: 0.9
+      top_p: 0.4
+    batch_size: 50
+    min_docsearch_score: 0.01
+    count: 100
+    prompt_path: riddle.txt
+
+  ##################################################################################
+  # Wordgames.
+  wordgame:
+    count: 100
+    batch_size: 10
+    min_docsearch_score: 0.01
+    prompt_path: wordgame.txt
+
+  ##################################################################################
+  # Roleplay.
+  roleplay:
+    api_params:
+      temperature: 0.9
+    count: 100
+    batch_size: 10
+    min_docsearch_score: 0.1
+    prompt_path: roleplay.txt
+
+  ##################################################################################
+  # Chain-of-thought.
+  cot:
+    count: 50
+    batch_size: 5
+    min_docsearch_score: 0.03
+    prompt_path: cot.txt
+
+  ##################################################################################
+  # Agent/router.
+  agent:
+    count: 100
+    batch_size: 5
+    min_docsearch_score: 0.03
+    prompt_path: agent.txt
+
+  ##################################################################################
+  # reWOO style planner
+  plan:
+    count: 100
+    batch_size: 1
+    min_docsearch_score: 0.02
+    prompt_path: plan.txt
+
+  ##################################################################################
+  # Writing tasks.
+  writing:
+    api_params:
+      temperature: 0.9
+    styles:
+      - happy
+      - sad
+      - tragic
+      - unexpected
+      - inspirational
+      - evil
+      - hilarious
+      - suspenseful
+      - horrific
+      - nostalgic
+      - thought-provoking
+      - enigmatic
+      - fantastical
+      - heartwarming
+      - romantic
+    count: 100
+    batch_size: 12
+    min_docsearch_score: 0.1
+
+  ##################################################################################
+  # Character/scenario card tasks.
+  card:
+    api_params:
+      temperature: 0.9
+    count: 50
+    batch_size: 5
+    min_docsearch_score: 0.05
+
+  ##################################################################################
+  # Jokes.
+  joke:
+    api_params:
+      temperature: 0.9
+    count: 100
+    batch_size: 20
+    min_docsearch_score: 0.06
+
+  ##################################################################################
+  # Songs.
+  song:
+    api_params:
+      temperature: 0.9
+    count: 200
+    batch_size: 25
+    min_docsearch_score: 0.1
+
+  ##################################################################################
+  # Multiple choice.
+  multiple_choice:
+    api_params:
+      temperature: 0.5
+    count: 100
+    batch_size: 5
+    min_docsearch_score: 0.03
+    contextual_ratio: 0.3
+
+  ##################################################################################
+  # Detailed writing.
+  detailed_writing:
+    api_params:
+      temperature: 0.9
+    batch_size: 2
+    count: 50
+    min_docsearch_score: 0.1
+
+  ##################################################################################
+  # Character cards - these aren't used directly, they are stored in output_dir, and
+  # used by the chat instructor, stylized response, etc.
+  character:
+    api_params:
+      temperature: 0.9
+    count: 25
+    batch_size: 1
+    min_docsearch_score: 0.1
+    seed_path: character_seeds
+    output_dir: characters
+
+  ##################################################################################
+  # Chats - this is $$$, many calls, use with care.
+  rp:
+    api_params:
+      temperature: 0.9
+      presence_penalty: 1.3
+      frequency_penalty: 1.3
+    count: 25
+    turn_count: 12
+
+  ##################################################################################
+  # Stylized responses, from chat character cards.
+  stylized_response:
+    api_params:
+      temperature: 0.7
+    batch_size: 15
+    count: 100
+    min_docsearch_score: 0.3
+    categories:
+      - trivia
+      - experience
+      - general
+      - joke
+      - riddle
+
+  ##################################################################################
+  # Get-to-know-me.  This is a simple generator that creates N questions to ask of
+  # a character (from character instructor).  We can combine all of the question
+  # and response pairs into one large training section, which acts somewhat like
+  # ghost attention - each response was generated with the character system prompt,
+  # but the individual user/assistant response pairs are just the questions and
+  # answers, so we train the LLM to focus on the provided system prompt, even after
+  # many rounds of interactions.  In theory, this will help the system prompt to
+  # stay very sticky.
+  gtkm:
+    api_params:
+      temperature: 0.7
+    question_count: 15
+    count: 100
+
+  ##################################################################################
+  # Common misconceptions.
+  misconception:
+    api_params:
+      temperature: 0.5
+    batch_size: 25
+    min_docsearch_score: 0.02
+    count: 500
+
+
+  ##################################################################################
+  # Some semblence of awareness (time, location, senses).
+  awareness:
+    count: 100
+    batch_size: 5
+    min_docsearch_score: 0.1
+
+  ##################################################################################
+  # Basic text enhancement/correcting.
+  editor:
+    count: 100
+    batch_size: 5
+    min_docsearch_score: 0.01

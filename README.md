@@ -1,13 +1,13 @@
 # 🧪 Evalchemy
 
-> A framework for Gold Standard Language Model Evaluations
+> *A framework for Gold Standard Language Model Evaluations*
 
 This evaluation framework builds upon the [LM-Eval-Harness](https://github.com/EleutherAI/lm-evaluation-harness) to provide a unified, easy-to-use platform for language model evaluation. We've streamlined the process by:
 
-- Integrating multiple popular evaluation repositories into a single, cohesive framework
-- Providing simple installation and unified dependencies
-- Supporting both data-parallel and model-parallel evaluation strategies
-- Offering consistent interfaces across different benchmarks
+- Integrating multiple popular evaluation repositories into a single, cohesive framework.
+- Providing simple installation and unified dependencies.
+- Supporting both data-parallel and model-parallel evaluation strategies.
+- Offering consistent interfaces across different benchmarks.
 
 ### Key Features
 
@@ -29,13 +29,13 @@ Additional Features:
 
 ```bash
 # Create and activate conda environment
-conda create --name dcft python=3.10
-conda activate dcft      
+conda create --name evalchemy python=3.10
+conda activate evalchemy      
 
 # Install dependencies
 pip install -e ".[eval]"
 
-# Log into HuggingFace for dataset
+# Log into HuggingFace for datasets and models.
 huggingface-cli login
 ```
 
@@ -65,12 +65,19 @@ Make sure your `OPENAI_API_KEY` is set in your environment before running evalua
 
 ```bash
 python -m eval.eval \
-    --model hf \                # Model type (example: hf, vllm)
-    --tasks HumanEval,mmlu \    # Comma-separated list of benchmarks to run
-    --model_args "pretrained=meta-llama/Meta-Llama-3-8B-Instruct" \  # Model path and parameters
-    --batch_size 16 \         # Batch size for inference
-    --output_path logs         # Directory to save evaluation results
+    --model hf \
+    --tasks HumanEval,mmlu \
+    --model_args "pretrained=meta-llama/Meta-Llama-3-8B-Instruct" \
+    --batch_size 16 \
+    --output_path logs
 ```
+
+**Args**: 
+- `--model`: Model type (example: hf, vllm)
+- `--tasks`: Comma-separated list of benchmarks to run
+- `--model_args`: Model path and parameters
+- `--batch_size`: Batch size for inference
+- `--output_path`: Directory to save evaluation results
 
 Example running multiple benchmarks:
 ```bash
@@ -136,7 +143,7 @@ In addition to the default assignments, we support using gpt-4o-mini-2024-07-18 
 
 ### ⏱️ Runtime and Cost Analysis
 
-Our framework makes running common benchmarks simple, fast, and versatile! We list the speeds and costs for each benchmark that we achieve with our framework. 
+Our framework makes running common benchmarks simple, fast, and versatile! We list the speeds and costs for each benchmark that we achieve with our framework for Llama-3-8B-Instruct on 8xH100 GPUs.
 
 | Benchmark | Runtime (8xH100) | Batch Size | Total Tokens | API Cost | Notes |
 |-----------|------------------|------------|--------------|-----------|--------|
@@ -235,6 +242,16 @@ outputs = model.generate_until(all_instances)
 ```
 
 2. Use the LM-eval logger for consistent logging across evaluations
+
+### 🔧 Troubleshooting
+Evalchemy has been tested on CUDA 12.4. If you run into issues like this: `undefined symbol: __nvJitLinkComplete_12_4, version libnvJitLink.so.12`, try updating your CUDA version:
+```bash
+wget https://developer.download.nvidia.com/compute/cuda/repos/debian11/x86_64/cuda-keyring_1.1-1_all.deb
+sudo dpkg -i cuda-keyring_1.1-1_all.deb
+sudo add-apt-repository contrib
+sudo apt-get update
+sudo apt-get -y install cuda-toolkit-12-4
+```
 
 ## 🏆 Leaderboard Integration
 

@@ -193,8 +193,6 @@ cython_debug/
 */.DS_Store
 */.DS_Store?
 
-baselines/mappers/enrichers/language_id_enrichment_models/
-baselines/mappers/enrichers/quality_prediction_enrichment_models/
 myenv/
 venv/
 .history
@@ -220,12 +218,6 @@ gpqa_data_orig*
 secrets.env
 eval/sagemaker_scripts/configs/
 plotting/paper/experiments.csv
-
-# DCFT
-data/
-datasets/
-dcft/**/data
-dcft/**/cache
 
 # MixEval
 eval/chat_benchmarks/MixEval/scripts/

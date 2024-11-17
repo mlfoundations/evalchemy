@@ -2,7 +2,7 @@
 
 > *A framework for Gold Standard Language Model Evaluations*
 
-The Datacomp community and Bespoke Labs are excited to introduce EvalChemy, a unified and easy-to-use platform for evaluating Language models. EvalChemy builds upon the [LM-Eval-Harness](https://github.com/EleutherAI/lm-evaluation-harness) to provide a unified, easy-to-use platform for language model evaluation. We've streamlined the process by:
+The [Datacomp community](https://datacomp.ai) and [Bespoke Labs](https://bespokelabs.ai) are excited to introduce Evalchemy, a unified and easy-to-use platform for evaluating Language models. Evalchemy builds upon the [LM-Eval-Harness](https://github.com/EleutherAI/lm-evaluation-harness) to provide a unified, easy-to-use platform for language model evaluation. We've streamlined the process by:
 
 ### Key Features
 
@@ -73,7 +73,7 @@ python -m eval.eval \
 The results will be written out in `output_path`. If you have `jq` [installed](https://jqlang.github.io/jq/download/) you can view the results by easily after evaluation. Example: `jq '.results' logs/Qwen__Qwen2.5-7B-Instruct/results_2024-11-17T17-12-28.668908.json`
 
 **Args**: 
-- `--model`: Model type (example: hf, vllm)
+- `--model`: Model type (one of `hf`, `vllm`). 
 - `--tasks`: Comma-separated list of benchmarks to run
 - `--model_args`: Model path and parameters
 - `--batch_size`: Batch size for inference

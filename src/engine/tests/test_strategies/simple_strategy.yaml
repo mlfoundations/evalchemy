@@ -1,0 +1,10 @@
+operators:
+  - id: dummy_source
+    config:
+      type: dummy_source
+      num_rows: 5
+  - id: uppercase
+    config:
+      type: function
+      sharded: true
+      function: engine.tests.dummy_functions.dummy_uppercase

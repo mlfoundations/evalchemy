@@ -1,0 +1,10 @@
+operators:
+  - id: load_and_sample_flan_zsopt_data
+    config:
+      type: function
+      function: data_strategies.SlimOrca.utils.load_and_sample_dataset
+      function_config:
+        dataset_name: Open-Orca/FLAN
+        data_dir: flan_zsopt_data
+        strategy: total_num_queries_stratified
+        num_queries: 2_000_000

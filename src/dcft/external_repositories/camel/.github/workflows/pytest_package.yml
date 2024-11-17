@@ -1,0 +1,116 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Pytest Camel package
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+permissions:
+  contents: read
+
+jobs:
+  pytest_package_fast_test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python environment and install dependencies
+      uses: ./.github/actions/camel_install
+      with:
+        python-version: "3.10"
+    - name: Run pytest
+      env:
+        OPENAI_API_KEY: "${{ secrets.OPENAI_API_KEY }}"
+        GOOGLE_API_KEY: "${{ secrets.GOOGLE_API_KEY }}"
+        SEARCH_ENGINE_ID: "${{ secrets.SEARCH_ENGINE_ID }}"
+        OPENWEATHERMAP_API_KEY: "${{ secrets.OPENWEATHERMAP_API_KEY }}"
+        ANTHROPIC_API_KEY: "${{ secrets.ANTHROPIC_API_KEY }}"
+        GROQ_API_KEY: "${{ secrets.GROQ_API_KEY }}"
+        COHERE_API_KEY: "${{ secrets.COHERE_API_KEY }}"
+        NVIDIA_API_BASE_URL: "${{ secrets.NVIDIA_API_BASE_URL }}"
+        NVIDIA_API_KEY: "${{ secrets.NVIDIA_API_KEY }}"
+        ZHIPUAI_API_BASE_URL: "${{ secrets.ZHIPUAI_API_BASE_URL }}"
+        ZHIPUAI_API_KEY: "${{ secrets.ZHIPUAI_API_KEY }}"
+        HF_TOKEN: "${{ secrets.HF_TOKEN }}"
+        AZURE_OPENAI_API_KEY: "to-be-filled"
+        AZURE_API_VERSION: "to-be-filled"
+        AZURE_DEPLOYMENT_NAME: "to-be-filled"
+        AZURE_OPENAI_ENDPOINT: "https://camel.openai.azure.com/"
+        MISTRAL_API_KEY: "${{ secrets.MISTRAL_API_KEY }}"
+        REKA_API_KEY: "${{ secrets.REKA_API_KEY }}"
+        NEO4J_URI: "${{ secrets.NEO4J_URI }}"
+        NEO4J_USERNAME: "${{ secrets.NEO4J_USERNAME }}"
+        NEO4J_PASSWORD: "${{ secrets.NEO4J_PASSWORD }}"
+        FIRECRAWL_API_KEY: "${{ secrets.FIRECRAWL_API_KEY }}"
+      run: poetry run pytest --fast-test-mode test/
+
+  pytest_package_llm_test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python environment and install dependencies
+      uses: ./.github/actions/camel_install
+      with:
+        python-version: "3.10"
+    - name: Run pytest
+      env:
+        OPENAI_API_KEY: "${{ secrets.OPENAI_API_KEY }}"
+        GOOGLE_API_KEY: "${{ secrets.GOOGLE_API_KEY }}"
+        SEARCH_ENGINE_ID: "${{ secrets.SEARCH_ENGINE_ID }}"
+        OPENWEATHERMAP_API_KEY: "${{ secrets.OPENWEATHERMAP_API_KEY }}"
+        ANTHROPIC_API_KEY: "${{ secrets.ANTHROPIC_API_KEY }}"
+        GROQ_API_KEY: "${{ secrets.GROQ_API_KEY }}"
+        COHERE_API_KEY: "${{ secrets.COHERE_API_KEY }}"
+        NVIDIA_API_BASE_URL: "${{ secrets.NVIDIA_API_BASE_URL }}"
+        NVIDIA_API_KEY: "${{ secrets.NVIDIA_API_KEY }}"
+        ZHIPUAI_API_BASE_URL: "${{ secrets.ZHIPUAI_API_BASE_URL }}"
+        ZHIPUAI_API_KEY: "${{ secrets.ZHIPUAI_API_KEY }}"
+        HF_TOKEN: "${{ secrets.HF_TOKEN }}"
+        AZURE_OPENAI_API_KEY: "to-be-filled"
+        AZURE_API_VERSION: "to-be-filled"
+        AZURE_DEPLOYMENT_NAME: "to-be-filled"
+        AZURE_OPENAI_ENDPOINT: "https://camel.openai.azure.com/"
+        MISTRAL_API_KEY: "${{ secrets.MISTRAL_API_KEY }}"
+        REKA_API_KEY: "${{ secrets.REKA_API_KEY }}"
+        NEO4J_URI: "${{ secrets.NEO4J_URI }}"
+        NEO4J_USERNAME: "${{ secrets.NEO4J_USERNAME }}"
+        NEO4J_PASSWORD: "${{ secrets.NEO4J_PASSWORD }}"
+        FIRECRAWL_API_KEY: "${{ secrets.FIRECRAWL_API_KEY }}"
+      run: poetry run pytest --llm-test-only test/
+
+  pytest_package_very_slow_test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python environment and install dependencies
+      uses: ./.github/actions/camel_install
+      with:
+        python-version: "3.10"
+    - name: Run pytest
+      env:
+        OPENAI_API_KEY: "${{ secrets.OPENAI_API_KEY }}"
+        GOOGLE_API_KEY: "${{ secrets.GOOGLE_API_KEY }}"
+        SEARCH_ENGINE_ID: "${{ secrets.SEARCH_ENGINE_ID }}"
+        OPENWEATHERMAP_API_KEY: "${{ secrets.OPENWEATHERMAP_API_KEY }}"
+        ANTHROPIC_API_KEY: "${{ secrets.ANTHROPIC_API_KEY }}"
+        GROQ_API_KEY: "${{ secrets.GROQ_API_KEY }}"
+        COHERE_API_KEY: "${{ secrets.COHERE_API_KEY }}"
+        NVIDIA_API_BASE_URL: "${{ secrets.NVIDIA_API_BASE_URL }}"
+        NVIDIA_API_KEY: "${{ secrets.NVIDIA_API_KEY }}"
+        ZHIPUAI_API_BASE_URL: "${{ secrets.ZHIPUAI_API_BASE_URL }}"
+        ZHIPUAI_API_KEY: "${{ secrets.ZHIPUAI_API_KEY }}"
+        HF_TOKEN: "${{ secrets.HF_TOKEN }}"
+        AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}"
+        AZURE_API_VERSION: ${{ secrets.AZURE_API_VERSION }}"
+        AZURE_DEPLOYMENT_NAME: ${{ secrets.AZURE_DEPLOYMENT_NAME }}"
+        AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}"
+        MISTRAL_API_KEY: "${{ secrets.MISTRAL_API_KEY }}"
+        REKA_API_KEY: "${{ secrets.REKA_API_KEY }}"
+        NEO4J_URI: "${{ secrets.NEO4J_URI }}"
+        NEO4J_USERNAME: "${{ secrets.NEO4J_USERNAME }}"
+        NEO4J_PASSWORD: "${{ secrets.NEO4J_PASSWORD }}"
+        FIRECRAWL_API_KEY: "${{ secrets.FIRECRAWL_API_KEY }}"
+      run: poetry run pytest --very-slow-test-only test/

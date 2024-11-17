@@ -1,0 +1,16 @@
+operators:
+  - id: source1
+    config:
+      type: dummy_source
+      num_rows: 3
+  - id: source2
+    config:
+      type: dummy_source
+      num_rows: 3
+    input_ids: []
+  - id: mix
+    input_ids: [source1, source2]
+    config:
+      type: mix
+      seed: 42
+output_ids: [mix]

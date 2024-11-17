@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: raycluster-autoscaler-head-svc-public
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 10001
+      targetPort: 10001
+      protocol: TCP
+      appProtocol: tcp
+      name: port-10001
+    - port: 8265
+      protocol: TCP
+      appProtocol: tcp
+      targetPort: 8265
+      name: port-8265
+    - port: 6379
+      protocol: TCP
+      appProtocol: tcp
+      targetPort: 6379
+      name: port-6379
+    - port: 8080
+      protocol: TCP
+      appProtocol: tcp
+      targetPort: 8080
+      name: port-8080
+  selector:
+    ray.io/identifier: raycluster-autoscaler-head
+    ray.io/node-type: head

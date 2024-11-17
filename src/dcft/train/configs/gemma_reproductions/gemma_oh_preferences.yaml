@@ -1,0 +1,29 @@
+### preset
+include_hp: dcft/train/hp_settings/simpo.yaml
+
+### model
+model_name_or_path: "google/gemma-2-9b-it"
+
+### train
+per_device_train_batch_size: 2
+gradient_accumulation_steps: 32
+
+### dataset
+dataset: f74ef242-2408-4447-af56-2f2b394effb5
+dataset_dir: DATABASE
+template: gemma
+formatting: sharegpt
+ranking: true
+messages: conversations
+chosen: chosen
+rejected: rejected
+
+### output
+output_dir: "experiments/train/checkpoints/gemma-oh-preferences"
+
+## reporting
+report_to: wandb
+run_name: gemma-oh-preferences
+push_to_db: true
+push_to_hub: true
+export_hub_model_id: mlfoundations-dev/gemma-oh-preferences

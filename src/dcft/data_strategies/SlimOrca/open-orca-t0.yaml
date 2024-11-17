@@ -1,0 +1,32 @@
+operators:
+  - id: load_and_sample_t0_zsopt_data
+    config:
+      type: function
+      function: data_strategies.SlimOrca.utils.load_and_sample_dataset
+      function_config:
+        dataset_name: Open-Orca/FLAN
+        data_dir: t0_zsopt_data
+        strategy: total_num_queries_stratified
+        num_queries: 2_500_000
+
+  - id: add_system_instructions_t0
+    input_ids:
+      - load_and_sample_t0_zsopt_data
+    config:
+      type: function
+      function: data_strategies.SlimOrca.utils.add_system_instructions
+      function_config:
+        mixture_name: t0
+
+  - id: generate_responses_t0
+    input_ids:
+      - add_system_instructions_t0
+    config:
+      type: function
+      function: utils.completions.generate_response
+      function_config:
+        system_message_column: system_instruction
+        user_message_column: inputs
+        output_column: model_response
+        model: gpt-4o-mini
+        working_dir: ./data/open-orca-t0

@@ -1,0 +1,71 @@
+Below are examples of tasks/prompts that can be used to generate a step-by-step execution plan for the provided input.
+
+Example 1.
+For the following tasks, make plans that can solve the problem step-by-step. For each plan, indicate which external tool together with tool input to use in order to retrieve evidence. You can store the evidence into a variable #E[index] that can be called by later tools.
+
+Here are the tools available to be called:
+Wikipedia[input]: Tool that allows the user to search for information from Wikipedia. This tool is particularly useful in gaining knowledge about people, places, companies, historical events, and other types of factual information. The input to this function should be a search string that would help find the appropriate page. The output may be quite verbose and noisy, but often contains the correct piece of information related to the input query.
+QA[input]: Tool that can answer questions either directly from common sense and general world knowledge, as well as answering questions given input context that may contain the answer.
+
+Each plan should be followed by exactly one evidence (#E[index]) value.
+
+The output should be in format:
+Plan: first action to take based in input question
+#E1 = function to call with input parameter
+Plan: next action to take, based on result of #E1
+#E2 = next function to call and input parameter, which may include reference to previous evidence, e.g. "Given context #E1"
+...
+Final answer: #E[n]
+
+Question: What is the elevation range for the area that the eastern sector of the Colorado orogeny extends into?
+
+Example 2.
+Please create a step-by-step plan to generate an ideal response to the user instruction, making use of a set of available tools. Each plan will have a corresponding evidence value, which will be the output of one of the available functions given an input string
+ that can be the user question, one or more previous evidence values, or a mixture of both.
+
+Here are the tools available to be called:
+Google[input]: Tool that allows the user to search for information using the Google search engine. This tool is useful in finding an appropriate list of sites that may or may not include the answer to the user's question. The function doesn't directly answer the question; it finds a list of sites that may have the answer.
+Scraper[input]: Load one or more websites from the input string containing newline delimited links, where input is one or more links, and produces plain text output containing the content of the links.
+LinkExtractor[input]: Extract links from plain text and produces a plain text, newline delimited response of links.
+LLM[input]: Question answering language model, particularly useful in answering questions based on an input passage of text. The input must be a text question that references an :evidence[n]: variable, e.g. What color is the cat, given :evidence1:?
+
+The input to each function just just be a plain string, without quotes or "+" to concatenate a string with an evidence variable, e.g. LLM[What is the capital of Michigan, given :evidence3:?]
+
+Be sure to only include one evidence output per plan step.
+
+The output should be in format:
+Plan: first action to take based in input question
+:evidence0: = function to call with input parameter
+Plan: next action to take, based on result of :evidence0:
+:evidence1: = [next function to call and input parameter, which may include reference to previous evidence, e.g. "Given context :evidence0"]
+...
+Answer: [:evidence[n]: containing the final answer.]
+
+Question: Who is the current CEO of Tesla and what are some of the key patents they hold?
+
+End of examples.
+
+I would like you to generate {batch_size} new, unique tasks of a similar format.
+
+Be sure to include at least 5 unique available tools per task.
+
+Make sure the inputs are somewhat complex, with multiple criteria that would require making use of all of the provided tools.
+
+One of the tools must be a question answering tool similar to "QA" in the example, but it can have a different name.
+
+Don't make any reference to the examples in the output.
+
+{topic_avoidance}
+
+Be sure all of the new tasks include instructions to generate a plan, explanation of the variables and functions available, and response format.
+
+All output text should be in {language}, but the exact term "TSK" is a special token that must not be translated.
+
+Don't make any reference in the tasks that it's part of a batch; each task should be completely standalone.
+
+The output format should be:
+TSK 1. first task
+TSK 2. second task
+...
+
+Be sure to include "TSK", untranslated, as a prefix as described in response format.

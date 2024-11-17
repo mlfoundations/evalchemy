@@ -1,0 +1,15 @@
+operators:
+  - id: topic_generation
+    config:
+      type: function
+      sharded: false
+      function: data_strategies.Camel.utils.generate_biology_topic
+  
+  - id: qa_generation
+    config:
+      type: function
+      sharded: true
+      num_shards: 25
+      function: data_strategies.Camel.utils.generate_biology_qa
+    input_ids:
+      - topic_generation

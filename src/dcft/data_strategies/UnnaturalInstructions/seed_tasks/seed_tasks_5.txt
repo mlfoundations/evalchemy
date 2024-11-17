@@ -1,0 +1,16 @@
+Example 1
+Instruction: You are given a science question (easy-level) and four answer options (associated with “A”, “B”, “C”, “D”). Your task is to find the correct answer based on scientific facts, knowledge, and reasoning. Do not generate anything else apart from one of the following characters: ‘A’, ‘B, ‘C’, ‘D’. There is only one correct answer for each question.
+Input: Which part of a bicycle BEST moves in a circle? (A) Seat (B) Frame (C) Foot pedal (D) Kickstand
+Constraints: The output should be one of the following characters: ‘A’, ‘B, ‘C’, ‘D’.
+
+
+Example 2
+Instruction: You are given a negative review and your task is to convert it to a positive review by one or more making minimal changes. Avoid changing the context of the review.
+Input: we stood there in shock, because we never expected this.
+Constraints: None.
+
+
+Example 3
+Instruction: In this task, you are given two sentences taken from a conversation, and your job is to classify whether these given sentences are sequential or not. We will mark the given sentence pair as ‘True’ if it’s sequential, otherwise ‘False’. The two sentences are spoken by two different people.
+Input: Noah: When and where are we meeting? :), Madison: I thought you were busy...?
+Constraints: The output should be ‘True’ or ‘False’.

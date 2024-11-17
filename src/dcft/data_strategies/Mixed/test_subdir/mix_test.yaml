@@ -1,0 +1,20 @@
+operators:
+- id: mix_banana
+  input_ids: ['load_evol_instruct', 'load_shp']
+  config:
+    type: mix
+
+- id: load_evol_instruct
+  config:
+    type: load_preexisting
+    framework_name: evol_instruct_test
+
+- id: load_shp
+  config:
+    type: hf_source
+    dataset: stanfordnlp/SHP
+    split: train
+    columns: 
+      - history
+      - human_ref_A
+    num_truncate: 3

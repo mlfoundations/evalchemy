@@ -1,13 +1,8 @@
 # 🧪 Evalchemy
 
-> A framework for Gold Standard Language Model Evaluations
+> *A framework for Gold Standard Language Model Evaluations*
 
-This evaluation framework builds upon the [LM-Eval-Harness](https://github.com/EleutherAI/lm-evaluation-harness) to provide a unified, easy-to-use platform for language model evaluation. We've streamlined the process by:
-
-- Integrating multiple popular evaluation repositories into a single, cohesive framework
-- Providing simple installation and unified dependencies
-- Supporting both data-parallel and model-parallel evaluation strategies
-- Offering consistent interfaces across different benchmarks
+The [Datacomp community](https://datacomp.ai) and [Bespoke Labs](https://bespokelabs.ai) are excited to introduce Evalchemy, a unified and easy-to-use platform for evaluating Language models. Evalchemy builds upon the [LM-Eval-Harness](https://github.com/EleutherAI/lm-evaluation-harness) to provide a unified, easy-to-use platform for language model evaluation. We've streamlined the process by:
 
 ### Key Features
 
@@ -27,15 +22,18 @@ Additional Features:
 
 ### Installation
 
+We suggest using conda ([installation instructions](https://docs.anaconda.com/miniconda/#quick-command-line-install)). 
+
 ```bash
 # Create and activate conda environment
-conda create --name dcft python=3.10
-conda activate dcft      
+conda create --name evalchemy python=3.10
+conda activate evalchemy      
 
 # Install dependencies
 pip install -e ".[eval]"
+pip install -e eval/chat_benchmarks/alpaca_eval
 
-# Log into HuggingFace for dataset
+# Log into HuggingFace for datasets and models.
 huggingface-cli login
 ```
 
@@ -44,14 +42,14 @@ huggingface-cli login
 ### Built-in Benchmarks
 - All tasks from [LM-Eval-Harness](https://github.com/EleutherAI/lm-evaluation-harness)
 - Custom instruction-based tasks (found in `eval/chat_benchmarks/`):
-  - **MTBench**: [Multi-turn dialogue evaluation benchmark](https://github.com/lm-sys/FastChat/tree/main/fastchat/llm_judge)
-  - **WildBench**: [Real-world task evaluation](https://github.com/RUCAIBox/WildBench)
-  - **RepoBench**: [Code understanding and repository-level tasks](https://github.com/mlfoundations/RepoBench)
-  - **MixEval**: [Comprehensive evaluation across domains](https://github.com/Thartvigsen/MixEval)
-  - **IFEval**: [Instruction following capability evaluation](https://github.com/OpenBMB/IFEval)
+  - **MTBench**: [Multi-turn dialogue evaluation benchmark](https://github.com/mtbench101/mt-bench-101)
+  - **WildBench**: [Real-world task evaluation](https://github.com/allenai/WildBench)
+  - **RepoBench**: [Code understanding and repository-level tasks](https://github.com/Leolty/repobench)
+  - **MixEval**: [Comprehensive evaluation across domains](https://github.com/Psycoy/MixEval)
+  - **IFEval**: [Instruction following capability evaluation](https://github.com/google-research/google-research/tree/master/instruction_following_eval)
   - **AlpacaEval**: [Instruction following evaluation](https://github.com/tatsu-lab/alpaca_eval)
   - **HumanEval**: [Code generation and problem solving](https://github.com/openai/human-eval)
-  - **ZeroEval**: [Logical reasoning and problem solving](https://github.com/allenai/zero-eval)
+  - **ZeroEval**: [Logical reasoning and problem solving](https://github.com/WildEval/ZeroEval)
   - **MBPP**: [Python programming benchmark](https://github.com/google-research/google-research/tree/master/mbpp)
   - **Arena-Hard-Auto** (Coming soon): [Automatic evaluation tool for instruction-tuned LLMs](https://github.com/lmarena/arena-hard-auto)
   - **SWE-Bench** (Coming soon): [Evaluating large language models on real world software issues](https://github.com/princeton-nlp/SWE-bench)
@@ -65,24 +63,34 @@ Make sure your `OPENAI_API_KEY` is set in your environment before running evalua
 
 ```bash
 python -m eval.eval \
-    --model hf \                # Model type (example: hf, vllm)
-    --tasks HumanEval,mmlu \    # Comma-separated list of benchmarks to run
-    --model_args "pretrained=meta-llama/Meta-Llama-3-8B-Instruct" \  # Model path and parameters
-    --batch_size 16 \         # Batch size for inference
-    --output_path logs         # Directory to save evaluation results
+    --model hf \
+    --tasks HumanEval,mmlu \
+    --model_args "pretrained=meta-llama/Meta-Llama-3-8B-Instruct" \
+    --batch_size 16 \
+    --output_path logs
 ```
+
+The results will be written out in `output_path`. If you have `jq` [installed](https://jqlang.github.io/jq/download/) you can view the results by easily after evaluation. Example: `jq '.results' logs/Qwen__Qwen2.5-7B-Instruct/results_2024-11-17T17-12-28.668908.json`
+
+**Args**: 
+
+- `--model`: Which model type or provider is evaluated (example: hf, vllm)
+- `--tasks`: Comma-separated list of parameters passed to the model constructor. Accepts a string of the format `"arg1=val1,arg2=val2,..."`. You can find the list supported arguments [here](https://github.com/EleutherAI/lm-evaluation-harness/blob/365fcda9b85bbb6e0572d91976b8daf409164500/lm_eval/models/huggingface.py#L66).
+- `--model_args`: Model path and parameters
+- `--batch_size`: Batch size for inference
+- `--output_path`: Directory to save evaluation results
 
 Example running multiple benchmarks:
 ```bash
 python -m eval.eval \
     --model hf \
     --tasks MTBench,WildBench,alpaca_eval \
-    --model_args "pretrained=meta-llama/Llama-3-8B-Instruct" \
+    --model_args "pretrained=meta-llama/Meta-Llama-3-8B-Instruct" \
     --batch_size 16 \
     --output_path logs
 ```
 
-We add several examples in `eval/examples` of sample scripts in different use cases for our evaluation framework. 
+We add several more commands examples in [`eval/examples`](https://github.com/mlfoundations/Evalchemy/tree/main/eval/examples) to help you get started using Evalchemy. 
 
 ## 🔧 Advanced Usage
 
@@ -99,7 +107,7 @@ accelerate launch --num-processes <num-gpus> --num-machines <num-nodes> \
     --multi-gpu -m eval.eval \
     --model hf \
     --tasks MTBench,alpaca_eval \
-    --model_args 'pretrained=meta-llama/Llama-3-8B-Instruct' \
+    --model_args 'pretrained=meta-llama/Meta-Llama-3-8B-Instruct' \
     --batch_size 2 \
     --output_path logs
 ```
@@ -112,7 +120,7 @@ For models that don't fit on a single GPU, use model parallelism:
 python -m eval.eval \
     --model hf \
     --tasks MTBench,alpaca_eval \
-    --model_args 'pretrained=meta-llama/Llama-3-8B-Instruct,parallelize=True' \
+    --model_args 'pretrained=meta-llama/Meta-Llama-3-8B-Instruct,parallelize=True' \
     --batch_size 2 \
     --output_path logs
 ```
@@ -136,7 +144,7 @@ In addition to the default assignments, we support using gpt-4o-mini-2024-07-18 
 
 ### ⏱️ Runtime and Cost Analysis
 
-Our framework makes running common benchmarks simple, fast, and versatile! We list the speeds and costs for each benchmark that we achieve with our framework. 
+Our framework makes running common benchmarks simple, fast, and versatile! We list the speeds and costs for each benchmark that we achieve with our framework for Llama-3-8B-Instruct on 8xH100 GPUs.
 
 | Benchmark | Runtime (8xH100) | Batch Size | Total Tokens | API Cost | Notes |
 |-----------|------------------|------------|--------------|-----------|--------|
@@ -203,7 +211,7 @@ To run evaluations in debug mode, add the `--debug` flag:
 python -m eval.eval \
     --model hf \
     --tasks MTBench \
-    --model_args "pretrained=meta-llama/Llama-3-8B-Instruct" \
+    --model_args "pretrained=meta-llama/Meta-Llama-3-8B-Instruct" \
     --batch_size 2 \
     --output_path logs \
     --debug
@@ -236,6 +244,16 @@ outputs = model.generate_until(all_instances)
 
 2. Use the LM-eval logger for consistent logging across evaluations
 
+### 🔧 Troubleshooting
+Evalchemy has been tested on CUDA 12.4. If you run into issues like this: `undefined symbol: __nvJitLinkComplete_12_4, version libnvJitLink.so.12`, try updating your CUDA version:
+```bash
+wget https://developer.download.nvidia.com/compute/cuda/repos/debian11/x86_64/cuda-keyring_1.1-1_all.deb
+sudo dpkg -i cuda-keyring_1.1-1_all.deb
+sudo add-apt-repository contrib
+sudo apt-get update
+sudo apt-get -y install cuda-toolkit-12-4
+```
+
 ## 🏆 Leaderboard Integration
 
 ### 🗄️ Database Schema
@@ -245,7 +263,7 @@ We support automatically logging evaluation results to a unified PostgreSQL data
 python -m eval.eval \
     --model hf \
     --tasks MTBench,alpaca_eval \
-    --model_args 'pretrained=meta-llama/Llama-3-8B-Instruct' \
+    --model_args 'pretrained=meta-llama/Meta-Llama-3-8B-Instruct' \
     --batch_size 2 \
     --output_path logs \
     --use_database
@@ -335,7 +353,7 @@ export DB_USER=<DB_USER>
 python -m eval.eval \
     --model hf \
     --tasks MTBench,alpaca_eval \
-    --model_args 'pretrained=meta-llama/Llama-3-8B-Instruct' \
+    --model_args 'pretrained=meta-llama/Meta-Llama-3-8B-Instruct' \
     --batch_size 2 \
     --output_path logs \
     --use_database \
@@ -343,8 +361,6 @@ python -m eval.eval \
     --creation_location "Lab Name" \
     --created_by "Researcher Name"
 ```
-
-View results on the [leaderboard](https://llm-leaderboard-319533213591.us-central1.run.app/).
 
 ### 🔄 Updating Database Results
 

@@ -133,20 +133,14 @@ class MixEvalBenchmark(BaseBenchmark):
 
         self.logger.info("Generating responses for MixEval...")
         for split in splits:
-            results = self._eval_split(model, split)
-            if model.world_size > 1:
-                combined_results = results
-                if model.rank == 0:
-                    out_dict[split] = combined_results
-                    response_file = self._get_response_file()
-                    with open(response_file, "w") as f:
-                        for result in combined_results:
-                            f.write(json.dumps(result) + "\n")
-            else:
-                out_dict[split] = results
-
-        if model.world_size > 1:
-            dist.destroy_process_group()
+            self.args.split = split
+            all_results = self._eval_split(model, split)
+            if model.rank == 0:
+                response_file = self._get_response_file()
+                with open(response_file, "w") as f:
+                    for result in all_results:
+                        f.write(json.dumps(result) + "\n")
+            out_dict[split] = all_results
 
         # Only return results on rank 0
         if model.world_size > 1 and model.rank != 0:
@@ -198,16 +192,14 @@ class MixEvalBenchmark(BaseBenchmark):
             )
         all_responses = self.compute(model, all_instances)
 
-        if model.rank != 0:
-            return None
-
         for idx in list(range(len(eval_dataset.raw_inputs))):
             eval_dataset.raw_inputs[idx]["response"] = all_responses[idx]
 
-        with open(response_file, "w") as f:
-            for item in eval_dataset.raw_inputs:
-                json_line = json.dumps(item)
-                f.write(json_line + "\n")
+        if model.rank == 0:
+            with open(response_file, "w") as f:
+                for item in eval_dataset.raw_inputs:
+                    json_line = json.dumps(item)
+                    f.write(json_line + "\n")
         return eval_dataset.raw_inputs
 
     def evaluate_responses(self, results: Dict[str, Any]) -> Dict[str, Any]:

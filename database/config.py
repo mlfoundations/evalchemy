@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 DB_PASSWORD = os.getenv("DB_PASSWORD")
-DB_HOST = "35.225.163.235"
+DB_HOST = os.getenv("DB_HOST")
 DB_PORT = "5432"
 DB_NAME = "postgres"
 DB_USER = "postgres"

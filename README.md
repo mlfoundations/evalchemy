@@ -2,7 +2,7 @@
 
 > *A framework for gold standard language model evaluations*
 
-The [DataComp community](https://datacomp.ai) and [Bespoke Labs](https://bespokelabs.ai) are excited to introduce Evalchemy, a unified and easy-to-use platform for evaluating language models. Evalchemy builds upon the [LM Evaluation Harness](https://github.com/EleutherAI/lm-evaluation-harness). We've streamlined the process by:
+The [DataComp community](https://datacomp.ai) and [Bespoke Labs](https://bespokelabs.ai) are excited to introduce Evalchemy, a unified and easy-to-use platform for evaluating language models. Evalchemy builds upon the [LM-Eval-Harness](https://github.com/EleutherAI/lm-evaluation-harness) to provide a unified, easy-to-use platform for language model evaluation. We've streamlined the process by:
 
 ### Key Features
 
@@ -33,7 +33,7 @@ conda activate evalchemy
 pip install -e ".[eval]"
 pip install -e eval/chat_benchmarks/alpaca_eval
 
-# Log in to HuggingFace for datasets and models.
+# Log into HuggingFace for datasets and models.
 huggingface-cli login
 ```
 
@@ -66,7 +66,7 @@ python -m eval.eval \
     --model hf \
     --tasks HumanEval,mmlu \
     --model_args "pretrained=meta-llama/Meta-Llama-3-8B-Instruct" \
-    --batch_size 16 \
+    --batch_size 2 \
     --output_path logs
 ```
 
@@ -86,7 +86,7 @@ python -m eval.eval \
     --model hf \
     --tasks MTBench,WildBench,alpaca_eval \
     --model_args "pretrained=meta-llama/Meta-Llama-3-8B-Instruct" \
-    --batch_size 16 \
+    --batch_size 2 \
     --output_path logs
 ```
 
@@ -96,10 +96,11 @@ We add several more commands examples in [`eval/examples`](https://github.com/ml
 
 ### Support for different models
 
-Through LM-Eval-Harness, we support a wide array of different models, including HuggingFace models and OpenAI. For more information on how to use such models, we list all models supported at the [models page](https://github.com/EleutherAI/lm-evaluation-harness/tree/main/lm_eval/models).
+Through LM-Eval-Harness, we support all HuggingFace models. We are currently adding support for all LM-Eval-Harness models such as OpenAI and VLLM. For more information on such models, please check out [models page](https://github.com/EleutherAI/lm-evaluation-harness/tree/main/lm_eval/models).
 
 #### Coming Soon
 - Support for [vLLM models](https://vllm.ai/)
+- Support for [OpenAI](https://openai.com/)
 
 ### Multi-GPU Evaluation
 
@@ -111,7 +112,7 @@ accelerate launch --num-processes <num-gpus> --num-machines <num-nodes> \
     --model hf \
     --tasks MTBench,alpaca_eval \
     --model_args 'pretrained=meta-llama/Meta-Llama-3-8B-Instruct' \
-    --batch_size 32 \
+    --batch_size 2 \
     --output_path logs
 ```
 
@@ -124,7 +125,7 @@ python -m eval.eval \
     --model hf \
     --tasks MTBench,alpaca_eval \
     --model_args 'pretrained=meta-llama/Meta-Llama-3-8B-Instruct,parallelize=True' \
-    --batch_size 32 \
+    --batch_size 2 \
     --output_path logs
 ```
 
@@ -138,7 +139,7 @@ As part of our framework, we want to make swapping in different Language Model J
 ```bash
 --annotator_model auto
 ```
-In addition to the default assignments, we support using `gpt-4o-mini-2024-07-18` as a judge:
+In addition to the default assignments, we support using gpt-4o-mini-2024-07-18 as a judge:
 
 ```bash
 --annotator_model gpt-4o-mini-2024-07-18

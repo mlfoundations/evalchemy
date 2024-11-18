@@ -18,7 +18,7 @@ class IFEvalBenchmark(BaseBenchmark):
         num_examples: int = 3,
         start_idx: int = 10,
         end_idx: int = 510,
-        debug_size: Optional[int] = None,
+        debug: bool = False,
         logger: Optional[logging.Logger] = None,
     ):
         """
@@ -39,7 +39,7 @@ class IFEvalBenchmark(BaseBenchmark):
         self.num_examples = num_examples
         self.start_idx = start_idx
         self.end_idx = end_idx
-        self.debug_size = debug_size
+        self.debug = debug
 
     def read_test_examples(self, data_path: str) -> Generator[Dict[str, str], None, None]:
         """
@@ -58,9 +58,9 @@ class IFEvalBenchmark(BaseBenchmark):
             self.logger.info(f"Loaded {len(examples)} examples from {data_path}")
 
             eval_range = range(self.start_idx, min(self.end_idx, len(examples)))
-            if self.debug_size:
-                eval_range = list(eval_range)[: self.debug_size]
-                self.logger.info(f"Debug mode: using {self.debug_size} examples")
+            if self.debug:
+                eval_range = list(eval_range)[:2]
+                self.logger.info(f"Debug mode: using 2 examples")
 
             for i in eval_range:
                 ex = examples[i]

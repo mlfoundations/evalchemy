@@ -30,7 +30,6 @@ dependencies = [
     "peft",
     "trl",
     "bitsandbytes",
-    "deepspeed",
     "sentencepiece",
     "sentence-transformers>=2.2.2",
     "optimum==1.12.0",

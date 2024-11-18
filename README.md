@@ -129,7 +129,7 @@ python -m eval.eval \
  --output_path logs
 ```
 
-> **💡 Note**: While "auto" batch size is supported, we recommend manually tuning the batch size for optimal performance. The optimal batch size depends on the model size, GPU memory, and the specific benchmark. We used a maximum of 32 and a minimum of 4 (for RepoBench) to evalua Llama-3-8B-Instruct on 8xH100 GPUs.
+> **💡 Note**: While "auto" batch size is supported, we recommend manually tuning the batch size for optimal performance. The optimal batch size depends on the model size, GPU memory, and the specific benchmark. We used a maximum of 32 and a minimum of 4 (for RepoBench) to evaluate Llama-3-8B-Instruct on 8xH100 GPUs.
 
 ### Customizing Evaluation
 
@@ -229,18 +229,18 @@ This is particularly useful when testing new evaluation implementations, debuggi
 1. Utilize batch processing for faster evaluation:
 ```python
 all_instances.append(
- Instance(
+    Instance(
         "generate_until",
- example,
- (
- inputs,
- {
+        example,
+        (
+            inputs,
+            {
                 "max_new_tokens": 1024,
                 "do_sample": False,
- },
- ),
- idx,
- )
+            },
+        ),
+        idx,
+    )
 )
 
 outputs = self.compute(model, all_instances)

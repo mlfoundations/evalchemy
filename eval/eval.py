@@ -35,7 +35,7 @@ def setup_custom_parser():
 
     db_group.add_argument("--model_id", type=str, default=None, help="Model UUID for direct database tracking")
 
-    parser.add_argument("--use_database", action="store_true", help="Where to use DCFT Database to track results.")
+    parser.add_argument("--use_database", action="store_true", help="Where to use PostgreSQL Database to track results.")
     parser.add_argument(
         "--model_name",
         type=str,

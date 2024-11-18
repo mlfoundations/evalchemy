@@ -2,7 +2,7 @@
 
 > *A framework for gold standard language model evaluations*
 
-![alt text](https://private-user-images.githubusercontent.com/10456588/387109202-1e3772f5-d1dd-43ab-962e-e6a36a587130.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MzE5MTU1MzUsIm5iZiI6MTczMTkxNTIzNSwicGF0aCI6Ii8xMDQ1NjU4OC8zODcxMDkyMDItMWUzNzcyZjUtZDFkZC00M2FiLTk2MmUtZTZhMzZhNTg3MTMwLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNDExMTglMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjQxMTE4VDA3MzM1NVomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPWI0ODE2YjZlOGYzMDcxYWJmMmM0MGEzMjkwMWE3MjQ1YzBlMTU2Y2JhNjE4NGZiY2QxMWFmZWFmZjY0MzAwODEmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.U35fgW0krGXtYkOSgYtCZtDwuQrz1gBscKqZ7gkGJKA)
+![alt text](https://github.com/mlfoundations/evalchemy/blob/etashg/small_changes/image.png)
 
 Evalchemy is a unified and easy-to-use toolkit for evaluating language models, focussing on post-trained models. Evalchemy is developed by the [DataComp community](https://datacomp.ai) and [Bespoke Labs](https://bespokelabs.ai)  and builds on the [LM-Eval-Harness](https://github.com/EleutherAI/lm-evaluation-harness) to provide a unified, easy-to-use platform for language model evaluation. Evalchemy integrates multiple existing benchmarks, such as RepoBench, AlpacaEval, and ZeroEval. We've streamlined the process by:
 

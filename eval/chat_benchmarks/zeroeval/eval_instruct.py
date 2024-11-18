@@ -60,7 +60,6 @@ class ZeroEvalBenchmark(BaseBenchmark):
             if self.debug:
                 dataset = dataset.select(range(min(10, len(dataset))))
                 self.logger.info(f"Debug mode: using {len(dataset)} examples")
-                self.logger.info(f"Example: {dataset[0]}")
 
             # Process each item
             prompt_generation_args = Namespace(run_name="")
@@ -121,10 +120,6 @@ class ZeroEvalBenchmark(BaseBenchmark):
             # Apply template
             model_inputs = [model.apply_chat_template(chat) for chat in extracted_chats]
 
-            if self.debug:
-                self.logger.info(f"Example chat history: {chat_history[0]}")
-                self.logger.info(f"Example model inputs: {model_inputs[0]}")
-
             output_path = os.path.join(temp_dir, f"{task}.json")
             results[task] = output_path
 
@@ -154,9 +149,6 @@ class ZeroEvalBenchmark(BaseBenchmark):
 
             outputs = [[output] for output in outputs]
 
-            if self.debug:
-                self.logger.info(f"Example outputs: {outputs[0]}")
-
             # Save outputs
             save_args = Namespace(
                 data_name=task,
@@ -168,9 +160,6 @@ class ZeroEvalBenchmark(BaseBenchmark):
                 max_tokens=4096,
             )
             save_outputs(save_args, id_strs, outputs, chat_history, metadata, model_inputs, output_path)
-
-            if self.debug:
-                self.logger.info(f"Example output path: {output_path}")
 
         results["temp_dir_obj"] = temp_dir_obj
         return results

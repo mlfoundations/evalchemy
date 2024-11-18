@@ -133,11 +133,6 @@ python -m eval.eval \
 
 ### Output Log Structure
 
-# Evaluation Log Documentation
-
-This document explains the structure and meaning of the evaluation log JSON output from a language model evaluation run.
-
-## Results Section
 Our generated logs include critical information about each evaluation to help inform your experiments. We highlight important items in our generated logs. 
 
 - Model Configuration

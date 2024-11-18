@@ -1,4 +1,4 @@
-accelerate launch --num-processes 1 --num-machines 1 -m eval.eval \
+accelerate launch --num-processes 1 --num-machines 1 -m evalchemy.eval \
     --model hf \
     --task alpaca_eval \
     --model_args 'pretrained=mistralai/Mistral-7B-Instruct-v0.3' \

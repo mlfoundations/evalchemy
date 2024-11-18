@@ -31,7 +31,7 @@ conda activate evalchemy
 
 # Install dependencies
 pip install -e ".[eval]"
-pip install -e eval/chat_benchmarks/alpaca_eval
+pip install -e evalchemy/chat_benchmarks/alpaca_eval
 
 # Log into HuggingFace for datasets and models.
 huggingface-cli login
@@ -41,7 +41,7 @@ huggingface-cli login
 
 ### Built-in Benchmarks
 - All tasks from [LM-Eval-Harness](https://github.com/EleutherAI/lm-evaluation-harness)
-- Custom instruction-based tasks (found in `eval/chat_benchmarks/`):
+- Custom instruction-based tasks (found in `evalchemy/chat_benchmarks/`):
   - **MTBench**: [Multi-turn dialogue evaluation benchmark](https://github.com/mtbench101/mt-bench-101)
   - **WildBench**: [Real-world task evaluation](https://github.com/allenai/WildBench)
   - **RepoBench**: [Code understanding and repository-level tasks](https://github.com/Leolty/repobench)
@@ -62,7 +62,7 @@ huggingface-cli login
 Make sure your `OPENAI_API_KEY` is set in your environment before running evaluations.
 
 ```bash
-python -m eval.eval \
+python -m evalchemy.eval \
     --model hf \
     --tasks HumanEval,mmlu \
     --model_args "pretrained=meta-llama/Meta-Llama-3-8B-Instruct" \
@@ -82,7 +82,7 @@ The results will be written out in `output_path`. If you have `jq` [installed](h
 
 Example running multiple benchmarks:
 ```bash
-python -m eval.eval \
+python -m evalchemy.eval \
     --model hf \
     --tasks MTBench,WildBench,alpaca_eval \
     --model_args "pretrained=meta-llama/Meta-Llama-3-8B-Instruct" \
@@ -90,7 +90,7 @@ python -m eval.eval \
     --output_path logs
 ```
 
-We add several more commands examples in [`eval/examples`](https://github.com/mlfoundations/Evalchemy/tree/main/eval/examples) to help you get started using Evalchemy. 
+We add several more commands examples in [`evalchemy/examples`](evalchemy/examples) to help you get started using Evalchemy. 
 
 ## 🔧 Advanced Usage
 
@@ -104,7 +104,7 @@ For faster evaluation using data parallelism (recommended):
 
 ```bash
 accelerate launch --num-processes <num-gpus> --num-machines <num-nodes> \
-    --multi-gpu -m eval.eval \
+    --multi-gpu -m evalchemy.eval \
     --model hf \
     --tasks MTBench,alpaca_eval \
     --model_args 'pretrained=meta-llama/Meta-Llama-3-8B-Instruct' \
@@ -117,7 +117,7 @@ accelerate launch --num-processes <num-gpus> --num-machines <num-nodes> \
 For models that don't fit on a single GPU, use model parallelism:
 
 ```bash
-python -m eval.eval \
+python -m evalchemy.eval \
     --model hf \
     --tasks MTBench,alpaca_eval \
     --model_args 'pretrained=meta-llama/Meta-Llama-3-8B-Instruct,parallelize=True' \
@@ -183,7 +183,7 @@ To run ZeroEval benchmarks, you need to:
 
 To add a new evaluation system:
 
-1. Create a new directory under `eval/chat_benchmarks/`
+1. Create a new directory under `evalchemy/chat_benchmarks/`
 2. Implement `eval_instruct.py` with two required functions:
    - `eval_instruct(model)`: Takes an LM Eval Model, returns results dict
    - `evaluate(results)`: Takes results dict, returns evaluation metrics
@@ -194,13 +194,13 @@ Use git subtree to manage external evaluation code:
 
 ```bash
 # Add external repository
-git subtree add --prefix=eval/chat_benchmarks/new_eval https://github.com/original/repo.git main --squash
+git subtree add --prefix=evalchemy/chat_benchmarks/new_eval https://github.com/original/repo.git main --squash
 
 # Pull updates
-git subtree pull --prefix=eval/chat_benchmarks/new_eval https://github.com/original/repo.git main --squash
+git subtree pull --prefix=evalchemy/chat_benchmarks/new_eval https://github.com/original/repo.git main --squash
 
 # Push contributions back
-git subtree push --prefix=eval/chat_benchmarks/new_eval https://github.com/original/repo.git contribution-branch
+git subtree push --prefix=evalchemy/chat_benchmarks/new_eval https://github.com/original/repo.git contribution-branch
 ```
 
 ### 🔍 Debug Mode
@@ -208,7 +208,7 @@ git subtree push --prefix=eval/chat_benchmarks/new_eval https://github.com/origi
 To run evaluations in debug mode, add the `--debug` flag:
 
 ```bash
-python -m eval.eval \
+python -m evalchemy.eval \
     --model hf \
     --tasks MTBench \
     --model_args "pretrained=meta-llama/Meta-Llama-3-8B-Instruct" \
@@ -260,7 +260,7 @@ sudo apt-get -y install cuda-toolkit-12-4
 
 We support automatically logging evaluation results to a unified PostgreSQL database. To enable logging to such a database, please use the "--use_database" flag (which defaults to False)
 ```bash
-python -m eval.eval \
+python -m evalchemy.eval \
     --model hf \
     --tasks MTBench,alpaca_eval \
     --model_args 'pretrained=meta-llama/Meta-Llama-3-8B-Instruct' \
@@ -350,7 +350,7 @@ export DB_USER=<DB_USER>
 ### 📊 Submit Results to Leaderboard
 
 ```bash
-python -m eval.eval \
+python -m evalchemy.eval \
     --model hf \
     --tasks MTBench,alpaca_eval \
     --model_args 'pretrained=meta-llama/Meta-Llama-3-8B-Instruct' \

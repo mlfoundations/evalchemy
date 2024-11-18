@@ -156,7 +156,7 @@ dev = [
 ]
 eval = [
     # Using exact package names from their setup files
-    "fschat @ file:eval/chat_benchmarks/MTBench",  # Changed to match the likely package name
+    "fschat @ file:evalchemy/chat_benchmarks/MTBench",  # Changed to match the likely package name
 ]
 
 [tool.hatch.build.targets.wheel]

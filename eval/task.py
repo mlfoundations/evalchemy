@@ -131,14 +131,14 @@ class TaskManager:
             for param_name, param in init_params.items():
                 if param_name in self.benchmark_kwargs:
                     valid_kwargs[param_name] = self.benchmark_kwargs[param_name]
-                    self.logger.info(f"Passing {param_name} to {name} benchmark")
+                    self.logger.debug(f"Passing {param_name} to {name} benchmark")
 
             instance = benchmark_class(**valid_kwargs)
 
             self.tasks[name] = benchmark_class
             self.benchmark_instances[name] = instance
 
-            self.logger.info(f"Successfully registered benchmark: {name}")
+            self.logger.debug(f"Successfully registered benchmark: {name}")
 
         except Exception as e:
             self.logger.error(f"Error registering benchmark {name}: {str(e)}")

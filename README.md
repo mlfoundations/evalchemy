@@ -145,24 +145,25 @@ In addition to the default assignments, we support using gpt-4o-mini-2024-07-18 
 --annotator_model gpt-4o-mini-2024-07-18
 ```
 
+We are planning on adding support for different judges in the future!
 
 ### ⏱️ Runtime and Cost Analysis
 
 Evalchemy makes running common benchmarks simple, fast, and versatile! We list the speeds and costs for each benchmark we achieve with Evalchemy for Llama-3-8B-Instruct on 8xH100 GPUs.
 
-| Benchmark | Runtime (8xH100) | Batch Size | Total Tokens | API Cost | Notes |
-|-----------|------------------|------------|--------------|-----------|--------|
-| MTBench | 14:00 | 32 | ~196K | $0.05-6.40 | Varies by judge (GPT-4 vs GPT-4-mini) |
-| WildBench | 38:00 | 32 | ~2.2M | $0.43 | Using GPT-4-mini judge |
-| RepoBench | 46:00 | 4 | - | - | Lower batch size due to memory |
-| MixEval | 13:00 | 32 | ~4-6M | $0.76-3.36 | Varies by judge model |
-| AlpacaEval | 16:00 | 32 | ~936K | $0.14-9.40 | Varies by judge (GPT-4 vs GPT-4-mini) |
-| HumanEval | 4:00 | 32 | - | - | No API costs |
-| ZeroEval | 1:44:00 | 32 | - | - | Longest runtime |
-| MBPP | 6:00 | 32 | - | - | No API costs |
-| MMLU | 7:00 | 32 | - | - | No API costs |
-| ARC | 4:00 | 32 | - | - | No API costs |
-| Drop | 20:00 | 32 | - | - | No API costs |
+| Benchmark | Runtime (8xH100) | Batch Size | Total Tokens | Default Judge Cost ($) | GPT-4o-mini Judge Cost ($) | Notes |
+|-----------|------------------|------------|--------------|----------------|-------------------|--------|
+| MTBench | 14:00 | 32 | ~196K | 6.40 | 0.05 | |
+| WildBench | 38:00 | 32 | ~2.2M | - | 0.43 | Using GPT-4-mini judge |
+| RepoBench | 46:00 | 4 | - | - | - | Lower batch size due to memory |
+| MixEval | 13:00 | 32 | ~4-6M | 3.36 | 0.76 | Varies by judge model |
+| AlpacaEval | 16:00 | 32 | ~936K | 9.40 | 0.14 | |
+| HumanEval | 4:00 | 32 | - | - | - | No API costs |
+| ZeroEval | 1:44:00 | 32 | - | - | - | Longest runtime |
+| MBPP | 6:00 | 32 | - | - | - | No API costs |
+| MMLU | 7:00 | 32 | - | - | - | No API costs |
+| ARC | 4:00 | 32 | - | - | - | No API costs |
+| Drop | 20:00 | 32 | - | - | - | No API costs |
 
 **Notes:**
 - Runtimes measured using 8x H100 GPUs with Llama-3 8B Instruct model

@@ -2,7 +2,7 @@
 
 > *A framework for gold standard language model evaluations*
 
-Evalchemy, is a unified and easy-to-use toolkit for evaluating language models, with a focus on models after some form of fine-tuning (instruction tuning, RLHF, etc.). Evalchemy is developed by the DataComp community and Bespoke Labs, and builds on the [LM-Eval-Harness](https://github.com/EleutherAI/lm-evaluation-harness) to provide a unified, easy-to-use platform for language model evaluation. Evalchemy integrates multiple existing benchmarks such as RepoBench, AlpacaEval and ZeroEval.  We've streamlined the process by:
+Evalchemy is a unified and easy-to-use toolkit for evaluating language models, Focussing on models after some form of fine-tuning (instruction tuning, RLHF, etc.). Evalchemy is developed by the DataComp community and Bespoke Labs and builds on the [LM-Eval-Harness](https://github.com/EleutherAI/lm-evaluation-harness) to provide a unified, easy-to-use platform for language model evaluation. Evalchemy integrates multiple existing benchmarks, such as RepoBench, AlpacaEval, and ZeroEval. We've streamlined the process by:
 
 ### Key Features
 
@@ -10,7 +10,7 @@ Evalchemy, is a unified and easy-to-use toolkit for evaluating language models, 
 - **Parallel Evaluation**:
   - Data-Parallel: Distribute evaluations across multiple GPUs for faster results
   - Model-Parallel: Handle large models that don't fit on a single GPU
-- **Simplified Usage**: Run any benchmark with consistent command-line interface
+- **Simplified Usage**: Run any benchmark with a consistent command-line interface
 - **Results Management**: 
   - Local results tracking with standardized output format
   - Optional database integration for systematic tracking
@@ -50,7 +50,7 @@ huggingface-cli login
   - **ZeroEval**: [Logical reasoning and problem solving](https://github.com/WildEval/ZeroEval)
   - **MBPP**: [Python programming benchmark](https://github.com/google-research/google-research/tree/master/mbpp)
   - **Arena-Hard-Auto** (Coming soon): [Automatic evaluation tool for instruction-tuned LLMs](https://github.com/lmarena/arena-hard-auto)
-  - **SWE-Bench** (Coming soon): [Evaluating large language models on real world software issues](https://github.com/princeton-nlp/SWE-bench)
+  - **SWE-Bench** (Coming soon): [Evaluating large language models on real-world software issues](https://github.com/princeton-nlp/SWE-bench)
   - **SafetyBench** (Coming soon): [Evaluating the safety of LLMs](https://github.com/thu-coai/SafetyBench)
   - **Berkeley Function Calling Leaderboard** (Coming soon): [Evaluating ability of LLMs to use APIs](https://gorilla.cs.berkeley.edu/blogs/13_bfcl_v3_multi_turn.html)
 
@@ -61,19 +61,19 @@ Make sure your `OPENAI_API_KEY` is set in your environment before running evalua
 
 ```bash
 python -m eval.eval \
-    --model hf \
+ --model hf \
     --tasks HumanEval,mmlu \
-    --model_args "pretrained=mistralai/Mistral-7B-Instruct-v0.3" \
+ --model_args "pretrained=mistralai/Mistral-7B-Instruct-v0.3" \
     --batch_size 2 \
-    --output_path logs
+ --output_path logs
 ```
 
-The results will be written out in `output_path`. If you have `jq` [installed](https://jqlang.github.io/jq/download/) you can view the results by easily after evaluation. Example: `jq '.results' logs/Qwen__Qwen2.5-7B-Instruct/results_2024-11-17T17-12-28.668908.json`
+The results will be written out in `output_path`. If you have `jq` [installed](https://jqlang.github.io/jq/download/), you can view the results easily after evaluation. Example: `jq '.results' logs/Qwen__Qwen2.5-7B-Instruct/results_2024-11-17T17-12-28.668908.json`
 
 **Args**: 
 
 - `--model`: Which model type or provider is evaluated (example: hf)
-- `--tasks`: Comma-separated list of parameters passed to the model constructor. Accepts a string of the format `"arg1=val1,arg2=val2,..."`. You can find the list supported arguments [here](https://github.com/EleutherAI/lm-evaluation-harness/blob/365fcda9b85bbb6e0572d91976b8daf409164500/lm_eval/models/huggingface.py#L66).
+- `--tasks`: Comma-separated list of parameters passed to the model constructor. Accepts a string of the format `"arg1=val1,arg2=val2,..."`. You can find the list of supported arguments [here](https://github.com/EleutherAI/lm-evaluation-harness/blob/365fcda9b85bbb6e0572d91976b8daf409164500/lm_eval/models/huggingface.py#L66).
 - `--model_args`: Model path and parameters
 - `--batch_size`: Batch size for inference
 - `--output_path`: Directory to save evaluation results
@@ -81,20 +81,20 @@ The results will be written out in `output_path`. If you have `jq` [installed](h
 Example running multiple benchmarks:
 ```bash
 python -m eval.eval \
-    --model hf \
+ --model hf \
     --tasks MTBench,WildBench,alpaca_eval \
-    --model_args "pretrained=mistralai/Mistral-7B-Instruct-v0.3" \
+ --model_args "pretrained=mistralai/Mistral-7B-Instruct-v0.3" \
     --batch_size 2 \
-    --output_path logs
+ --output_path logs
 ```
 
-We add several more commands examples in [`eval/examples`](https://github.com/mlfoundations/Evalchemy/tree/main/eval/examples) to help you get started using Evalchemy. 
+We add several more command examples in [`eval/examples`](https://github.com/mlfoundations/Evalchemy/tree/main/eval/examples) to help you start using Evalchemy. 
 
 ## 🔧 Advanced Usage
 
 ### Support for different models
 
-Through LM-Eval-Harness, we support all HuggingFace models. We are currently adding support for all LM-Eval-Harness models such as OpenAI and VLLM. For more information on such models, please check out [models page](https://github.com/EleutherAI/lm-evaluation-harness/tree/main/lm_eval/models).
+Through LM-Eval-Harness, we support all HuggingFace models and are currently adding support for all LM-Eval-Harness models, such as OpenAI and VLLM. For more information on such models, please check out the [models page](https://github.com/EleutherAI/lm-evaluation-harness/tree/main/lm_eval/models).
 
 To choose a model, simply set 'pretrained=<name of hf model>' where the model name can either be a HuggingFace model name or a path to a local model. 
 
@@ -108,11 +108,11 @@ For faster evaluation using data parallelism (recommended):
 
 ```bash
 accelerate launch --num-processes <num-gpus> --num-machines <num-nodes> \
-    --multi-gpu -m eval.eval \
+ --multi-gpu -m eval.eval \
     --model hf \
-    --tasks MTBench,alpaca_eval \
+ --tasks MTBench,alpaca_eval \
     --model_args 'pretrained=mistralai/Mistral-7B-Instruct-v0.3' \
-    --batch_size 2 \
+ --batch_size 2 \
     --output_path logs
 ```
 
@@ -122,20 +122,20 @@ For models that don't fit on a single GPU, use model parallelism:
 
 ```bash
 python -m eval.eval \
-    --model hf \
+ --model hf \
     --tasks MTBench,alpaca_eval \
-    --model_args 'pretrained=mistralai/Mistral-7B-Instruct-v0.3,parallelize=True' \
+ --model_args 'pretrained=mistralai/Mistral-7B-Instruct-v0.3,parallelize=True' \
     --batch_size 2 \
-    --output_path logs
+ --output_path logs
 ```
 
-> **💡 Note**: While "auto" batch size is supported, we recommend manually tuning the batch size for optimal performance. The optimal batch size depends on the model size, GPU memory, and the specific benchmark. We used a maximum of 32 and a minimum of 4 (for RepoBench) evaluating Llama-3-8B-Instruct on 8xH100 GPUs.
+> **💡 Note**: While "auto" batch size is supported, we recommend manually tuning the batch size for optimal performance. The optimal batch size depends on the model size, GPU memory, and the specific benchmark. We used a maximum of 32 and a minimum of 4 (for RepoBench) to evalua Llama-3-8B-Instruct on 8xH100 GPUs.
 
 ### Customizing Evaluation
 
 #### 🤖 Change Annotator Model
 
-As part of our framework, we want to make swapping in different Language Model Judges for common benchmarks easy. Currently, we support two judge settings. The first is the default setting, where we use a benchmark's default judge. To activate this, you can either do nothing or pass in
+As part of Evalchemy, we want to make swapping in different Language Model Judges for standard benchmarks easy. Currently, we support two judge settings. The first is the default setting, where we use a benchmark's default judge. To activate this, you can either do nothing or pass in
 ```bash
 --annotator_model auto
 ```
@@ -148,7 +148,7 @@ In addition to the default assignments, we support using gpt-4o-mini-2024-07-18 
 
 ### ⏱️ Runtime and Cost Analysis
 
-Our framework makes running common benchmarks simple, fast, and versatile! We list the speeds and costs for each benchmark that we achieve with our framework for Llama-3-8B-Instruct on 8xH100 GPUs.
+Evalchemy makes running common benchmarks simple, fast, and versatile! We list the speeds and costs for each benchmark we achieve with Evalchemy for Llama-3-8B-Instruct on 8xH100 GPUs.
 
 | Benchmark | Runtime (8xH100) | Batch Size | Total Tokens | API Cost | Notes |
 |-----------|------------------|------------|--------------|-----------|--------|
@@ -190,7 +190,7 @@ To add a new evaluation system:
 1. Create a new directory under `eval/chat_benchmarks/`
 2. Implement `eval_instruct.py` with two required functions:
    - `eval_instruct(model)`: Takes an LM Eval Model, returns results dict
-   - `evaluate(results)`: Takes results dict, returns evaluation metrics
+   - `evaluate(results)`: Takes results dictionary, returns evaluation metrics
 
 ### Adding External Evaluation Repositories
 
@@ -213,15 +213,14 @@ To run evaluations in debug mode, add the `--debug` flag:
 
 ```bash
 python -m eval.eval \
-    --model hf \
+ --model hf \
     --tasks MTBench \
-    --model_args "pretrained=mistralai/Mistral-7B-Instruct-v0.3" \
+ --model_args "pretrained=mistralai/Mistral-7B-Instruct-v0.3" \
     --batch_size 2 \
-    --output_path logs \
+ --output_path logs \
     --debug
 ```
 
-Debug mode provides:
 This is particularly useful when testing new evaluation implementations, debugging model configurations, verifying dataset access, and testing database connectivity.
 
 ### 🚀 Performance Tips
@@ -229,21 +228,21 @@ This is particularly useful when testing new evaluation implementations, debuggi
 1. Utilize batch processing for faster evaluation:
 ```python
 all_instances.append(
-    Instance(
+ Instance(
         "generate_until",
-        example,
-        (
-            inputs,
-            {
+ example,
+ (
+ inputs,
+ {
                 "max_new_tokens": 1024,
                 "do_sample": False,
-            },
-        ),
-        idx,
-    )
+ },
+ ),
+ idx,
+ )
 )
 
-outputs = model.generate_until(all_instances)
+outputs = self.compute(model, all_instances)
 ```
 
 2. Use the LM-eval logger for consistent logging across evaluations

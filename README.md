@@ -61,11 +61,11 @@ Make sure your `OPENAI_API_KEY` is set in your environment before running evalua
 
 ```bash
 python -m eval.eval \
- --model hf \
+    --model hf \
     --tasks HumanEval,mmlu \
- --model_args "pretrained=mistralai/Mistral-7B-Instruct-v0.3" \
+    --model_args "pretrained=mistralai/Mistral-7B-Instruct-v0.3" \
     --batch_size 2 \
- --output_path logs
+    --output_path logs
 ```
 
 The results will be written out in `output_path`. If you have `jq` [installed](https://jqlang.github.io/jq/download/), you can view the results easily after evaluation. Example: `jq '.results' logs/Qwen__Qwen2.5-7B-Instruct/results_2024-11-17T17-12-28.668908.json`
@@ -81,11 +81,11 @@ The results will be written out in `output_path`. If you have `jq` [installed](h
 Example running multiple benchmarks:
 ```bash
 python -m eval.eval \
- --model hf \
+    --model hf \
     --tasks MTBench,WildBench,alpaca_eval \
- --model_args "pretrained=mistralai/Mistral-7B-Instruct-v0.3" \
+    --model_args "pretrained=mistralai/Mistral-7B-Instruct-v0.3" \
     --batch_size 2 \
- --output_path logs
+    --output_path logs
 ```
 
 We add several more command examples in [`eval/examples`](https://github.com/mlfoundations/Evalchemy/tree/main/eval/examples) to help you start using Evalchemy. 
@@ -108,11 +108,11 @@ For faster evaluation using data parallelism (recommended):
 
 ```bash
 accelerate launch --num-processes <num-gpus> --num-machines <num-nodes> \
- --multi-gpu -m eval.eval \
+    --multi-gpu -m eval.eval \
     --model hf \
- --tasks MTBench,alpaca_eval \
+    --tasks MTBench,alpaca_eval \
     --model_args 'pretrained=mistralai/Mistral-7B-Instruct-v0.3' \
- --batch_size 2 \
+    --batch_size 2 \
     --output_path logs
 ```
 
@@ -122,11 +122,11 @@ For models that don't fit on a single GPU, use model parallelism:
 
 ```bash
 python -m eval.eval \
- --model hf \
+    --model hf \
     --tasks MTBench,alpaca_eval \
- --model_args 'pretrained=mistralai/Mistral-7B-Instruct-v0.3,parallelize=True' \
+    --model_args 'pretrained=mistralai/Mistral-7B-Instruct-v0.3,parallelize=True' \
     --batch_size 2 \
- --output_path logs
+    --output_path logs
 ```
 
 > **💡 Note**: While "auto" batch size is supported, we recommend manually tuning the batch size for optimal performance. The optimal batch size depends on the model size, GPU memory, and the specific benchmark. We used a maximum of 32 and a minimum of 4 (for RepoBench) to evaluate Llama-3-8B-Instruct on 8xH100 GPUs.
@@ -214,11 +214,11 @@ To run evaluations in debug mode, add the `--debug` flag:
 
 ```bash
 python -m eval.eval \
- --model hf \
+    --model hf \
     --tasks MTBench \
- --model_args "pretrained=mistralai/Mistral-7B-Instruct-v0.3" \
+    --model_args "pretrained=mistralai/Mistral-7B-Instruct-v0.3" \
     --batch_size 2 \
- --output_path logs \
+    --output_path logs \
     --debug
 ```
 

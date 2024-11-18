@@ -74,7 +74,7 @@ The results will be written out in `output_path`. If you have `jq` [installed](h
 
 **Args**: 
 
-- `--model`: Which model type or provider is evaluated (example: hf, vllm)
+- `--model`: Which model type or provider is evaluated (example: hf)
 - `--tasks`: Comma-separated list of parameters passed to the model constructor. Accepts a string of the format `"arg1=val1,arg2=val2,..."`. You can find the list supported arguments [here](https://github.com/EleutherAI/lm-evaluation-harness/blob/365fcda9b85bbb6e0572d91976b8daf409164500/lm_eval/models/huggingface.py#L66).
 - `--model_args`: Model path and parameters
 - `--batch_size`: Batch size for inference
@@ -96,7 +96,10 @@ We add several more commands examples in [`eval/examples`](https://github.com/ml
 
 ### Support for different models
 
-Through LM-Eval-Harness, we support a wide array of different models, including HuggingFace models, VLLM, OpenAI, and more. For more information on how to use such models, we list all models supported at the [models page](https://github.com/EleutherAI/lm-evaluation-harness/tree/main/lm_eval/models).
+Through LM-Eval-Harness, we support a wide array of different models, including HuggingFace models and OpenAI. For more information on how to use such models, we list all models supported at the [models page](https://github.com/EleutherAI/lm-evaluation-harness/tree/main/lm_eval/models).
+
+#### Coming Soon
+- Support for [vLLM models](https://vllm.ai/)
 
 ### Multi-GPU Evaluation
 

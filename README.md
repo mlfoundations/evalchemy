@@ -1,8 +1,8 @@
 # 🧪 Evalchemy
 
-> *A framework for Gold Standard Language Model Evaluations*
+> *A framework for gold standard language model evaluations*
 
-The [Datacomp community](https://datacomp.ai) and [Bespoke Labs](https://bespokelabs.ai) are excited to introduce Evalchemy, a unified and easy-to-use platform for evaluating Language models. Evalchemy builds upon the [LM-Eval-Harness](https://github.com/EleutherAI/lm-evaluation-harness) to provide a unified, easy-to-use platform for language model evaluation. We've streamlined the process by:
+The [DataComp community](https://datacomp.ai) and [Bespoke Labs](https://bespokelabs.ai) are excited to introduce Evalchemy, a unified and easy-to-use platform for evaluating language models. Evalchemy builds upon the [LM Evaluation Harness](https://github.com/EleutherAI/lm-evaluation-harness). We've streamlined the process by:
 
 ### Key Features
 
@@ -33,14 +33,14 @@ conda activate evalchemy
 pip install -e ".[eval]"
 pip install -e eval/chat_benchmarks/alpaca_eval
 
-# Log into HuggingFace for datasets and models.
+# Log in to HuggingFace for datasets and models.
 huggingface-cli login
 ```
 
 ## 📚 Available Tasks
 
 ### Built-in Benchmarks
-- All tasks from [LM-Eval-Harness](https://github.com/EleutherAI/lm-evaluation-harness)
+- All tasks from [LM Evaluation Harness](https://github.com/EleutherAI/lm-evaluation-harness)
 - Custom instruction-based tasks (found in `eval/chat_benchmarks/`):
   - **MTBench**: [Multi-turn dialogue evaluation benchmark](https://github.com/mtbench101/mt-bench-101)
   - **WildBench**: [Real-world task evaluation](https://github.com/allenai/WildBench)
@@ -111,7 +111,7 @@ accelerate launch --num-processes <num-gpus> --num-machines <num-nodes> \
     --model hf \
     --tasks MTBench,alpaca_eval \
     --model_args 'pretrained=meta-llama/Meta-Llama-3-8B-Instruct' \
-    --batch_size 2 \
+    --batch_size 32 \
     --output_path logs
 ```
 
@@ -124,7 +124,7 @@ python -m eval.eval \
     --model hf \
     --tasks MTBench,alpaca_eval \
     --model_args 'pretrained=meta-llama/Meta-Llama-3-8B-Instruct,parallelize=True' \
-    --batch_size 2 \
+    --batch_size 32 \
     --output_path logs
 ```
 
@@ -138,7 +138,7 @@ As part of our framework, we want to make swapping in different Language Model J
 ```bash
 --annotator_model auto
 ```
-In addition to the default assignments, we support using gpt-4o-mini-2024-07-18 as a judge:
+In addition to the default assignments, we support using `gpt-4o-mini-2024-07-18` as a judge:
 
 ```bash
 --annotator_model gpt-4o-mini-2024-07-18

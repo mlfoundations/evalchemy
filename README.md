@@ -159,6 +159,7 @@ Evalchemy makes running common benchmarks simple, fast, and versatile! We list t
 | MixEval | 13:00 | 32 | ~4-6M | 3.36 | 0.76 | Varies by judge model |
 | AlpacaEval | 16:00 | 32 | ~936K | 9.40 | 0.14 | |
 | HumanEval | 4:00 | 32 | - | - | - | No API costs |
+| IFEval | 1:30 | 32 | - | - | - | No API costs |
 | ZeroEval | 1:44:00 | 32 | - | - | - | Longest runtime |
 | MBPP | 6:00 | 32 | - | - | - | No API costs |
 | MMLU | 7:00 | 32 | - | - | - | No API costs |

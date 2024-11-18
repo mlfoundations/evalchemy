@@ -140,57 +140,50 @@ This document explains the structure and meaning of the evaluation log JSON outp
 ## Results Section
 Our generated logs include critical information about each evaluation to help inform your experiments. We highlight important items in our generated logs. 
 
-### Model Configuration
-- `model`: Model framework used
-- `model_args`: Model arguments for the model framework
-- `batch_size`: Size of processing batches
-- `device`: Computing device specification 
-- `annotator_model`: Model used for annotation ("gpt-4o-mini-2024-07-18")
+- Model Configuration
+  - `model`: Model framework used
+  - `model_args`: Model arguments for the model framework
+  - `batch_size`: Size of processing batches
+  - `device`: Computing device specification
+  - `annotator_model`: Model used for annotation ("gpt-4o-mini-2024-07-18")
+- Seed Configuration
+  - `random_seed`: General random seed
+  - `numpy_seed`: NumPy-specific seed
+  - `torch_seed`: PyTorch-specific seed
+  - `fewshot_seed`: Seed for few-shot examples
+- Model Details
+  - `model_num_parameters`: Number of model parameters
+  - `model_dtype`: Model data type
+  - `model_revision`: Model version
+  - `model_sha`: Model commit hash
 
-#### Seed Configuration
-- `random_seed`: General random seed 
-- `numpy_seed`: NumPy-specific seed
-- `torch_seed`: PyTorch-specific seed
-- `fewshot_seed`: Seed for few-shot examples 
-
-#### Model Details
-- `model_num_parameters`: Number of model parameters 
-- `model_dtype`: Model data type 
-- `model_revision`: Model version 
-- `model_sha`: Model commit hash
-
-#### Version Control
-- `git_hash`: Repository commit hash 
-- `date`: Unix timestamp of evaluation 
-- `transformers_version`: Hugging Face Transformers version 
-
-#### Tokenizer Configuration
-- `tokenizer_pad_token`: Padding token details 
-- `tokenizer_eos_token`: End of sequence token 
-- `tokenizer_bos_token`: Beginning of sequence token 
-- `eot_token_id`: End of text token ID 
-- `max_length`: Maximum sequence length 
-
-#### Model Settings
-- `model_source`: Model source platform 
-- `model_name`: Full model identifier
-- `model_name_sanitized`: Sanitized model name for file system usage
-- `chat_template`: Conversation template 
-- `chat_template_sha`: Template hash 
-
-#### Timing Information
-- `start_time`: Evaluation start timestamp
-- `end_time`: Evaluation end timestamp 
-- `total_evaluation_time_seconds`: Total duration
-
-#### Hardware Environment
-The log includes detailed information about:
-- PyTorch version and build configuration
-- Operating system details
-- GPU configuration 
-- CPU specifications 
-- CUDA and driver versions
-- Relevant library versions
+- Version Control
+  - `git_hash`: Repository commit hash
+  - `date`: Unix timestamp of evaluation
+  - `transformers_version`: Hugging Face Transformers version
+- Tokenizer Configuration
+  - `tokenizer_pad_token`: Padding token details
+  - `tokenizer_eos_token`: End of sequence token
+  - `tokenizer_bos_token`: Beginning of sequence token
+  - `eot_token_id`: End of text token ID
+  - `max_length`: Maximum sequence length
+- Model Settings
+  - `model_source`: Model source platform
+  - `model_name`: Full model identifier
+  - `model_name_sanitized`: Sanitized model name for file system usage
+  - `chat_template`: Conversation template
+  - `chat_template_sha`: Template hash
+- Timing Information
+  - `start_time`: Evaluation start timestamp
+  - `end_time`: Evaluation end timestamp
+  - `total_evaluation_time_seconds`: Total duration
+- Hardware Environment
+  - PyTorch version and build configuration
+  - Operating system details
+  - GPU configuration
+  - CPU specifications
+  - CUDA and driver versions
+  - Relevant library versions
 
 ### Customizing Evaluation
 

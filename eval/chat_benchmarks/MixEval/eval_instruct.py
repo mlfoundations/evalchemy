@@ -165,7 +165,7 @@ class MixEvalBenchmark(BaseBenchmark):
         eval_dataset = get_eval_dataset(self.args)
 
         if self.args.debug:
-            eval_dataset = Subset(eval_dataset, range(2))
+            eval_dataset.raw_inputs = eval_dataset.raw_inputs[:2]
             self.logger.info(f"Debug mode: using 2 examples")
 
         all_prompts = [inp["formated_input"] for inp in eval_dataset.raw_inputs]

@@ -1,0 +1,20 @@
+{
+    "CommonsenseQA": 0.778,
+    "OpenBookQA": 0.864,
+    "GSM8k": 0.965,
+    "TriviaQA": 0.748,
+    "MATH": 0.71,
+    "BBH": 0.85,
+    "SIQA": 0.704,
+    "MMLU": 0.711,
+    "AGIEval": 0.48346153846153844,
+    "overall": 0.756,
+    "BoolQ": 0.84,
+    "ARC": 0.859,
+    "MBPP": 0.0,
+    "DROP": 0.839,
+    "HellaSwag": 0.646,
+    "WinoGrande": 0.333,
+    "GPQA": 0.0,
+    "PIQA": 0.896
+}

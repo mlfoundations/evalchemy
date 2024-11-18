@@ -161,9 +161,6 @@ class MixEvalBenchmark(BaseBenchmark):
         self.args.split = split
         self.args.model_name = self._get_model_name(model)
         response_file = self._get_response_file()
-        if model.world_size > 1:
-            # Add GPU rank to filename to avoid conflicts
-            response_file = response_file.replace(".jsonl", f"_rank{model.rank}.jsonl")
 
         eval_dataset = get_eval_dataset(self.args)
 

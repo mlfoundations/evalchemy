@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "dcft"
+name = "evalchemy"
 version = "0.1.0"
-description = "DCFT Training Package"
+description = "Evalchemy Evaluation Framework"
 authors = [
     { name = "Your Name", email = "your.email@example.com" },
 ]
@@ -144,8 +144,8 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/dcft"
-Repository = "https://github.com/yourusername/dcft.git"
+Homepage = "https://github.com/yourusername/evalchemy"
+Repository = "https://github.com/yourusername/evalchemy.git"
 
 [project.optional-dependencies]
 dev = [
@@ -160,7 +160,7 @@ eval = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["dcft", "database"]
+packages = ["evalchemy", "database"]
 
 [tool.hatch.metadata]
 allow-direct-references = true
@@ -171,24 +171,19 @@ python_files = ["test_*.py"]
 
 [tool.black]
 line-length = 120
-extend-exclude = '(dcft/external_repositories/alpaca/seed_tasks.jsonl)'
 
 [tool.isort]
 profile = "black"
 multi_line_output = 3
 
-[project.scripts]
-# DCFT scripts
-dcft-train = "dcft.train.llamafactory.src.train:main"
-
 [tool.setuptools]
-packages = ["dcft"]
+packages = ["evalchemy"]
 
 [tool.setuptools.package-dir]
-dcft = "dcft"
+evalchemy = "evalchemy"
 
 [tool.setuptools.package-data]
-dcft = [
+evalchemy = [
     "external_repositories/code2flow/**/*",
     "external_repositories/airoboros/**/*",
 ]

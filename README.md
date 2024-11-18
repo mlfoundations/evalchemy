@@ -2,7 +2,7 @@
 
 > *A framework for gold standard language model evaluations*
 
-The [DataComp community](https://datacomp.ai) and [Bespoke Labs](https://bespokelabs.ai) are excited to introduce Evalchemy, a unified and easy-to-use platform for evaluating language models. Evalchemy builds upon the [LM-Eval-Harness](https://github.com/EleutherAI/lm-evaluation-harness) to provide a unified, easy-to-use platform for language model evaluation. We've streamlined the process by:
+Evalchemy, is a unified and easy-to-use toolkit for evaluating language models, with a focus on models after some form of fine-tuning (instruction tuning, RLHF, etc.). Evalchemy is developed by the DataComp community and Bespoke Labs, and builds on the [LM-Eval-Harness](https://github.com/EleutherAI/lm-evaluation-harness) to provide a unified, easy-to-use platform for language model evaluation. Evalchemy integrates multiple existing benchmarks such as RepoBench, AlpacaEval and ZeroEval.  We've streamlined the process by:
 
 ### Key Features
 
@@ -11,8 +11,6 @@ The [DataComp community](https://datacomp.ai) and [Bespoke Labs](https://bespoke
   - Data-Parallel: Distribute evaluations across multiple GPUs for faster results
   - Model-Parallel: Handle large models that don't fit on a single GPU
 - **Simplified Usage**: Run any benchmark with consistent command-line interface
-
-Additional Features:
 - **Results Management**: 
   - Local results tracking with standardized output format
   - Optional database integration for systematic tracking
@@ -65,7 +63,7 @@ Make sure your `OPENAI_API_KEY` is set in your environment before running evalua
 python -m eval.eval \
     --model hf \
     --tasks HumanEval,mmlu \
-    --model_args "pretrained=meta-llama/Meta-Llama-3-8B-Instruct" \
+    --model_args "pretrained=mistralai/Mistral-7B-Instruct-v0.3" \
     --batch_size 2 \
     --output_path logs
 ```
@@ -85,7 +83,7 @@ Example running multiple benchmarks:
 python -m eval.eval \
     --model hf \
     --tasks MTBench,WildBench,alpaca_eval \
-    --model_args "pretrained=meta-llama/Meta-Llama-3-8B-Instruct" \
+    --model_args "pretrained=mistralai/Mistral-7B-Instruct-v0.3" \
     --batch_size 2 \
     --output_path logs
 ```
@@ -97,6 +95,8 @@ We add several more commands examples in [`eval/examples`](https://github.com/ml
 ### Support for different models
 
 Through LM-Eval-Harness, we support all HuggingFace models. We are currently adding support for all LM-Eval-Harness models such as OpenAI and VLLM. For more information on such models, please check out [models page](https://github.com/EleutherAI/lm-evaluation-harness/tree/main/lm_eval/models).
+
+To choose a model, simply set 'pretrained=<name of hf model>' where the model name can either be a HuggingFace model name or a path to a local model. 
 
 #### Coming Soon
 - Support for [vLLM models](https://vllm.ai/)
@@ -111,7 +111,7 @@ accelerate launch --num-processes <num-gpus> --num-machines <num-nodes> \
     --multi-gpu -m eval.eval \
     --model hf \
     --tasks MTBench,alpaca_eval \
-    --model_args 'pretrained=meta-llama/Meta-Llama-3-8B-Instruct' \
+    --model_args 'pretrained=mistralai/Mistral-7B-Instruct-v0.3' \
     --batch_size 2 \
     --output_path logs
 ```
@@ -124,7 +124,7 @@ For models that don't fit on a single GPU, use model parallelism:
 python -m eval.eval \
     --model hf \
     --tasks MTBench,alpaca_eval \
-    --model_args 'pretrained=meta-llama/Meta-Llama-3-8B-Instruct,parallelize=True' \
+    --model_args 'pretrained=mistralai/Mistral-7B-Instruct-v0.3,parallelize=True' \
     --batch_size 2 \
     --output_path logs
 ```
@@ -215,7 +215,7 @@ To run evaluations in debug mode, add the `--debug` flag:
 python -m eval.eval \
     --model hf \
     --tasks MTBench \
-    --model_args "pretrained=meta-llama/Meta-Llama-3-8B-Instruct" \
+    --model_args "pretrained=mistralai/Mistral-7B-Instruct-v0.3" \
     --batch_size 2 \
     --output_path logs \
     --debug

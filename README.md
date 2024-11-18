@@ -75,7 +75,7 @@ The results will be written out in `output_path`. If you have `jq` [installed](h
 **Args**: 
 
 - `--model`: Which model type or provider is evaluated (example: hf)
-- `--tasks`: Tasks to be evaluated
+- `--tasks`: Comma-separated list of tasks to be evaluated
 - `--model_args`: Model path and parameters
 - `--batch_size`: Batch size for inference
 - `--output_path`: Directory to save evaluation results

@@ -196,7 +196,8 @@ class WildBenchBenchmark(BaseBenchmark):
             outputs = self.compute(model, all_instances)
 
             # Return None early for non-primary ranks
-            if model.rank != 0:
+            is_main_process = model.accelerator.process_index == 0 if hasattr(model, 'accelerator') else model.world_size <= 1
+            if not is_main_process:
                 return None
 
             outputs = [[output] for output in outputs]

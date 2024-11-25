@@ -5,9 +5,11 @@ import os
 import sys
 import time
 from typing import Optional, List, Dict, Union
+from pathlib import Path
 
 import concurrent.futures
 import torch.distributed as dist
+from huggingface_hub import snapshot_download
 
 from lm_eval import utils
 from lm_eval import evaluator as pretrain_evaluator
@@ -24,6 +26,103 @@ import lm_eval.models
 
 from eval.task import TaskManager as InstructTaskManager
 from eval.eval_tracker import DCEvaluationTracker
+
+
+class ModelInitializer:
+    """Handles model initialization for distributed evaluations."""
+    
+    def __init__(self, cache_dir: Optional[str] = None):
+        self.cache_dir = cache_dir or os.getenv('HF_HOME', 
+            os.path.join(os.path.expanduser("~"), ".cache", "huggingface"))
+        self._ensure_directory(self.cache_dir)
+            
+    def _ensure_directory(self, path: str) -> None:
+        """Safely create directory if it doesn't exist."""
+        Path(path).mkdir(parents=True, exist_ok=True)
+        
+    def download_model(self, model_id: str) -> None:
+        """Download model files with proper error handling."""
+        try:
+            snapshot_download(
+                repo_id=model_id,
+                cache_dir=self.cache_dir,
+                local_files_only=False,
+                resume_download=True
+            )
+        except Exception as e:
+            raise RuntimeError(f"Failed to download model {model_id}: {str(e)}")
+
+
+def initialize_model_for_eval(
+    model: Union[str, LM],
+    model_args: Optional[str] = None,
+    batch_size: int = None,
+    max_batch_size: Optional[int] = None,
+    device: Optional[str] = None,
+    cache_dir: Optional[str] = None
+) -> LM:
+    """
+    Initialize model for distributed evaluation where each node runs independent evaluations.
+    
+    Args:
+        model (Union[str, LM]):
+            Either a string identifier for the model to load from registry,
+            or an already instantiated LM object.
+        model_args (Optional[str], optional):
+            Additional arguments for model initialization as a string.
+            Only used if model is provided as a string. Defaults to None.
+        batch_size (Optional[int], optional):
+            Batch size for model inference. Defaults to None.
+        max_batch_size (Optional[int], optional):
+            Maximum allowed batch size. Defaults to None.
+        device (Optional[str], optional):
+            Device to load the model on (e.g., 'cuda', 'cpu'). Defaults to None.
+
+    Returns:
+        LM:
+            Initialized language model instance with configured parameters
+            and a sanitized model identifier.
+    """
+    local_rank = int(os.getenv('LOCAL_RANK', '0'))
+    
+    if isinstance(model, str):
+        initializer = ModelInitializer(cache_dir)
+        
+        try:
+            initializer.download_model(model)
+        except Exception as e:
+            print(f"Rank {local_rank} failed to initialize model: {str(e)}")
+            if dist.is_initialized():
+                dist.barrier()  # Ensure all ranks fail together
+            raise e
+            
+        if dist.is_initialized():
+            dist.barrier()
+
+        if model_args is None:
+            model_args = ""
+
+        config = {
+            "batch_size": batch_size,
+            "max_batch_size": max_batch_size,
+            "device": device,
+        }
+
+        try:
+            lm = lm_eval.api.registry.get_model(model).create_from_arg_string(
+                model_args,
+                config,
+            )
+        except Exception as e:
+            print(f"Rank {local_rank} failed to create model: {str(e)}")
+            if dist.is_initialized():
+                dist.barrier()
+            raise e
+    else:
+        lm = model
+
+    lm.model_identifier = sanitize_model_name(f"model_{model}_model_args_{model_args}")
+    return lm
 
 
 def setup_custom_parser():
@@ -148,7 +247,7 @@ def evaluate(
         cpu_count = os.cpu_count()
 
         max_workers = min(len(valid_tasks), cpu_count * 2)
-        if lm.world_size <= 1 or lm.rank == 0:
+        if (hasattr(lm, 'accelerator') and lm.accelerator.process_index == 0) or lm.world_size <= 1 or :
             with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
                 evaluate_results = list(
                     executor.map(
@@ -302,7 +401,8 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
     )
 
     # Add metadata to results
-    if lm.rank == 0:
+    is_main_process = lm.accelerator.process_index == 0 if hasattr(lm, 'accelerator') else lm.world_size <= 1
+    if is_main_process:
         add_results_metadata(results, args, lm)
         handle_evaluation_output(results, args, evaluation_tracker, wandb_logger)
 

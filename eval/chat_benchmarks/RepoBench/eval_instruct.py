@@ -59,7 +59,8 @@ class RepoBenchmark(BaseBenchmark):
         if self.legacy_mode:
             return self._generate_responses_legacy(model)
 
-        if model.rank == 0:
+        is_main_process = model.accelerator.process_index == 0 if hasattr(model, 'accelerator') else model.world_size <= 1
+        if is_main_process:
             temp_dir_obj = tempfile.TemporaryDirectory()
             temp_dir = temp_dir_obj.name
 
@@ -76,8 +77,14 @@ class RepoBenchmark(BaseBenchmark):
 
                 all_instances = []
                 # Split dataset across ranks for parallel construction
-                # Get subset of dataset for this rank using built-in slice functionality
-                rank_dataset = list(islice(dataset, model.rank, len(dataset), model.world_size))
+                # Get subset of dataset for this rank using the same slicing strategy as the compute function
+                if hasattr(model, 'accelerator'):
+                    chunk_size = len(dataset) // model.world_size
+                    start = model.accelerator.process_index * chunk_size
+                    end = start + chunk_size if model.accelerator.process_index < model.world_size - 1 else len(dataset)
+                    rank_dataset = dataset.select(range(start, end))
+                else:
+                    rank_dataset = list(islice(dataset, model.rank, len(dataset), model.world_size))
 
                 # Process examples for this rank's shard
                 for idx, example in enumerate(rank_dataset):
@@ -100,7 +107,8 @@ class RepoBenchmark(BaseBenchmark):
                 outputs = self.compute(model, all_instances, do_slice=False)
 
                 # Only rank 0 should save the results
-                if model.rank != 0:
+                is_main_process = model.accelerator.process_index == 0 if hasattr(model, 'accelerator') else model.world_size <= 1
+                if not is_main_process:
                     continue
 
                 generated_examples = []
@@ -118,7 +126,7 @@ class RepoBenchmark(BaseBenchmark):
                     for ex in generated_examples:
                         fw.write(json.dumps(ex) + "\n")
 
-        if model.rank == 0:
+        if is_main_process:
             return {"temp_dir_obj": temp_dir_obj}
 
     def _generate_responses_legacy(self, model: LM) -> Dict[str, Any]:
@@ -129,6 +137,7 @@ class RepoBenchmark(BaseBenchmark):
         temp_dir_obj = tempfile.TemporaryDirectory()
         temp_dir = temp_dir_obj.name
 
+        is_main_process = model.accelerator.process_index == 0 if hasattr(model, 'accelerator') else model.world_size <= 1
         for lang in self.languages:
             for subset in self.subsets:
                 dataset = load_data(split="test", task="completion", language=lang, length="2k", setting=subset)
@@ -155,8 +164,8 @@ class RepoBenchmark(BaseBenchmark):
                     )
 
                 outputs = self.compute(model, all_instances, do_slice=False)
-
-                if model.rank != 0:
+                
+                if not is_main_process:
                     continue
 
                 generated_examples = []

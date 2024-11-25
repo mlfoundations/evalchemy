@@ -132,10 +132,12 @@ class MixEvalBenchmark(BaseBenchmark):
         out_dict = {}
 
         self.logger.info("Generating responses for MixEval...")
+        is_main_process = model.accelerator.process_index == 0 if hasattr(model, 'accelerator') else model.world_size <= 1
+
         for split in splits:
             self.args.split = split
             all_results = self._eval_split(model, split)
-            if model.rank == 0:
+            if is_main_process:
                 response_file = self._get_response_file()
                 with open(response_file, "w") as f:
                     for result in all_results:
@@ -143,7 +145,7 @@ class MixEvalBenchmark(BaseBenchmark):
             out_dict[split] = all_results
 
         # Only return results on rank 0
-        if model.world_size > 1 and model.rank != 0:
+        if not is_main_process:
             return None
         return out_dict
 
@@ -192,7 +194,8 @@ class MixEvalBenchmark(BaseBenchmark):
         for idx in list(range(len(eval_dataset.raw_inputs))):
             eval_dataset.raw_inputs[idx]["response"] = all_responses[idx]
 
-        if model.rank == 0:
+        is_main_process = model.accelerator.process_index == 0 if hasattr(model, 'accelerator') else model.world_size <= 1
+        if is_main_process:
             with open(response_file, "w") as f:
                 for item in eval_dataset.raw_inputs:
                     json_line = json.dumps(item)
@@ -243,7 +246,8 @@ class MixEvalBenchmark(BaseBenchmark):
         generation_results = self.generate_responses(model)
 
         # Only evaluate on rank 0
-        if model.world_size > 1 and model.rank != 0:
+        is_main_process = model.accelerator.process_index == 0 if hasattr(model, 'accelerator') else model.world_size <= 1
+        if not is_main_process:
             return None
 
         evaluation_results = self.evaluate_responses(generation_results)

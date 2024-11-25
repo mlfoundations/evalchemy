@@ -151,7 +151,8 @@ class MTBenchBenchmark(BaseBenchmark):
                     all_convs[q_idx].append({"role": "assistant", "content": output})
                     all_choices[q_idx]["turns"].append(output)
 
-            if model.rank != 0:
+            is_main_process = model.accelerator.process_index == 0 if hasattr(model, 'accelerator') else model.world_size <= 1
+            if not is_main_process:
                 continue
 
             # Save completed conversations

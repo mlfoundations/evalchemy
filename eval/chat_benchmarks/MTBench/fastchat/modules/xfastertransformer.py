@@ -36,7 +36,7 @@ def load_xft_model(model_path, xft_config: XftConfig):
     tokenizer = AutoTokenizer.from_pretrained(model_path, use_fast=False, padding_side="left", trust_remote_code=True)
     xft_model = xfastertransformer.AutoModel.from_pretrained(model_path, dtype=data_type)
     model = XftModel(xft_model=xft_model, xft_config=xft_config)
-    if model.model.rank > 0:
+    if model.model.accelerator.process_index > 0:
         while True:
             model.model.generate()
     return model, tokenizer

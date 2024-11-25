@@ -20,23 +20,23 @@ class BaseBenchmark(ABC):
 
     def compute(self, model: LM, inputs: List[Instance], do_slice: bool = True) -> List[str]:
         if model.world_size > 1 and do_slice:
-            prompts = list(islice(inputs, model.rank, len(inputs), model.world_size))
+            chunk_size = len(inputs) // model.world_size
+            start = model.accelerator.process_index * chunk_size
+            end = start + chunk_size if model.accelerator.process_index < model.world_size - 1 else len(inputs)
+            prompts = inputs[start:end]
         else:
             prompts = inputs
 
         results = model.generate_until(prompts)
         if model.world_size > 1:
             all_results = [None for _ in range(model.world_size)]
-
             dist.all_gather_object(all_results, results)
 
-            # Merge results from all ranks
-            length = sum(len(res) for res in all_results if res is not None)
-            merged = [None] * length
-            for rank, sub_results in enumerate(all_results):
+            # Simply concatenate results in rank order
+            merged = []
+            for sub_results in all_results:
                 if sub_results is not None:
-                    for i, item in enumerate(sub_results):
-                        merged[i * model.world_size + rank] = item
+                    merged.extend(sub_results)
             return merged
         else:
             return results

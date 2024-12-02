@@ -3,7 +3,7 @@ tasks:
   - task_name: alpaca_eval
     batch_size: 32
   - task_name: WildBench
-    batch_size: 16
+    batch_size: 8
   - task_name: MixEval
     batch_size: 32
   - task_name: MTBench

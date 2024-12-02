@@ -49,7 +49,6 @@ dependencies = [
     # NLP & Text Processing
     "nltk",
     "fasttext-wheel",
-    "lm-eval[vllm]",
     "codebleu",
     "sacrebleu",
     "langdetect",

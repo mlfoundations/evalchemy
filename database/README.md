@@ -110,3 +110,5 @@ By default, running the evals will create a new entry in the database. If you in
 2. Model Name: `--model_name <MODEL_NAME_IN_DB>`
 
 Note: If both are provided, model_id takes precedence.
+
+If the model ID and metric are found in the database, default behavior is to *not* run the benchmark again. If you wish to overwrite the database, you simple pass in `--overwrite-database`. 

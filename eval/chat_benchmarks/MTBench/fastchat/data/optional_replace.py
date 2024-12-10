@@ -7,6 +7,7 @@ python3 -m fastchat.data.optional_replace --in input.json --out output.json --mo
 Requirement:
 pip3 install transformers tqdm
 """
+
 import argparse
 import json
 import traceback
@@ -15,9 +16,7 @@ import transformers
 from tqdm import tqdm
 
 
-def replace_special_tokens(
-    tokenizer: transformers.PreTrainedTokenizer, text: str
-) -> str:
+def replace_special_tokens(tokenizer: transformers.PreTrainedTokenizer, text: str) -> str:
     if not text:
         return text
 

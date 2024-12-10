@@ -5,6 +5,7 @@
 Usage:
 python3 -m fastchat.data.clean_sharegpt --in sharegpt_html.json --out sharegpt_clean.json
 """
+
 import argparse
 from concurrent.futures import ProcessPoolExecutor
 import json
@@ -19,9 +20,7 @@ from tqdm import tqdm
 
 div_pattern = re.compile("<div.*?>")
 span_pattern = re.compile("<span.*?>")
-code_lang_pattern = re.compile(
-    "```\s*" + "(.*?)" + "(?:Copy code)+" + "(.+?)" + "\s*?```", re.DOTALL
-)
+code_lang_pattern = re.compile("```\s*" + "(.*?)" + "(?:Copy code)+" + "(.+?)" + "\s*?```", re.DOTALL)
 code_lang_format = "```\g<1>\n\g<2>\n```"
 regenerate_pattern = re.compile("\d+ / \d+")
 copy_chars_pattern = re.compile("Copy\d+ chars / \d+ words")
@@ -155,9 +154,7 @@ def clean_html_all(content, begin, end):
     content = content[begin:end]
     processed = []
     with ProcessPoolExecutor() as executor:
-        for result in tqdm(
-            executor.map(clean_html_one_sample, content), total=len(content)
-        ):
+        for result in tqdm(executor.map(clean_html_one_sample, content), total=len(content)):
             processed.append(result)
 
     visited = {}

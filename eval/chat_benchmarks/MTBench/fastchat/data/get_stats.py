@@ -26,9 +26,7 @@ def tokenize_one_sample(c):
 def tokenize_dataset(content):
     processed = []
     with ProcessPoolExecutor() as executor:
-        for result in tqdm(
-            executor.map(tokenize_one_sample, content), total=len(content)
-        ):
+        for result in tqdm(executor.map(tokenize_one_sample, content), total=len(content)):
             processed.append(result)
 
     return processed
@@ -59,9 +57,7 @@ def compute_stats(content):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--in-file", type=str)
-    parser.add_argument(
-        "--model-name-or-path", type=str, default="meta-llama/Llama-2-7b-chat-hf"
-    )
+    parser.add_argument("--model-name-or-path", type=str, default="meta-llama/Llama-2-7b-chat-hf")
     args = parser.parse_args()
 
     content = json.load(open(args.in_file, "r"))

@@ -1,0 +1,10 @@
+annotator_model: gpt-4o-mini-2024-07-18
+tasks:
+  - task_name: alpaca_eval
+    batch_size: 32
+  - task_name: WildBench
+    batch_size: 16
+  - task_name: MixEval
+    batch_size: 32
+  - task_name: MTBench
+    batch_size: 32

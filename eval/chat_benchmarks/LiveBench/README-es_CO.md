@@ -1,74 +1,74 @@
-# LiveBench
+# LiveBench (en inglés)
 
 ![Crates.io](https://img.shields.io/crates/l/Ap?color=orange)
 
 <p align="center">
-    <a href="https://livebench.ai/">🏆 Leaderboard</a> •
-    <a href="https://huggingface.co/livebench">💻 Data </a> •
-    <a href="https://livebench.ai/livebench.pdf">📝 Paper</a> 
+    <a href="https://livebench.ai/"> Tabla de clasificación</a> •
+    <a href="https://huggingface.co/livebench"> Datos </a> •
+    <a href="https://livebench.ai/livebench.pdf"> Papel</a> 
 </p>
 
-Top models as of December 1st, 2024 (see the full and up-to-date leaderboard [here](https://livebench.ai/)):
+Las mejores modelos a partir del 6 de agosto de 2024 (consulta la tabla de clasificación completa [aquí](https://livebench.ai/)):
 
-![image](assets/livebench-2024-12-01.png)
+![imagen](assets/livebench-2024-08-06.png)
 
-Please see the [changelog](https://github.com/LiveBench/LiveBench/blob/main/changelog.md) for details about each LiveBench update.
+**Actualización 28 de julio de 2024:** La primera actualización mensual. Agregamos 50 preguntas en una nueva tarea de razonamiento espacial, 28 preguntas adicionales de generación de codificación y 12 preguntas adicionales de finalización de codificación. Además, fusionamos una de las dependencias opcionales en pyproject.toml en el flujo de dependencias principal para resolver un problema experimentado al usar `gen_api_answer.py` sin instalar paquetes como torch.
 
-## Table of Contents
+## Tabla de contenidos
 
-- [Introduction](#introduction)
-- [Installation Quickstart](#installation-quickstart)
-- [Usage](#usage)
-- [Data](#data)
-- [Adding New Questions](#adding-new-questions)
-- [Documentation](#documentation)
-- [Citation](#citation)
+- [Introducción](#introduction)
+- [Inicio rápido de la instalación](#installation-quickstart)
+- [Uso](#usage)
+- [Datos](#data)
+- [Adición de nuevas preguntas](#adding-new-questions)
+- [Documentación](#documentation)
+- [Cita](#citation)
 
-## Introduction
+## Introducción
 
-Introducing LiveBench: a benchmark for LLMs designed with test set contamination and objective evaluation in mind.
+Presentamos LiveBench: un punto de referencia para LLM diseñado teniendo en cuenta la contaminación del conjunto de pruebas y la evaluación objetiva.
 
-LiveBench has the following properties:
+LiveBench tiene las siguientes propiedades:
 
-* LiveBench is designed to limit potential contamination by releasing new questions monthly, as well as having questions based on recently-released datasets, arXiv papers, news articles, and IMDb movie synopses.
-* Each question has verifiable, objective ground-truth answers, allowing hard questions to be scored accurately and automatically, without the use of an LLM judge.
-* LiveBench currently contains a set of 18 diverse tasks across 6 categories, and we will release new, harder tasks over time.
+* LiveBench está diseñado para limitar la contaminación potencial mediante la publicación de nuevas preguntas mensualmente, así como preguntas basadas en conjuntos de datos recientemente publicados, documentos de arXiv, artículos de noticias y sinopsis de películas de IMDb.
+* Cada pregunta tiene respuestas verificables, objetivas y basadas en la verdad, lo que permite que las preguntas difíciles se califiquen de manera precisa y automática, sin el uso de un juez de LLM.
+* LiveBench contiene actualmente un conjunto de 18 tareas diversas en 6 categorías, y lanzaremos nuevas tareas más difíciles con el tiempo.
 
-**We will evaluate your model!** Open an [issue](https://github.com/LiveBench/LiveBench/issues) or email us at [livebench.ai@gmail.com](mailto:livebench.ai@gmail.com)!
+**¡Evaluaremos tu modelo!** ¡Abra un [número](https://github.com/LiveBench/LiveBench/issues) o envíenos un correo electrónico a [livebench.ai@gmail.com](mailto:livebench.ai@gmail.com)!
 
-## Installation Quickstart
+## Inicio rápido de la instalación
 
-Tested on Python 3.10
+Probado en Python 3.10
 
-To generate answers with API models (i.e. with `gen_api_answer.py`), conduct judgments, and show results:
+Para generar respuestas con modelos de API (es decir, con gen_api_answer.py), realizar juicios y mostrar resultados:
 
 ```bash
 cd LiveBench
 pip install -e .
 ```
 
-To do all of the above and also generate answers with local GPU inference on open source models (i.e. with gen_model_answer.py):
+Para hacer todo lo anterior y también generar respuestas con inferencia de GPU local en modelos de código abierto (es decir, con gen_model_answer.py):
 ```bash
 cd LiveBench
 pip install -e .[flash_attn]
 ```
 
-**Note about fschat**: The fschat package version on pip (i.e., [lmsys/fastchat](https://github.com/lm-sys/FastChat)) is currently out of date, so we strongly recommend `pip uninstall fschat` before running the above, since it will then automatically install a more recent commit of fastchat.
+**Nota sobre fschat**: La versión del paquete fschat en pip (es decir, [lmsys/fastchat](https://github.com/lm-sys/FastChat)) está actualmente desactualizada, por lo que recomendamos encarecidamente `pip uninstall fschat` antes de ejecutar lo anterior, ya que entonces instalará automáticamente una confirmación más reciente de fastchat.
 
-Our repo is adapted from FastChat's excellent [llm_judge](https://github.com/lm-sys/FastChat/tree/main/fastchat/llm_judge) module, and it also contains code from [LiveCodeBench](https://github.com/LiveCodeBench/LiveCodeBench) and [IFEval](https://github.com/Rohan2002/IFEval?tab=readme-ov-file).
+Nuestro repositorio está adaptado del excelente módulo de llm_judge de FastChat [](https://github.com/lm-sys/FastChat/tree/main/fastchat/llm_judge) , y también contiene código de [LiveCodeBench](https://github.com/LiveCodeBench/LiveCodeBench) e [IFEval](https://github.com/Rohan2002/IFEval?tab=readme-ov-file).
 
-## Usage
+## Uso
 
 ```bash
 cd livebench
 ```
 
-To generate model answers on LiveBench, run:
+Para generar respuestas de modelo en LiveBench, ejecute:
 ```bash
 python gen_model_answer.py --model-path /path/to/Mistral-7B-Instruct-v0.2/ --model-id Mistral-7B-Instruct-v0.2 --dtype bfloat16 --bench-name live_bench
 ```
 
-For API-based models, first set the appropriate key and then run the `gen_api_answer.py`. We currently support the following APIs: OpenAI, Anthropic, Mistral, Cohere, and Gemini. The command to run all of LiveBench on an `api_model_name`, run this command. Note: In a Windows terminal you'd use `set` instead of `export`:
+En el caso de los modelos basados en API, primero establezca la clave adecuada y, a continuación, ejecute el archivo `gen_api_answer.py`. Actualmente admitimos las siguientes API: OpenAI, Anthropic, Mistral, Cohere y Gemini. El comando para ejecutar todo LiveBench en un `api_model_name`, ejecute este comando:
 ```bash
 export OPENAI_API_KEY=<your_key>
 export ANTHROPIC_API_KEY=<your_key>
@@ -79,24 +79,24 @@ export DEEPSEEK_API_KEY=<your_key>
 python gen_api_answer.py --model <api_model_name> --bench-name live_bench
 ```
 
-To generate model answers with VLLM or other arbitrary APIs matching the OpenAI API format, run (for additional details, see [here](https://github.com/LiveBench/LiveBench/issues/29#issuecomment-2282909975):
+Para generar respuestas de modelo con VLLM u otras API arbitrarias que coincidan con el formato de API de OpenAI, ejecute:
 ```bash
 export LIVEBENCH_API_KEY=<your API key if needed. Usually not needed for VLLM>
 python gen_api_answer.py --model <api_model_name> --bench-name live_bench --api-base <your endpoint. Often, for VLLM, this is http://localhost:8000/v1>
 ```
 
-To score the model outputs:
+Para puntuar los resultados del modelo:
 
 ```bash
 python gen_ground_truth_judgment.py --bench-name live_bench
 ```
 
-To show all the results:
+Para mostrar todos los resultados:
 ```bash
 python show_livebench_result.py
 ```
 
-You may want to run these commands on just some models. To run any of the above python files (`gen_model_answer.py`, `gen_api_answer.py`, `gen_ground_truth_judgment`, or `show_livebench_result.py`) for specific models, use the following argument styles:
+Es posible que desee ejecutar estos comandos solo en algunos modelos. Para ejecutar cualquiera de los archivos python anteriores (`gen_model_answer.py`, `gen_api_answer.py`, `gen_ground_truth_judgment`, o `show_livebench_result.py`) para modelos específicos, utilice los siguientes estilos de argumentos:
 ```bash
 python gen_model_answer.py          --bench-name live_bench --model-path /path/to/Mistral-7B-Instruct-v0.2/ --model-id Mistral-7B-Instruct-v0.2 --dtype bfloat16 
 python gen_api_answer.py            --bench-name live_bench --model gpt-4-turbo
@@ -104,40 +104,46 @@ python gen_ground_truth_judgment.py --bench-name live_bench --model-list Mistral
 python show_livebench_result.py    --bench-name live_bench --model-list Mistral-7B-Instruct-v0.2 Llama-2-7b-chat-hf claude-3-opus-20240229
 ```
 
-Or, you may want to show results for a specific category or task of LiveBench by using the `--bench-name` argument. Here, we run `show_livebench_result.py` on just the `web_of_lies_v2` task: 
+O bien, es posible que desee mostrar los resultados de una categoría o tarea específica de LiveBench mediante el `--bench-name` argumento. Aquí, nos ejecutamos `show_livebench_result.py` solo en la `web_of_lies_v2` tarea: 
 ```bash
 python show_livebench_result.py --bench-name live_bench/reasoning/web_of_lies_v2
 ```
 
-By default, any of the above scripts will use the most recent livebench version (currently `2024-08-31`). You can optionally specify the `--livebench-releases` arg to use an earlier version of livebench (which had some questions not yet added or changed). The current options are `2024-07-26`, `2024-06-24`, `2024-08-31`.
+De forma predeterminada, cualquiera de los scripts anteriores utilizará todas las preguntas de livebench publicadas hasta ahora. Ninguna de las preguntas de Livebench ha sido oficialmente obsoleta/excluida. Opcionalmente, puede especificar el `--livebench-releases` arg para restringir las preguntas que utiliza para agregarlas en versiones específicas.
 
+Para usar todas las preguntas:
 ```bash
-python gen_api_answer.py --bench-name live_bench --model gpt-4o-mini-2024-07-18	--livebench-release-option 2024-07-26
+python gen_api_answer.py --bench-name live_bench --model gpt-4-turbo --livebench-releases 2024-07-26 2024-06-24
 ```
 
-To optionally download `question.jsonl` files (for inspection) and answer/judgment files from the leaderboard, use
+Para usar solo las preguntas de la actualización de julio de 2024:
+```bash
+python gen_api_answer.py --bench-name live_bench --model gpt-4-turbo --livebench-releases 2024-07-26
+```
+
+Para descargar opcionalmente `question.jsonl` archivos (para inspección) y archivos de respuestas/juicios de la tabla de clasificación, use
 ```bash
 python download_questions.py
 python download_leaderboard.py
 ```
 
-To use `question.jsonl` files instead of using the questions from huggingface, set `--question-source jsonl` on `gen_api_answer.py`, `gen_model_answer.py`, and `gen_ground_truth_judgment.py`. This is also a useful feature if you want to tweak the question jsonls or experiment with your own questions.
+Para usar `question.jsonl` archivos en lugar de huggingface, establezca `--question-source jsonl` en `gen_api_answer.py`, `gen_model_answer.py`, y `gen_ground_truth_judgment.py`. Esta también es una característica útil si desea modificar los jsonls de las preguntas o experimentar con sus propias preguntas.
 
-## Data
-The questions for each of the categories can be found below:
-- [Reasoning](https://huggingface.co/datasets/livebench/reasoning)
-- [Math](https://huggingface.co/datasets/livebench/math)
-- [Coding](https://huggingface.co/datasets/livebench/coding)
-- [Language](https://huggingface.co/datasets/livebench/language)
-- [Data Analysis](https://huggingface.co/datasets/livebench/data_analysis)
-- [Instruction Following](https://huggingface.co/datasets/livebench/instruction_following)
+## Datos
+Las preguntas para cada una de las categorías se pueden encontrar a continuación:
+- [Razonamiento](https://huggingface.co/datasets/livebench/reasoning)
+- [Matemática](https://huggingface.co/datasets/livebench/math)
+- [Codificación](https://huggingface.co/datasets/livebench/coding)
+- [Idioma](https://huggingface.co/datasets/livebench/language)
+- [Análisis de datos](https://huggingface.co/datasets/livebench/data_analysis)
+- [Instrucciones siguientes](https://huggingface.co/datasets/livebench/instruction_following)
 
-Also available are the [model answers](https://huggingface.co/datasets/livebench/model_answer) and the [model judgments](https://huggingface.co/datasets/livebench/model_judgment).
+También están disponibles las [respuestas modelo](https://huggingface.co/datasets/livebench/model_answer) y los [juicios modelo.](https://huggingface.co/datasets/livebench/model_judgment)
 
-## Adding New Questions
-If you want to create your own set of questions, or try out different prompts, etc, follow these steps:
+## Adición de nuevas preguntas
+Si desea crear su propio conjunto de preguntas, o probar diferentes indicaciones, etcétera, siga estos pasos:
 
-- Create a `question.jsonl` file with the following path: `livebench/data/live_bench/<category>/<task>/question.jsonl`. For example, `livebench/data/reasoning/web_of_lies_new_prompt/question.jsonl`. Here is an example of the format for `question.jsonl` (it's the first few questions from [web_of_lies_v2](https://huggingface.co/datasets/livebench/reasoning)):
+- Cree un `question.jsonl` archivo con la siguiente ruta: `livebench/data/live_bench/<category>/<task>/question.jsonl`. Por ejemplo, `livebench/data/reasoning/web_of_lies_new_prompt/question.jsonl`. A continuación, se muestra un ejemplo del formato para `question.jsonl` (son las primeras preguntas de [web_of_lies_v2](https://huggingface.co/datasets/livebench/reasoning)):
 
 ```jsonl
 {"question_id": "0daa7ca38beec4441b9d5c04d0b98912322926f0a3ac28a5097889d4ed83506f", "category": "reasoning", "ground_truth": "no, yes, yes", "turns": ["In this question, assume each person either always tells the truth or always lies. Tala is at the movie theater. The person at the restaurant says the person at the aquarium lies. Ayaan is at the aquarium. Ryan is at the botanical garden. The person at the park says the person at the art gallery lies. The person at the museum tells the truth. Zara is at the museum. Jake is at the art gallery. The person at the art gallery says the person at the theater lies. Beatriz is at the park. The person at the movie theater says the person at the train station lies. Nadia is at the campground. The person at the campground says the person at the art gallery tells the truth. The person at the theater lies. The person at the amusement park says the person at the aquarium tells the truth. Grace is at the restaurant. The person at the aquarium thinks their friend is lying. Nia is at the theater. Kehinde is at the train station. The person at the theater thinks their friend is lying. The person at the botanical garden says the person at the train station tells the truth. The person at the aquarium says the person at the campground tells the truth. The person at the aquarium saw a firetruck. The person at the train station says the person at the amusement park lies. Mateo is at the amusement park. Does the person at the train station tell the truth? Does the person at the amusement park tell the truth? Does the person at the aquarium tell the truth? Think step by step, and then put your answer in **bold** as a list of three words, yes or no (for example, **yes, no, yes**). If you don't know, guess."], "task": "web_of_lies_v2"}
@@ -147,25 +153,25 @@ If you want to create your own set of questions, or try out different prompts, e
 {"question_id": "36febbb33b3d28b8f75e1a7f798fcff09903e94a50b89da2dbf1ed160508c02c", "category": "reasoning", "ground_truth": "yes, yes, yes", "turns": ["In this question, assume each person either always tells the truth or always lies. Beatriz is at the vineyard. The person at the city hall says the person at the school lies. The person at the ice skating rink says the person at the school tells the truth. Quan is at the ice skating rink. The person at the amusement park says the person at the school tells the truth. Olivia is at the restaurant. The person at the vineyard says the person at the botanical garden tells the truth. The person at the vineyard says the person at the campground tells the truth. Charlie is at the campground. Soren is at the school. Grace is at the barbershop. The person at the school says the person at the vineyard tells the truth. The person at the barbershop says the person at the campground tells the truth. Mateo is at the amusement park. Tala is at the botanical garden. The person at the campground tells the truth. The person at the restaurant tells the truth. Devika is at the city hall. The person at the amusement park thinks their neighbor is telling the truth. The person at the amusement park thinks their friend is lying. Does the person at the amusement park tell the truth? Does the person at the school tell the truth? Does the person at the vineyard tell the truth? Think step by step, and then put your answer in **bold** as a list of three words, yes or no (for example, **yes, no, yes**). If you don't know, guess."], "task": "web_of_lies_v2"}
 ```
 
-- Create a new scoring method in the `process_results` folder. If it is similar to an existing task, you can copy that task's scoring function. For example, `livebench/process_results/reasoning/web_of_lies_new_prompt/utils.py` can be a copy of the `web_of_lies_v2` scoring method.
-- Add the scoring function to `gen_ground_truth_judgment.py` [here](https://github.com/LiveBench/LiveBench/blob/93e3a7d4fa5bb164ef4cb58f67683e4e54554af9/livebench/gen_ground_truth_judgment.py#L124).
+- Cree un nuevo método de puntuación en la `process_results` carpeta. Si es similar a una tarea existente, puede copiar la función de puntuación de esa tarea. Por ejemplo, `livebench/process_results/reasoning/web_of_lies_new_prompt/utils.py` puede ser una copia del método de `web_of_lies_v2` puntuación.
+- Agregue la función de puntuación aquí `gen_ground_truth_judgment.py` [](https://github.com/LiveBench/LiveBench/blob/93e3a7d4fa5bb164ef4cb58f67683e4e54554af9/livebench/gen_ground_truth_judgment.py#L124).
 
-- Run and score models using the `question-source jsonl` and specifying your task. For example: 
+- Ejecute y puntúe modelos mediante el `question-source jsonl` y especificando la tarea. Por ejemplo: 
 ```bash 
 python gen_api_answer.py --bench-name live_bench/reasoning/web_of_lies_new_prompt --model claude-3-5-sonnet-20240620 --question-source jsonl
 python gen_ground_truth_judgment.py --bench-name live_bench/reasoning/web_of_lies_new_prompt --question-source jsonl
 python show_livebench_result.py --bench-name live_bench/reasoning/web_of_lies_new_prompt
 ```
 
-## Documentation
-Here, we describe our dataset documentation. This information is also available in our paper.
-- [Author Responsibility](docs/AUTHOR_RESPONSIBILITY.md)
-- [Code of Conduct](docs/CODE_OF_CONDUCT.md)
-- [Contributing](docs/CONTRIBUTING.md)
-- [Datasheet for LiveBench](docs/DATASHEET.md)
-- [Maintenance Plan](docs/MAINTENANCE_PLAN.md)
+## Documentación
+Aquí, describimos la documentación de nuestro conjunto de datos. Esta información también está disponible en nuestro documento.
+- [Responsabilidad del autor](docs/AUTHOR_RESPONSIBILITY.md)
+- [Código de Conducta](docs/CODE_OF_CONDUCT.md)
+- [Contribuyendo](docs/CONTRIBUTING.md)
+- [Hoja de datos de LiveBench](docs/DATASHEET.md)
+- [Plan de mantenimiento](docs/MAINTENANCE_PLAN.md)
 
-## Citation
+## Cita
 
 ```bibtex
 @article{livebench,

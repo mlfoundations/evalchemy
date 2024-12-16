@@ -1,0 +1,182 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "evalchemy"
+version = "0.1.0"
+description = "Evalchemy Evaluation Framework"
+authors = [
+    { name = "Your Name", email = "your.email@example.com" },
+]
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+
+dependencies = [
+    # Core ML and Deep Learning
+    "torch",
+    "torchvision",
+    "transformers",
+    "accelerate",
+    "peft",
+    "trl",
+    "bitsandbytes",
+    "sentencepiece",
+    "sentence-transformers>=2.2.2",
+    "optimum==1.12.0",
+    
+    # Machine Learning and Scientific Computing
+    "numpy",
+    "pandas",
+    "scipy",
+    "scikit-learn",
+    "faiss-cpu==1.7.4",
+    
+    # ML Experiment Tracking & Visualization
+    "wandb",
+    "tensorboard",
+    "evaluate",
+    
+    # NLP & Text Processing
+    "nltk",
+    "fasttext-wheel",
+    "codebleu",
+    "sacrebleu",
+    "langdetect",
+    "fuzzywuzzy",
+    "python-Levenshtein",
+    
+    # Data Processing & Parsing
+    "datasets",
+    "protobuf",
+    "bs4",
+    "lxml",
+    "fastavro",
+    "jsonpickle",
+    "hjson",
+    "msgpack",
+    
+    # AI Service Providers
+    "openai",
+    "anthropic",
+    "cohere",
+    "google-generativeai",
+    "mistralai",
+    "reka-api",
+    "together",
+    "fschat",
+    "dashscope",
+    
+    # Cloud & Storage
+    "gcsfs",
+    "google-cloud-aiplatform",
+    "google-auth==2.25.1",
+    "boto3",
+    "botocore",
+    "sagemaker",
+    "fsspec==2024.6.1",
+    "hf-transfer",
+    "huggingface_hub[cli]",
+    
+    # Code Analysis & Development
+    "black",
+    "tree-sitter-python",
+    "tree-sitter-java",
+    "tree_sitter",
+    "asttokens",
+    "mypy_extensions",
+    
+    # Web & API
+    "fastapi>=0.101.0",
+    "uvicorn>=0.23.0",
+    "aiohttp[speedups]>=3.8",
+    "httpx",
+    "httpx-sse",
+    "requests>=2.28",
+    "websocket",
+    "aiofiles",
+    
+    # Database
+    "sqlalchemy",
+    "psycopg[binary]",
+    "psycopg2-binary",
+    "sqlitedict",
+    
+    # Utilities
+    "tqdm",
+    "python-box",
+    "fire",
+    "tiktoken",
+    "ray[default]",
+    "backoff>=2.2",
+    "docker-pycreds",
+    "sentry-sdk",
+    "loguru>=0.7",
+    "liger-kernel",
+    "python-dotenv",
+    "shortuuid",
+    "tenacity",
+    "prettytable",
+    "portalocker",
+    "tabulate",
+    "colorama",
+    "termcolor",
+    "distro",
+    "typing_inspect",
+    "py-cpuinfo",
+    "jiter",
+    "patsy",
+    "joblib",
+    "threadpoolctl",
+    "jmespath",
+    "immutabledict",
+]
+
+[project.urls]
+Homepage = "https://github.com/mlfoundations/evalchemy"
+Repository = "https://github.com/mlfoundations/evalchemy.git"
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "black",
+    "isort",
+    "flake8",
+]
+eval = [
+    # Using exact package names from their setup files
+    "fschat @ file:eval/chat_benchmarks/MTBench",  # Changed to match the likely package name
+    "lm-eval[vllm]@git+https://github.com/EtashGuha/lm-evaluation-harness@etashg/tokenize_fix",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["evalchemy", "database"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+
+[tool.black]
+line-length = 120
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+
+[tool.setuptools]
+packages = ["evalchemy"]
+
+[tool.setuptools.package-dir]
+evalchemy = "evalchemy"

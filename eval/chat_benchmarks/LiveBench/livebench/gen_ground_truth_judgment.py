@@ -166,8 +166,7 @@ def gen_judgments(
     model_list,
     remove_existing_file,
     bench_name,
-):
-    
+):    
     # Load answers
     model_answers = load_model_answers(answer_dir)
     print('models:',model_answers.keys())
@@ -240,7 +239,7 @@ def gen_judgments(
                         fout.write(json.dumps(result) + "\n")
     else:
         # Play matches
-        if parallel == 1:
+        if parallel == 0:
             for match in tqdm(matches):
                 results = play_a_match_func(match, output_file=output_file)
         else:

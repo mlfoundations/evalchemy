@@ -39,7 +39,7 @@ dependencies = [
     "pandas",
     "scipy",
     "scikit-learn",
-    "faiss-cpu==1.7.4",
+    "faiss-cpu>=1.7.4",
     
     # ML Experiment Tracking & Visualization
     "wandb",
@@ -153,7 +153,6 @@ dev = [
 ]
 eval = [
     # Using exact package names from their setup files
-    "fschat @ file:eval/chat_benchmarks/MTBench",  # Changed to match the likely package name
     "lm-eval[vllm]@git+https://github.com/EtashGuha/lm-evaluation-harness@etashg/tokenize_fix",
 ]
 

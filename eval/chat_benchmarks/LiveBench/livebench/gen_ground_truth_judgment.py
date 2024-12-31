@@ -2,6 +2,7 @@
 Usage:
 python gen_ground_truth_judgment.py --bench-name live_bench --model-list [LIST-OF-MODEL-ID] --parallel [num-concurrent-api-call] --mode [single|pairwise-baseline|pairwise-all]
 """
+
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 import json
@@ -22,9 +23,9 @@ from livebench.process_results.reasoning.web_of_lies_v2.utils import web_of_lies
 from livebench.process_results.reasoning.house_traversal.utils import house_traversal_process_results
 from livebench.process_results.reasoning.zebra_puzzle.utils import zebra_puzzle_process_results
 from livebench.process_results.reasoning.spatial.utils import spatial_process_results
-from livebench.process_results.math.math_competitions.utils import mathcontest_process_results,aime_process_results 
+from livebench.process_results.math.math_competitions.utils import mathcontest_process_results, aime_process_results
 from livebench.process_results.math.olympiad.utils import proof_rearrangement_process_results
-from livebench.process_results.math.AMPS_Hard.utils import amps_hard_process_results 
+from livebench.process_results.math.AMPS_Hard.utils import amps_hard_process_results
 from livebench.process_results.writing.plot_unscrambling.utils import plot_unscrambling_process_results
 from livebench.process_results.writing.typos.utils import typos_process_results
 from livebench.process_results.writing.connections.utils import connections_process_results
@@ -40,7 +41,7 @@ from livebench.common import (
     make_match_single,
     MatchSingle,
     get_categories_tasks,
-    LIVE_BENCH_DATA_SUPER_PATH
+    LIVE_BENCH_DATA_SUPER_PATH,
 )
 
 
@@ -66,20 +67,25 @@ def play_a_match_gt(match: MatchSingle, output_file: str):
         match.model,
         match.answer,
     )
-    coding_test_case_tasks = ["coding_completion","LCB_generation"]
-    if "ground_truth" not in question and "reference" not in question and question["task"] not in coding_test_case_tasks and question["category"] != "instruction_following":
+    coding_test_case_tasks = ["coding_completion", "LCB_generation"]
+    if (
+        "ground_truth" not in question
+        and "reference" not in question
+        and question["task"] not in coding_test_case_tasks
+        and question["category"] != "instruction_following"
+    ):
         raise ValueError("Questions must have ground_truth to run gen_ground_truth_judgment.")
 
     task = question["task"]
     task_or_subtask = question["subtask"] if "subtask" in question.keys() else question["task"]
     question_text = question["turns"][0]
     ground_truth = question.get("ground_truth", None)
-    llm_answer = answer['choices'][0]['turns'][-1]
+    llm_answer = answer["choices"][0]["turns"][-1]
     score = 0
     category = None
 
     # todo: find a better solution than a long if statement.
-    splits = task_or_subtask.split('_')
+    splits = task_or_subtask.split("_")
     if splits[0] in ["amc", "smc"] or (len(splits) > 1 and splits[1] == "amc"):
         score = mathcontest_process_results(ground_truth, llm_answer, question_text)
         category = "math"
@@ -113,7 +119,7 @@ def play_a_match_gt(match: MatchSingle, output_file: str):
     elif task_or_subtask == "spatial":
         score = spatial_process_results(ground_truth, llm_answer)
         category = "reasoning"
-    elif task_or_subtask == 'typos':
+    elif task_or_subtask == "typos":
         score = typos_process_results(ground_truth, llm_answer)
         category = "language"
     elif task_or_subtask == "connections":
@@ -144,11 +150,7 @@ def play_a_match_gt(match: MatchSingle, output_file: str):
     }
     if "subtask" in question.keys():
         result["subtask"] = question["subtask"]
-    print(
-        f"question: {question_id}, turn: {turn}, model: {model}, "
-        f"score: {score}, "
-       
-    )
+    print(f"question: {question_id}, turn: {turn}, model: {model}, " f"score: {score}, ")
 
     if output_file:
         os.makedirs(os.path.dirname(output_file), exist_ok=True)
@@ -166,10 +168,10 @@ def gen_judgments(
     model_list,
     remove_existing_file,
     bench_name,
-):    
+):
     # Load answers
     model_answers = load_model_answers(answer_dir)
-    print('models:',model_answers.keys())
+    print("models:", model_answers.keys())
 
     if model_list is None:
         models = get_model_list(answer_dir)
@@ -177,7 +179,8 @@ def gen_judgments(
         models = model_list
 
     play_a_match_func = play_a_match_gt
-
+    base_result_dir = "/".join(output_file.split("/")[:-5])
+    print(f"base_result_dir: {base_result_dir}")
     os.makedirs(os.path.dirname(output_file), exist_ok=True)
     if output_file and os.path.exists(output_file) and remove_existing_file:
         os.remove(output_file)
@@ -203,11 +206,11 @@ def gen_judgments(
     # Show match stats and prompt enter to continue
     print("Stats:")
     print(json.dumps(match_stat, indent=4))
-    #input("Press Enter to confirm...")
+    # input("Press Enter to confirm...")
 
     if "instruction_following" in bench_name:
-        nltk.download('punkt')
-        task_name = matches[0].question['task']
+        nltk.download("punkt")
+        task_name = matches[0].question["task"]
 
         if model_list is None:
             models = get_model_list(answer_dir)
@@ -215,7 +218,9 @@ def gen_judgments(
             models = model_list
 
         for model_id in models:
-            scores = instruction_following_process_results(questions, model_answers, task_name, model_id)
+            scores = instruction_following_process_results(
+                questions, model_answers, task_name, model_id, base_result_dir
+            )
             for item in scores:
                 question_id = item["question_id"]
                 score = item["score"]
@@ -229,9 +234,7 @@ def gen_judgments(
                     "tstamp": time.time(),
                     "category": "instruction_following",
                 }
-                print(
-                    f"question: {question_id}, turn: {turn}, model: {model_id}, "
-                    f"score: {score}, ")
+                print(f"question: {question_id}, turn: {turn}, model: {model_id}, " f"score: {score}, ")
 
                 if output_file:
                     os.makedirs(os.path.dirname(output_file), exist_ok=True)
@@ -251,14 +254,11 @@ def gen_judgments(
             np.random.shuffle(matches)
 
             with ThreadPoolExecutor(parallel) as executor:
-                for match in tqdm(
-                    executor.map(play_a_match_wrapper, matches), total=len(matches)
-                ):
+                for match in tqdm(executor.map(play_a_match_wrapper, matches), total=len(matches)):
                     pass
 
     # De-duplicate and sort judgment file
     reorg_output_file(output_file)
-
 
 
 if __name__ == "__main__":
@@ -276,55 +276,55 @@ if __name__ == "__main__":
         default=None,
         help="A list of models to be evaluated",
     )
-    parser.add_argument(
-        "--parallel", type=int, default=1, help="The number of concurrent API calls."
-    )
-    parser.add_argument(
-        "--first-n", type=int, help="A debug option. Only run the first `n` judgments."
-    )
+    parser.add_argument("--parallel", type=int, default=1, help="The number of concurrent API calls.")
+    parser.add_argument("--first-n", type=int, help="A debug option. Only run the first `n` judgments.")
     parser.add_argument(
         "--question-begin",
         type=int,
         help="A debug option. The begin index of questions.",
     )
+    parser.add_argument("--question-end", type=int, help="A debug option. The end index of questions.")
     parser.add_argument(
-        "--question-end", type=int, help="A debug option. The end index of questions."
+        "--remove-existing-file", action="store_true", default=False, help="Remove existing judgment file."
     )
     parser.add_argument(
-        "--remove-existing-file", action="store_true", default=False,
-        help="Remove existing judgment file."
+        "--question-source",
+        type=str,
+        default="huggingface",
+        help="The source of the questions. 'huggingface' will draw questions from huggingface. 'jsonl' will use local jsonl files to permit tweaking or writing custom questions.",
     )
     parser.add_argument(
-        "--question-source", type=str, default="huggingface", help="The source of the questions. 'huggingface' will draw questions from huggingface. 'jsonl' will use local jsonl files to permit tweaking or writing custom questions."
-    )
-    parser.add_argument(
-        "--livebench-release-option", type=str, default='2024-08-31', help="Livebench release to use. Provide a single date option, current options are {'2024-08-31' (august update), '2024-07-26' (july update), '2024-06-24' (original release)}. Will handle excluding deprecated questions for selected release."
+        "--livebench-release-option",
+        type=str,
+        default="2024-08-31",
+        help="Livebench release to use. Provide a single date option, current options are {'2024-08-31' (august update), '2024-07-26' (july update), '2024-06-24' (original release)}. Will handle excluding deprecated questions for selected release.",
     )
     args = parser.parse_args()
 
-    valid_livebench_releases = set(['2024-07-26', '2024-06-24', '2024-08-31'])
+    valid_livebench_releases = set(["2024-07-26", "2024-06-24", "2024-08-31"])
 
     if args.livebench_release_option not in valid_livebench_releases:
         raise ValueError(f"Bad release {args.livebench_release_option}.")
-        
-    release_set = set([
-        r for r in valid_livebench_releases if r <= args.livebench_release_option
-    ])
+
+    release_set = set([r for r in valid_livebench_releases if r <= args.livebench_release_option])
 
     if args.question_source == "huggingface":
         categories, tasks = get_categories_tasks(args.bench_name)
 
         for category_name, task_names in tasks.items():
             for task_name in task_names:
-                questions = load_questions(categories[category_name], release_set, task_name, args.question_begin, args.question_end)
+                questions = load_questions(
+                    categories[category_name], release_set, task_name, args.question_begin, args.question_end
+                )
                 if args.first_n:
                     questions = questions[: args.first_n]
-                questions = questions[args.question_begin:args.question_end]
+                questions = questions[args.question_begin : args.question_end]
 
                 questions = [
-                    q for q in questions if q['livebench_removal_date'] == "" or q['livebench_removal_date'] > args.livebench_release_option
+                    q
+                    for q in questions
+                    if q["livebench_removal_date"] == "" or q["livebench_removal_date"] > args.livebench_release_option
                 ]
-
 
                 task_full_name = f"{LIVE_BENCH_DATA_SUPER_PATH}/{category_name}/{task_name}"
                 output_file = f"data/{task_full_name}/model_judgment/ground_truth_judgment.jsonl"
@@ -341,7 +341,6 @@ if __name__ == "__main__":
                     bench_name=task_full_name,
                 )
 
-
     elif args.question_source == "jsonl":
         list_of_question_files = []
         original_question_file = f"data/{args.bench_name}/question.jsonl"
@@ -355,13 +354,15 @@ if __name__ == "__main__":
             questions = load_questions_jsonl(question_file, release_set, args.question_begin, args.question_end)
             if args.first_n:
                 questions = questions[: args.first_n]
-            questions = questions[args.question_begin:args.question_end]
+            questions = questions[args.question_begin : args.question_end]
 
             questions = [
-                q for q in questions if q['livebench_removal_date'] == "" or q['livebench_removal_date'] > args.livebench_release_option
+                q
+                for q in questions
+                if q["livebench_removal_date"] == "" or q["livebench_removal_date"] > args.livebench_release_option
             ]
 
-            bench_name = os.path.dirname(question_file).replace("data/","")
+            bench_name = os.path.dirname(question_file).replace("data/", "")
 
             output_file = f"data/{bench_name}/model_judgment/ground_truth_judgment.jsonl"
             answer_dir = f"data/{bench_name}/model_answer/"
@@ -378,4 +379,3 @@ if __name__ == "__main__":
 
     else:
         raise ValueError(f"Bad question source {args.question_source}.")
-    

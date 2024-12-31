@@ -1,12 +1,7 @@
 from typing import Dict, Any, Optional, List
 import logging
-import subprocess
 import os
 from eval.chat_benchmarks.LiveBench.livebench.common import load_questions
-from eval.chat_benchmarks.LiveBench.livebench.gen_ground_truth_judgment import play_a_match_gt
-from eval.chat_benchmarks.LiveBench.livebench.model import get_conversation_template
-from fastchat.utils import str_to_torch_dtype
-import torch
 import json
 import shortuuid
 import time
@@ -15,31 +10,24 @@ from lm_eval.api.instance import Instance
 
 from lm_eval.api.model import LM
 
-import argparse
 import json
 import os
-import random
 import time
 import glob
 
 import shortuuid
-import torch
 from tqdm import tqdm
 
 from eval.chat_benchmarks.LiveBench.livebench.common import (
-    reorg_answer_file,
     get_categories_tasks,
-    get_hf_dataset,
-    get_tasks_from_hf_category,
     load_questions,
     load_questions_jsonl,
     LIVE_BENCH_DATA_SUPER_PATH,
+    reorg_answer_file,
 )
-from eval.chat_benchmarks.LiveBench.livebench.model import load_model, get_conversation_template
-from fastchat.utils import str_to_torch_dtype
-from eval.chat_benchmarks.LiveBench.livebench.gen_api_answer import get_answer
 from eval.chat_benchmarks.LiveBench.livebench.gen_ground_truth_judgment import gen_judgments
 from eval.task import BaseBenchmark
+
 
 class LiveBenchBenchmark(BaseBenchmark):
     """
@@ -49,7 +37,7 @@ class LiveBenchBenchmark(BaseBenchmark):
     def __init__(
         self,
         dtype: str = "float32",
-        max_new_token: int = 4096,
+        max_new_token: int = 256,
         dataset_name: str = "live_bench",
         question_source: str = "huggingface",
         temperature: float = 0.0,
@@ -89,32 +77,33 @@ class LiveBenchBenchmark(BaseBenchmark):
             self.question_begin = None
             self.question_end = None
             self.max_tokens = max_new_token
-        assert release_date in ["2024-07-26", "2024-06-24", "2024-08-31"]
         self.temperature = temperature
         self.num_choices = num_choices
-        
+        self.all_release_dates = ["2024-07-26", "2024-06-24", "2024-08-31"]
+
         self.data_path = f"eval/chat_benchmarks/LiveBench/data"
 
     def get_question_list(self, model_name: str, release_set: set):
         questions_all = []
-        answer_files  = []
+        answer_files = []
 
         if self.question_source == "huggingface":
             categories, tasks = get_categories_tasks(self.dataset_name)
 
             for category_name, task_names in tasks.items():
                 for task_name in task_names:
-                    questions = load_questions(categories[category_name], release_set, task_name, self.question_begin, self.question_end)
+                    questions = load_questions(
+                        categories[category_name],
+                        self.all_release_dates,
+                        task_name,
+                        self.question_begin,
+                        self.question_end,
+                    )
 
                     task_full_name = f"{LIVE_BENCH_DATA_SUPER_PATH}/{category_name}/{task_name}"
                     answer_file = f"{self.data_path}/{task_full_name}/model_answer/{model_name}.jsonl"
 
-                    questions_all.extend(
-                        [
-                            (q, answer_file)
-                            for q in questions
-                        ]
-                    )
+                    questions_all.extend([(q, answer_file) for q in questions])
 
                     answer_files.append(answer_file)
         elif self.question_source == "jsonl":
@@ -123,21 +112,18 @@ class LiveBenchBenchmark(BaseBenchmark):
             if os.path.exists(original_question_file):
                 list_of_question_files = [original_question_file]
             else:
-                list_of_question_files = glob.glob(f"{self.data_path}/{self.dataset_name}/**/question.jsonl", recursive=True)
+                list_of_question_files = glob.glob(
+                    f"{self.data_path}/{self.dataset_name}/**/question.jsonl", recursive=True
+                )
 
             for question_file in list_of_question_files:
                 print(question_file)
                 questions = load_questions_jsonl(question_file, release_set, self.question_begin, self.question_end)
 
-                bench_name = os.path.dirname(question_file).replace(f"{self.data_path}/","")
+                bench_name = os.path.dirname(question_file).replace(f"{self.data_path}/", "")
                 answer_file = f"{self.data_path}/{bench_name}/model_answer/{model_name}.jsonl"
 
-                questions_all.extend(
-                    [
-                        (q, answer_file)
-                        for q in questions
-                    ]
-                )
+                questions_all.extend([(q, answer_file) for q in questions])
 
                 if len(questions) > 0:
                     answer_files.append(answer_file)
@@ -146,7 +132,9 @@ class LiveBenchBenchmark(BaseBenchmark):
             raise ValueError(f"Bad question source {self.question_source}.")
 
         questions_all = [
-            q for q in questions_all if q[0]['livebench_removal_date'] == "" or q[0]['livebench_removal_date'] > self.release_date
+            q
+            for q in questions_all
+            if q[0]["livebench_removal_date"] == "" or q[0]["livebench_removal_date"] > self.release_date
         ]
         return questions_all
 
@@ -179,22 +167,23 @@ class LiveBenchBenchmark(BaseBenchmark):
         # Load questions
         model_name = self._get_model_name(model)
         questions = self.get_question_list(model_name, [self.release_date])
-        questions = questions[self.question_begin:self.question_end]
+        questions = questions[self.question_begin : self.question_end]
         # Generate answers
-        answers = []
+        all_choices = {k: [{"index": i, "turns": []} for i in range(self.num_choices)] for _, k in questions}
         all_instances = []
-        all_convs = [[] for _ in questions]
-        all_choices = [{"index": i, "turns": []} for _ in questions for i in range(self.num_choices)]
         max_turns = max(len(q["turns"]) for q, _ in questions)
+        if model.rank == 0:
+            tqdm_gen = tqdm(range(self.num_choices * max_turns * len(questions)))
         for choice_num in range(self.num_choices):
+            all_convs = [[] for _ in questions]
             for turn_num in range(max_turns):
-                for idx, (question, answer_file) in enumerate(tqdm(questions)):
+                for idx, (question, answer_file) in enumerate(questions):
                     if turn_num < len(question["turns"]):
                         qs = question["turns"][turn_num]
                         all_convs[idx].append({"role": "user", "content": qs})
-                        
+
                         prompt = model.apply_chat_template(all_convs[idx])
-                        
+
                         all_instances.append(
                             Instance(
                                 "generate_until",
@@ -210,32 +199,43 @@ class LiveBenchBenchmark(BaseBenchmark):
                                 idx,
                             )
                         )
-                    
-                    if all_instances:
-                        outputs = self.compute(model, all_instances)
+                    if model.rank == 0:
+                        tqdm_gen.update(1)
+                        tqdm_gen.set_description(f"Generating {choice_num} {turn_num} {idx}")
+                        tqdm_gen.refresh()
 
-                        for idx, output in enumerate(outputs):
-                            all_convs[idx].append({"role": "assistant", "content": output})
-                            all_choices[choice_num]["turns"].append(output)
-                      
-                      
+                if all_instances:
+                    print(f"Computing... {len(questions)}")
+                    outputs = self.compute(model, all_instances)
+
+                    for idx, output in enumerate(outputs):
+                        all_convs[idx].append({"role": "assistant", "content": output})
+            for idx, (_, answer_file) in enumerate(questions):
+                choice_idx = choice_num  # Current choice index
+                all_choices[answer_file][choice_idx]["turns"] = [
+                    c["content"] for c in all_convs[idx] if c["role"] == "assistant"
+                ]
+
         if model.rank != 0:
             return all_choices
-        
+
         results = []
         for idx, (question, answer_file) in enumerate(questions):
             os.makedirs(os.path.dirname(answer_file), exist_ok=True)
+            print(f"Writing to {answer_file}")
+            print(f"Writing {all_choices[answer_file]}")
             with open(os.path.expanduser(answer_file), "a") as fout:
                 ans_json = {
                     "question_id": question["question_id"],
-                    "question": question,
                     "answer_id": shortuuid.uuid(),
                     "model_id": model_name,
-                    "choices": all_choices,
+                    "choices": all_choices[answer_file],
                     "tstamp": time.time(),
                 }
                 results.append(ans_json)
                 fout.write(json.dumps(ans_json) + "\n")
+            print(f"Wrote {answer_file}")
+            reorg_answer_file(answer_file)
 
         return results
 
@@ -250,7 +250,7 @@ class LiveBenchBenchmark(BaseBenchmark):
             Dictionary containing evaluation metrics
         """
         model_name = results[0]["model_id"]
-        # questions = self.get_question_list(model_name, [self.release_date])
+        # questions = self.get_question_list(model_name,)
         if self.question_source == "huggingface":
             categories, tasks = get_categories_tasks(self.dataset_name)
             if self.debug:
@@ -259,11 +259,19 @@ class LiveBenchBenchmark(BaseBenchmark):
 
             for category_name, task_names in tasks.items():
                 for task_name in task_names:
-                    questions = load_questions(categories[category_name], self.release_date, task_name, self.question_begin, self.question_end)
+                    questions = load_questions(
+                        categories[category_name],
+                        self.all_release_dates,
+                        task_name,
+                        self.question_begin,
+                        self.question_end,
+                    )
 
-                    questions = [
-                        q for q in questions if q['livebench_removal_date'] == "" or q['livebench_removal_date'] > self.release_date
-                    ]
+                    # questions = [
+                    #     q
+                    #     for q in questions
+                    #     if q["livebench_removal_date"] == "" or q["livebench_removal_date"] > self.release_date
+                    # ]
 
                     task_full_name = f"{LIVE_BENCH_DATA_SUPER_PATH}/{category_name}/{task_name}"
                     output_file = f"{self.data_path}/{task_full_name}/model_judgment/ground_truth_judgment.jsonl"
@@ -281,24 +289,29 @@ class LiveBenchBenchmark(BaseBenchmark):
                             bench_name=task_full_name,
                         )
 
-
         elif self.question_source == "jsonl":
             list_of_question_files = []
             original_question_file = f"{self.data_path}/{self.dataset_name}/question.jsonl"
             if os.path.exists(original_question_file):
                 list_of_question_files = [original_question_file]
             else:
-                list_of_question_files = glob.glob(f"{self.data_path}/{self.dataset_name}/**/question.jsonl", recursive=True)
+                list_of_question_files = glob.glob(
+                    f"{self.data_path}/{self.dataset_name}/**/question.jsonl", recursive=True
+                )
 
             for question_file in list_of_question_files:
                 print(question_file)
-                questions = load_questions_jsonl(question_file, self.release_date, self.question_begin, self.question_end)
+                questions = load_questions_jsonl(
+                    question_file, self.release_date, self.question_begin, self.question_end
+                )
 
                 questions = [
-                    q for q in questions if q['livebench_removal_date'] == "" or q['livebench_removal_date'] > self.release_date
+                    q
+                    for q in questions
+                    if q["livebench_removal_date"] == "" or q["livebench_removal_date"] > self.release_date
                 ]
 
-                bench_name = os.path.dirname(question_file).replace(f"{self.data_path}/","")
+                bench_name = os.path.dirname(question_file).replace(f"{self.data_path}/", "")
 
                 output_file = f"{self.data_path}/{bench_name}/model_judgment/ground_truth_judgment.jsonl"
                 answer_dir = f"{self.data_path}/{bench_name}/model_answer/"
@@ -314,7 +327,12 @@ class LiveBenchBenchmark(BaseBenchmark):
 
         else:
             raise ValueError(f"Bad question source {self.question_source}.")
-        
+
+        # read the file and return the results
+        with open(output_file, "r") as f:
+            results = [json.loads(line) for line in f]
+
+        return results
 
     def run_benchmark(self) -> Dict[str, float]:
         """
@@ -331,9 +349,7 @@ class LiveBenchBenchmark(BaseBenchmark):
                 return None
 
             evaluation_results = self.evaluate_responses(generation_results)
-            evaluation_results.update(
-                {"benchmark_version": "live_bench"}
-            )
+            evaluation_results.update({"benchmark_version": "live_bench"})
             return evaluation_results
 
         except Exception as e:

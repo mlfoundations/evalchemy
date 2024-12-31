@@ -5,10 +5,10 @@ import re
 def mathcontest_process_results(ground_truth: str, llm_answer: str, question_text: str) -> int:
     score = 0
     # the reference answer must be a single capital letter from A to E (I.e., the multiple choice answer)
-    if not (isinstance(ground_truth, str) and len(ground_truth) == 1 and 'A' <= ground_truth <= 'E'):
+    if not (isinstance(ground_truth, str) and len(ground_truth) == 1 and "A" <= ground_truth <= "E"):
         raise ValueError("amc_answer must be a single capital letter between A and E.")
 
-    # The LLM was prompted to repeat letter answer 5 times, to make it easy to pull out the answer        
+    # The LLM was prompted to repeat letter answer 5 times, to make it easy to pull out the answer
     if ground_truth * 4 in llm_answer:
         score = 1
 
@@ -41,14 +41,14 @@ def mathcontest_process_results(ground_truth: str, llm_answer: str, question_tex
             print("GROUND TRUTH", ground_truth.strip().lower())
             if last_boxed:
                 print("BOXED:", parsed_answer)
-            print("END OF OUTPUT", llm_answer[-50:])      
+            print("END OF OUTPUT", llm_answer[-50:])
 
     return score
 
 
 def extract_answer(statement, letter):
 
-    pattern = r'\\textbf{\(([A-E])\)\s?}(.*?)(?:\\qquad|\$)'
+    pattern = r"\\textbf{\(([A-E])\)\s?}(.*?)(?:\\qquad|\$)"
     matches = re.findall(pattern, statement)
     answers = {match[0]: match[1].strip() for match in matches}
     answer = answers.get(letter, None)
@@ -100,7 +100,7 @@ def last_boxed_only_string(string: str) -> Optional[str]:
     if right_brace_idx is None:
         retval = None
     else:
-        retval = string[idx : right_brace_idx + 1].replace("$", "").replace("fbox","boxed")
+        retval = string[idx : right_brace_idx + 1].replace("$", "").replace("fbox", "boxed")
 
     return retval
 

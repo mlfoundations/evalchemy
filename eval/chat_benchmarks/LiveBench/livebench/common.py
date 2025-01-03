@@ -31,13 +31,14 @@ one_score_pattern_backup = re.compile("\[(\d+\.?\d*)\]")
 LIVE_BENCH_HF_ORGANIZATION = "livebench"
 LIVE_BENCH_DATA_SUPER_PATH = "live_bench"
 LIVE_BENCH_CATEGORIES = [
-    'coding',
-    'data_analysis',
-    'instruction_following',
-    'math',
-    'reasoning',
-    'language',
+    "coding",
+    "data_analysis",
+    "instruction_following",
+    "math",
+    "reasoning",
+    "language",
 ]
+
 
 @dataclasses.dataclass
 class MatchSingle:
@@ -49,18 +50,15 @@ class MatchSingle:
 
 
 def get_categories_tasks(bench_name: str):
-    split_bench_name = bench_name.rstrip('/').split('/')
-    assert(split_bench_name[0] == 'live_bench')
+    split_bench_name = bench_name.rstrip("/").split("/")
+    assert split_bench_name[0] == "live_bench"
     if len(split_bench_name) == 1:
         # specify entire bench
 
-        categories = {
-            category_name : get_hf_dataset(category_name)
-            for category_name in LIVE_BENCH_CATEGORIES
-        }
+        categories = {category_name: get_hf_dataset(category_name) for category_name in LIVE_BENCH_CATEGORIES}
 
         tasks = {
-            category_name : get_tasks_from_hf_category(categories[category_name])
+            category_name: get_tasks_from_hf_category(categories[category_name])
             for category_name in LIVE_BENCH_CATEGORIES
         }
 
@@ -68,27 +66,19 @@ def get_categories_tasks(bench_name: str):
         # specify a category or task
         category_name = split_bench_name[1]
 
-        categories = {
-            category_name : get_hf_dataset(category_name)
-        }
+        categories = {category_name: get_hf_dataset(category_name)}
 
         if len(split_bench_name) == 2:
-            tasks = {
-                category_name : get_tasks_from_hf_category(categories[category_name])
-            } 
+            tasks = {category_name: get_tasks_from_hf_category(categories[category_name])}
         else:
-            assert(len(split_bench_name) == 3)
+            assert len(split_bench_name) == 3
             task_name = split_bench_name[2]
-            tasks = {
-                category_name : [
-                    task_name
-                ]
-            } 
+            tasks = {category_name: [task_name]}
 
     return categories, tasks
 
 
-def get_hf_dataset(dataset_name: str, split='test'):
+def get_hf_dataset(dataset_name: str, split="test"):
     return load_dataset(f"{LIVE_BENCH_HF_ORGANIZATION}/{dataset_name}", split=split)
 
 
@@ -98,22 +88,28 @@ def get_tasks_from_hf_category(category: Dataset):
 
 def load_answers_judgments():
     model_judgment_dataset = get_hf_dataset("model_judgment", split="leaderboard")
-    model_answer_dataset   = get_hf_dataset("model_answer", split="leaderboard")
+    model_answer_dataset = get_hf_dataset("model_answer", split="leaderboard")
 
     model_judgment = {
-        category_name : [example for example in model_judgment_dataset.filter(lambda row: row["category"] == category_name)]
+        category_name: [
+            example for example in model_judgment_dataset.filter(lambda row: row["category"] == category_name)
+        ]
         for category_name in LIVE_BENCH_CATEGORIES
     }
 
     model_answer = {
-        category_name : [example for example in model_answer_dataset.filter(lambda row: row["category"] == category_name)]
+        category_name: [
+            example for example in model_answer_dataset.filter(lambda row: row["category"] == category_name)
+        ]
         for category_name in LIVE_BENCH_CATEGORIES
     }
 
     return model_answer, model_judgment
 
 
-def load_questions(category: Dataset, livebench_releases: set, task_name: Optional[str], begin: Optional[int], end: Optional[int]):
+def load_questions(
+    category: Dataset, livebench_releases: set, task_name: Optional[str], begin: Optional[int], end: Optional[int]
+):
     """Load questions from a file."""
     if task_name is not None:
         questions = [example for example in category.filter(lambda row: row["task"] == task_name)]
@@ -121,15 +117,21 @@ def load_questions(category: Dataset, livebench_releases: set, task_name: Option
         questions = list(category)
     questions = questions[begin:end]
     for q in questions:
-        if 'livebench_release_date' in q.keys() and isinstance(q['livebench_release_date'], datetime):
-            q['livebench_release_date'] = datetime.strftime(q['livebench_release_date'], '%Y-%m-%d')
-        if 'livebench_removal_date' in q.keys() and isinstance(q['livebench_removal_date'], datetime):
-            q['livebench_removal_date'] = datetime.strftime(q['livebench_removal_date'], '%Y-%m-%d')
-        if 'release_date' in q.keys() and isinstance(q['release_date'], datetime):
-            q['release_date'] = datetime.strftime(q['release_date'], '%Y-%m-%d')
-        if 'original_json' in q.keys() and 'contest_date' in q['original_json'].keys() and isinstance(q['original_json']['contest_date'], datetime):
-            q['original_json']['contest_date'] = datetime.strftime(q['original_json']['contest_date'], '%Y-%m-%d %H:%M:%S')
-    questions = [q for q in questions if q['livebench_release_date'] in livebench_releases]
+        if "livebench_release_date" in q.keys() and isinstance(q["livebench_release_date"], datetime):
+            q["livebench_release_date"] = datetime.strftime(q["livebench_release_date"], "%Y-%m-%d")
+        if "livebench_removal_date" in q.keys() and isinstance(q["livebench_removal_date"], datetime):
+            q["livebench_removal_date"] = datetime.strftime(q["livebench_removal_date"], "%Y-%m-%d")
+        if "release_date" in q.keys() and isinstance(q["release_date"], datetime):
+            q["release_date"] = datetime.strftime(q["release_date"], "%Y-%m-%d")
+        if (
+            "original_json" in q.keys()
+            and "contest_date" in q["original_json"].keys()
+            and isinstance(q["original_json"]["contest_date"], datetime)
+        ):
+            q["original_json"]["contest_date"] = datetime.strftime(
+                q["original_json"]["contest_date"], "%Y-%m-%d %H:%M:%S"
+            )
+    questions = [q for q in questions if q["livebench_release_date"] in livebench_releases]
     return questions
 
 
@@ -140,7 +142,7 @@ def load_questions_jsonl(question_file: str, livebench_releases: set, begin: Opt
             if line:
                 questions.append(json.loads(line))
     questions = questions[begin:end]
-    questions = [q for q in questions if q['livebench_release_date'] in livebench_releases]
+    questions = [q for q in questions if q["livebench_release_date"] in livebench_releases]
     return questions
 
 
@@ -155,7 +157,7 @@ def load_model_answers(answer_dir: str):
     model_answers = {}
 
     for filename in filenames:
-        model_name = os.path.basename(filename)[:-len('.jsonl')]
+        model_name = os.path.basename(filename)[: -len(".jsonl")]
         answer = {}
         with open(filename) as fin:
             for line in fin:
@@ -195,12 +197,9 @@ def make_match_single(
             m = models[i]
             a = model_answers[m][q_id]
 
-            matches.append(
-                MatchSingle(
-                    dict(q), m, a, multi_turn=multi_turn
-                )
-            )
+            matches.append(MatchSingle(dict(q), m, a, multi_turn=multi_turn))
     return matches
+
 
 def chat_completion_openai(model, conv, temperature, max_tokens, api_dict=None):
     if api_dict is not None:
@@ -233,6 +232,7 @@ def chat_completion_inference_openai(model, conv, temperature, max_tokens, api_d
     output = API_ERROR_OUTPUT
 
     from openai import OpenAI
+
     client = OpenAI()
 
     for _ in range(API_MAX_RETRY):
@@ -243,8 +243,8 @@ def chat_completion_inference_openai(model, conv, temperature, max_tokens, api_d
                 model=model,
                 messages=messages,
                 n=1,
-                #temperature=temperature,
-                #max_tokens=max_tokens,
+                # temperature=temperature,
+                # max_tokens=max_tokens,
             )
             output = response.choices[0].message.content
             break
@@ -253,6 +253,7 @@ def chat_completion_inference_openai(model, conv, temperature, max_tokens, api_d
             time.sleep(API_RETRY_SLEEP)
 
     return output
+
 
 def chat_completion_deepseek(model, conv, temperature, max_tokens, api_dict=None):
     if api_dict is not None and "api_key" in api_dict:
@@ -262,18 +263,14 @@ def chat_completion_deepseek(model, conv, temperature, max_tokens, api_dict=None
     output = API_ERROR_OUTPUT
     for _ in range(API_MAX_RETRY):
         try:
-            print('sleeping for 3 sec')
+            print("sleeping for 3 sec")
             time.sleep(3)
             from openai import OpenAI
+
             client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com")
             messages = conv.to_openai_api_messages()
             response = client.chat.completions.create(
-                model=model,
-                messages=messages,
-                temperature=temperature,
-                max_tokens=max_tokens,
-                n=1,
-                stream=False
+                model=model, messages=messages, temperature=temperature, max_tokens=max_tokens, n=1, stream=False
             )
             output = response.choices[0].message.content
             break
@@ -282,6 +279,7 @@ def chat_completion_deepseek(model, conv, temperature, max_tokens, api_dict=None
             time.sleep(API_RETRY_SLEEP)
 
     return output
+
 
 def chat_completion_nvidia(model, conv, temperature, max_tokens, api_dict=None):
     if api_dict is not None and "api_key" in api_dict:
@@ -291,7 +289,7 @@ def chat_completion_nvidia(model, conv, temperature, max_tokens, api_dict=None):
     output = API_ERROR_OUTPUT
     for _ in range(API_MAX_RETRY):
         try:
-            print('sleeping for 2 sec')
+            print("sleeping for 2 sec")
             time.sleep(2)
             if "nvidia/" in model:
                 full_model_name = model
@@ -299,15 +297,11 @@ def chat_completion_nvidia(model, conv, temperature, max_tokens, api_dict=None):
                 full_model_name = "nvidia/" + model
 
             from openai import OpenAI
+
             client = OpenAI(api_key=api_key, base_url="https://integrate.api.nvidia.com/v1")
             messages = conv.to_openai_api_messages()
             response = client.chat.completions.create(
-                model=full_model_name,
-                messages=messages,
-                temperature=0.5,
-                max_tokens=max_tokens,
-                top_p=1,
-                stream=False
+                model=full_model_name, messages=messages, temperature=0.5, max_tokens=max_tokens, top_p=1, stream=False
             )
             output = response.choices[0].message.content
             break
@@ -316,6 +310,7 @@ def chat_completion_nvidia(model, conv, temperature, max_tokens, api_dict=None):
             time.sleep(API_RETRY_SLEEP)
 
     return output
+
 
 def chat_completion_openrouter(model, conv, temperature, max_tokens, api_dict=None):
     if api_dict is not None and "api_key" in api_dict:
@@ -325,13 +320,13 @@ def chat_completion_openrouter(model, conv, temperature, max_tokens, api_dict=No
     output = API_ERROR_OUTPUT
     for _ in range(API_MAX_RETRY):
         try:
-            print('sleeping for 2 sec')
+            print("sleeping for 2 sec")
             time.sleep(2)
             if "grok" in model:
                 full_model_name = "x-ai/" + model
 
-
             from openai import OpenAI
+
             client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=api_key)
             messages = conv.to_openai_api_messages()
 
@@ -341,7 +336,7 @@ def chat_completion_openrouter(model, conv, temperature, max_tokens, api_dict=No
                 temperature=temperature,
                 max_tokens=max_tokens,
                 n=1,
-                stream=False
+                stream=False,
             )
             output = response.choices[0].message.content
             break
@@ -351,13 +346,15 @@ def chat_completion_openrouter(model, conv, temperature, max_tokens, api_dict=No
 
     return output
 
+
 def chat_completion_vertex(model, conv, temperature, max_tokens, api_dict=None, project_name="DEFAULT"):
     output = API_ERROR_OUTPUT
     for _ in range(API_MAX_RETRY):
         try:
             import vertexai
             from vertexai.preview.generative_models import GenerativeModel, Image
-            print('sleeping for 5 sec')
+
+            print("sleeping for 5 sec")
             time.sleep(5)
             vertexai.init(project=project_name, location="us-central1")
             generative_multimodal_model = GenerativeModel(model)
@@ -368,35 +365,25 @@ def chat_completion_vertex(model, conv, temperature, max_tokens, api_dict=None, 
             break
         except Exception as e:
             print(e)
-            print('sleeping for 5 sec')
+            print("sleeping for 5 sec")
             time.sleep(5)
 
     return output.strip()
 
+
 def chat_completion_google_generativeai(model, conv, temperature, max_tokens, api_dict=None):
     import google.generativeai as genai
+
     if api_dict is not None and "api_key" in api_dict:
         api_key = api_dict["api_key"]
     else:
         api_key = os.environ["GEMINI_API_KEY"]
     genai.configure(api_key=api_key)
     safety_settings = [
-        {
-            "category": "HARM_CATEGORY_HARASSMENT",
-            "threshold": "BLOCK_NONE"
-        },
-        {
-            "category": "HARM_CATEGORY_HATE_SPEECH",
-            "threshold": "BLOCK_NONE"
-        },
-        {
-            "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-            "threshold": "BLOCK_NONE"
-        },
-        {
-            "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-            "threshold": "BLOCK_NONE"
-        },
+        {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+        {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+        {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+        {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
     ]
     generation_config = {
         "temperature": temperature,
@@ -408,12 +395,11 @@ def chat_completion_google_generativeai(model, conv, temperature, max_tokens, ap
     output = API_ERROR_OUTPUT
     for _ in range(API_MAX_RETRY):
         try:
-            print('sleeping for 3 sec')
+            print("sleeping for 3 sec")
             time.sleep(3)
             gemini = genai.GenerativeModel(
-                model_name=model,
-                generation_config=generation_config,
-                safety_settings=safety_settings)
+                model_name=model, generation_config=generation_config, safety_settings=safety_settings
+            )
 
             convo = gemini.start_chat(history=[])
             prompt = conv.messages[0][1]
@@ -431,8 +417,10 @@ def chat_completion_google_generativeai(model, conv, temperature, max_tokens, ap
 
     return output
 
+
 def chat_completion_together(model, conv, temperature, max_tokens, api_dict=None):
     from together import Together
+
     if api_dict is not None and "api_key" in api_dict:
         api_key = api_dict["api_key"]
     else:
@@ -443,7 +431,7 @@ def chat_completion_together(model, conv, temperature, max_tokens, api_dict=None
         try:
             prompt = [text for role, text in conv.messages if role == "user"][0]
             stream = client.chat.completions.create(
-                model="meta-llama/"+model,
+                model="meta-llama/" + model,
                 messages=[{"role": "user", "content": prompt}],
                 stream=True,
             )
@@ -456,6 +444,7 @@ def chat_completion_together(model, conv, temperature, max_tokens, api_dict=None
             time.sleep(API_RETRY_SLEEP)
 
     return output
+
 
 def chat_completion_openai_azure(model, conv, temperature, max_tokens, api_dict=None):
     openai.api_type = "azure"
@@ -511,9 +500,7 @@ def chat_completion_anthropic(model, conv, temperature, max_tokens, api_dict=Non
                 model=model,
                 max_tokens=max_tokens,
                 temperature=temperature,
-                messages=[
-                    {"role": "user", "content": [{"type": "text", "text": prompt}]}
-                ],
+                messages=[{"role": "user", "content": [{"type": "text", "text": prompt}]}],
             )
             output = response.content[0].text
             break
@@ -534,7 +521,7 @@ def chat_completion_mistral(model, conv, temperature, max_tokens, api_dict=None)
         try:
             from mistralai.client import MistralClient
             from mistralai.models.chat_completion import ChatMessage
-            
+
             client = MistralClient(api_key=api_key)
             prompt = prompt = conv.messages[0][1]
 
@@ -542,7 +529,7 @@ def chat_completion_mistral(model, conv, temperature, max_tokens, api_dict=None)
                 model=model,
                 max_tokens=max_tokens,
                 temperature=temperature,
-                messages=[ChatMessage(role="user", content=prompt)]
+                messages=[ChatMessage(role="user", content=prompt)],
             )
 
             output = chat_response.choices[0].message.content
@@ -551,6 +538,7 @@ def chat_completion_mistral(model, conv, temperature, max_tokens, api_dict=None)
             print(type(e), e)
             time.sleep(API_RETRY_SLEEP)
     return output.strip()
+
 
 def chat_completion_cohere(model, conv, temperature, max_tokens, api_dict=None):
     if api_dict is not None and "api_key" in api_dict:
@@ -562,7 +550,7 @@ def chat_completion_cohere(model, conv, temperature, max_tokens, api_dict=None):
     for _ in range(API_MAX_RETRY):
         try:
             import cohere
-            
+
             co = cohere.Client(api_key=api_key)
             prompt = prompt = [text for role, text in conv.messages if role == "user"][0]
 
@@ -578,6 +566,7 @@ def chat_completion_cohere(model, conv, temperature, max_tokens, api_dict=None):
             print(type(e), e)
             time.sleep(API_RETRY_SLEEP)
     return output.strip()
+
 
 def chat_completion_palm(chat_state, model, conv, temperature, max_tokens):
     from fastchat.serve.api_provider import init_palm_chat
@@ -662,9 +651,7 @@ def check_data(questions, model_answers, models):
             # raise ValueError(f"Missing model answer for {m}")
         m_answer = model_answers[m]
         for q in questions:
-            assert (
-                q["question_id"] in m_answer
-            ), f"Missing model {m}'s answer to Question {q['question_id']}"
+            assert q["question_id"] in m_answer, f"Missing model {m}'s answer to Question {q['question_id']}"
 
 
 def get_model_list(answer_dir):

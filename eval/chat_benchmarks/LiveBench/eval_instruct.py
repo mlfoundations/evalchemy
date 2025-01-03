@@ -63,7 +63,7 @@ class LiveBenchBenchmark(BaseBenchmark):
         self.question_source = question_source
         self.do_sample = do_sample
         self.debug = debug
-        self.annotator_model = annotator_model
+        self.annotator_model = "none"
         self.release_date = release_date
         self.remove_existing_file = remove_existing_file
         self.num_workers = 32
@@ -131,11 +131,11 @@ class LiveBenchBenchmark(BaseBenchmark):
         else:
             raise ValueError(f"Bad question source {self.question_source}.")
 
-        questions_all = [
-            q
-            for q in questions_all
-            if q[0]["livebench_removal_date"] == "" or q[0]["livebench_removal_date"] > self.release_date
-        ]
+        # questions_all = [
+        #     q
+        #     for q in questions_all
+        #     if q[0]["livebench_removal_date"] == "" or q[0]["livebench_removal_date"] > self.release_date
+        # ]
         return questions_all
 
     def _get_model_name(self, model: LM) -> str:
@@ -166,7 +166,7 @@ class LiveBenchBenchmark(BaseBenchmark):
         # return [{"model_id": self._get_model_name(model)}]
         # Load questions
         model_name = self._get_model_name(model)
-        questions = self.get_question_list(model_name, [self.release_date])
+        questions = self.get_question_list(model_name, self.all_release_dates)
         questions = questions[self.question_begin : self.question_end]
         # Generate answers
         all_choices = {k: [{"index": i, "turns": []} for i in range(self.num_choices)] for _, k in questions}
@@ -251,6 +251,8 @@ class LiveBenchBenchmark(BaseBenchmark):
         """
         model_name = results[0]["model_id"]
         # questions = self.get_question_list(model_name,)
+        all_results = []
+        question_to_date = {}
         if self.question_source == "huggingface":
             categories, tasks = get_categories_tasks(self.dataset_name)
             if self.debug:
@@ -266,7 +268,6 @@ class LiveBenchBenchmark(BaseBenchmark):
                         self.question_begin,
                         self.question_end,
                     )
-
                     # questions = [
                     #     q
                     #     for q in questions
@@ -279,6 +280,11 @@ class LiveBenchBenchmark(BaseBenchmark):
                     answer_dir = f"{self.data_path}/{task_full_name}/model_answer/"
 
                     if len(questions) > 0:
+                        for question in questions:
+                            question_to_date[question["question_id"]] = {
+                                "livebench_removal_date": question["livebench_removal_date"],
+                                "livebench_release_date": question["livebench_release_date"],
+                            }
                         gen_judgments(
                             parallel=self.num_workers,
                             questions=questions,
@@ -288,6 +294,8 @@ class LiveBenchBenchmark(BaseBenchmark):
                             remove_existing_file=self.remove_existing_file,
                             bench_name=task_full_name,
                         )
+                    with open(output_file, "r") as f:
+                        all_results.extend([json.loads(line) for line in f])
 
         elif self.question_source == "jsonl":
             list_of_question_files = []
@@ -300,21 +308,26 @@ class LiveBenchBenchmark(BaseBenchmark):
                 )
 
             for question_file in list_of_question_files:
-                print(question_file)
+                for question in questions:
+                    question_to_date[question["question_id"]] = {
+                        "livebench_removal_date": question["livebench_removal_date"],
+                        "livebench_release_date": question["livebench_release_date"],
+                    }
                 questions = load_questions_jsonl(
-                    question_file, self.release_date, self.question_begin, self.question_end
+                    question_file, self.all_release_dates, self.question_begin, self.question_end
                 )
 
-                questions = [
-                    q
-                    for q in questions
-                    if q["livebench_removal_date"] == "" or q["livebench_removal_date"] > self.release_date
-                ]
+                # questions = [
+                #     q
+                #     for q in questions
+                #     if q["livebench_removal_date"] == "" or q["livebench_removal_date"] > self.release_date
+                # ]
 
                 bench_name = os.path.dirname(question_file).replace(f"{self.data_path}/", "")
 
                 output_file = f"{self.data_path}/{bench_name}/model_judgment/ground_truth_judgment.jsonl"
                 answer_dir = f"{self.data_path}/{bench_name}/model_answer/"
+
                 if len(questions) > 0:
                     gen_judgments(
                         parallel=self.num_workers,
@@ -324,15 +337,54 @@ class LiveBenchBenchmark(BaseBenchmark):
                         remove_existing_file=self.remove_existing_file,
                         bench_name=bench_name,
                     )
+                    with open(output_file, "r") as f:
+                        all_results.extend([json.loads(line) for line in f])
 
         else:
             raise ValueError(f"Bad question source {self.question_source}.")
 
-        # read the file and return the results
-        with open(output_file, "r") as f:
-            results = [json.loads(line) for line in f]
+        # After getting all results, calculate metrics
+        metrics = {}
+        # Group results by task and calculate averages
+        task_scores = {}
+        for entry in all_results:
+            task = entry["task"]
+            score = entry["score"]
+            if task not in task_scores:
+                task_scores[task] = []
+            task_scores[task].append(score)
 
-        return results
+        # Calculate task averages
+        for task, scores in task_scores.items():
+            metrics[f"{task}"] = sum(scores) / len(scores) * 100
+
+        # Calculate global average
+        all_scores = [entry["score"] for entry in all_results]
+        metrics["global_average"] = sum(all_scores) / len(all_scores) * 100
+
+        # Group by date if timestamp exists
+        date_scores = {}
+        for entry in all_results:
+            date = question_to_date[entry["question_id"]]["livebench_removal_date"]
+            if date not in date_scores:
+                date_scores[date] = []
+            date_scores[date].append(entry["score"])
+
+        # Calculate date averages
+        for date, scores in date_scores.items():
+            if date == "":
+                subset_name = "subset_no_date"
+            else:
+                subset_name = f"subset_{date}"
+            metrics[subset_name] = sum(scores) / len(scores) * 100
+
+        result_dict = {
+            self.annotator_model: {
+                "metrics": metrics,
+            },
+            "num_questions": len(all_results),
+        }
+        return result_dict
 
     def run_benchmark(self) -> Dict[str, float]:
         """

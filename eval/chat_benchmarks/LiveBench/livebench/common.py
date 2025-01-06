@@ -647,8 +647,7 @@ def check_data(questions, model_answers, models):
     # check model answers
     for m in models:
         if not m in model_answers:
-            breakpoint()
-            # raise ValueError(f"Missing model answer for {m}")
+            raise ValueError(f"Missing model answer for {m}")
         m_answer = model_answers[m]
         for q in questions:
             assert q["question_id"] in m_answer, f"Missing model {m}'s answer to Question {q['question_id']}"

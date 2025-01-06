@@ -131,11 +131,6 @@ class LiveBenchBenchmark(BaseBenchmark):
         else:
             raise ValueError(f"Bad question source {self.question_source}.")
 
-        # questions_all = [
-        #     q
-        #     for q in questions_all
-        #     if q[0]["livebench_removal_date"] == "" or q[0]["livebench_removal_date"] > self.release_date
-        # ]
         return questions_all
 
     def _get_model_name(self, model: LM) -> str:
@@ -316,12 +311,6 @@ class LiveBenchBenchmark(BaseBenchmark):
                 questions = load_questions_jsonl(
                     question_file, self.all_release_dates, self.question_begin, self.question_end
                 )
-
-                # questions = [
-                #     q
-                #     for q in questions
-                #     if q["livebench_removal_date"] == "" or q["livebench_removal_date"] > self.release_date
-                # ]
 
                 bench_name = os.path.dirname(question_file).replace(f"{self.data_path}/", "")
 

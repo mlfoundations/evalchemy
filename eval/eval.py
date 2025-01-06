@@ -252,10 +252,10 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
         with open(args.config, "r") as file:
             tasks_yaml = yaml.safe_load(file)
         args.tasks = ",".join([t["task_name"] for t in tasks_yaml["tasks"]])
-        batch_sizes_list = [t["batch_size"] for t in tasks_yaml["tasks"]]
+        batch_sizes_list = [int(t["batch_size"]) for t in tasks_yaml["tasks"]]
         args.annotator_model = tasks_yaml.get("annotator_model", args.annotator_model)
     else:
-        batch_sizes_list = [args.batch_size for _ in range(len(args.tasks.split(",")))]
+        batch_sizes_list = [int(args.batch_size) for _ in range(len(args.tasks.split(",")))]
 
     # Initialize evaluation tracker
     if args.output_path:

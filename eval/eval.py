@@ -506,11 +506,12 @@ def handle_evaluation_output(
     if args.use_database and not args.debug:
         evaluation_tracker.update_evalresults_db(
             results,
-            args.model_id,
-            args.model_name,
-            args.creation_location,
-            args.created_by,
-            args.is_external_model,
+            model_id=args.model_id,
+            model_source=args.model,
+            model_name=args.model_name,
+            creation_location=args.creation_location,
+            created_by=args.created_by,
+            is_external=args.is_external_model,
         )
 
     if args.log_samples:

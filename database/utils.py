@@ -14,6 +14,19 @@ from datetime import datetime, timezone
 from uuid import UUID
 import uuid
 from contextlib import contextmanager
+import openai
+
+
+def get_full_openai_model_name(alias):
+    try:
+        # Make a simple request using the alias
+        response = openai.chat.completions.create(
+            model=alias, messages=[{"role": "system", "content": "Identify the model name."}], max_tokens=1
+        )
+        # Extract and return the full model name from the response
+        return response.model
+    except Exception as e:
+        return f"An error occurred: {str(e)}"
 
 
 def create_db_engine() -> Tuple[Engine, sessionmaker]:
@@ -254,31 +267,40 @@ def get_model_from_db(id: "UUID") -> Model:
         return model_db_obj.to_dict()
 
 
-def get_or_add_model_by_name(hf_model: str):
+def get_or_add_model_by_name(model: str, model_source: str = "hf"):
     """
-    Given hf_model path, return UUID of hf_model.
+    Given model path, return UUID of model.
     Checks for existence by using git commit hash.
     If doesn't exist in DB, create an entry and return UUID of entry.
     If there exists more than one entry in DB, return UUID of latest model by last_modified.
 
     Args:
-        hf_model (str): The path or identifier for the Hugging Face model.
+        model (str): The path or identifier for the Hugging Face or other model.
     """
-    git_commit_hash = HfApi().model_info(hf_model).sha
+    if model_source == "hf":
+        git_commit_hash = HfApi().model_info(model).sha
+    else:
+        if "openai" in model_source:
+            model = get_full_openai_model_name(model)
+        git_commit_hash = model + "_" + datetime.now(timezone.utc).strftime("%Y-%m-%d-%H-%M-%S")
+
     with session_scope() as session:
         model_instances = (
             session.query(Model)
-            .filter(Model.weights_location == hf_model)
+            .filter(Model.weights_location == model)
             .filter(Model.git_commit_hash == git_commit_hash)
             .all()
         )
         model_instances = [i.to_dict() for i in model_instances]
 
-    if len(model_instances) == 0:
-        print(f"{hf_model} doesn't exist in database. Creating entry:")
-        return register_hf_model_to_db(hf_model)
+    if len(model_instances) == 0 and model_source == "hf":
+        print(f"{model} doesn't exist in database. Creating entry:")
+        return register_hf_model_to_db(model)
+    elif len(model_instances) == 0:
+        print(f"{model} doesn't exist in database. Creating entry:")
+        return register_model_to_db(model, model_source)
     elif len(model_instances) > 1:
-        print(f"WARNING: Model {hf_model} has multiple entries in DB. Returning latest match.")
+        print(f"WARNING: Model {model} has multiple entries in DB. Returning latest match.")
         model_instances = sorted(model_instances, key=lambda x: (x["last_modified"] is not None, x["last_modified"]))
         for i in model_instances:
             print(f"id: {i['id']}, git_commit_hash: {i['git_commit_hash']}")
@@ -349,6 +371,53 @@ def register_hf_model_to_db(hf_model: str, force: bool = False):
         )
 
         # Add and commit to database
+        session.add(model)
+        session.commit()
+        print(f"Model successfully registered to db! {model}")
+
+    return id
+
+
+def register_model_to_db(model_name: str, model_source: str) -> UUID:
+    """
+    Registers a new model to the database for non-HuggingFace models.
+
+    Args:
+        model_name (str): The name or identifier for the model
+        model_source (str): Source of the model (e.g., 'openai-chat-completions', 'anthropic')
+
+    Returns:
+        UUID: The unique identifier assigned to the registered model
+
+    Raises:
+        ValueError: If the model cannot be registered due to missing metadata
+    """
+    id = uuid.uuid4()
+    creation_time = datetime.now(timezone.utc)
+
+    # Create a unique git_commit_hash-like identifier using timestamp
+    git_commit_hash = f"{model_name}_{creation_time.strftime('%Y-%m-%d-%H-%M-%S')}"
+
+    with session_scope() as session:
+        model = Model(
+            id=id,
+            name=model_name,
+            base_model_id=id,
+            created_by=model_source,
+            creation_location=model_source,
+            creation_time=creation_time,
+            training_start=creation_time,
+            training_end=creation_time,
+            training_parameters=None,
+            training_status=None,
+            dataset_id=None,
+            is_external=True,
+            weights_location=model_name,
+            wandb_link=None,
+            git_commit_hash=git_commit_hash,
+            last_modified=creation_time,
+        )
+
         session.add(model)
         session.commit()
         print(f"Model successfully registered to db! {model}")

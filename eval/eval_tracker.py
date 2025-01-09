@@ -179,7 +179,9 @@ class DCEvaluationTracker:
         else:
             eval_logger.info("Output path not provided, skipping saving results aggregated")
 
-    def get_or_create_model(self, model_name: str, model_id: Optional[str]) -> Tuple[uuid.UUID, uuid.UUID]:
+    def get_or_create_model(
+        self, model_name: str, model_id: Optional[str], model_source: str = "hf"
+    ) -> Tuple[uuid.UUID, uuid.UUID]:
         """
         Retrieve an existing model or create a new one in the database.
 
@@ -196,7 +198,7 @@ class DCEvaluationTracker:
         assert model_name or model_id
         try:
             if not model_id:
-                model_id = get_or_add_model_by_name(model_name)
+                model_id = get_or_add_model_by_name(model_name, model_source)
             model_configs = get_model_from_db(model_id)
             return model_id, model_configs["dataset_id"]
         except Exception as e:
@@ -333,6 +335,7 @@ class DCEvaluationTracker:
         self,
         eval_log_dict: Dict[str, Any],
         model_id: Optional[str],
+        model_source: str = "hf",
         model_name: Optional[str] = None,
         creation_location: Optional[str] = None,
         created_by: Optional[str] = None,
@@ -344,6 +347,7 @@ class DCEvaluationTracker:
         Args:
             eval_log_dict: Dictionary containing evaluation logs and results
             model_id: Optional UUID of the model
+            model_source: Source of the model (similar to the model arg in eval.py)
             model_name: Optional name of the model
             creation_location: Location where evaluation was run
             created_by: Username who ran the evaluation
@@ -359,11 +363,18 @@ class DCEvaluationTracker:
                 args_dict = simple_parse_args_string(eval_log_dict["config"]["model_args"])
                 model_name = args_dict["pretrained"]
 
-            weights_location = (
-                f"https://huggingface.co/{model_name}" if is_external and check_hf_model_exists(model_name) else "NA"
-            )
+            if model_source == "hf":
+                weights_location = (
+                    f"https://huggingface.co/{model_name}"
+                    if is_external and check_hf_model_exists(model_name)
+                    else "NA"
+                )
+            else:
+                weights_location = "NA"
 
-            model_id, dataset_id = self.get_or_create_model(model_name=model_name, model_id=model_id)
+            model_id, dataset_id = self.get_or_create_model(
+                model_name=model_name, model_id=model_id, model_source=model_source
+            )
             eval_logger.info(f"Updating results for model_id: {str(model_id)}")
 
             results = eval_log_dict["results"]

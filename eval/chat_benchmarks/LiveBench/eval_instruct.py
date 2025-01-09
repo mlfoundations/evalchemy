@@ -27,6 +27,7 @@ from eval.chat_benchmarks.LiveBench.livebench.common import (
 )
 from eval.chat_benchmarks.LiveBench.livebench.gen_ground_truth_judgment import gen_judgments
 from eval.task import BaseBenchmark
+from eval.chat_benchmarks.LiveBench.livebench.model import get_conversation_template
 
 
 class LiveBenchBenchmark(BaseBenchmark):
@@ -37,7 +38,7 @@ class LiveBenchBenchmark(BaseBenchmark):
     def __init__(
         self,
         dtype: str = "float32",
-        max_new_token: int = 256,
+        max_new_token: int = 4096,
         dataset_name: str = "live_bench",
         question_source: str = "huggingface",
         temperature: float = 0.0,
@@ -79,7 +80,7 @@ class LiveBenchBenchmark(BaseBenchmark):
             self.max_tokens = max_new_token
         self.temperature = temperature
         self.num_choices = num_choices
-        self.all_release_dates = ["2024-07-26", "2024-06-24", "2024-08-31"]
+        self.all_release_dates = ["2024-07-26", "2024-06-24", "2024-08-31", "2024-11-25"]
 
         self.data_path = f"eval/chat_benchmarks/LiveBench/data"
 
@@ -164,27 +165,31 @@ class LiveBenchBenchmark(BaseBenchmark):
         questions = self.get_question_list(model_name, self.all_release_dates)
         questions = questions[self.question_begin : self.question_end]
         # Generate answers
-        all_choices = {k: [{"index": i, "turns": []} for i in range(self.num_choices)] for _, k in questions}
+        all_choices = {}
+        for idx, (_, answer_file) in enumerate(questions):
+            if answer_file not in all_choices:
+                all_choices[answer_file] = {}
+            all_choices[answer_file][idx] = [{"index": i, "turns": []} for i in range(self.num_choices)]
         all_instances = []
         max_turns = max(len(q["turns"]) for q, _ in questions)
         if model.rank == 0:
             tqdm_gen = tqdm(range(self.num_choices * max_turns * len(questions)))
         for choice_num in range(self.num_choices):
-            all_convs = [[] for _ in questions]
+            all_convs = [get_conversation_template(model_name) for _ in questions]
             for turn_num in range(max_turns):
                 for idx, (question, answer_file) in enumerate(questions):
                     if turn_num < len(question["turns"]):
                         qs = question["turns"][turn_num]
-                        all_convs[idx].append({"role": "user", "content": qs})
+                        all_convs[idx].append_message(all_convs[idx].roles[0], qs)
+                        all_convs[idx].append_message(all_convs[idx].roles[1], None)
 
-                        prompt = model.apply_chat_template(all_convs[idx])
-
+                        prompt = all_convs[idx].get_prompt()
                         all_instances.append(
                             Instance(
                                 "generate_until",
                                 all_convs[idx],
                                 (
-                                    prompt,
+                                    str(prompt),
                                     {
                                         "max_gen_toks": self.max_tokens,
                                         "do_sample": self.temperature >= 1e-4,
@@ -204,32 +209,33 @@ class LiveBenchBenchmark(BaseBenchmark):
                     outputs = self.compute(model, all_instances)
 
                     for idx, output in enumerate(outputs):
-                        all_convs[idx].append({"role": "assistant", "content": output})
+                        all_convs[idx].update_last_message(output)
             for idx, (_, answer_file) in enumerate(questions):
                 choice_idx = choice_num  # Current choice index
-                all_choices[answer_file][choice_idx]["turns"] = [
-                    c["content"] for c in all_convs[idx] if c["role"] == "assistant"
+                all_choices[answer_file][idx][choice_idx]["turns"] = [
+                    c[1] for c in all_convs[idx].messages if c[0].lower() == "assistant"
                 ]
 
+        print(f"Rank: {model.rank}, finished generating")
         if model.rank != 0:
             return all_choices
 
         results = []
         for idx, (question, answer_file) in enumerate(questions):
             os.makedirs(os.path.dirname(answer_file), exist_ok=True)
-            print(f"Writing to {answer_file}")
-            print(f"Writing {all_choices[answer_file]}")
+            # print(f"Writing to {answer_file}")
+            # print(f"Writing {all_choices[answer_file]}")
             with open(os.path.expanduser(answer_file), "a") as fout:
                 ans_json = {
                     "question_id": question["question_id"],
                     "answer_id": shortuuid.uuid(),
                     "model_id": model_name,
-                    "choices": all_choices[answer_file],
+                    "choices": all_choices[answer_file][idx],
                     "tstamp": time.time(),
                 }
                 results.append(ans_json)
                 fout.write(json.dumps(ans_json) + "\n")
-            print(f"Wrote {answer_file}")
+            # print(f"Wrote {answer_file}")
             reorg_answer_file(answer_file)
 
         return results
@@ -248,6 +254,7 @@ class LiveBenchBenchmark(BaseBenchmark):
         # questions = self.get_question_list(model_name,)
         all_results = []
         question_to_date = {}
+        print("Evaluating")
         if self.question_source == "huggingface":
             categories, tasks = get_categories_tasks(self.dataset_name)
             if self.debug:
@@ -332,20 +339,30 @@ class LiveBenchBenchmark(BaseBenchmark):
         else:
             raise ValueError(f"Bad question source {self.question_source}.")
 
+        print("Finished evaluating, calculating metrics")
         # After getting all results, calculate metrics
         metrics = {}
         # Group results by task and calculate averages
         task_scores = {}
+        category_scores = {}
         for entry in all_results:
             task = entry["task"]
+            category = entry["category"]
             score = entry["score"]
             if task not in task_scores:
                 task_scores[task] = []
             task_scores[task].append(score)
+            if category not in category_scores:
+                category_scores[category] = []
+            category_scores[category].append(score)
 
         # Calculate task averages
         for task, scores in task_scores.items():
             metrics[f"{task}"] = sum(scores) / len(scores) * 100
+
+        # Calculate category averages
+        for category, scores in category_scores.items():
+            metrics[f"{category}"] = sum(scores) / len(scores) * 100
 
         # Calculate global average
         all_scores = [entry["score"] for entry in all_results]

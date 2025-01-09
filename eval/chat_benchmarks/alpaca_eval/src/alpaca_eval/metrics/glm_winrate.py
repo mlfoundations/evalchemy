@@ -122,9 +122,12 @@ def get_length_controlled_winrate(
         save_weights_dir.mkdir(exist_ok=True, parents=True)
         weights_path = save_weights_dir / f"baseline_{baseline_name}.csv"
         if weights_path.exists():
-            saved_weights = pd.read_csv(weights_path, index_col=0)
-            new_weights = pd.DataFrame(weights, index=[model_name])
-            saved_weights = pd.concat([saved_weights, new_weights], axis=0)
+            try:
+                saved_weights = pd.read_csv(weights_path, index_col=0)
+                new_weights = pd.DataFrame(weights, index=[model_name])
+                saved_weights = pd.concat([saved_weights, new_weights], axis=0)
+            except:
+                saved_weights = pd.DataFrame(weights, index=[model_name])
         else:
             saved_weights = pd.DataFrame(weights, index=[model_name])
         saved_weights = saved_weights[~saved_weights.index.duplicated(keep="last")]

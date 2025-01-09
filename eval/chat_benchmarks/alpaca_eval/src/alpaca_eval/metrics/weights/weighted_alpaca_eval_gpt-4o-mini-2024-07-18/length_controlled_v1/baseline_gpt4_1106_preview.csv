@@ -1,0 +1,2 @@
+,np.tanh(std_delta_len),instruction_difficulty,not_gamed_baseline.astype(float)
+"model_hf_model_args_pretrained=penfever__Llama-3-8B-WildChat-500k-8B-2blend,dtype=bfloat16",-1.5944321215706829,0.4904819163456168,-1.6050463989884014

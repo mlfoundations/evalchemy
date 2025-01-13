@@ -47,6 +47,22 @@ def get_function_name(question: str, lang: str):
     return func_name, func_prefix
 
 
+def get_code_block(input: str, lang: str):
+    input = input.split("\n")
+    beg = 0
+    while not input[0].strip().startswith("```") and beg < len(input) - 2:
+        beg += 1
+    # Remove the code block quotes
+    beg += 1
+    end = len(input)
+    while not input[-1].strip().endswith("```") and end > 1:
+        end -= 1
+    # Remove the code block quotes
+    end -= 1
+    input = input[beg:end]
+    return "\n".join(input)
+
+
 def extract_generation_code(example: str, lang_code: str, verbose: bool = False):
     task_id = example["task_id"]
     output = example.get("output", example.get("gpt_completion"))
@@ -56,6 +72,12 @@ def extract_generation_code(example: str, lang_code: str, verbose: bool = False)
     indent = setting["indent"]
 
     try:
+        func_name, func_prefix = get_function_name(question, lang)
+
+        # If the model did not repeat the question, add it to the output
+        if func_name not in output:
+            output = "```" + lang + "\n" + question + "\n" + get_code_block(output, lang_code) + "\n```"
+
         code_block: str = re.findall(f"```{lang.lower()}\n(.*?)```", output, re.DOTALL | re.IGNORECASE)[0]
         if verbose:
             print(">>> Task: {}\n{}".format(task_id, code_block))
@@ -64,8 +86,6 @@ def extract_generation_code(example: str, lang_code: str, verbose: bool = False)
         if setting.get("main", None) and setting["main"] in code_block:
             main_start = code_block.index(setting["main"])
             code_block = code_block[:main_start]
-
-        func_name, func_prefix = get_function_name(question, lang)
 
         try:
             start = code_block.lower().index(func_name.lower())

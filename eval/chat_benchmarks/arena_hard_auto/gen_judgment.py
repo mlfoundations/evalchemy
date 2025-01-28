@@ -131,10 +131,14 @@ def judgment(**args):
 #     args = parser.parse_args()
 #     print(args)
 
-def execute_judgment(setting_file = "eval/chat_benchmarks/arena_hard_auto/config/judge_config.yaml", endpoint_file = "eval/chat_benchmarks/arena_hard_auto/config/api_config.yaml", model_name = "gpt-3.5-turbo-0125"):
+def execute_judgment(setting_file = "eval/chat_benchmarks/arena_hard_auto/config/judge_config.yaml", endpoint_file = "eval/chat_benchmarks/arena_hard_auto/config/api_config.yaml", model_name = "gpt-3.5-turbo-0125", judge_model = "gpt-4o-mini-2024-07-18"):
     configs = make_config(setting_file)
     endpoint_list = make_config(endpoint_file)
 
+    # override the default judge model in judge_config.yaml 
+    # ensure that judge model has config in api_config.yaml 
+    configs["judge_model"] = judge_model
+    
     print(f'judge model: {configs["judge_model"]}, baseline: {configs["baseline"]}, baseline model: {configs["baseline_model"]}, reference: {configs["reference"]}, '
           + f'reference models: {configs["ref_model"]}, temperature: {configs["temperature"]}, max tokens: {configs["max_tokens"]}, pairwise: {configs["pairwise"]}')
 

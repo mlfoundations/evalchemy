@@ -7,6 +7,7 @@ import pandas as pd
 import shortuuid
 import subprocess
 import json
+import tiktoken
 
 from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
@@ -26,7 +27,7 @@ class ArenaHardBenchmark(BaseBenchmark):
         temperature: float = 0.5,
         do_sample: bool = True,
         debug: bool = False,
-        annotator_model: str = "gpt-4o-mini-2024-07-18",
+        annotator_model: str = "auto",
         logger: Optional[logging.Logger] = None,
     ):
         """
@@ -70,7 +71,7 @@ class ArenaHardBenchmark(BaseBenchmark):
         try:
             examples = self.load_questions()
             all_instances = []
-            for idx, example in enumerate(examples[:2]):
+            for idx, example in enumerate(examples):
                 try:
                     instruction = example['turns'][0]['content']
                     formatted_instruction = model.apply_chat_template([{"role": "user", "content": instruction}])
@@ -104,12 +105,13 @@ class ArenaHardBenchmark(BaseBenchmark):
             model_outputs = []
             for idx, (example, output) in enumerate(zip(examples, outputs)):
                 try:
+                    encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
                     instance = {
                         "question_id": example["question_id"],
                         "answer_id": shortuuid.uuid(),
                         "model_id": model.model_identifier,
                         ## TODO: fix token_len computation -- currently 1.3 * len(output)
-                        "choices": [{"index":0,"turns":[{"content": output,"token_len": 1.3 * len(output)}]}],
+                        "choices": [{"index":0,"turns":[{"content": output,"token_len": len(encoding.encode(output, disallowed_special=()))}]}],
                     }
                     with open(f"eval/chat_benchmarks/arena_hard_auto/data/arena-hard-v0.1/model_answer/{model.model_identifier}.jsonl", "a") as f:
                         f.write(json.dumps(instance, ensure_ascii=False) + "\n")
@@ -120,14 +122,13 @@ class ArenaHardBenchmark(BaseBenchmark):
 
             self.logger.info(f"Generated {len(model_outputs)} responses")
 
-            return model.model_identifier
-            # return {"model_outputs": model_outputs, "model_identifier": model.model_identifier}
+            return {"model_outputs": model_outputs, "model_identifier": model.model_identifier}
 
         except Exception as e:
             self.logger.error(f"Error in generate_responses: {str(e)}")
             raise
 
-    def evaluate_responses(self, model_name: str) -> Dict[str, float]:
+    def evaluate_responses(self, model_results: Dict) -> Dict[str, float]:
         """
         Evaluate the generated responses using Arena Hard evaluation metrics.
 
@@ -139,17 +140,18 @@ class ArenaHardBenchmark(BaseBenchmark):
         """
         
         self.logger.info("Running Arena Hard judgements...")
+        model_name = model_results['model_identifier']
         print(f'model name: {model_name}')
-        print(1/0)
-        execute_judgment(model_name = model_name)
+        print(f'annotator model: {self.annotator_model}')
+        execute_judgment(model_name = model_name, judge_model = self.annotator_model)
         
         ## save a leaderboard in leaderboard dir
         subprocess.run(['python', '-m', 'eval.chat_benchmarks.arena_hard_auto.show_result', '--judge-name', f'{self.annotator_model}', '--output'])
         df = pd.read_csv(f'eval/chat_benchmarks/arena_hard_auto/leaderboard/arena_hard_leaderboard_{self.annotator_model}.csv')
         ## find our model name using model_identifier and pick the row
-        results = process_df()
+        model_results = df.loc[df['model']==model_name]
         
-        return {'results': results}
+        return {'results': {'score': model_results['score'].iloc[0], 'avg_tokens':model_results['avg_tokens'].iloc[0]}}
 
     def run_benchmark(self, model: LM) -> Dict[str, float]:
         """
@@ -164,11 +166,7 @@ class ArenaHardBenchmark(BaseBenchmark):
         self.logger.info("Starting Alpaca benchmark evaluation")
         try:
             generation_results = self.generate_responses(model)
-
-            if generation_results is None:
-                return None
-            
-            evaluation_results = self.evaluate_responses(model_name=model.model_identifier)
+            evaluation_results = self.evaluate_responses(generation_results)
             evaluation_results.update(
                 {"benchmark_version": "arena_hard_auto", "temperature": self.temperature, "max_tokens": self.max_tokens}
             )

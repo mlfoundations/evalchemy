@@ -145,6 +145,25 @@ Now, begin with the [ASSESS] action for the following task:
         {final formatted, precise, and clear solution} \
         <|end_of_solution|> \
         Now, try to solve the following question through the above guidelines:",
+    "open-thoughts/open-thinker-7B": "Your role as an assistant involves thoroughly exploring questions through a systematic long \
+        thinking process before providing the final precise and accurate solutions. This requires \
+        engaging in a comprehensive cycle of analysis, summarizing, exploration, reassessment, reflection, \
+        backtracing, and iteration to develop well-considered thinking process. \
+        Please structure your response into two main sections: Thought and Solution. \
+        In the Thought section, detail your reasoning process using the specified format: \
+        <|begin_of_thought|> {thought with steps separated with '\n\n'} \
+        <|end_of_thought|> \
+        Each step should include detailed considerations such as analisying questions, summarizing \
+        relevant findings, brainstorming new ideas, verifying the accuracy of the current steps, refining \
+        any errors, and revisiting previous steps. \
+        In the Solution section, based on various attempts, explorations, and reflections from the Thought \
+        section, systematically present the final solution that you deem correct. The solution should \
+        remain a logical, accurate, concise expression style and detail necessary step needed to reach the \
+        conclusion, formatted as follows: \
+        <|begin_of_solution|> \
+        {final formatted, precise, and clear solution} \
+        <|end_of_solution|> \
+        Now, try to solve the following question through the above guidelines:",
     "openai/o1-mini": "Question: {input}\nAnswer: ",
     "openai/o1-preview": "Question: {input}\nAnswer: ",
     "openai/gpt-4o-mini": "User: {input}\nPlease reason step by step, and put your final answer within \\boxed{{}}.\n\nAssistant:",
@@ -174,4 +193,5 @@ MODEL_TO_NAME = {
     "mlfoundations-dev/Bespoke-Stratos-17k-v2": "Bespoke-Stratos-17k-v2",
     "mlfoundations-dev/DCFT-Stratos-Verified-114k-7B-4gpus": "DCFT-Stratos-Verified-114k-7B-4gpus",
     "mlfoundations-dev/Bespoke-Stratos-35k-32b": "DCFT-Bespoke-Stratos-35k-32b",
+    "open-thoughts/open-thinker-7B": "open-thinker-7B",
 }

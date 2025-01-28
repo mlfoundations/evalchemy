@@ -1,0 +1,2 @@
+,win_rate,standard_error,mode,avg_length,n_wins,n_wins_base,n_draws,n_total,discrete_win_rate,length_controlled_winrate,lc_standard_error
+"model_curator_model_args_pretrained=claude-3-5-haiku-20241022,tokenized_requests=False,batch_size=1",1.164905949480044e-08,1.0075340561854773e-08,community,767,0,2,0,2,0.0,0.06762320291059314,0.002549102616915971

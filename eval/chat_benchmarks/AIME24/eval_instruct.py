@@ -62,7 +62,10 @@ class AIME24Benchmark(BaseBenchmark):
             model_name = model.pretrained
         else:
             model_name = model.model_args["model"]
-        system_prompt = SYSTEM_PROMPT[model_name]
+        try:
+            system_prompt = SYSTEM_PROMPT[model_name]
+        except KeyError:
+            system_prompt = "You are a helpful and harmless assistant. You should think step-by-step."
         for idx, example in enumerate(examples):
             messages = [
                 {"role": "system", "content": system_prompt},

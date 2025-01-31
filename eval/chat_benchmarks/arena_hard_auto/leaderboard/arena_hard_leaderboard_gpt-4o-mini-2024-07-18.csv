@@ -1,0 +1,5 @@
+model,score,rating_q025,rating_q975,CI,avg_tokens,date
+gpt-4-0314,50.0,50.0,50.0,"(-0.00, +0.00)",423.0,2025-01-27
+gpt-3.5-turbo-0125,30.0,22.19,39.07,"(-7.81, +9.07)",329.0,2025-01-27
+"model_hf_model_args_pretrained=Qwen__Qwen1.5-1.8B-Chat,batch_size=2",5.56,3.63,7.73,"(-1.93, +2.17)",635.0,2025-01-27
+"model_hf_model_args_pretrained=Qwen__Qwen1.5-1.8B,batch_size=2",0.0,0.0,0.0,"(-0.00, +0.00)",0.0,2025-01-27

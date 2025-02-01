@@ -1,0 +1,2 @@
+ga025.hpc.nyu.edu slots=4
+ga026.hpc.nyu.edu slots=4

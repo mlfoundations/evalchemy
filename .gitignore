@@ -225,4 +225,16 @@ eval/chat_benchmarks/MixEval/mix_eval/data/test/
 eval/chat_benchmarks/MixEval/mix_eval/data/model_responses
 eval/chat_benchmarks/MixEval/mix_eval/eval_scripts
 eval/chat_benchmarks/MixEval/results
+<<<<<<< HEAD
+
+# MT Bench Data
+eval/chat_benchmarks/MTBench/fastchat/llm_judge/data
+
+# Local logs, scripts and results
+results
+logs
+script
+offload
+=======
 results/
+>>>>>>> e1ff09cde1541e41c48f2b76ab4ef4250cb7cfd2

@@ -51,7 +51,6 @@ class ArenaHardBenchmark(BaseBenchmark):
         self.debug = debug
         self.annotator_model = annotator_model
 
-    
     def load_questions(self) -> List[Dict[str, str]]:
         """Load Arena-Hard-Auto questions from the data file."""
         with open(self.data_file, "r") as f:
@@ -74,7 +73,7 @@ class ArenaHardBenchmark(BaseBenchmark):
             all_instances = []
             for idx, example in enumerate(examples[:1]):
                 try:
-                    instruction = example['turns'][0]['content']
+                    instruction = example["turns"][0]["content"]
                     formatted_instruction = model.apply_chat_template([{"role": "user", "content": instruction}])
 
                     all_instances.append(
@@ -112,9 +111,22 @@ class ArenaHardBenchmark(BaseBenchmark):
                         "answer_id": shortuuid.uuid(),
                         "model_id": model.model_identifier,
                         ## TODO: fix token_len computation -- currently 1.3 * len(output)
-                        "choices": [{"index":0,"turns":[{"content": output,"token_len": len(encoding.encode(output, disallowed_special=()))}]}],
+                        "choices": [
+                            {
+                                "index": 0,
+                                "turns": [
+                                    {
+                                        "content": output,
+                                        "token_len": len(encoding.encode(output, disallowed_special=())),
+                                    }
+                                ],
+                            }
+                        ],
                     }
-                    with open(f"eval/chat_benchmarks/arena_hard_auto/data/arena-hard-v0.1/model_answer/{model.model_identifier}.jsonl", "a") as f:
+                    with open(
+                        f"eval/chat_benchmarks/arena_hard_auto/data/arena-hard-v0.1/model_answer/{model.model_identifier}.jsonl",
+                        "a",
+                    ) as f:
                         f.write(json.dumps(instance, ensure_ascii=False) + "\n")
                     model_outputs.append(instance)
                 except Exception as e:
@@ -139,19 +151,19 @@ class ArenaHardBenchmark(BaseBenchmark):
         Returns:
             Dictionary containing evaluation metrics
         """
-        
+
         self.logger.info("Running Arena Hard judgements...")
-        model_name = model_results['model_identifier']
-        print(f'model name: {model_name}')
-        print(f'annotator model: {self.annotator_model}')
-        execute_judgment(model_name = model_name, judge_model = self.annotator_model)
-        
+        model_name = model_results["model_identifier"]
+        print(f"model name: {model_name}")
+        print(f"annotator model: {self.annotator_model}")
+        execute_judgment(model_name=model_name, judge_model=self.annotator_model)
+
         ## save a leaderboard in leaderboard dir
         df = generate_arena_hard_leaderboard(judge_name=self.annotator_model)
         ## find our model name using model_identifier and pick the row
-        model_results = df.loc[df['model']==model_name]
-        
-        return {'results': {'score': model_results['score'].iloc[0], 'avg_tokens':model_results['avg_tokens'].iloc[0]}}
+        model_results = df.loc[df["model"] == model_name]
+
+        return {"results": {"score": model_results["score"].iloc[0], "avg_tokens": model_results["avg_tokens"].iloc[0]}}
 
     def run_benchmark(self, model: LM) -> Dict[str, float]:
         """

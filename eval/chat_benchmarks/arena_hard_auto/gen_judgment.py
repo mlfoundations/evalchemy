@@ -56,12 +56,7 @@ def judgment(**args):
 
     num_games = 2 if configs["pairwise"] else 1
 
-    output = {
-        "question_id": question["question_id"],
-        "model": answer["model_id"],
-        "judge": model,
-        "games": []
-        }
+    output = {"question_id": question["question_id"], "model": answer["model_id"], "judge": model, "games": []}
 
     for game in range(num_games):
         conv = [{"role": "system", "content": configs["system_prompt"]}]
@@ -74,7 +69,7 @@ def judgment(**args):
             base = 1
 
             if baseline:
-                if game % 2 == 1: # swap position
+                if game % 2 == 1:  # swap position
                     answer, baseline = baseline, answer
 
                 for i, turn in enumerate(baseline["choices"][0]["turns"]):
@@ -88,12 +83,12 @@ def judgment(**args):
                 for j, ref_answer in enumerate(reference):
                     for i, turn in enumerate(ref_answer["choices"][0]["turns"]):
                         prompt_args[f"ref_answer_{i+j+1}"] = turn["content"]
-            
+
             user_prompt = template.format(**prompt_args)
             conv.append({"role": "user", "content": user_prompt})
 
         judgment = ""
-        for _ in range(configs['number_of_judgment_attempts']):
+        for _ in range(configs["number_of_judgment_attempts"]):
             new_judgment = get_answer(
                 endpoint_info["model_name"],
                 conv,
@@ -102,7 +97,7 @@ def judgment(**args):
                 args["endpoint_dict"],
             )
 
-            judgment += ("\n" + new_judgment)
+            judgment += "\n" + new_judgment
 
             score, try_again = get_score(judgment, args["regex_pattern"])
 
@@ -111,13 +106,11 @@ def judgment(**args):
             if not try_again:
                 break
 
-            conv.append({"role": "user", "content": "continue your judgment and finish by outputting a final verdict label"})
+            conv.append(
+                {"role": "user", "content": "continue your judgment and finish by outputting a final verdict label"}
+            )
 
-        result = {
-            "user_prompt": conv[1]["content"],
-            "judgment": judgment,
-            "score": score
-        }
+        result = {"user_prompt": conv[1]["content"], "judgment": judgment, "score": score}
         output["games"].append(result)
 
     with open(output_file, "a") as f:
@@ -131,38 +124,50 @@ def judgment(**args):
 #     args = parser.parse_args()
 #     print(args)
 
-def execute_judgment(setting_file = "eval/chat_benchmarks/arena_hard_auto/config/judge_config.yaml", endpoint_file = "eval/chat_benchmarks/arena_hard_auto/config/api_config.yaml", model_name = "gpt-3.5-turbo-0125", judge_model = "gpt-4o-mini-2024-07-18"):
+
+def execute_judgment(
+    setting_file="eval/chat_benchmarks/arena_hard_auto/config/judge_config.yaml",
+    endpoint_file="eval/chat_benchmarks/arena_hard_auto/config/api_config.yaml",
+    model_name="gpt-3.5-turbo-0125",
+    judge_model="gpt-4o-mini-2024-07-18",
+):
     configs = make_config(setting_file)
     endpoint_list = make_config(endpoint_file)
 
-    # override the default judge model in judge_config.yaml 
-    # ensure that judge model has config in api_config.yaml 
+    # override the default judge model in judge_config.yaml
+    # ensure that judge model has config in api_config.yaml
     configs["judge_model"] = judge_model
-    
-    print(f'judge model: {configs["judge_model"]}, baseline: {configs["baseline"]}, baseline model: {configs["baseline_model"]}, reference: {configs["reference"]}, '
-          + f'reference models: {configs["ref_model"]}, temperature: {configs["temperature"]}, max tokens: {configs["max_tokens"]}, pairwise: {configs["pairwise"]}')
+
+    print(
+        f'judge model: {configs["judge_model"]}, baseline: {configs["baseline"]}, baseline model: {configs["baseline_model"]}, reference: {configs["reference"]}, '
+        + f'reference models: {configs["ref_model"]}, temperature: {configs["temperature"]}, max tokens: {configs["max_tokens"]}, pairwise: {configs["pairwise"]}'
+    )
 
     if configs["regex_pattern"]:
         pattern = re.compile(configs["regex_pattern"])
 
     question_file = os.path.join("eval/chat_benchmarks/arena_hard_auto/data", configs["bench_name"], "question.jsonl")
     answer_dir = os.path.join("eval/chat_benchmarks/arena_hard_auto/data", configs["bench_name"], "model_answer")
-    ref_answer_dir = os.path.join("eval/chat_benchmarks/arena_hard_auto/data", configs["bench_name"], "reference_answer")
+    ref_answer_dir = os.path.join(
+        "eval/chat_benchmarks/arena_hard_auto/data", configs["bench_name"], "reference_answer"
+    )
 
     questions = load_questions(question_file)
     model_answers = load_model_answers(answer_dir)
-    
+
     # if user choose a set of models, only judge those models
     # models = [model for model in configs["model_list"]]
     models = [model_name]
-        
+
     ref_answers = None
     if configs["reference"]:
         ref_answers = load_model_answers(ref_answer_dir)
         ref_answers = [ref_answers[model] for model in configs["ref_model"]]
-    
+
     output_files = {}
-    output_dir = f"eval/chat_benchmarks/arena_hard_auto/data/{configs['bench_name']}/model_judgment/{configs['judge_model']}"
+    output_dir = (
+        f"eval/chat_benchmarks/arena_hard_auto/data/{configs['bench_name']}/model_judgment/{configs['judge_model']}"
+    )
     for model in models:
         output_files[model] = os.path.join(
             output_dir,
@@ -175,9 +180,9 @@ def execute_judgment(setting_file = "eval/chat_benchmarks/arena_hard_auto/config
     existing_judgments = load_model_answers(output_dir)
 
     endpoint_info = endpoint_list[configs["judge_model"]]
-    print(f'endpoint info: {endpoint_info}')
+    print(f"endpoint info: {endpoint_info}")
     # print(2/0)
-    
+
     with concurrent.futures.ThreadPoolExecutor(max_workers=endpoint_info["parallel"]) as executor:
         futures = []
         for model in models:
@@ -215,7 +220,5 @@ def execute_judgment(setting_file = "eval/chat_benchmarks/arena_hard_auto/config
             if count > 0:
                 print(f"{count} number of existing judgments")
 
-        for future in tqdm(
-            concurrent.futures.as_completed(futures), total=len(futures)
-        ):
+        for future in tqdm(concurrent.futures.as_completed(futures), total=len(futures)):
             future.result()

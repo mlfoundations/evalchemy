@@ -1,3 +1,17 @@
+# Arena-Hard-Auto at Evalchemy 
+
+Must specify annotator model to smoothly run judgement aggregation and get win rate. 
+
+```
+python -m eval.eval\
+    --model hf\
+    --tasks arena_hard_auto\
+    --model_args "pretrained=Qwen/Qwen1.5-1.8B-Chat" \
+    --batch_size 2 \
+    --output_path logs \
+    --annotator_model gpt-4o-mini-2024-07-18 \ 
+```
+
 # Arena-Hard-Auto
 
 > 🚨 New feature: **Style Control** is now added to Arena Hard Auto! Check this [section](#style-control) to start using style control!

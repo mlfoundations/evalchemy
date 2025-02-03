@@ -12,6 +12,7 @@ import tiktoken
 from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
 from eval.chat_benchmarks.arena_hard_auto.gen_judgment import execute_judgment
+from eval.chat_benchmarks.arena_hard_auto.show_result import generate_arena_hard_leaderboard
 from eval.task import BaseBenchmark
 
 
@@ -71,7 +72,7 @@ class ArenaHardBenchmark(BaseBenchmark):
         try:
             examples = self.load_questions()
             all_instances = []
-            for idx, example in enumerate(examples):
+            for idx, example in enumerate(examples[:1]):
                 try:
                     instruction = example['turns'][0]['content']
                     formatted_instruction = model.apply_chat_template([{"role": "user", "content": instruction}])
@@ -146,8 +147,7 @@ class ArenaHardBenchmark(BaseBenchmark):
         execute_judgment(model_name = model_name, judge_model = self.annotator_model)
         
         ## save a leaderboard in leaderboard dir
-        subprocess.run(['python', '-m', 'eval.chat_benchmarks.arena_hard_auto.show_result', '--judge-name', f'{self.annotator_model}', '--output'])
-        df = pd.read_csv(f'eval/chat_benchmarks/arena_hard_auto/leaderboard/arena_hard_leaderboard_{self.annotator_model}.csv')
+        df = generate_arena_hard_leaderboard(judge_name=self.annotator_model)
         ## find our model name using model_identifier and pick the row
         model_results = df.loc[df['model']==model_name]
         

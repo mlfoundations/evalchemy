@@ -233,6 +233,10 @@ def update_model_args_with_name(model_args: str, model_name: str) -> str:
     args_dict = simple_parse_args_string(model_args)
     if "pretrained" not in args_dict:
         return f"pretrained={model_name},{model_args}"
+    else:
+        assert (
+            args_dict["pretrained"] == model_name
+        ), f"Provided model_args contains different pretrained model '{args_dict['pretrained']}' than specified model_name '{model_name}'"
     return model_args
 
 

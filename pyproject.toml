@@ -148,7 +148,10 @@ dependencies = [
     "pqdm>=0.2.0",
     "tempdir>=0.7.1",
     "tree_sitter_languages>=1.10.2",
-    "wget>=3.2"
+    "wget>=3.2",
+
+    # SWE-bench
+    "swebench>=3.0.4",
 ]
 
 [project.urls]

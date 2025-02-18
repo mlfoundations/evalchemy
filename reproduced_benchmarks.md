@@ -88,4 +88,5 @@
 | CRUXEval    | Marianna| Qwen/Qwen2.5-Coder-7B-Instruct          | Input-CoT (pass@1)            | 66.2        | 65.8            |  [Qwen2.5-Coder Technical Report](https://arxiv.org/pdf/2409.12186) (Table 18)                                     |
 |             |         |                                         | Output-CoT (pass@1)           | 66.7        | 65.9            |                                     |
 |             |         | Qwen/Qwen2.5-Coder-3B-Instruct          | Input-CoT (pass@1)            | 53.4        | 53.2            |                                    |
-|             |         |                                         | Output-CoT (pass@1)           | 53.3        | 56.0            |                                     |
+|             |         |                                         | Output-CoT (pass@1)           | 53.3        | 56.0            |  
+| Alice In Wonderland       | Negin    | gpt-4o-2024-05-13              | accuracy                | 16.7        | 16.6           | [Paper](https://arxiv.org/abs/2406.02061) |

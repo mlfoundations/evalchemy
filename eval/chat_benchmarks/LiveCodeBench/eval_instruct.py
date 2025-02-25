@@ -2,6 +2,7 @@ from collections import defaultdict
 import json
 import logging
 from typing import Any, Dict, List, Optional
+import numpy as np
 
 from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
@@ -33,6 +34,13 @@ def has_code(response):
     return matches
 
 
+# Calculate mean and standard error for all metrics
+def calc_stats(values):
+    mean = np.mean(values)
+    stderr = np.std(values, ddof=1) / np.sqrt(len(values))
+    return mean, stderr
+
+
 class LiveCodeBenchBenchmark(BaseBenchmark):
     """
     LiveCodeBench Benchmark for evaluating the math reasoning of LLMs.
@@ -58,6 +66,7 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
         self.debug = debug
         self.max_new_tokens = 32768  # set higher to avoid truncation for reasoning models
         self.seed = seed
+        self.n_repeat = 3
 
     def generate_responses(self, model: LM) -> Dict[str, Any]:
         """
@@ -74,43 +83,48 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
         if self.debug:
             examples = examples[:10]
 
-        # Prepare instances for model
-        all_instances = []
-        for idx, example in enumerate(examples):
-            if example["is_stdin"]:
-                prompt_text = (
-                    "Generate an executable Python function generated from the given prompt. The function should take stdin as input and print the output. Simply call the function after the definition."
-                    + example["prompt"]
-                )
-            else:
-                prompt_text = (
-                    "Generate an executable Python function generated from the given prompt. Return the function body without invoking it at the final solution."
-                    + example["prompt"]
-                )
-            messages = [{"role": "user", "content": prompt_text}]
+        all_outputs = []
 
-            templated_messages = model.apply_chat_template(messages)
+        for i in range(self.n_repeat):
+            all_instances = []
+            seed = [s + i for s in self.seed]
 
-            all_instances.append(
-                Instance(
-                    "generate_until",
-                    example,
-                    (
-                        templated_messages,
-                        {
-                            "do_sample": False,
-                            "max_new_tokens": self.max_new_tokens,
-                            "temperature": 0.7,
-                            "seed": self.seed,
-                        },
-                    ),
-                    idx,
+            for idx, example in enumerate(examples):
+                if example["is_stdin"]:
+                    prompt_text = (
+                        "Generate an executable Python function generated from the given prompt. The function should take stdin as input and print the output. Simply call the function after the definition."
+                        + example["prompt"]
+                    )
+                else:
+                    prompt_text = (
+                        "Generate an executable Python function generated from the given prompt. Return the function body without invoking it at the final solution."
+                        + example["prompt"]
+                    )
+                messages = [{"role": "user", "content": prompt_text}]
+
+                templated_messages = model.apply_chat_template(messages)
+
+                all_instances.append(
+                    Instance(
+                        "generate_until",
+                        example,
+                        (
+                            templated_messages,
+                            {
+                                "do_sample": False,
+                                "max_new_tokens": self.max_new_tokens,
+                                "temperature": 0.7,
+                                "seed": seed,
+                            },
+                        ),
+                        idx,
+                    )
                 )
-            )
 
-        # Generate model responses
-        self.logger.info("Generating responses for LiveCodeBench...")
-        outputs = self.compute(model, all_instances)
+            # Generate model responses
+            self.logger.info("Generating responses for LiveCodeBench...")
+            outputs = self.compute(model, all_instances)
+            all_outputs.append(outputs)
 
         # Return None early for non-primary ranks
         if model.rank != 0:
@@ -118,9 +132,9 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
 
         examples_list = []
 
-        for example, output in zip(examples, outputs):
-            example["model_output"] = output
-            example["model_answer"] = has_code(output)
+        for example, outputs in zip(examples, zip(*all_outputs)):
+            example["model_outputs"] = list(outputs)
+            example["model_answers"] = [has_code(o) for o in outputs]
             examples_list.append(example)
 
         return {"examples": examples_list}
@@ -202,62 +216,105 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
         """Evaluate the generated solution completions in parallel using threads."""
         self.logger.info(f"Evaluating {len(responses['examples'])} examples...")
 
-        # Use ThreadPoolExecutor with limited concurrency
-        results = []
-        with ThreadPoolExecutor(max_workers=32) as executor:
-            future_to_example = {}
-            for i, example in enumerate(responses["examples"]):
-                future = executor.submit(self.evaluate_single_example, example)
-                future_to_example[future] = (i, example)
+        # First, organize completions by repeat index
+        examples_by_repeat = defaultdict(list)
+        for example in responses["examples"]:
+            for i, (output, answers) in enumerate(zip(example["model_outputs"], example["model_answers"])):
+                # Create a copy of the original example and update with the specific completion
+                example_copy = example.copy()  # Make a shallow copy of the example
+                example_copy["model_answer"] = answers
+                example_copy["model_output"] = output
+                # Remove the lists of all outputs/answers to avoid confusion
+                example_copy.pop("model_outputs", None)
+                example_copy.pop("model_answers", None)
+                examples_by_repeat[i].append(example_copy)
 
-            # Collect results as they complete
-            results = [None] * len(responses["examples"])
-            for future in as_completed(future_to_example):
-                idx, example = future_to_example[future]
-                try:
-                    result = future.result()
-                    # Store both result and corresponding example
-                    results[idx] = (result, example)
-                    # self.logger.info(f"Example {idx} ({example['difficulty']}): {result['correctness']}")
-                except Exception as e:
-                    self.logger.error(f"Future error for example {idx}: {str(e)}")
-                    results[idx] = (
-                        {
-                            "content": example["model_answer"],
-                            "difficulty": example["difficulty"],
-                            "correctness": False,
-                            "reason": f"Future error: {str(e)}",
-                        },
-                        example,
-                    )
+        # Evaluate each set of completions separately
+        all_metrics = []
 
-        # Calculate metrics from results
-        total_correct = sum(1 for result, _ in results if result["correctness"])
-        total_finish = len(results)
+        for repeat_idx, examples in examples_by_repeat.items():
+            # Use ThreadPoolExecutor with limited concurrency
+            results = []
+            with ThreadPoolExecutor(max_workers=32) as executor:
+                future_to_example = {}
+                for i, example in enumerate(examples):
+                    future = executor.submit(self.evaluate_single_example, example)
+                    future_to_example[future] = (i, example)
 
-        per_difficulty_correct = defaultdict(int)
-        per_difficulty_total = defaultdict(int)
+                # Collect results as they complete
+                results = [None] * len(examples)
+                for future in as_completed(future_to_example):
+                    idx, example = future_to_example[future]
+                    try:
+                        result = future.result()
+                        results[idx] = (result, example)
+                    except Exception as e:
+                        self.logger.error(f"Future error for example {idx}: {str(e)}")
+                        results[idx] = (
+                            {
+                                "content": example["model_answer"],
+                                "difficulty": example["difficulty"],
+                                "correctness": False,
+                                "reason": f"Future error: {str(e)}",
+                            },
+                            example,
+                        )
 
-        for result, example in results:
-            per_difficulty_correct[example["difficulty"]] += result["correctness"]
-            per_difficulty_total[example["difficulty"]] += 1
+            # Calculate metrics for this repeat
+            total_correct = sum(1 for result, _ in results if result["correctness"])
+            total_finish = len(results)
 
-        output = {
-            "total_correct": total_correct,
-            "total_finish": total_finish,
-            "accuracy": total_correct / total_finish,
-            "examples": [result for result, _ in results],  # Only include results in output
-            "per_difficulty_correct": per_difficulty_correct,
-            "per_difficulty_total": per_difficulty_total,
-        }
-        for difficulty in per_difficulty_correct.keys():
-            output[f"accuracy_{difficulty}"] = per_difficulty_correct[difficulty] / per_difficulty_total[difficulty]
+            per_difficulty_correct = defaultdict(int)
+            per_difficulty_total = defaultdict(int)
 
-        self.logger.info(f"Total examples: {total_finish}")
-        self.logger.info(f"Total correct: {total_correct}")
-        self.logger.info(f"Overall accuracy: {total_correct / total_finish:.2%}")
+            for result, example in results:
+                per_difficulty_correct[example["difficulty"]] += result["correctness"]
+                per_difficulty_total[example["difficulty"]] += 1
 
-        return output
+            metrics = {
+                "total_correct": total_correct,
+                "total_finish": total_finish,
+                "accuracy": total_correct / total_finish,
+                "per_difficulty_correct": dict(per_difficulty_correct),
+                "per_difficulty_total": dict(per_difficulty_total),
+            }
+
+            # Add per-difficulty accuracies
+            for difficulty in per_difficulty_correct.keys():
+                metrics[f"accuracy_{difficulty}"] = (
+                    per_difficulty_correct[difficulty] / per_difficulty_total[difficulty]
+                )
+
+            all_metrics.append(metrics)
+
+        final_metrics = {}
+
+        # Calculate stats for overall accuracy
+        acc_values = [m["accuracy"] for m in all_metrics]
+        mean_acc, stderr_acc = calc_stats(acc_values)
+        final_metrics["accuracy_mean"] = mean_acc
+        final_metrics["accuracy_stderr"] = stderr_acc
+
+        # Calculate stats for each difficulty level
+        difficulties = all_metrics[0]["per_difficulty_correct"].keys()
+        for diff in difficulties:
+            acc_values = [m[f"accuracy_{diff}"] for m in all_metrics]
+            mean_acc, stderr_acc = calc_stats(acc_values)
+            final_metrics[f"accuracy_{diff}_mean"] = mean_acc
+            final_metrics[f"accuracy_{diff}_stderr"] = stderr_acc
+
+        # Log results
+        self.logger.info(f"Overall accuracy: {mean_acc:.2%} ± {stderr_acc:.2%}")
+        for diff in difficulties:
+            mean = final_metrics[f"accuracy_{diff}_mean"]
+            stderr = final_metrics[f"accuracy_{diff}_stderr"]
+            self.logger.info(f"Accuracy {diff}: {mean:.2%} ± {stderr:.2%}")
+
+        # Include raw results and examples in final metrics
+        final_metrics["raw_metrics"] = all_metrics
+        final_metrics["examples"] = [result for result, _ in results]  # Include last run's examples
+
+        return final_metrics
 
     def load_questions(self) -> List[Dict[str, str]]:
         """Load LiveCodeBench questions from source."""

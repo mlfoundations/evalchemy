@@ -8,6 +8,7 @@ from datasets import load_dataset
 from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
 from lm_eval.models.vllm_causallms import VLLM
+import numpy as np
 
 from eval.task import BaseBenchmark
 
@@ -44,6 +45,7 @@ class GPQADiamondBenchmark(BaseBenchmark):
         self.debug = debug
         self.seed = seed
         self.max_new_tokens = 32768
+        self.n_repeat = 3
 
     def generate_responses(self, model: LM) -> Dict[str, Any]:
         """
@@ -57,9 +59,6 @@ class GPQADiamondBenchmark(BaseBenchmark):
         """
         examples = self.load_questions()
 
-        # Prepare instances for model
-        all_instances = []
-
         if isinstance(model, lm_eval.models.huggingface.HFLM):
             model_name = model.pretrained
         elif isinstance(model, lm_eval.models.openai_completions.OpenAIChatCompletion):
@@ -67,44 +66,54 @@ class GPQADiamondBenchmark(BaseBenchmark):
         else:
             model_name = model.model_args["model"]
 
-        for idx, example in enumerate(examples):
-            multiple_choice_string, correct_answer = self.generate_multiple_choice_answers(example)
-            example["answer"] = correct_answer
+        all_outputs = []
 
-            messages = [
-                {"role": "user", "content": PROMPT.format(problem=example["Question"], options=multiple_choice_string)},
-            ]
+        for i in range(self.n_repeat):
+            all_instances = []
+            seed = [s + i for s in self.seed]
 
-            templated_messages = model.apply_chat_template(messages)
+            for idx, example in enumerate(examples):
+                multiple_choice_string, correct_answer = self.generate_multiple_choice_answers(example)
+                example["answer"] = correct_answer
 
-            all_instances.append(
-                Instance(
-                    "generate_until",
-                    example,
-                    (
-                        templated_messages,
-                        {
-                            "do_sample": False,
-                            "temperature": 0.7,
-                            "max_new_tokens": self.max_new_tokens,
-                            "seed": self.seed,
-                        },
-                    ),
-                    idx,
+                messages = [
+                    {
+                        "role": "user",
+                        "content": PROMPT.format(problem=example["Question"], options=multiple_choice_string),
+                    },
+                ]
+
+                templated_messages = model.apply_chat_template(messages)
+
+                all_instances.append(
+                    Instance(
+                        "generate_until",
+                        example,
+                        (
+                            templated_messages,
+                            {
+                                "do_sample": True,
+                                "temperature": 0.7,
+                                "max_new_tokens": self.max_new_tokens,
+                                "seed": seed,
+                            },
+                        ),
+                        idx,
+                    )
                 )
-            )
 
-        # Generate model responses
-        self.logger.info("Generating responses for GPQADiamond...")
-        outputs = self.compute(model, all_instances)
+            # Generate model responses
+            self.logger.info("Generating responses for GPQADiamond...")
+            outputs = self.compute(model, all_instances)
+            all_outputs.append(outputs)
 
         # Return None early for non-primary ranks
         if model.rank != 0:
             return None
 
-        for example, output in zip(examples, outputs):
-            example["model_output"] = output
-            example["model_answer"] = get_multiple_choice_answer(output)
+        for example, outputs in zip(examples, zip(*all_outputs)):
+            example["model_outputs"] = list(outputs)
+            example["model_answers"] = [get_multiple_choice_answer(o) for o in outputs]
 
         return {"examples": examples}
 
@@ -114,14 +123,37 @@ class GPQADiamondBenchmark(BaseBenchmark):
             return None
 
         examples = results["examples"]
-        total = len(examples)
-        solved = sum(example["answer"] == example["model_answer"] for example in examples)
+        num_questions = len(examples)
+
+        # Calculate accuracy for each repetition
+        all_results = []
+        for i in range(self.n_repeat):
+
+            solved = sum([example["answer"] == example["model_answers"][i] for example in examples])
+
+            all_results.append(
+                {
+                    "repetition": i + 1,
+                    "num_total": num_questions,
+                    "num_solved": solved,
+                    "accuracy": solved / num_questions,
+                }
+            )
+
+        # Calculate overall statistics
+        solved_avg = np.mean([result["num_solved"] for result in all_results])
+        accuracy_avg = np.mean([result["accuracy"] for result in all_results])
+        accuracy_std = np.std([result["accuracy"] for result in all_results])
+        accuracy_std_err = np.std([result["accuracy"] for result in all_results]) / np.sqrt(self.n_repeat)
 
         results.update(
             {
-                "num_total": total,
-                "num_solved": solved,
-                "accuracy": solved / total,
+                "num_total": num_questions,
+                "solved_avg": solved,
+                "run_stats": all_results,
+                "accuracy_avg": accuracy_avg,
+                "accuracy_std_err": accuracy_std_err,
+                "num_repeat": self.n_repeat,
             }
         )
 

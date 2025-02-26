@@ -89,3 +89,4 @@
 |             |         |                                         | Output-CoT (pass@1)           | 66.7        | 65.9            |                                     |
 |             |         | Qwen/Qwen2.5-Coder-3B-Instruct          | Input-CoT (pass@1)            | 53.4        | 53.2            |                                    |
 |             |         |                                         | Output-CoT (pass@1)           | 53.3        | 56.0            |                                     |
+| MedQA       | Asad    | openai/gpt-4o-mini-2024-07-18           | accuracy                      | 74.4%       | 72.4%           | [Vals.ai Leaderboard](https://www.vals.ai/benchmarks/medqa-02-03-2025) |

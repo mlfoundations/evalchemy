@@ -170,9 +170,9 @@ class BBEHBenchmark(BaseBenchmark):
                 subtask_data = json.load(f)['examples']
                 subtask_data = [{"input": example["input"], "target": example["target"], "task": subtask} for example in subtask_data]
                 questions = questions + subtask_data
-        import random
-        random.shuffle(questions)
-        questions = questions[:10]
+        # import random
+        # random.shuffle(questions)
+        # questions = questions[:10]
         self.logger.info(f"Loaded {len(questions)} questions from {self.data_file}")
         return questions
 

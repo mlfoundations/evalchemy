@@ -114,7 +114,6 @@ class BBEHBenchmark(BaseBenchmark):
 
         return {"examples": examples}
 
-    def evaluate_responses(self, results: Dict[str, Any]) -> Dict[str, float]:
         """Evaluate the generated solution completions."""
 
         # Handle None result from non-primary ranks
@@ -194,10 +193,10 @@ class BBEHBenchmark(BaseBenchmark):
             if answer == "":
                 answer = output.split("The answer is ")[1].strip()
             
-            ## The answer is 3. -> The answer is 3
+            ## 3. -> 3
             if answer.endswith("."):
                 answer = answer[:-1]
-                
+
             return answer
         except:
             return ""

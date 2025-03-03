@@ -45,8 +45,9 @@ class BBEHBenchmark(BaseBenchmark):
         self.data_file = data_file
         self.debug = debug
         self.seed = seed
-        self.max_new_tokens = 32768  # set higher to avoid truncation for reasoning models
-        self.n_repeat = 5
+        # self.max_new_tokens = 32768  # set higher to avoid truncation for reasoning models
+        self.max_new_tokens = 1024  # set higher to avoid truncation for reasoning models
+        self.n_repeat = 1
 
     def generate_responses(self, model: LM) -> Dict[str, Any]:
         """
@@ -139,6 +140,9 @@ class BBEHBenchmark(BaseBenchmark):
                 performance_task = 100 * task_performance[task] / task_performance_total[task]
                 task_result[task] = performance_task
                 harmonic_mean_acc.append(performance_task)
+            
+            ## Avoid division by zero
+            harmonic_mean_acc  = [x + 1 if x == 0 else x for x in harmonic_mean_acc]
             harmonic_mean_acc = hmean(harmonic_mean_acc)
             task_result["harmonic_accuracy"] = harmonic_mean_acc
             task_result["repetition"] = i + 1
@@ -172,7 +176,7 @@ class BBEHBenchmark(BaseBenchmark):
                 questions = questions + subtask_data
         # import random
         # random.shuffle(questions)
-        # questions = questions[:10]
+        # questions = questions[:1000]
         self.logger.info(f"Loaded {len(questions)} questions from {self.data_file}")
         return questions
 
@@ -187,8 +191,13 @@ class BBEHBenchmark(BaseBenchmark):
         """
         try:
             answer = output.split("The answer is:")[1].strip()
+            if answer == "":
+                answer = output.split("The answer is ")[1].strip()
+            
+            ## The answer is 3. -> The answer is 3
             if answer.endswith("."):
                 answer = answer[:-1]
+                
             return answer
         except:
             return ""

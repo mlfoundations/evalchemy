@@ -63,6 +63,8 @@ class MTBenchBenchmark(BaseBenchmark):
     MTBench benchmark for evaluating multi-turn chat capabilities.
     """
 
+    REQUIRES_OPENAI_ANNOTATOR = False  # Can also be anthropic
+
     def __init__(
         self,
         base_path: str = "eval/chat_benchmarks/MTBench",

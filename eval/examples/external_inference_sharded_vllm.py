@@ -50,7 +50,6 @@ def process_shard(repo_id: str, rank: int, global_size: int, model_name: str) ->
     logger.info("Initializing VLLM")
     llm = LLM(
         model=model_name,
-        tokenizer="auto",
         trust_remote_code=True,
         gpu_memory_utilization=0.9,
     )
@@ -66,17 +65,20 @@ def process_shard(repo_id: str, rank: int, global_size: int, model_name: str) ->
         sampling_params = SamplingParams(
             temperature=gen_kwargs.get("temperature", 0.7),
             top_p=gen_kwargs.get("top_p", 0.95),
-            max_tokens=gen_kwargs.get("max_tokens", 4096),
+            max_tokens=gen_kwargs.get("max_new_tokens", 4096),
             stop=gen_kwargs.get("stop", None),
             seed=gen_kwargs.get("seed", None),
         )
 
         # Generate the output
         context = example["context"]
+        # TODO: If you require more than a string, prompt, change this
+        prompt = context[0]['content']
         logger.info(f"Generating output for example {idx} (shard {rank})")
 
         # Call VLLM to generate the output
-        outputs = llm.generate(context, sampling_params)
+        # TODO: if we group by sampling_params, we can generate multiple outputs at once
+        outputs = llm.generate(prompt, sampling_params)
 
         # Extract the generated text
         generated_text = outputs[0].outputs[0].text if outputs and outputs[0].outputs else ""
@@ -97,7 +99,7 @@ def process_shard(repo_id: str, rank: int, global_size: int, model_name: str) ->
     # Push the results to Hub
     # Extract model name for the output repo ID (use last part of path)
     model_short_name = model_name.split("/")[-1]
-    output_repo_id = f"{repo_id}_{model_short_name}"
+    output_repo_id = f"{repo_id}_{global_size}shards_{model_short_name}"
     try:
         push_to_hub_with_retry(output_ds, output_repo_id, f"shard_{rank}")
         logger.info(f"Shard {rank} pushed to hub as {output_repo_id}")

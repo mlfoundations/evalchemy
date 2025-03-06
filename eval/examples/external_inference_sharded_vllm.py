@@ -104,7 +104,7 @@ def process_shard(repo_id: str, rank: int, global_size: int, model_name: str) ->
                 logger.info(f"Processed {idx + 1}/{len(ds)} examples in shard {rank}")
 
     # Create a new dataset with the model outputs
-    output_ds = load_dataset("dict", data={"train": processed_examples})["train"]
+    output_ds = ds.add_column("model_outputs", processed_examples)
 
     # Push the results to Hub
     # Extract model name for the output repo ID (use last part of path)

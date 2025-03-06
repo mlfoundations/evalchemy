@@ -17,13 +17,13 @@ logger = logging.getLogger(__name__)
     wait=wait_exponential(multiplier=1, min=30, max=600),
     reraise=True,
 )
-def push_to_hub_with_retry(dataset, repo_id, config_name):
+def push_to_hub_with_retry(dataset, repo_id, data_dir):
     """Push dataset to Hugging Face Hub with automatic retries."""
     try:
-        dataset.push_to_hub(repo_id, config_name=config_name)
-        logger.info(f"Successfully pushed {config_name} to {repo_id}")
+        dataset.push_to_hub(repo_id, data_dir=data_dir)
+        logger.info(f"Successfully pushed {data_dir} to {repo_id}")
     except Exception as e:
-        logger.error(f"Push failed for {config_name}, will retry: {str(e)}")
+        logger.error(f"Push failed for {data_dir}, will retry: {str(e)}")
         raise
 
 

@@ -27,7 +27,7 @@ def push_to_hub_with_retry(dataset, repo_id, config_name):
         raise
 
 
-def process_shard(repo_id: str, rank: int, global_size: int, model_name: str) -> None:
+def process_shard(repo_id: str, rank: int, global_size: int, model_name: str, tp: int) -> None:
     """Process a single shard of the dataset.
 
     Args:
@@ -52,6 +52,7 @@ def process_shard(repo_id: str, rank: int, global_size: int, model_name: str) ->
         model=model_name,
         trust_remote_code=True,
         gpu_memory_utilization=0.9,
+        tensor_parallel_size=tp,
     )
 
     # Process each example and group by sampling params
@@ -125,6 +126,7 @@ def main():
     parser.add_argument("--rank", type=int, required=True, help="Shard index (0-based)")
     parser.add_argument("--repo_id", type=str, required=True, help="Hugging Face Hub repository ID")
     parser.add_argument("--model_name", type=str, required=True, help="Name or path of the model for VLLM")
+    parser.add_argument("--tp", type=int, default=1, help="Tensor parallelism size for VLLM")
 
     args = parser.parse_args()
 
@@ -133,7 +135,7 @@ def main():
         raise ValueError(f"Rank ({args.rank}) must be between 0 and global_size-1 ({args.global_size-1})")
 
     # Process the shard
-    process_shard(args.repo_id, args.rank, args.global_size, args.model_name)
+    process_shard(args.repo_id, args.rank, args.global_size, args.model_name, args.tp)
 
 
 if __name__ == "__main__":

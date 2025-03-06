@@ -13,6 +13,6 @@ class Answer(LLM):
         return row
 
 
-answer = Answer(model="gpt-4o-mini")
-ds = answer.run(ds)
+answer = Answer(model_name="gpt-4o-mini")
+ds = answer(ds)
 ds.push_to_hub("mlfoundations-dev/AIME24_evalchemy_gpt-4o-mini")

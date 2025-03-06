@@ -90,11 +90,10 @@ class AIME25Benchmark(BaseBenchmark):
 
                 # Add repetition information to instance metadata
                 instance.metadata = {
-                    "problem_id": example["id"] if "id" in example else idx,
+                    "problem_id": str(example["id"]) if "id" in example else str(idx),
                     "repeat_index": i,  # Store which repetition this is
-                    "expected_answer": example["answer"],
-                    "reference_solution": example["solution"],
-                    # "example": example,
+                    "expected_answer": str(example["answer"]),
+                    "reference_solution": str(example["solution"]) if "solution" in example else "",
                 }
 
                 all_instances.append(instance)

@@ -3,7 +3,7 @@ import logging
 import os
 from typing import Any, Dict, List
 
-from datasets import load_dataset
+from datasets import load_dataset, Dataset
 from tenacity import retry, stop_after_attempt, wait_exponential
 from vllm import LLM, SamplingParams
 
@@ -104,7 +104,7 @@ def process_shard(repo_id: str, rank: int, global_size: int, model_name: str) ->
                 logger.info(f"Processed {idx + 1}/{len(ds)} examples in shard {rank}")
 
     # Create a new dataset with the model outputs
-    output_ds = ds.add_column("model_outputs", processed_examples)
+    output_ds = Dataset.from_list(processed_examples)
 
     # Push the results to Hub
     # Extract model name for the output repo ID (use last part of path)
@@ -113,6 +113,7 @@ def process_shard(repo_id: str, rank: int, global_size: int, model_name: str) ->
     try:
         push_to_hub_with_retry(output_ds, output_repo_id, f"shard_{rank}")
         logger.info(f"Shard {rank} pushed to hub as {output_repo_id}")
+        logger.info(f"View the dataset at https://huggingface.co/datasets/{output_repo_id}")
     except Exception as e:
         logger.error(f"Failed to push shard {rank} after all retries: {str(e)}")
 

@@ -1,30 +1,26 @@
-from collections import defaultdict
+import base64
+import copy
 import json
 import logging
-from typing import Any, Dict, List, Optional
-import numpy as np
-
-from lm_eval.api.instance import Instance
-from lm_eval.api.model import LM
-from lm_eval.tasks.hendrycks_math.utils import is_equiv, last_boxed_only_string, remove_boxed
-
-import base64
-import zlib
 import pickle
-import json
-import copy
-from .livecodebench_utils import lcb_run, map_to_example, has_test_type, post_process_code, translate_private_test_cases
-
-from eval.task import BaseBenchmark
-from datasets import load_dataset
+import re
+import zlib
+from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from multiprocessing import Pool, cpu_count
+from typing import Any, Dict, List, Optional
 
 import lm_eval.models
+import numpy as np
+from datasets import load_dataset
+from lm_eval.api.instance import Instance
+from lm_eval.api.model import LM
 from lm_eval.models.vllm_causallms import VLLM
+from lm_eval.tasks.hendrycks_math.utils import is_equiv, last_boxed_only_string, remove_boxed
 
+from eval.task import BaseBenchmark
 
-import re
-from multiprocessing import Pool, cpu_count
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from .livecodebench_utils import has_test_type, lcb_run, map_to_example, post_process_code, translate_private_test_cases
 
 
 def has_code(response):
@@ -104,22 +100,22 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
 
                 templated_messages = model.apply_chat_template(messages)
 
-                all_instances.append(
-                    Instance(
-                        "generate_until",
-                        example,
-                        (
-                            templated_messages,
-                            {
-                                "do_sample": False,
-                                "max_new_tokens": self.max_new_tokens,
-                                "temperature": 0.7,
-                                "seed": seed,
-                            },
-                        ),
-                        idx,
-                    )
+                instance = Instance(
+                    "generate_until",
+                    example,
+                    (
+                        templated_messages,
+                        {
+                            "do_sample": False,
+                            "max_new_tokens": self.max_new_tokens,
+                            "temperature": 0.7,
+                            "seed": seed,
+                        },
+                    ),
+                    idx,
                 )
+                instance.repeat_idx = i
+                all_instances.append(instance)
 
             # Generate model responses
             self.logger.info("Generating responses for LiveCodeBench...")

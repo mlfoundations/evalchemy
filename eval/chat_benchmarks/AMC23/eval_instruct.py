@@ -97,9 +97,9 @@ class AMC23Benchmark(BaseBenchmark):
                 )
 
                 # Add repetition information to instance metadata
+                instance.repeat_idx = i
                 instance.metadata = {
                     "problem_id": str(example["id"]) if "id" in example else str(idx),
-                    "repeat_index": i,  # Store which repetition this is
                     "expected_answer": str(example["answer"]),
                     "reference_solution": str(example["solution"]) if "solution" in example else "",
                 }

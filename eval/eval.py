@@ -1,33 +1,32 @@
 import argparse
+import concurrent.futures
 import json
 import logging
 import os
 import sys
 import time
-import yaml
-from typing import Optional, List, Dict, Union
+from typing import Dict, List, Optional, Union
 
-import concurrent.futures
-import torch.distributed as dist
-
-from lm_eval import utils
-from lm_eval import evaluator as pretrain_evaluator
-from lm_eval.tasks import TaskManager as PretrainTaskManager
-from lm_eval.api.model import LM
-from lm_eval.loggers import EvaluationTracker, WandbLogger
-from lm_eval.loggers.utils import add_env_info, add_tokenizer_info, get_git_commit_hash
-from lm_eval.utils import handle_non_serializable, simple_parse_args_string, sanitize_model_name
-from lm_eval.__main__ import setup_parser, parse_eval_args
 import lm_eval.api.metrics
 import lm_eval.api.registry
 import lm_eval.api.task
 import lm_eval.models
+import torch.distributed as dist
+import yaml
+from lm_eval import evaluator as pretrain_evaluator
+from lm_eval import utils
+from lm_eval.__main__ import parse_eval_args, setup_parser
+from lm_eval.api.model import LM
+from lm_eval.loggers import EvaluationTracker, WandbLogger
+from lm_eval.loggers.utils import add_env_info, add_tokenizer_info, get_git_commit_hash
+from lm_eval.tasks import TaskManager as PretrainTaskManager
+from lm_eval.utils import handle_non_serializable, sanitize_model_name, simple_parse_args_string
 
 from eval.chat_benchmarks.curator_lm import CuratorAPIModel  # register curator model
-from eval.task import TaskManager as InstructTaskManager
-from eval.eval_tracker import DCEvaluationTracker
-
+from eval.chat_benchmarks.upload_to_hf_lm import UploadInstancesToHF  # register upload_to_hf model
 from eval.constants import LIST_OPENAI_MODELS
+from eval.eval_tracker import DCEvaluationTracker
+from eval.task import TaskManager as InstructTaskManager
 
 
 def setup_custom_parser():
@@ -446,7 +445,9 @@ def add_results_metadata(results: Dict, batch_sizes_list: List[int], args: argpa
         "model": (
             args.model
             if isinstance(args.model, str)
-            else args.model.config._name_or_path if hasattr(args.model, "config") else type(args.model).__name__
+            else args.model.config._name_or_path
+            if hasattr(args.model, "config")
+            else type(args.model).__name__
         ),
         "model_args": args.model_args,
         "tasks": args.tasks,

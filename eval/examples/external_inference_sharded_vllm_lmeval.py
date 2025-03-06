@@ -116,7 +116,7 @@ def process_shard(repo_id: str, rank: int, global_size: int, model_name: str, mo
 
     # Extract model name for the output repo ID (use last part of path if applicable)
     model_short_name = model_name.split("/")[-1] if "/" in model_name else model_name
-    output_repo_id = f"{repo_id}_{model_short_name}"
+    output_repo_id = f"{repo_id}_{global_size}shards_{model_short_name}"
 
     # Push the results to Hub
     try:

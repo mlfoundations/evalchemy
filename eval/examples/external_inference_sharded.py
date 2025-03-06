@@ -10,13 +10,9 @@ from tenacity import before_sleep_log, retry, stop_after_attempt, wait_exponenti
 # Each node you use a different shard index
 # Using curator with API model it is faster to just run a single curator instance, no shards
 
-num_shards = 64  # Tested with 1, 2, 8, (16, 32, 64 breaks)
-# return RepoUrl(d["url"], endpoint=self.endpoint) KeyError: 'url' (race condition? rate limit?)
+num_shards = 4  # Tested with 1, 2, 8, 16, 32
 ds_name = "mlfoundations-dev/REASONING_evalchemy"
-output_ds_name = f"{ds_name}_{num_shards}_sharded_gpt-4o-mini"
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+output_ds_name = f"{ds_name}_{num_shards}_shards_gpt-4o-mini"
 
 
 class Answer(LLM):
@@ -29,8 +25,8 @@ class Answer(LLM):
 
 
 @retry(
-    stop=stop_after_attempt(5),
-    wait=wait_exponential(multiplier=1, min=4, max=60),
+    stop=stop_after_attempt(10),
+    wait=wait_exponential(multiplier=1, min=30, max=600),
     reraise=True,
 )
 def push_to_hub_with_retry(dataset, ds_name, shard_index):

@@ -133,7 +133,7 @@ def process_shard(repo_id: str, rank: int, global_size: int, model_name: str, tp
     model_short_name = model_name.split("/")[-1]
     output_repo_id = f"{repo_id}_{global_size}shards_{model_short_name}"
     try:
-        upload_shard(output_ds, output_repo_id, f"shard_{rank}", global_size)
+        upload_shard(output_ds, output_repo_id, rank, global_size)
         logger.info(f"Shard {rank} pushed to hub as {output_repo_id}")
         logger.info(f"View the dataset at https://huggingface.co/datasets/{output_repo_id}")
     except Exception as e:

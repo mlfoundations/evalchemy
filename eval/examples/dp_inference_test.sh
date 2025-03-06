@@ -2,7 +2,7 @@
 
 DATASET="mlfoundations-dev/REASONING_evalchemy"
 MODEL_NAME="Qwen/Qwen2.5-7B-Instruct"
-GLOBAL_SIZE=128
+GLOBAL_SIZE=2048
 START_RANK=0
 
 # Run all commands in parallel

@@ -92,7 +92,8 @@ class AIME24Benchmark(BaseBenchmark):
                 instance.metadata = {
                     "problem_id": example["id"] if "id" in example else idx,
                     "repeat_index": i,  # Store which repetition this is
-                    "example": example,
+                    "expected_answer": example["expected_answer"],
+                    "reference_solution": example["reference_solution"],
                 }
 
                 all_instances.append(instance)

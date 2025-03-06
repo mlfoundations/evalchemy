@@ -64,6 +64,7 @@ class UploadInstancesToHF(TemplateLM):
             A list of empty strings, one for each instance.
         """
         # Convert current batch of instances to dictionary format
+        counter = 0
         for instance in requests:
             # Extract context and generation args
             context = instance.args[0]
@@ -79,13 +80,17 @@ class UploadInstancesToHF(TemplateLM):
                 if isinstance(instance.metadata, dict):
                     metadata = instance.metadata.copy()
 
+            # If no instance id, then create one
+            if "request_id" not in metadata:
+                metadata["request_id"] = counter
+                counter += 1
+
             # Create a dictionary representation of the instance
             instance_dict = {
                 "context": context,
                 "gen_kwargs": gen_kwargs,
-                "problem_id": metadata.get("problem_id") if "problem_id" in metadata else instance.request_id,
                 "repeat_index": metadata.get("repeat_index"),
-                "request_id": instance.request_id if hasattr(instance, "request_id") else None,
+                "request_id": metadata["request_id"],
                 # For compatibility with existing code, maintain the metadata field
                 "metadata": metadata,
             }

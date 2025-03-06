@@ -23,6 +23,7 @@ from lm_eval.tasks import TaskManager as PretrainTaskManager
 from lm_eval.utils import handle_non_serializable, sanitize_model_name, simple_parse_args_string
 
 from eval.chat_benchmarks.curator_lm import CuratorAPIModel  # register curator model
+from eval.chat_benchmarks.precomputed_hf_lm import PrecomputedHFLM  # register precomputed_hf model
 from eval.chat_benchmarks.upload_to_hf_lm import UploadInstancesToHF  # register upload_to_hf model
 from eval.constants import LIST_OPENAI_MODELS
 from eval.eval_tracker import DCEvaluationTracker
@@ -222,6 +223,17 @@ def evaluate(
             lm.upload_to_hub()
         except Exception as e:
             eval_logger.error(f"Error uploading instances to HF: {str(e)}")
+            import traceback
+
+            traceback.print_exc()
+
+    # If we're using PrecomputedHFLM, update the README with evaluation results
+    if lm is not None and hasattr(lm, "update_repo_readme") and callable(lm.update_repo_readme):
+        try:
+            eval_logger.info("Updating repository README with evaluation results...")
+            lm.update_repo_readme(results)
+        except Exception as e:
+            eval_logger.error(f"Error updating repository README: {str(e)}")
             import traceback
 
             traceback.print_exc()

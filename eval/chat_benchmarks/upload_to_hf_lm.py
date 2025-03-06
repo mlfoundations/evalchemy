@@ -21,7 +21,7 @@ class UploadInstancesToHF(TemplateLM):
         self,
         repo_id: str,
         token: Optional[str] = None,
-        subset_name: Optional[str] = None,
+        subset_name: str = "default",
         push_to_hub: bool = True,
         model: str = "upload_to_hf",
         **kwargs,

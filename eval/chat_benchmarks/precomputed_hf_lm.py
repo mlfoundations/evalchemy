@@ -88,42 +88,21 @@ class PrecomputedHFLM(TemplateLM):
             self.logger.info(f"Loaded dataset with {len(self.dataset)} examples")
 
             # Validate that the dataset has the required columns
-            required_columns = ["context", "model_outputs", "metadata"]
+            required_columns = ["context", "model_outputs", "metadata", "task_name", "repeat_idx", "request_idx"]
             for col in required_columns:
                 if col not in self.dataset.column_names:
                     self.logger.error(f"Dataset is missing required column: {col}")
                     raise ValueError(f"Dataset is missing required column: {col}")
 
-            # Create lookup dictionaries for fast access using different key combinations
-            self.examples_by_id = {}
-            self.examples_by_repeat_and_id = {}
+            # Create lookup dictionaries for fast access (can create multiple for different lookup strategies)
             self.examples_by_task_repeat_and_id = {}
 
             for example in self.dataset:
-                request_id = example["metadata"].get("request_id")
-                repeat_index = example["metadata"].get("repeat_index")
-                task_name = example["metadata"].get("task_name")
-
-                # Also try to get task_name from top level if it exists
-                if task_name is None and "task_name" in example:
-                    task_name = example["task_name"]
-
-                # Store by ID for simple lookups
-                if request_id is not None:
-                    self.examples_by_id[request_id] = example
-
-                # Store by repeat_index and problem_id for more complex lookups
-                if repeat_index is not None and "problem_id" in example["metadata"]:
-                    problem_id = example["metadata"]["problem_id"]
-
-                    # Store with just repeat and problem ID
-                    key = (repeat_index, problem_id)
-                    self.examples_by_repeat_and_id[key] = example
-
-                    # Store with task, repeat, and problem ID for more specific lookups
-                    if task_name is not None:
-                        task_key = (task_name, repeat_index, problem_id)
-                        self.examples_by_task_repeat_and_id[task_key] = example
+                request_idx = example["request_idx"]
+                repeat_idx = example["repeat_idx"]
+                task_name = example["task_name"]
+                key = (task_name, repeat_idx, request_idx)
+                self.examples_by_task_repeat_and_id[key] = example
 
             self.logger.info("Dataset loaded and indexed successfully")
 
@@ -142,61 +121,28 @@ class PrecomputedHFLM(TemplateLM):
             A list of precomputed model outputs corresponding to each instance.
         """
         outputs = []
-
+        request_idx = 0
         for instance in requests:
             # Extract metadata to identify the corresponding example
-            metadata = {}
-            if hasattr(instance, "metadata") and instance.metadata:
-                metadata = instance.metadata
-
-            # Get task name either from metadata or instance
-            task_name = metadata.get("task_name")
-            if task_name is None and hasattr(instance, "task_name"):
-                task_name = instance.task_name
-
-            # Get output using task_name, problem_id, and repeat_index if all available
-            example = None
-            if task_name and "problem_id" in metadata and "repeat_index" in metadata:
-                task_key = (task_name, metadata["repeat_index"], metadata["problem_id"])
-                example = self.examples_by_task_repeat_and_id.get(task_key)
-
-                if example:
-                    self.logger.debug(f"Found example using task key: {task_key}")
-                else:
-                    self.logger.debug(f"No example found for task key: {task_key}")
-
-            # If not found, try without task name
-            if example is None and "problem_id" in metadata and "repeat_index" in metadata:
-                key = (metadata["repeat_index"], metadata["problem_id"])
-                example = self.examples_by_repeat_and_id.get(key)
-                if example:
-                    self.logger.debug(f"Found example using problem+repeat key: {key}")
-
-            # If still not found, try request_id
-            if example is None and "request_id" in metadata:
-                example = self.examples_by_id.get(metadata["request_id"])
-                if example:
-                    self.logger.debug(f"Found example using request_id: {metadata['request_id']}")
-
-            # If still no match, try context matching
-            if example is None:
-                context = instance.args[0]
-                matching_examples = [ex for ex in self.dataset if ex["context"] == context]
-                example = matching_examples[0] if matching_examples else None
-                if example:
-                    self.logger.debug("Found example using context matching")
+            task_name = instance.task_name
+            if hasattr(instance, "repeat_idx"):
+                repeat_idx = instance.repeat_idx
+            else:
+                repeat_idx = 0
+            key = (task_name, repeat_idx, request_idx)
+            example = self.examples_by_task_repeat_and_id.get(key)
+            if example:
+                self.logger.debug(f"Found example using task key: {key}")
+            else:
+                self.logger.debug(f"No example found for task key: {key}")
 
             # Get the model output from the matched example
             if example and "model_outputs" in example:
                 outputs.append(example["model_outputs"])
             else:
-                problem_id = metadata.get("problem_id", "unknown")
-                task_name_str = task_name or "unknown task"
-                self.logger.warning(
-                    f"No precomputed output found for {task_name_str}, problem_id: {problem_id}, repeat: {metadata.get('repeat_index')}"
-                )
+                self.logger.warning(f"No precomputed output found for {key}")
                 outputs.append("")  # Return empty string if no match found
-
+            request_idx += 1
         self.logger.info(f"Retrieved {len(outputs)} precomputed outputs")
         return outputs
 
@@ -364,6 +310,7 @@ class PrecomputedHFLM(TemplateLM):
                     token=self.token,
                 )
                 self.logger.info(f"Pushed updated README to {self.repo_id}")
+                self.logger.info(f"Viewable at https://huggingface.co/datasets/{self.repo_id}")
                 return True
             except Exception as e:
                 self.logger.error(f"Failed to push README to HF Hub: {e}")

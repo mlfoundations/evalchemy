@@ -126,7 +126,7 @@ class AIME24Benchmark(BaseBenchmark):
         all_results = []
         for i in range(self.n_repeat):
             solved = sum(
-                [is_equiv(str(example["expected_answer"]), example["model_answers"][i]) for example in examples]
+                [is_equiv(str(example["expected_answer"]), str(example["model_answers"][i])) for example in examples]
             )
             all_results.append(
                 {

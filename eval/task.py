@@ -1,19 +1,19 @@
-from abc import ABC, abstractmethod
-from typing import Dict, List, Callable, Any, Optional, Type
-import os
 import importlib.util
-import sys
 import inspect
 import logging
-from itertools import islice
-
-import torch
+import os
 import random
-import numpy as np
-import torch.distributed as dist
-from lm_eval.api.model import LM
-from lm_eval.api.instance import Instance
+import sys
+from abc import ABC, abstractmethod
+from itertools import islice
+from typing import Any, Callable, Dict, List, Optional, Type
+
 import lm_eval.models as lm_eval_models
+import numpy as np
+import torch
+import torch.distributed as dist
+from lm_eval.api.instance import Instance
+from lm_eval.api.model import LM
 
 
 class BaseBenchmark(ABC):
@@ -36,7 +36,10 @@ class BaseBenchmark(ABC):
                     model, lm_eval_models.openai_completions.OpenAICompletionsAPI
                 ):
                     instance.args[1]["seed"] = seeds[0] if "seed" in instance.args[1] else None
-                elif isinstance(model, lm_eval_models.vllm_causallms.VLLM):
+                elif (
+                    isinstance(model, lm_eval_models.vllm_causallms.VLLM)
+                    or "UploadInstancesToHF" in model.__class__.__name__
+                ):
                     instance.args[1]["seed"] = seeds[0] if "seed" in instance.args[1] else None
                 else:  # Huggingface does not support seed
                     _ = instance.args[1].pop("seed") if "seed" in instance.args[1] else None

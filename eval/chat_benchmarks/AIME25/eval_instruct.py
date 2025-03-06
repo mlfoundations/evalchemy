@@ -1,16 +1,15 @@
 import json
 import logging
 from typing import Any, Dict, List, Optional
-import numpy as np
 
+import lm_eval.models
+import numpy as np
 from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
+from lm_eval.models.vllm_causallms import VLLM
 from lm_eval.tasks.hendrycks_math.utils import is_equiv, last_boxed_only_string, remove_boxed
 
 from eval.task import BaseBenchmark
-
-import lm_eval.models
-from lm_eval.models.vllm_causallms import VLLM
 
 # Modified version of hendrycks_math with additional instruction to mark the solution with \\boxed
 # https://github.com/mlfoundations/evalchemy/blob/e70a45e41cb2ada273d6bb98e75dba303ec31f8b/eval/chat_benchmarks/AMC23/eval_instruct.py#L15
@@ -74,22 +73,29 @@ class AIME25Benchmark(BaseBenchmark):
 
                 templated_messages = model.apply_chat_template(messages)
 
-                all_instances.append(
-                    Instance(
-                        "generate_until",
-                        example,
-                        (
-                            templated_messages,
-                            {
-                                "do_sample": False,
-                                "max_new_tokens": self.max_new_tokens,
-                                "temperature": 0.7,
-                                "seed": seed,
-                            },
-                        ),
-                        idx,
-                    )
+                instance = Instance(
+                    "generate_until",
+                    example,
+                    (
+                        templated_messages,
+                        {
+                            "do_sample": False,
+                            "max_new_tokens": self.max_new_tokens,
+                            "temperature": 0.7,
+                            "seed": seed,
+                        },
+                    ),
+                    idx,
                 )
+
+                # Add repetition information to instance metadata
+                instance.metadata = {
+                    "problem_id": example["id"] if "id" in example else idx,
+                    "repeat_index": i,  # Store which repetition this is
+                    "example": example,
+                }
+
+                all_instances.append(instance)
 
             # Generate model responses
             self.logger.info("Generating responses for AIME25...")
@@ -118,7 +124,6 @@ class AIME25Benchmark(BaseBenchmark):
         # Calculate accuracy for each repetition
         all_results = []
         for i in range(self.n_repeat):
-
             solved = sum([is_equiv(str(example["answer"]), example["model_answers"][i]) for example in examples])
             all_results.append(
                 {

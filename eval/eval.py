@@ -215,6 +215,17 @@ def evaluate(
         except Exception as e:
             eval_logger.error(f"Error in pretrain evaluation: {str(e)}")
 
+    # If we're using UploadInstancesToHF, make sure to call upload_to_hub
+    if lm is not None and hasattr(lm, "upload_to_hub") and callable(lm.upload_to_hub):
+        try:
+            eval_logger.info("Uploading accumulated instances to HuggingFace Hub...")
+            lm.upload_to_hub()
+        except Exception as e:
+            eval_logger.error(f"Error uploading instances to HF: {str(e)}")
+            import traceback
+
+            traceback.print_exc()
+
     return results
 
 

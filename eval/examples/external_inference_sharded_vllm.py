@@ -1,9 +1,9 @@
 import argparse
 import logging
-import os
-from typing import Any, Dict, List
+import tempfile
 
-from datasets import load_dataset, Dataset
+from datasets import Dataset, load_dataset
+from huggingface_hub import HfApi
 from tenacity import retry, stop_after_attempt, wait_exponential
 from vllm import LLM, SamplingParams
 
@@ -11,19 +11,40 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-# Configure retry decorator for push_to_hub
 @retry(
     stop=stop_after_attempt(10),
     wait=wait_exponential(multiplier=1, min=30, max=600),
     reraise=True,
 )
-def push_to_hub_with_retry(dataset, repo_id, data_dir):
+def upload_shard(dataset, repo_id, shard_num, num_shards):
     """Push dataset to Hugging Face Hub with automatic retries."""
+    api = HfApi()
+    # Check if repo exists before creating
     try:
-        dataset.push_to_hub(repo_id, data_dir=data_dir)
-        logger.info(f"Successfully pushed {data_dir} to {repo_id}")
+        api.repo_info(repo_id=repo_id, repo_type="dataset")
+        print(f"Repository {repo_id} already exists")
+    except Exception:
+        print(f"Creating new repository {repo_id}")
+        api.create_repo(repo_id=repo_id, repo_type="dataset")
+
+    try:
+        # Create temporary file and save the dataset
+        with tempfile.NamedTemporaryFile(suffix=".parquet") as tmp:
+            dataset.to_parquet(tmp.name)
+            # Format the filename for the shard
+            shard_filename = f"train-{shard_num:05d}-of-{num_shards:05d}.parquet"
+            # Upload the file
+            api.upload_file(
+                path_or_fileobj=tmp.name,
+                path_in_repo=shard_filename,
+                repo_id=repo_id,
+                repo_type="dataset",
+                commit_message=f"Adding shard {shard_num}",
+            )
+
+        print(f"Successfully pushed shard {shard_num} to {repo_id} as {shard_filename}")
     except Exception as e:
-        logger.error(f"Push failed for {data_dir}, will retry: {str(e)}")
+        print(f"Push failed for shard {shard_num}, will retry: {str(e)}")
         raise
 
 
@@ -89,7 +110,7 @@ def process_shard(repo_id: str, rank: int, global_size: int, model_name: str, tp
     for param_key, example_group in examples_by_params.items():
         indices, examples, sampling_params = zip(*example_group)
         prompts = [ex["context"][0]["content"] for ex in examples]
-        
+
         logger.info(f"Generating outputs for batch of {len(prompts)} examples with same parameters")
         outputs = llm.generate(prompts, sampling_params[0])  # All sampling_params are the same in the group
 
@@ -112,7 +133,7 @@ def process_shard(repo_id: str, rank: int, global_size: int, model_name: str, tp
     model_short_name = model_name.split("/")[-1]
     output_repo_id = f"{repo_id}_{global_size}shards_{model_short_name}"
     try:
-        push_to_hub_with_retry(output_ds, output_repo_id, f"shard_{rank}")
+        upload_shard(output_ds, output_repo_id, f"shard_{rank}", global_size)
         logger.info(f"Shard {rank} pushed to hub as {output_repo_id}")
         logger.info(f"View the dataset at https://huggingface.co/datasets/{output_repo_id}")
     except Exception as e:

@@ -16,3 +16,4 @@ class Answer(LLM):
 answer = Answer(model_name="gpt-4o-mini")
 ds = answer(ds)
 ds.push_to_hub("mlfoundations-dev/REASONING_evalchemy_gpt-4o-mini")
+print("Viewable at https://huggingface.co/datasets/mlfoundations-dev/REASONING_evalchemy_gpt-4o-mini")

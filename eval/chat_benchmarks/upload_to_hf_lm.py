@@ -78,6 +78,11 @@ class UploadInstancesToHF(TemplateLM):
             if repeat_idx is None:
                 repeat_idx = 0
 
+            # Default metadata is [null, null, null] for some reason
+            metadata = self.get_attr(instance, "metadata")
+            if not isinstance(metadata, dict):
+                metadata = None
+
             # Create a dictionary representation of the instance
             instance_dict = {
                 "context": instance.args[0],
@@ -85,7 +90,7 @@ class UploadInstancesToHF(TemplateLM):
                 "repeat_idx": repeat_idx,
                 "request_idx": request_idx,
                 "task_name": self.get_attr(instance, "task_name"),
-                "metadata": self.get_attr(instance, "metadata"),
+                "metadata": metadata,
             }
             request_idx += 1
 

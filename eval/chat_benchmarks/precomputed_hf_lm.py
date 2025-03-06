@@ -212,47 +212,61 @@ class PrecomputedHFLM(TemplateLM):
                 self.logger.error("No results available to update README")
                 return False
 
-            # Get task results (assuming single task for simplicity)
-            task_name = list(results["results"].keys())[0]
-            task_results = results["results"][task_name]
-
-            if not task_results:
-                self.logger.error(f"No results found for task {task_name}")
-                return False
-
-            # MATH500 uses "accuracy" instead of "accuracy_avg"
-            if "accuracy_avg" not in task_results and "accuracy" not in task_results:
-                self.logger.error(f"No metrics found for task {task_name}")
-                return False
-
-            # Format the results for README
-
-            runs = task_results.get("run_stats", [])
             results_md = f"\n## Evaluation Results\n\n"
-            results_md += f"### {task_name}\n\n"
 
-            if runs:
-                # Get the accuracy value, which might be under different keys
-                accuracy = task_results.get("accuracy_avg", task_results.get("accuracy", 0)) * 100
-                std_err = task_results.get("accuracy_std_err", 0) * 100
-                results_md += f"- **Average Accuracy**: {accuracy:.2f}% ± {std_err:.2f}%\n"
-                results_md += f"- **Number of Runs**: {len(runs)}\n\n"
-                results_md += "| Run | Accuracy | Questions Solved | Total Questions |\n"
-                results_md += "|-----|----------|-----------------|----------------|\n"
-                for run in runs:
-                    run_accuracy = run["accuracy"] * 100
-                    results_md += f"| {run.get('repetition', 'N/A')} | {run_accuracy:.2f}% | {run.get('num_solved', 'N/A')} | {run.get('num_total', 'N/A')} |\n"
-                results_md += "\n"
-            else:
-                # Get the accuracy value, which might be under different keys
-                accuracy = task_results.get("accuracy_avg", task_results.get("accuracy", 0)) * 100
-                results_md += f"- **Accuracy**: {accuracy:.2f}%\n"
-                results_md += "| Accuracy | Questions Solved | Total Questions |\n"
-                results_md += "|----------|-----------------|----------------|\n"
-                num_solved = task_results.get("num_solved", "N/A")
-                num_total = task_results.get("num_total", "N/A")
-                results_md += f"| {accuracy:.2f}% | {num_solved} | {num_total} |\n"
-                results_md += "\n"
+            # Add summary table if there are multiple tasks
+            tasks = results["results"].keys()
+            if len(tasks) > 1:
+                results_md += "### Summary\n\n"
+                results_md += "| Metric | " + " | ".join(tasks) + " |\n"
+                results_md += "|--------|" + "|".join(["-" * len(task) for task in tasks]) + "|\n"
+
+                # Add accuracy row
+                accuracies = []
+                for task_name in tasks:
+                    task_results = results["results"][task_name]
+                    accuracy = task_results.get("accuracy_avg", task_results.get("accuracy", 0)) * 100
+                    accuracies.append(f"{accuracy:.1f}")
+                results_md += "| Accuracy | " + " | ".join(accuracies) + " |\n\n"
+
+            # Continue with existing detailed results for each task
+            for task_name, task_results in results["results"].items():
+                if not task_results:
+                    self.logger.error(f"No results found for task {task_name}")
+                    return False
+
+                # MATH500 uses "accuracy" instead of "accuracy_avg"
+                if "accuracy_avg" not in task_results and "accuracy" not in task_results:
+                    self.logger.error(f"No metrics found for task {task_name}")
+                    return False
+
+                # Format the results for README
+
+                runs = task_results.get("run_stats", [])
+                results_md += f"### {task_name}\n\n"
+
+                if runs:
+                    # Get the accuracy value, which might be under different keys
+                    accuracy = task_results.get("accuracy_avg", task_results.get("accuracy", 0)) * 100
+                    std_err = task_results.get("accuracy_std_err", 0) * 100
+                    results_md += f"- **Average Accuracy**: {accuracy:.2f}% ± {std_err:.2f}%\n"
+                    results_md += f"- **Number of Runs**: {len(runs)}\n\n"
+                    results_md += "| Run | Accuracy | Questions Solved | Total Questions |\n"
+                    results_md += "|-----|----------|-----------------|----------------|\n"
+                    for run in runs:
+                        run_accuracy = run["accuracy"] * 100
+                        results_md += f"| {run.get('repetition', 'N/A')} | {run_accuracy:.2f}% | {run.get('num_solved', 'N/A')} | {run.get('num_total', 'N/A')} |\n"
+                    results_md += "\n"
+                else:
+                    # Get the accuracy value, which might be under different keys
+                    accuracy = task_results.get("accuracy_avg", task_results.get("accuracy", 0)) * 100
+                    results_md += f"- **Accuracy**: {accuracy:.2f}%\n"
+                    results_md += "| Accuracy | Questions Solved | Total Questions |\n"
+                    results_md += "|----------|-----------------|----------------|\n"
+                    num_solved = task_results.get("num_solved", "N/A")
+                    num_total = task_results.get("num_total", "N/A")
+                    results_md += f"| {accuracy:.2f}% | {num_solved} | {num_total} |\n"
+                    results_md += "\n"
 
             # Download the README if path not provided
             if not readme_path:

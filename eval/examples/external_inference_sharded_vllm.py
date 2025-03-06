@@ -54,9 +54,8 @@ def process_shard(repo_id: str, rank: int, global_size: int, model_name: str) ->
         gpu_memory_utilization=0.9,
     )
 
-    # Process each example and generate outputs
-    processed_examples = []
-
+    # Process each example and group by sampling params
+    examples_by_params = {}
     for idx, example in enumerate(ds):
         # Extract gen_kwargs for this example
         gen_kwargs = example.get("gen_kwargs", {})
@@ -70,28 +69,39 @@ def process_shard(repo_id: str, rank: int, global_size: int, model_name: str) ->
             seed=gen_kwargs.get("seed", None),
         )
 
-        # Generate the output
-        context = example["context"]
-        # TODO: If you require more than a string, prompt, change this
-        prompt = context[0]['content']
-        logger.info(f"Generating output for example {idx} (shard {rank})")
+        # Create a tuple of sampling parameters to use as dictionary key
+        param_key = (
+            sampling_params.temperature,
+            sampling_params.top_p,
+            sampling_params.max_tokens,
+            tuple(sampling_params.stop) if sampling_params.stop else None,
+            sampling_params.seed,
+        )
 
-        # Call VLLM to generate the output
-        # TODO: if we group by sampling_params, we can generate multiple outputs at once
-        outputs = llm.generate(prompt, sampling_params)
+        # Group examples by their sampling parameters
+        if param_key not in examples_by_params:
+            examples_by_params[param_key] = []
+        examples_by_params[param_key].append((idx, example, sampling_params))
 
-        # Extract the generated text
-        generated_text = outputs[0].outputs[0].text if outputs and outputs[0].outputs else ""
+    # Process examples in batches with same sampling parameters
+    processed_examples = [None] * len(ds)  # Pre-allocate list to maintain order
+    for param_key, example_group in examples_by_params.items():
+        indices, examples, sampling_params = zip(*example_group)
+        prompts = [ex["context"][0]["content"] for ex in examples]
+        
+        logger.info(f"Generating outputs for batch of {len(prompts)} examples with same parameters")
+        outputs = llm.generate(prompts, sampling_params[0])  # All sampling_params are the same in the group
 
-        # Create a new example with the model output
-        new_example = dict(example)
-        new_example["model_outputs"] = generated_text
+        # Process outputs and store results
+        for idx, example, output in zip(indices, examples, outputs):
+            generated_text = output.outputs[0].text if output.outputs else ""
+            new_example = dict(example)
+            new_example["model_outputs"] = generated_text
+            processed_examples[idx] = new_example
 
-        processed_examples.append(new_example)
-
-        # Log progress
-        if (idx + 1) % 10 == 0:
-            logger.info(f"Processed {idx + 1}/{len(ds)} examples in shard {rank}")
+            # Log progress
+            if (idx + 1) % 10 == 0:
+                logger.info(f"Processed {idx + 1}/{len(ds)} examples in shard {rank}")
 
     # Create a new dataset with the model outputs
     output_ds = load_dataset("dict", data={"train": processed_examples})["train"]

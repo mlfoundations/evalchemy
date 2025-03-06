@@ -79,9 +79,10 @@ class UploadInstancesToHF(TemplateLM):
                 repeat_idx = 0
 
             # Default metadata is [null, null, null] for some reason
+            # Need to have a consistent schema here - makes sharding work
             metadata = self.get_attr(instance, "metadata")
             if not isinstance(metadata, dict):
-                metadata = None
+                metadata = {"expected_answer": "", "problem_id": "", "reference_solution": ""}
 
             # Create a dictionary representation of the instance
             instance_dict = {

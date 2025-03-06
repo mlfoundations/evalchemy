@@ -1,3 +1,4 @@
+import logging
 import os
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -20,7 +21,7 @@ class UploadInstancesToHF(TemplateLM):
         self,
         repo_id: str,
         token: Optional[str] = None,
-        dataset_name: str = "instances",
+        subset_name: Optional[str] = None,
         push_to_hub: bool = True,
         model: str = "upload_to_hf",
         **kwargs,
@@ -39,10 +40,11 @@ class UploadInstancesToHF(TemplateLM):
         super().__init__()
         self.repo_id = repo_id
         self.token = token or os.environ.get("HF_TOKEN")
-        self.dataset_name = dataset_name
+        self.subset_name = subset_name
         self.push_to_hub = push_to_hub
         self.api = HfApi(token=self.token)
         self.tokenized_requests = False
+        self.logger = logging.getLogger("UploadInstancesToHF")
 
         # Storage for all instances across multiple generate_until calls
         self.all_instances_data = []
@@ -64,42 +66,40 @@ class UploadInstancesToHF(TemplateLM):
             A list of empty strings, one for each instance.
         """
         # Convert current batch of instances to dictionary format
-        counter = 0
+        request_idx = 0
         for instance in requests:
             # Extract context and generation args
-            context = instance.args[0]
             gen_kwargs = instance.args[1].copy()  # Make a copy to avoid modifying the original
-
-            # Check if original_seed was stored in the instance args
             if len(instance.args) > 2 and isinstance(instance.args[2], dict) and "original_seed" in instance.args[2]:
                 gen_kwargs["seed"] = instance.args[2]["original_seed"]
 
-            # Extract problem metadata if available
-            metadata = {}
-            if hasattr(instance, "metadata") and instance.metadata:
-                if isinstance(instance.metadata, dict):
-                    metadata = instance.metadata.copy()
-
-            # If no instance id, then create one
-            if "request_id" not in metadata:
-                metadata["request_id"] = counter
-                counter += 1
+            # Extract repeat index
+            repeat_idx = self.get_attr(instance, "repeat_idx")
+            if repeat_idx is None:
+                repeat_idx = 0
 
             # Create a dictionary representation of the instance
             instance_dict = {
-                "context": context,
+                "context": instance.args[0],
                 "gen_kwargs": gen_kwargs,
-                "repeat_index": metadata.get("repeat_index"),
-                "request_id": metadata["request_id"],
-                # For compatibility with existing code, maintain the metadata field
-                "metadata": metadata,
+                "repeat_idx": repeat_idx,
+                "request_idx": request_idx,
+                "task_name": self.get_attr(instance, "task_name"),
+                "metadata": self.get_attr(instance, "metadata"),
             }
+            request_idx += 1
 
             # Add to our accumulated data
             self.all_instances_data.append(instance_dict)
 
         # For now, just return empty strings - we'll upload in a separate method
         return [""] * len(requests)
+
+    def get_attr(self, instance, attr_name):
+        if hasattr(instance, attr_name):
+            return getattr(instance, attr_name)
+        else:
+            return None
 
     def __del__(self):
         """
@@ -122,8 +122,11 @@ class UploadInstancesToHF(TemplateLM):
             repo_id=self.repo_id,
             token=self.token,
             private=False,  # Default to public
-            config_name=self.dataset_name,
+            config_name=self.subset_name,
         )
+
+        # Log the URL for easy access
+        self.logger.info(f"Uploaded dataset to https://huggingface.co/datasets/{self.repo_id}")
 
         # Clear the data after uploading
         self.all_instances_data = []

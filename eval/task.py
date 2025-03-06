@@ -60,6 +60,11 @@ class BaseBenchmark(ABC):
     def compute(self, model: LM, inputs: List[Instance], do_slice: bool = True) -> List[str]:
         inputs = self._normalize_model_args(model, inputs)
 
+        # Add task_name to each instance
+        task_name = self.__class__.__name__.replace("Benchmark", "")
+        for instance in inputs:
+            instance.task_name = task_name
+
         if model.world_size > 1 and do_slice:
             prompts = list(islice(inputs, model.rank, len(inputs), model.world_size))
         else:

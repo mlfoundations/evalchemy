@@ -1,16 +1,22 @@
+import logging
 import multiprocessing as mp
 
 from bespokelabs.curator import LLM
 from datasets import load_dataset
+from tenacity import before_sleep_log, retry, stop_after_attempt, wait_exponential
 
 # This is just a demonstration of sharding.
 # Really you want to run eval model weights with multiple GPUs and nodes
 # Each node you use a different shard index
 # Using curator with API model it is faster to just run a single curator instance, no shards
 
-num_shards = 8  # Tested with 1, 2, 8, 64
+num_shards = 64  # Tested with 1, 2, 8, (16, 32, 64 breaks)
+# return RepoUrl(d["url"], endpoint=self.endpoint) KeyError: 'url' (race condition? rate limit?)
 ds_name = "mlfoundations-dev/REASONING_evalchemy"
 output_ds_name = f"{ds_name}_{num_shards}_sharded_gpt-4o-mini"
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 class Answer(LLM):
@@ -22,20 +28,35 @@ class Answer(LLM):
         return row
 
 
+@retry(
+    stop=stop_after_attempt(5),
+    wait=wait_exponential(multiplier=1, min=4, max=60),
+    reraise=True,
+)
+def push_to_hub_with_retry(dataset, ds_name, shard_index):
+    try:
+        dataset.push_to_hub(ds_name, config_name=f"shard_{shard_index}")
+    except Exception as e:
+        print(f"Shard {shard_index} push failed, will retry: {str(e)}")
+        raise
+
+
 def process_shard(shard_index):
     ds = load_dataset(ds_name, split="train")
     ds = ds.shard(num_shards=num_shards, index=shard_index)
     answer = Answer(model_name="gpt-4o-mini")
     ds = answer(ds)
 
-    ds.push_to_hub(output_ds_name, config_name=f"shard_{shard_index}")
-    # note there could be issues with processes uploading at the same time
-    # and also rate limits
-    print(f"Viewable at https://huggingface.co/datasets/{output_ds_name}")
+    try:
+        push_to_hub_with_retry(ds, output_ds_name, shard_index)
+        print(f"Shard {shard_index} pushed to hub")
+    except Exception as e:
+        print(f"Failed to push shard {shard_index} after all retries: {str(e)}")
 
 
 if __name__ == "__main__":
     with mp.Pool() as pool:
         pool.map(process_shard, range(num_shards))
+    print(f"Viewable at https://huggingface.co/datasets/{output_ds_name}")
     ds = load_dataset(output_ds_name, split="train")
     print(ds)

@@ -16,16 +16,16 @@ logger = logging.getLogger(__name__)
     wait=wait_exponential(multiplier=1, min=30, max=600),
     reraise=True,
 )
-def upload_shard(dataset, repo_id, shard_num, num_shards):
+def upload_shard(dataset, output_dataset, shard_num, num_shards):
     """Push dataset to Hugging Face Hub with automatic retries."""
     api = HfApi()
     # Check if repo exists before creating
     try:
-        api.repo_info(repo_id=repo_id, repo_type="dataset")
-        print(f"Repository {repo_id} already exists")
+        api.repo_info(repo_id=output_dataset, repo_type="dataset")
+        print(f"Repository {output_dataset} already exists")
     except Exception:
-        print(f"Creating new repository {repo_id}")
-        api.create_repo(repo_id=repo_id, repo_type="dataset")
+        print(f"Creating new repository {output_dataset}")
+        api.create_repo(repo_id=output_dataset, repo_type="dataset")
 
     try:
         # Create temporary file and save the dataset
@@ -37,29 +37,31 @@ def upload_shard(dataset, repo_id, shard_num, num_shards):
             api.upload_file(
                 path_or_fileobj=tmp.name,
                 path_in_repo=shard_filename,
-                repo_id=repo_id,
+                repo_id=output_dataset,
                 repo_type="dataset",
                 commit_message=f"Adding shard {shard_num}",
             )
 
-        print(f"Successfully pushed shard {shard_num} to {repo_id} as {shard_filename}")
+        print(f"Successfully pushed shard {shard_num} to {output_dataset} as {shard_filename}")
     except Exception as e:
         print(f"Push failed for shard {shard_num}, will retry: {str(e)}")
         raise
 
 
-def process_shard(repo_id: str, rank: int, global_size: int, model_name: str, tp: int) -> None:
+def process_shard(input_dataset: str, rank: int, global_size: int, model_name: str, tp: int, output_dataset: str = None) -> None:
     """Process a single shard of the dataset.
 
     Args:
-        repo_id: The Hugging Face Hub repository ID containing the inputs
+        input_dataset: The Hugging Face Hub repository ID containing the inputs
         rank: The shard index (0 to global_size-1)
         global_size: Total number of shards
         model_name: The name or path of the model for VLLM
+        tp: Tensor parallelism size for VLLM
+        output_dataset: Custom output repository ID. If None, a default name will be generated.
     """
     # Load the dataset from Hugging Face Hub
-    logger.info(f"Loading dataset from {repo_id}")
-    ds = load_dataset(repo_id, split="train")
+    logger.info(f"Loading dataset from {input_dataset}")
+    ds = load_dataset(input_dataset, split="train")
 
     # Shard the dataset
     logger.info(f"Sharding dataset: {global_size} shards, processing shard {rank}")
@@ -128,14 +130,17 @@ def process_shard(repo_id: str, rank: int, global_size: int, model_name: str, tp
     # Create a new dataset with the model outputs
     output_ds = Dataset.from_list(processed_examples)
 
-    # Push the results to Hub
     # Extract model name for the output repo ID (use last part of path)
     model_short_name = model_name.split("/")[-1]
-    output_repo_id = f"{repo_id}_{global_size}shards_{model_short_name}"
+    
+    # Use provided output_repo_id or generate default one
+    if output_dataset is None:
+        output_dataset = f"{input_dataset}_{global_size}shards_{model_short_name}"
+        
     try:
-        upload_shard(output_ds, output_repo_id, rank, global_size)
-        logger.info(f"Shard {rank} pushed to hub as {output_repo_id}")
-        logger.info(f"View the dataset at https://huggingface.co/datasets/{output_repo_id}")
+        upload_shard(output_ds, output_dataset, rank, global_size)
+        logger.info(f"Shard {rank} pushed to hub as {output_dataset}")
+        logger.info(f"View the dataset at https://huggingface.co/datasets/{output_dataset}")
     except Exception as e:
         logger.error(f"Failed to push shard {rank} after all retries: {str(e)}")
 
@@ -145,9 +150,11 @@ def main():
     parser = argparse.ArgumentParser(description="Run VLLM inference on a sharded dataset")
     parser.add_argument("--global_size", type=int, required=True, help="Total number of shards")
     parser.add_argument("--rank", type=int, required=True, help="Shard index (0-based)")
-    parser.add_argument("--repo_id", type=str, required=True, help="Hugging Face Hub repository ID")
+    parser.add_argument("--input_dataset", type=str, required=True, help="Hugging Face Hub repository ID")
+    parser.add_argument("--output_dataset", type=str, required=False, help="Hugging Face Hub repository ID. If not provided, a default name will be generated.")
     parser.add_argument("--model_name", type=str, required=True, help="Name or path of the model for VLLM")
     parser.add_argument("--tp", type=int, default=1, help="Tensor parallelism size for VLLM")
+
 
     args = parser.parse_args()
 
@@ -156,7 +163,7 @@ def main():
         raise ValueError(f"Rank ({args.rank}) must be between 0 and global_size-1 ({args.global_size-1})")
 
     # Process the shard
-    process_shard(args.repo_id, args.rank, args.global_size, args.model_name, args.tp)
+    process_shard(args.input_dataset, args.rank, args.global_size, args.model_name, args.tp, args.output_dataset)
 
 
 if __name__ == "__main__":

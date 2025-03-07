@@ -32,11 +32,13 @@ export $(grep -v '^#' .env | xargs)
 
 # SHARDED INFERENCE ARGUEMENTS
 export TASK="REASONING"
-export DATASET="mlfoundations-dev/${TASK}_evalchemy"
+export INPUT_DATASET="mlfoundations-dev/${TASK}_evalchemy"
 export MODEL_NAME="Qwen/Qwen2.5-7B-Instruct"
+export MODEL_NAME_SHORT=${MODEL_NAME##*/}
 export GLOBAL_SIZE=$SLURM_ARRAY_TASK_COUNT
 export RANK=$SLURM_ARRAY_TASK_ID
+export OUTPUT_DATASET="mlfoundations-dev/${TASK}_evalchemy_${GLOBAL_SIZE}shards_${MODEL_NAME_SHORT}"
 
 # SRUN TASKS
-srun bash -c 'echo "GLOBAL_SIZE: ${GLOBAL_SIZE},  RANK: ${RANK}, DATASET: ${DATASET}, MODEL: ${MODEL_NAME}"'
-srun bash -c 'python $WORK/evalchemy/eval/examples/external_inference_sharded_vllm.py --global_size ${GLOBAL_SIZE} --rank ${RANK} --repo_id ${DATASET} --model_name ${MODEL_NAME}'
+srun bash -c 'echo "GLOBAL_SIZE: ${GLOBAL_SIZE},  RANK: ${RANK}, INPUT_DATASET: ${INPUT_DATASET}, OUTPUT_DATASET: ${OUTPUT_DATASET}, MODEL: ${MODEL_NAME}"'
+srun bash -c 'python $WORK/evalchemy/eval/examples/external_inference_sharded_vllm.py --global_size ${GLOBAL_SIZE} --rank ${RANK} --input_dataset ${INPUT_DATASET} --output_dataset ${OUTPUT_DATASET} --model_name ${MODEL_NAME}'

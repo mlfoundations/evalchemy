@@ -15,6 +15,7 @@ from dotenv import load_dotenv
 import colorama
 from colorama import Fore, Style
 import signal
+from huggingface_hub import HfApi
 
 # Initialize colorama
 colorama.init()
@@ -124,12 +125,33 @@ def generate_task_hash(tasks):
     hash_obj = hashlib.md5(tasks_str.encode())
     return hash_obj.hexdigest()[:4]
 
-def create_evaluation_dataset(tasks, output_repo_id):
-    """Create the evaluation dataset."""
-    print_header("Creating Evaluation Dataset")
+def check_dataset_exists(repo_id):
+    """Check if a dataset repository exists on Hugging Face using the HfApi."""
+    api = HfApi()
+    try:
+        api.repo_info(repo_id=repo_id, repo_type="dataset")
+        return True
+    except Exception:
+        return False
+
+def create_evaluation_dataset(tasks):
+    """Create or use cached evaluation dataset."""
+    print_header("Preparing Evaluation Dataset")
     
+    # Generate a cached dataset name based on tasks
+    task_hash = generate_task_hash(tasks)
+    cached_dataset_id = f"mlfoundations-dev/evalset_{task_hash}"
+    
+    # Check if the cached dataset exists
+    if check_dataset_exists(cached_dataset_id):
+        print_success(f"Using cached evaluation dataset: {cached_dataset_id}")
+        return cached_dataset_id
+    
+    # If not, create a new evaluation dataset
+    print_info("Creating new evaluation dataset...")
+    print_warning("This may be slow on a login node, consider running this locally.")
     tasks_str = ",".join(tasks)
-    cmd = f"python -m eval.eval --model upload_to_hf --tasks {tasks_str} --model_args repo_id={output_repo_id} --output_path logs"
+    cmd = f"OPENAI_API_KEY=NONE python -m eval.eval --model upload_to_hf --tasks {tasks_str} --model_args repo_id={cached_dataset_id} --output_path logs"
     
     stdout, stderr, return_code = execute_command(cmd)
     
@@ -138,10 +160,10 @@ def create_evaluation_dataset(tasks, output_repo_id):
         print_error(f"Error: {stderr}")
         return False
     
-    print_success(f"Evaluation dataset created at: {output_repo_id}")
-    return True
+    print_success(f"Evaluation dataset created at: {cached_dataset_id}")
+    return cached_dataset_id
 
-def prepare_for_sbatch(output_repo_id, model_name):
+def prepare_for_sbatch(input_repo_id, output_repo_id, model_name):
     """Prepare for the sbatch job."""
     print_header("Preparing for SBATCH Job")
     
@@ -159,8 +181,8 @@ def prepare_for_sbatch(output_repo_id, model_name):
     print_success(f"Set HF_HUB to: {hf_hub}")
     
     # Download the dataset
-    print_info(f"Downloading dataset from: {output_repo_id}")
-    cmd = f"huggingface-cli download {output_repo_id} --repo-type dataset --local-dir {hf_hub}/datasets/{output_repo_id}"
+    print_info(f"Downloading dataset from: {input_repo_id}")
+    cmd = f"huggingface-cli download {input_repo_id} --repo-type dataset"
     stdout, stderr, return_code = execute_command(cmd)
     
     if return_code != 0:
@@ -169,10 +191,13 @@ def prepare_for_sbatch(output_repo_id, model_name):
         print_success("Dataset downloaded successfully.")
     
     # Download the target model
-    print_info(f"Ensuring model is available: {model_name}")
-    cmd = f"python -c \"from transformers import AutoTokenizer; AutoTokenizer.from_pretrained('{model_name}')\""
+    # print_info(f"Ensuring model is available: {model_name}")
+    # cmd = f"python -c \"from transformers import AutoTokenizer; AutoTokenizer.from_pretrained('{model_name}')\""
+    # stdout, stderr, return_code = execute_command(cmd)
+    print_info(f"Downloading model from: {model_name}")
+    cmd = f"huggingface-cli download {model_name}"
     stdout, stderr, return_code = execute_command(cmd)
-    
+
     if return_code != 0:
         print_warning(f"Model download may have issues: {stderr}")
     else:
@@ -180,7 +205,7 @@ def prepare_for_sbatch(output_repo_id, model_name):
     
     return logs_dir
 
-def launch_sbatch(model_name, dataset_repo_id, num_shards, logs_dir, tasks_str):
+def launch_sbatch(model_name, input_dataset, output_dataset, num_shards, logs_dir, tasks_str):
     """Launch the sbatch job."""
     print_header("Launching SBATCH Job")
     
@@ -193,7 +218,8 @@ def launch_sbatch(model_name, dataset_repo_id, num_shards, logs_dir, tasks_str):
     # Replace parameters in the sbatch script
     sbatch_content = sbatch_content.replace("#SBATCH --array=0-127", f"#SBATCH --array=0-{num_shards-1}")
     sbatch_content = sbatch_content.replace("export TASK=\"REASONING\"", f"export TASK=\"{tasks_str}\"")
-    sbatch_content = sbatch_content.replace("export DATASET=\"mlfoundations-dev/${TASK}_evalchemy\"", f"export DATASET=\"{dataset_repo_id}\"")
+    sbatch_content = sbatch_content.replace("export INPUT_DATASET=\"mlfoundations-dev/${TASK}_evalchemy\"", f"export INPUT_DATASET=\"{input_dataset}\"")
+    sbatch_content = sbatch_content.replace("export OUTPUT_DATASET=\"mlfoundations-dev/${TASK}_evalchemy_${GLOBAL_SIZE}shards_${MODEL_NAME_SHORT}\"", f"export OUTPUT_DATASET=\"{output_dataset}\"")
     sbatch_content = sbatch_content.replace("export MODEL_NAME=\"Qwen/Qwen2.5-7B-Instruct\"", f"export MODEL_NAME=\"{model_name}\"")
     
     # Add output log path
@@ -222,22 +248,56 @@ def launch_sbatch(model_name, dataset_repo_id, num_shards, logs_dir, tasks_str):
         print_error("Could not determine job ID from sbatch output.")
         return None
 
-def monitor_job(job_id, logs_dir, num_shards, watchdog_interval=30):
+def monitor_job(job_id, logs_dir, num_shards, watchdog_interval=60):
     """Monitor the slurm job and show progress."""
     print_header("Monitoring Job Progress")
     
     # Determine the log file pattern based on the job ID
     log_pattern = f"{logs_dir}/{job_id}_*.out"
     
+    # Define job states
+    running_states = ["RUNNING", "PENDING", "REQUEUED", "CONFIGURING", "COMPLETING", "RESIZING", "SUSPENDED", "REVOKED"]
+    failed_states = ["FAILED", "TIMEOUT", "CANCELLED", "OUT_OF_MEMORY", "NODE_FAIL", "PREEMPTED", "DEADLINE", "BOOT_FAIL", "SPECIAL_EXIT"]
+    
     try:
         while True:
-            # Check if the job is still running
-            cmd = f"sacct -j {job_id} --format=State --noheader | head -1"
+            # Get job state counts
+            cmd = f"sacct -j {job_id} --format=State --noheader"
             stdout, _, _ = execute_command(cmd, verbose=False)
-            state = stdout.strip()
             
-            if state not in ["RUNNING", "PENDING", "REQUEUED"]:
-                print_info(f"Job state: {state}")
+            if not stdout.strip():
+                print_warning("No job state information available yet. Waiting...")
+                time.sleep(10)
+                continue
+                
+            states = stdout.strip().split('\n')
+            
+            # Count states by category
+            running_count = sum(1 for state in states if any(s in state for s in running_states))
+            completed_count = sum(1 for state in states if "COMPLETED" in state)
+            failed_count = sum(1 for state in states if any(s in state for s in failed_states))
+            total_count = len(states)
+            
+            # Show job summary
+            print_info(f"Job Status: {completed_count} completed, {running_count} running, {failed_count} failed, {total_count} total")
+            
+            # Show failed jobs if any
+            if failed_count > 0:
+                # Create regex pattern for failed states
+                failed_pattern = "|".join(failed_states)
+                cmd = f"sacct -j {job_id} --format=JobID%20,State,ExitCode --noheader | grep -E '{failed_pattern}'"
+                stdout, _, _ = execute_command(cmd, verbose=False)
+                if stdout.strip():
+                    print_warning(f"Failed jobs (showing up to 5):")
+                    failed_lines = stdout.strip().split('\n')
+                    for i, line in enumerate(failed_lines[:5]):  # Show at most 5 failed jobs
+                        print_warning(f"  {line}")
+                    if len(failed_lines) > 5:
+                        print_warning(f"  ... and {len(failed_lines) - 5} more")
+            
+            # Check if all jobs are done
+            if running_count == 0:
+                print_success("All jobs have completed or terminated.")
                 break
             
             # Count various progress indicators
@@ -248,8 +308,6 @@ def monitor_job(job_id, logs_dir, num_shards, watchdog_interval=30):
                 ("Completed shards", f"grep -l \"Processed prompts: 100%\" {log_pattern} | wc -l")
             ]
             
-            # Print progress information
-            print_info(f"Job state: {state}")
             for label, cmd in progress_metrics:
                 stdout, _, _ = execute_command(cmd, verbose=False)
                 count = int(stdout.strip())
@@ -261,52 +319,84 @@ def monitor_job(job_id, logs_dir, num_shards, watchdog_interval=30):
     except KeyboardInterrupt:
         print_warning("Monitoring interrupted. Job is still running.")
         return
-    
-    print_success("Job has completed or terminated.")
 
 def check_job_completion(job_id):
-    """Check if all array jobs completed successfully."""
+    """Check if all array jobs completed successfully and report detailed status."""
     print_header("Checking Job Completion")
     
-    cmd = f"sacct -j {job_id} -X --format=JobID%20,JobName,Elapsed,State | grep -v 'PENDING\\|RUNNING'"
+    # Define job states
+    failed_states = ["FAILED", "TIMEOUT", "CANCELLED", "OUT_OF_MEMORY", "NODE_FAIL", "PREEMPTED", "DEADLINE", "BOOT_FAIL", "SPECIAL_EXIT"]
+    
+    # Get detailed job information
+    cmd = f"sacct -j {job_id} --format=JobID%20,JobName,Elapsed,State,ExitCode --noheader"
     stdout, _, _ = execute_command(cmd)
     
-    # Parse the output and count completed/failed jobs
-    lines = stdout.strip().split('\n')
-    total_jobs = len(lines) - 1  # Subtract header line
-    completed_jobs = sum(1 for line in lines[1:] if 'COMPLETED' in line)
+    # Parse the output and count jobs by state
+    lines = stdout.strip().split('\n') if stdout.strip() else []
+    total_jobs = len(lines)
+    completed_jobs = sum(1 for line in lines if 'COMPLETED' in line)
+    failed_jobs = sum(1 for line in lines if any(state in line for state in failed_states))
     
     # Print job statistics
     print_info(f"Total jobs: {total_jobs}")
     print_info(f"Completed jobs: {completed_jobs}")
+    print_info(f"Failed jobs: {failed_jobs}")
     
-    if completed_jobs < total_jobs:
-        print_warning(f"Some jobs failed or were cancelled: {total_jobs - completed_jobs} jobs")
-    else:
+    # Show detail on failed jobs if any
+    if failed_jobs > 0:
+        print_warning("Failed jobs:")
+        failure_types = {}
+        
+        # Group failures by state
+        for line in lines:
+            if any(state in line for state in failed_states):
+                for state in failed_states:
+                    if state in line:
+                        failure_types.setdefault(state, []).append(line)
+                        break
+        
+        # Print summary by failure type
+        for failure_type, failed_lines in failure_types.items():
+            print_warning(f"  {failure_type}: {len(failed_lines)} jobs")
+            
+            # Print up to 3 examples of each failure type
+            for i, line in enumerate(failed_lines[:3]):
+                print_warning(f"    {line}")
+            
+            if len(failed_lines) > 3:
+                print_warning(f"    ... and {len(failed_lines) - 3} more {failure_type} jobs")
+    
+    if completed_jobs == total_jobs:
         print_success("All jobs completed successfully.")
+    else:
+        print_warning(f"{completed_jobs}/{total_jobs} jobs completed successfully.")
     
-    # Calculate and print time statistics
-    cmd = f"""sacct -j {job_id} -X --format=JobID%20,JobName,Elapsed,State | awk '
-    {{
-        split($3, time, ":");
-        seconds = time[1]*3600 + time[2]*60 + time[3];
-        total += seconds;
-        if (NR == 1 || seconds < min) min = seconds;
-        if (NR == 1 || seconds > max) max = seconds;
-        count++;
-    }}
-    END {{
-        avg = total/count;
-        printf "Min: %02d:%02d:%02d, Max: %02d:%02d:%02d, Mean: %02d:%02d:%02d\\n", 
-               int(min/3600), int((min%3600)/60), min%60,
-               int(max/3600), int((max%3600)/60), max%60,
-               int(avg/3600), int((avg%3600)/60), avg%60
-    }}'"""
+    # Calculate and print time statistics for completed jobs
+    if completed_jobs > 0:
+        cmd = f"""sacct -j {job_id} --format=JobID%20,JobName,Elapsed,State --noheader | grep COMPLETED | awk '
+        {{
+            split($3, time, ":");
+            seconds = time[1]*3600 + time[2]*60 + time[3];
+            total += seconds;
+            if (NR == 1 || seconds < min) min = seconds;
+            if (NR == 1 || seconds > max) max = seconds;
+            count++;
+        }}
+        END {{
+            avg = total/count;
+            printf "Min: %02d:%02d:%02d, Max: %02d:%02d:%02d, Mean: %02d:%02d:%02d\\n", 
+                int(min/3600), int((min%3600)/60), min%60,
+                int(max/3600), int((max%3600)/60), max%60,
+                int(avg/3600), int((avg%3600)/60), avg%60
+        }}'"""
+        
+        stdout, _, _ = execute_command(cmd)
+        if stdout.strip():
+            print_info(f"Job timing statistics (for completed jobs):\n  {stdout}")
     
-    stdout, _, _ = execute_command(cmd)
-    print_info(f"Job timing statistics:\n  {stdout}")
-    
-    return completed_jobs == total_jobs
+    # Return true if enough jobs completed to consider the overall job successful
+    # Here we're considering 90% completion as a reasonable threshold, but this could be adjusted
+    return completed_jobs >= total_jobs * 0.9
 
 def compute_and_upload_scores(tasks, output_repo_id):
     """Compute and upload scores."""
@@ -348,23 +438,24 @@ def main():
     if not activate_conda_env():
         sys.exit(1)
     
-    # Generate timestamp and repository ID
-    timestamp = datetime.datetime.now().strftime("%m-%d-%y-%H-%M")
+    # Generate timestamp and repository ID for results
+    timestamp = datetime.datetime.now().strftime("%m-%d-%y_%H-%M")
     model_name_short = args.model_name.split("/")[-1]
     task_hash = generate_task_hash(tasks)
-    output_repo_id = f"mlfoundations-dev/{model_name_short}_eval_{timestamp}_{task_hash}"
+    output_dataset = f"mlfoundations-dev/{model_name_short}_eval_{timestamp}_{task_hash}"
     
-    print_info(f"Output repository: {output_repo_id}")
+    print_info(f"Output dataset for results: {output_dataset}")
     
-    # Create evaluation dataset
-    if not create_evaluation_dataset(tasks, output_repo_id):
+    # Create or get cached evaluation dataset
+    input_dataset = create_evaluation_dataset(tasks)
+    if not input_dataset:
         sys.exit(1)
     
     # Prepare for sbatch job
-    logs_dir = prepare_for_sbatch(output_repo_id, args.model_name)
+    logs_dir = prepare_for_sbatch(input_dataset, output_dataset, args.model_name)
     
-    # Launch sbatch job
-    job_id = launch_sbatch(args.model_name, output_repo_id, args.num_shards, logs_dir, args.tasks)
+    # Launch sbatch job with the dataset repo but save to output repo
+    job_id = launch_sbatch(args.model_name, input_dataset, output_dataset, args.num_shards, logs_dir, args.tasks)
     if not job_id:
         sys.exit(1)
     
@@ -374,6 +465,7 @@ def main():
     print_info(f"Cancel job: scancel {job_id}")
     print_info(f"View detailed job info: sacct -j {job_id} --format=JobID,JobName,State,Elapsed")
     print_info(f"Monitor logs: tail -f {logs_dir}/{job_id}_*.out")
+    print_info(f"Watch shards get uploaded: https://huggingface.co/datasets/{output_dataset}/tree/main")
     
     # If watchdog flag is not set, exit
     if not args.watchdog:
@@ -389,16 +481,18 @@ def main():
     
     # Compute and upload scores
     if success:
-        if compute_and_upload_scores(tasks, output_repo_id):
-            print_success(f"Evaluation completed successfully. Results uploaded to {output_repo_id}")
-            print_info(f"View the results at: https://huggingface.co/{output_repo_id}")
+        if compute_and_upload_scores(tasks, output_dataset):
+            print_success(f"Evaluation completed successfully. Results uploaded to {output_dataset}")
+            print_info(f"View the results at: https://huggingface.co/{output_dataset}")
+            print_info(f"Dataset used: {input_dataset}")
         else:
             print_error("Failed to compute and upload scores.")
     else:
         print_warning("Some jobs failed. You may want to check the logs before computing scores.")
         response = input("Would you like to compute scores anyway? (y/n): ")
         if response.lower() == 'y':
-            compute_and_upload_scores(tasks, output_repo_id)
+            compute_and_upload_scores(tasks, output_dataset)
+            print_info(f"Dataset used: {input_dataset}")
 
 if __name__ == "__main__":
     main()

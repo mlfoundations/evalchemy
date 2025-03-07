@@ -5,7 +5,6 @@
 #SBATCH --gres=gpu:1           
 #SBATCH --time=01:00:00        
 #SBATCH --mem=64G
-#SBATCH --exclusive
 #SBATCH --array=0-127 # Create 128 independent tasks (or however many idle gpus are there!)
 #SBATCH --account=p_finetuning
 

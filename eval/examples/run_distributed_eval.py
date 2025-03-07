@@ -149,7 +149,7 @@ def create_evaluation_dataset(tasks):
     
     # If not, create a new evaluation dataset
     print_info("Creating new evaluation dataset...")
-    print_warning("This may be slow on a login node, consider running this locally.")
+    print_warning("This may take a while the first time the eval datasets are downloaded and parsed. Consider running locally with more cpus.")
     tasks_str = ",".join(tasks)
     cmd = f"OPENAI_API_KEY=NONE python -m eval.eval --model upload_to_hf --tasks {tasks_str} --model_args repo_id={cached_dataset_id} --output_path logs"
     
@@ -376,7 +376,7 @@ def check_job_completion(job_id):
     
     # Calculate and print time statistics for completed jobs
     if completed_jobs > 0:
-        cmd = f"""sacct -j {job_id} --format=JobID%20,JobName,Elapsed,State --noheader | grep COMPLETED | awk '
+        cmd = f"""sacct -j {job_id} -X --format=JobID%20,JobName,Elapsed,State --noheader | grep COMPLETED | awk '
         {{
             split($3, time, ":");
             seconds = time[1]*3600 + time[2]*60 + time[3];
@@ -395,7 +395,7 @@ def check_job_completion(job_id):
         
         stdout, _, _ = execute_command(cmd)
         if stdout.strip():
-            print_info(f"Job timing statistics (for completed jobs):\n  {stdout}")
+            print_success(f"Job timing statistics (for completed jobs):\n  {stdout}")
     
     # Return true if enough jobs completed to consider the overall job successful
     # Here we're considering 90% completion as a reasonable threshold, but this could be adjusted
@@ -404,9 +404,10 @@ def check_job_completion(job_id):
 def compute_and_upload_scores(tasks, output_repo_id):
     """Compute and upload scores."""
     print_header("Computing and Uploading Scores")
+    print_warning("This may take a while the first time the eval datasets are downloaded and parsed. Consider running locally with more cpus.")
     
     tasks_str = ",".join(tasks)
-    cmd = f"python -m eval.eval --model precomputed_hf --model_args \"repo_id={output_repo_id}\" --tasks {tasks_str} --output_path logs --use_database"
+    cmd = f"OPENAI_API_KEY=NONE python -m eval.eval --model precomputed_hf --model_args \"repo_id={output_repo_id}\" --tasks {tasks_str} --output_path logs --use_database"
     
     stdout, stderr, return_code = execute_command(cmd)
     

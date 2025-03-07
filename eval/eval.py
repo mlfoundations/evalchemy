@@ -302,7 +302,9 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
         if not os.getenv("OPENAI_API_KEY"):
             raise ValueError("Please set OPENAI_API_KEY")
 
-    task_manager = InstructTaskManager(annotator_model=args.annotator_model, debug=args.debug, seed=args.seed)
+    task_manager = InstructTaskManager(
+        annotator_model=args.annotator_model, debug=args.debug, seed=args.seed, task_list=task_list
+    )
     pretrain_task_manager = PretrainTaskManager(args.verbosity, include_path=args.include_path)
 
     utils.eval_logger.info(f"Selected Tasks: {[task for task in task_list]}")

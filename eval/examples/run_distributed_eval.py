@@ -217,15 +217,26 @@ def prepare_for_sbatch(input_repo_id, output_repo_id, model_name):
     return logs_dir
 
 
-def launch_sbatch(model_name, input_dataset, output_dataset, num_shards, logs_dir, tasks_str):
+def launch_sbatch(model_name, input_dataset, output_dataset, num_shards, logs_dir, tasks_str, upload_from_worker=False):
     """Launch the sbatch job."""
     print_header("Launching SBATCH Job")
 
     # Create a temporary sbatch script with the correct parameters
     temp_sbatch_file = os.path.join(logs_dir, "job.sbatch")
 
-    with open("eval/examples/zih_sharded_ALL_job_array.sbatch", "r") as f:
+    # Use the appropriate sbatch script based on upload mode
+    if upload_from_worker:
+        sbatch_script = "eval/examples/zih_sharded_ALL_job_array.sbatch"
+        print_info("Using worker upload mode (uploading from worker nodes)")
+    else:
+        sbatch_script = "eval/examples/zih_sharded_ALL_job_array_upload.sbatch"
+        print_info("Using local save mode (saving locally and uploading from login node)")
+
+    with open(sbatch_script, "r") as f:
         sbatch_content = f.read()
+
+    # Get the output directory path for saving results locally
+    output_dir = os.path.join("$WORK", "evalchemy_results", tasks_str, model_name.split("/")[-1])
 
     # Replace parameters in the sbatch script
     sbatch_content = sbatch_content.replace("#SBATCH --array=0-127", f"#SBATCH --array=0-{num_shards-1}")
@@ -240,6 +251,9 @@ def launch_sbatch(model_name, input_dataset, output_dataset, num_shards, logs_di
     sbatch_content = sbatch_content.replace(
         'export MODEL_NAME="Qwen/Qwen2.5-7B-Instruct"', f'export MODEL_NAME="{model_name}"'
     )
+    sbatch_content = sbatch_content.replace(
+        'export OUTPUT_DIR="$WORK/evalchemy_results/${TASK}/${MODEL_NAME_SHORT}"', f'export OUTPUT_DIR="{output_dir}"'
+    )
 
     # Add output log path
     sbatch_content = sbatch_content.replace(
@@ -250,6 +264,7 @@ def launch_sbatch(model_name, input_dataset, output_dataset, num_shards, logs_di
         f.write(sbatch_content)
 
     print_success(f"Created temporary sbatch file: {temp_sbatch_file}")
+    print_info(f"Results will be saved locally to: {output_dir}")
 
     # Launch the sbatch job
     cmd = f"sbatch {temp_sbatch_file}"
@@ -257,17 +272,17 @@ def launch_sbatch(model_name, input_dataset, output_dataset, num_shards, logs_di
 
     if return_code != 0:
         print_error(f"Failed to launch sbatch job: {stderr}")
-        return None
+        return None, None
 
     # Extract the job ID from the output
     job_id_match = re.search(r"Submitted batch job (\d+)", stdout)
     if job_id_match:
         job_id = job_id_match.group(1)
         print_success(f"SBATCH job submitted with ID: {job_id}")
-        return job_id
+        return job_id, output_dir
     else:
         print_error("Could not determine job ID from sbatch output.")
-        return None
+        return None, None
 
 
 def monitor_job(job_id, logs_dir, num_shards, watchdog_interval_min=1):
@@ -358,7 +373,7 @@ def monitor_job(job_id, logs_dir, num_shards, watchdog_interval_min=1):
         return
 
 
-def check_job_completion(job_id):
+def check_job_completion(job_id, output_dir=None):
     """Check if all array jobs completed successfully and report detailed status."""
     print_header("Checking Job Completion")
 
@@ -447,9 +462,67 @@ def check_job_completion(job_id):
     return completed_jobs >= total_jobs * 0.9
 
 
-def compute_and_upload_scores(tasks, output_repo_id, model_name):
+def upload_shards_to_hub(output_dir, output_repo_id):
+    """Upload all locally saved shards to HuggingFace Hub."""
+    print_header("Uploading Results to HuggingFace Hub")
+
+    if not os.path.exists(output_dir):
+        print_error(f"Output directory {output_dir} does not exist")
+        return False
+
+    # Check if there are any parquet files
+    cmd = f"ls -1 {output_dir}/*.parquet 2>/dev/null | wc -l"
+    stdout, _, _ = execute_command(cmd)
+    file_count = int(stdout.strip())
+
+    if file_count == 0:
+        print_error(f"No parquet files found in {output_dir}")
+        return False
+
+    print_info(f"Found {file_count} parquet files to upload")
+
+    # Parse repository ID to get organization and repository name
+    parts = output_repo_id.split("/")
+    if len(parts) != 2:
+        print_error(f"Invalid repository ID format: {output_repo_id}. Expected format: 'organization/repository'")
+        return False
+
+    org = parts[0]
+    repo_name = parts[1]
+
+    # Create the dataset repository if it doesn't exist
+    cmd = f"huggingface-cli repo create {repo_name} --organization {org} --type dataset || echo 'Repository already exists'"
+    stdout, stderr, return_code = execute_command(cmd)
+
+    if return_code != 0:
+        print_warning(f"Repository creation returned non-zero status: {stderr}")
+
+    # Upload all files
+    print_info(f"Uploading files from {output_dir} to {output_repo_id}...")
+    cmd = f"huggingface-cli upload {output_repo_id} {output_dir} --repo-type dataset"
+    stdout, stderr, return_code = execute_command(cmd)
+
+    if return_code != 0:
+        print_error(f"Failed to upload files: {stderr}")
+        return False
+
+    print_success(f"All files successfully uploaded to {output_repo_id}")
+    print_info(f"View the dataset at https://huggingface.co/datasets/{output_repo_id}")
+    return True
+
+
+def compute_and_upload_scores(tasks, output_repo_id, model_name, output_dir=None, upload_shards=True):
     """Compute and upload scores."""
     print_header("Computing and Uploading Scores")
+
+    # If upload_shards is True and output_dir is provided, first upload the shards to HuggingFace Hub
+    if upload_shards and output_dir:
+        if not upload_shards_to_hub(output_dir, output_repo_id):
+            print_error("Failed to upload shards to HuggingFace Hub")
+            response = input("Continue with computing scores anyway? (y/n): ")
+            if response.lower() != "y":
+                return False
+
     print_warning(
         "This may take a while the first time the eval datasets are downloaded and parsed. Consider running locally with more cpus."
     )
@@ -480,6 +553,11 @@ def main():
     parser.add_argument("--model_name", type=str, required=True, help="Model name/path to evaluate")
     parser.add_argument("--num_shards", type=int, default=128, help="Number of shards for distributed evaluation")
     parser.add_argument("--watchdog", action="store_true", help="Monitor job progress and compute scores when done")
+    parser.add_argument(
+        "--upload_from_worker",
+        action="store_true",
+        help="Enable upload from worker nodes (default: False - save locally and upload from login node)",
+    )
 
     args = parser.parse_args()
 
@@ -515,7 +593,9 @@ def main():
     logs_dir = prepare_for_sbatch(input_dataset, output_dataset, args.model_name)
 
     # Launch sbatch job with the dataset repo but save to output repo
-    job_id = launch_sbatch(args.model_name, input_dataset, output_dataset, args.num_shards, logs_dir, args.tasks)
+    job_id, output_dir = launch_sbatch(
+        args.model_name, input_dataset, output_dataset, args.num_shards, logs_dir, args.tasks, args.upload_from_worker
+    )
     if not job_id:
         sys.exit(1)
 
@@ -525,7 +605,13 @@ def main():
     print_info(f"Cancel job: scancel {job_id}")
     print_info(f"View detailed job info: sacct -j {job_id} -X --format=JobID,JobName,State,Elapsed")
     print_info(f"Monitor logs: tail -f {logs_dir}/{job_id}_*.out")
-    print_info(f"Watch shards get uploaded: https://huggingface.co/datasets/{output_dataset}/tree/main")
+
+    # Show different info based on upload mode
+    if not args.upload_from_worker:
+        print_info(f"Results will be saved locally to: {output_dir}")
+        print_info(f"After completion, results will be uploaded to: https://huggingface.co/datasets/{output_dataset}")
+    else:
+        print_info(f"Watch shards get uploaded: https://huggingface.co/datasets/{output_dataset}/tree/main")
 
     # If watchdog flag is not set, exit
     if not args.watchdog:
@@ -539,9 +625,12 @@ def main():
     # Check job completion
     success = check_job_completion(job_id)
 
+    # Only upload shards if using login node uploads (not worker uploads)
+    upload_shards = not args.upload_from_worker
+
     # Compute and upload scores
     if success:
-        if compute_and_upload_scores(tasks, output_dataset, args.model_name):
+        if compute_and_upload_scores(tasks, output_dataset, args.model_name, output_dir, upload_shards):
             print_success(f"Evaluation completed successfully. Results uploaded to {output_dataset}")
             print_info(f"View the results at: https://huggingface.co/datasets/{output_dataset}")
         else:
@@ -550,7 +639,7 @@ def main():
         print_warning("Some jobs failed. You may want to check the logs before computing scores.")
         response = input("Would you like to compute scores anyway? (y/n): ")
         if response.lower() == "y":
-            compute_and_upload_scores(tasks, output_dataset, args.model_name)
+            compute_and_upload_scores(tasks, output_dataset, args.model_name, output_dir, upload_shards)
 
 
 if __name__ == "__main__":

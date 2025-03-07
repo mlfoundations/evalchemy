@@ -248,7 +248,7 @@ def launch_sbatch(model_name, input_dataset, output_dataset, num_shards, logs_di
         print_error("Could not determine job ID from sbatch output.")
         return None
 
-def monitor_job(job_id, logs_dir, num_shards, watchdog_interval=60):
+def monitor_job(job_id, logs_dir, num_shards, watchdog_interval_min=1):
     """Monitor the slurm job and show progress."""
     print_header("Monitoring Job Progress")
     
@@ -259,10 +259,12 @@ def monitor_job(job_id, logs_dir, num_shards, watchdog_interval=60):
     running_states = ["RUNNING", "PENDING", "REQUEUED", "CONFIGURING", "COMPLETING", "RESIZING", "SUSPENDED", "REVOKED"]
     failed_states = ["FAILED", "TIMEOUT", "CANCELLED", "OUT_OF_MEMORY", "NODE_FAIL", "PREEMPTED", "DEADLINE", "BOOT_FAIL", "SPECIAL_EXIT"]
     
+    time.sleep(5)
+    counter = 0
     try:
         while True:
             # Get job state counts
-            cmd = f"sacct -j {job_id} --format=State --noheader"
+            cmd = f"sacct -j {job_id} -X --format=State --noheader"
             stdout, _, _ = execute_command(cmd, verbose=False)
             
             if not stdout.strip():
@@ -279,13 +281,13 @@ def monitor_job(job_id, logs_dir, num_shards, watchdog_interval=60):
             total_count = len(states)
             
             # Show job summary
-            print_info(f"Job Status: {completed_count} completed, {running_count} running, {failed_count} failed, {total_count} total")
+            print_info(f"({counter*watchdog_interval_min}m) Job Status: {completed_count} completed, {running_count} running, {failed_count} failed, {total_count} total")
             
             # Show failed jobs if any
             if failed_count > 0:
                 # Create regex pattern for failed states
                 failed_pattern = "|".join(failed_states)
-                cmd = f"sacct -j {job_id} --format=JobID%20,State,ExitCode --noheader | grep -E '{failed_pattern}'"
+                cmd = f"sacct -j {job_id} -X --format=JobID%20,State,ExitCode --noheader | grep -E '{failed_pattern}'"
                 stdout, _, _ = execute_command(cmd, verbose=False)
                 if stdout.strip():
                     print_warning(f"Failed jobs (showing up to 5):")
@@ -315,7 +317,8 @@ def monitor_job(job_id, logs_dir, num_shards, watchdog_interval=60):
                 print(f"  {label}: {count}/{num_shards} ({percentage:.1f}%)")
             
             # Wait before checking again
-            time.sleep(watchdog_interval)
+            time.sleep(watchdog_interval_min * 60)
+            counter += 1
     except KeyboardInterrupt:
         print_warning("Monitoring interrupted. Job is still running.")
         return

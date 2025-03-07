@@ -236,7 +236,9 @@ def launch_sbatch(model_name, input_dataset, output_dataset, num_shards, logs_di
         sbatch_content = f.read()
 
     # Get the output directory path for saving results locally
-    output_dir = os.path.join("$WORK", "evalchemy_results", tasks_str, model_name.split("/")[-1])
+    # Extract repo name from output_dataset to use in local path
+    repo_name = output_dataset.split("/")[-1]
+    output_dir = os.path.join("$WORK", "evalchemy_results", repo_name)
 
     # Replace parameters in the sbatch script
     sbatch_content = sbatch_content.replace("#SBATCH --array=0-127", f"#SBATCH --array=0-{num_shards-1}")
@@ -434,6 +436,12 @@ def check_job_completion(job_id, output_dir=None):
     else:
         print_warning(f"{completed_jobs}/{total_jobs} jobs completed successfully.")
 
+    if output_dir:
+        cmd = f"ls -1 {output_dir}/*.parquet 2>/dev/null | wc -l"
+        stdout, _, _ = execute_command(cmd)
+        file_count = int(stdout.strip())
+        print_info(f"Found {file_count} parquet files in {output_dir}")
+
     # Calculate and print time statistics for completed jobs
     if completed_jobs > 0:
         cmd = f"""sacct -j {job_id} -X --format=JobID%20,JobName,Elapsed,State --noheader | grep COMPLETED | awk '
@@ -623,7 +631,7 @@ def main():
     monitor_job(job_id, logs_dir, args.num_shards)
 
     # Check job completion
-    success = check_job_completion(job_id)
+    success = check_job_completion(job_id, output_dir)
 
     # Only upload shards if using login node uploads (not worker uploads)
     upload_shards = not args.upload_from_worker

@@ -2,11 +2,11 @@
 #SBATCH --nodes=1            
 #SBATCH --ntasks=1           
 #SBATCH --cpus-per-task=8      
-#SBATCH --gres=gpu:4           
+#SBATCH --gres=gpu:1           
 #SBATCH --time=01:00:00        
 #SBATCH --mem=64G
 #SBATCH --exclusive
-#SBATCH --array=0-255 # Create 256 independent tasks (or however many idle gpus are there!)
+#SBATCH --array=0-127 # Create 128 independent tasks (or however many idle gpus are there!)
 #SBATCH --account=p_finetuning
 
 # MODULES

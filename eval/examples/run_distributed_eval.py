@@ -229,7 +229,7 @@ def launch_sbatch(model_name, input_dataset, output_dataset, num_shards, logs_di
         sbatch_script = "eval/examples/zih_sharded_ALL_job_array.sbatch"
         print_info("Using worker upload mode (uploading from worker nodes)")
     else:
-        sbatch_script = "eval/examples/zih_sharded_ALL_job_array_upload.sbatch"
+        sbatch_script = "eval/examples/zih_sharded_ALL_job_array_no_upload.sbatch"
         print_info("Using local save mode (saving locally and uploading from login node)")
 
     with open(sbatch_script, "r") as f:

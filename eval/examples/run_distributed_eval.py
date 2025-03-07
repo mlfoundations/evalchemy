@@ -86,7 +86,15 @@ def check_required_env_vars():
 
     if missing_vars:
         print_error(f"Missing required environment variables: {', '.join(missing_vars)}")
-        print_info("Please set these variables in your .env file and try again.")
+        print_info("Please set these variables using one of the following methods:")
+        print_info("1. Add them to your shell profile (~/.bashrc) and restart your shell")
+        print_info("2. Export them in your current shell: export HF_TOKEN=your_token")
+        print_info(
+            "3. Set them in .env file in evalchemy root (not recommended for sensitive tokens on shared systems)"
+        )
+        print_info("")
+        print_info("IMPORTANT: These variables will be automatically passed to worker nodes via SLURM's")
+        print_info("environment propagation (e.g. #SBATCH --export=ALL) which is the default behavior.")
         return False
 
     print_success("All required environment variables are set.")

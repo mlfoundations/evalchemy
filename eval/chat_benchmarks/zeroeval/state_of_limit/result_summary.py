@@ -1,8 +1,8 @@
 """
-This script will read the results from result_dirs_parsed and summarize the results. 
-We want to summarize the model performance on each example in each task that is evaluated. 
-We first save the model names that are correct and incorrect on each example, and then 
-we can compute the ratio on each example to know how many models are correct on each example. 
+This script will read the results from result_dirs_parsed and summarize the results.
+We want to summarize the model performance on each example in each task that is evaluated.
+We first save the model names that are correct and incorrect on each example, and then
+we can compute the ratio on each example to know how many models are correct on each example.
 We also include the reasoning provided by different models for each example.
 """
 

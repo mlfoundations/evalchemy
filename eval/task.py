@@ -108,6 +108,7 @@ class TaskManager:
         self.tasks: Dict[str, Any] = {}
         self.benchmark_instances: Dict[str, BaseBenchmark] = {}
         self.benchmark_kwargs = benchmark_kwargs
+        self.list_of_tasks_that_require_annotator_model = []
 
         # Load benchmarks from directory
         self._load_benchmarks(benchmarks_dir)
@@ -115,6 +116,15 @@ class TaskManager:
     def _load_benchmarks(self, benchmarks_dir: str):
         """Dynamically load benchmarks from the specified directory."""
         current_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), benchmarks_dir)
+
+        # Check if OpenAI API key is available
+        has_openai_key = os.getenv("OPENAI_API_KEY") is not None
+        if not has_openai_key:
+            self.logger.warning("OPENAI_API_KEY not set. Tasks requiring OpenAI will be skipped.")
+
+        # Temporarily set the API key to an empty string to prevent NoneType errors
+        if not has_openai_key:
+            os.environ["OPENAI_API_KEY"] = ""  # Empty string instead of None
 
         for item in os.listdir(current_dir):
             item_path = os.path.join(current_dir, item)
@@ -126,38 +136,60 @@ class TaskManager:
                 self.logger.warning(f"eval_instruct.py not found in {item}")
                 continue
 
-            # try:
-            # Import the module
-            sys.path.insert(0, item_path)
-            spec = importlib.util.spec_from_file_location(f"eval.{benchmarks_dir}.{item}.eval_instruct", eval_path)
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-            sys.path.pop(0)
+            try:
+                # Import the module
+                sys.path.insert(0, item_path)
+                spec = importlib.util.spec_from_file_location(f"eval.{benchmarks_dir}.{item}.eval_instruct", eval_path)
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+                sys.path.pop(0)
 
-            # Find benchmark class
-            benchmark_classes = [
-                cls
-                for _, cls in inspect.getmembers(module, inspect.isclass)
-                if (
-                    issubclass(cls, BaseBenchmark)
-                    and cls != BaseBenchmark
-                    and cls.__module__.replace(".", "/") in eval_path
+                # Find benchmark class
+                benchmark_classes = [
+                    cls
+                    for _, cls in inspect.getmembers(module, inspect.isclass)
+                    if (
+                        issubclass(cls, BaseBenchmark)
+                        and cls != BaseBenchmark
+                        and cls.__module__.replace(".", "/") in eval_path
+                    )
+                ]
+
+                if not benchmark_classes:
+                    self.logger.warning(f"No BaseBenchmark subclass found in {item}")
+                    continue
+
+                if len(benchmark_classes) > 1:
+                    self.logger.warning(f"Multiple benchmark classes found in {item}, using first one")
+
+                benchmark_class = benchmark_classes[0]
+
+                # Check if this benchmark requires OpenAI as annotator model
+                requires_annotator = "annotator_model" in inspect.signature(benchmark_class.__init__).parameters
+
+                # Check if the benchmark explicitly requires OpenAI for annotation
+                requires_openai = (
+                    hasattr(benchmark_class, "REQUIRES_OPENAI_ANNOTATOR") and benchmark_class.REQUIRES_OPENAI_ANNOTATOR
                 )
-            ]
 
-            if not benchmark_classes:
-                self.logger.warning(f"No BaseBenchmark subclass found in {item}")
+                if requires_annotator:
+                    self.list_of_tasks_that_require_annotator_model.append(item)
+
+                if not has_openai_key and requires_openai:
+                    self.logger.warning(
+                        f"Not loading {item} benchmark as it requires OpenAI as annotator model but OPENAI_API_KEY is not set"
+                    )
+                    continue
+
+                self._register_benchmark(item, benchmark_class)
+
+            except Exception as e:
+                self.logger.error(f"Error loading benchmark from {item}: {str(e)}")
                 continue
 
-            if len(benchmark_classes) > 1:
-                self.logger.warning(f"Multiple benchmark classes found in {item}, using first one")
-
-            benchmark_class = benchmark_classes[0]
-            self._register_benchmark(item, benchmark_class)
-
-            # except Exception as e:
-            #     self.logger.error(f"Error loading benchmark from {item}: {str(e)}")
-            #     continue
+        # Clean up temporary environment variable if we set it
+        if not has_openai_key and "OPENAI_API_KEY" in os.environ and os.environ["OPENAI_API_KEY"] == "":
+            del os.environ["OPENAI_API_KEY"]
 
     def _register_benchmark(self, name: str, benchmark_class: Type[BaseBenchmark]):
         """Register a benchmark class and create its instance."""
@@ -213,6 +245,30 @@ class TaskManager:
     def is_valid_task(self, task_name: str) -> bool:
         """Check if a task name is valid."""
         return task_name in self.tasks
+
+    def requires_annotator_model(self, task_name: str) -> bool:
+        """
+        Check if a task requires an annotator model by inspecting its __init__ signature.
+
+        Args:
+            task_name: The name of the task to check
+
+        Returns:
+            bool: True if the task's __init__ has an annotator_model parameter, False otherwise
+        """
+        if task_name in self.list_of_tasks_that_require_annotator_model:
+            return True
+        if task_name not in self.tasks:
+            self.logger.warning(f"Task not found: {task_name}")
+            return False
+
+        task_cls = self.tasks[task_name]
+
+        # Get the signature of the task's __init__ method
+        init_params = inspect.signature(task_cls.__init__).parameters
+
+        # Check if 'annotator_model' is in the parameters
+        return "annotator_model" in init_params
 
 
 def evaluate(

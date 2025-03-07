@@ -71,6 +71,8 @@ class WildBenchBenchmark(BaseBenchmark):
     WildBench benchmark for evaluating diverse real-world tasks.
     """
 
+    REQUIRES_OPENAI_ANNOTATOR = True
+
     def __init__(
         self,
         config: Optional[WildBenchConfig] = None,

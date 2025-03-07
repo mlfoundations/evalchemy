@@ -36,6 +36,8 @@ class MixEvalBenchmark(BaseBenchmark):
     MixEval benchmark for evaluating language model responses on various tasks.
     """
 
+    REQUIRES_OPENAI_ANNOTATOR = True
+
     def __init__(
         self,
         output_dir: str = "eval/chat_benchmarks/MixEval/results/",

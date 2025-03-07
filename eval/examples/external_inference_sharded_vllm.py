@@ -1,5 +1,6 @@
 import argparse
 import logging
+import os
 import tempfile
 
 from datasets import Dataset, load_dataset
@@ -48,7 +49,16 @@ def upload_shard(dataset, output_dataset, shard_num, num_shards):
         raise
 
 
-def process_shard(input_dataset: str, rank: int, global_size: int, model_name: str, tp: int, output_dataset: str = None) -> None:
+def process_shard(
+    input_dataset: str,
+    rank: int,
+    global_size: int,
+    model_name: str,
+    tp: int,
+    output_dataset: str = None,
+    no_upload: bool = False,
+    output_dir: str = None,
+) -> None:
     """Process a single shard of the dataset.
 
     Args:
@@ -58,6 +68,9 @@ def process_shard(input_dataset: str, rank: int, global_size: int, model_name: s
         model_name: The name or path of the model for VLLM
         tp: Tensor parallelism size for VLLM
         output_dataset: Custom output repository ID. If None, a default name will be generated.
+        no_upload: If True, don't upload to Hugging Face Hub and save locally instead.
+        output_dir: Directory to save the processed data locally when no_upload is True.
+                    If no_upload is False, this can also be specified to save a local copy.
     """
     # Load the dataset from Hugging Face Hub
     logger.info(f"Loading dataset from {input_dataset}")
@@ -77,6 +90,7 @@ def process_shard(input_dataset: str, rank: int, global_size: int, model_name: s
         gpu_memory_utilization=0.9,
         tensor_parallel_size=tp,
     )
+    # llm = None # test
 
     # Process each example and group by sampling params
     examples_by_params = {}
@@ -115,10 +129,12 @@ def process_shard(input_dataset: str, rank: int, global_size: int, model_name: s
 
         logger.info(f"Generating outputs for batch of {len(prompts)} examples with same parameters")
         outputs = llm.generate(prompts, sampling_params[0])  # All sampling_params are the same in the group
+        # outputs = [f"This is a test output {i}" for i in range(len(prompts))] # test
 
         # Process outputs and store results
         for idx, example, output in zip(indices, examples, outputs):
             generated_text = output.outputs[0].text if output.outputs else ""
+            # generated_text = "This is a test output for {}".format(idx) # test
             new_example = dict(example)
             new_example["model_outputs"] = generated_text
             processed_examples[idx] = new_example
@@ -129,20 +145,35 @@ def process_shard(input_dataset: str, rank: int, global_size: int, model_name: s
 
     # Create a new dataset with the model outputs
     output_ds = Dataset.from_list(processed_examples)
+    logger.info(f"Shard successfully processed and loaded into dataset: {len(output_ds)} examples")
 
     # Extract model name for the output repo ID (use last part of path)
     model_short_name = model_name.split("/")[-1]
-    
+
     # Use provided output_repo_id or generate default one
     if output_dataset is None:
         output_dataset = f"{input_dataset}_{global_size}shards_{model_short_name}"
-        
-    try:
-        upload_shard(output_ds, output_dataset, rank, global_size)
-        logger.info(f"Shard {rank} pushed to hub as {output_dataset}")
-        logger.info(f"View the dataset at https://huggingface.co/datasets/{output_dataset}")
-    except Exception as e:
-        logger.error(f"Failed to push shard {rank} after all retries: {str(e)}")
+
+    # Format the shard filename
+    shard_filename = f"train-{rank:05d}-of-{global_size:05d}.parquet"
+
+    # Save locally if output_dir is provided
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
+        local_path = os.path.join(output_dir, shard_filename)
+        output_ds.to_parquet(local_path)
+        logger.info(f"Saved shard {rank} locally to {local_path}")
+
+    # Upload to HF Hub if not disabled
+    if not no_upload:
+        try:
+            upload_shard(output_ds, output_dataset, rank, global_size)
+            logger.info(f"Shard {rank} pushed to hub as {output_dataset}")
+            logger.info(f"View the dataset at https://huggingface.co/datasets/{output_dataset}")
+        except Exception as e:
+            logger.error(f"Failed to push shard {rank} after all retries: {str(e)}")
+    else:
+        logger.info(f"Skipping upload to Hub (--no_upload flag enabled)")
 
 
 def main():
@@ -151,10 +182,16 @@ def main():
     parser.add_argument("--global_size", type=int, required=True, help="Total number of shards")
     parser.add_argument("--rank", type=int, required=True, help="Shard index (0-based)")
     parser.add_argument("--input_dataset", type=str, required=True, help="Hugging Face Hub repository ID")
-    parser.add_argument("--output_dataset", type=str, required=False, help="Hugging Face Hub repository ID. If not provided, a default name will be generated.")
+    parser.add_argument(
+        "--output_dataset",
+        type=str,
+        required=False,
+        help="Hugging Face Hub repository ID. If not provided, a default name will be generated.",
+    )
     parser.add_argument("--model_name", type=str, required=True, help="Name or path of the model for VLLM")
     parser.add_argument("--tp", type=int, default=1, help="Tensor parallelism size for VLLM")
-
+    parser.add_argument("--no_upload", action="store_true", help="Don't upload results to Hugging Face Hub")
+    parser.add_argument("--output_dir", type=str, help="Directory to save the processed data locally")
 
     args = parser.parse_args()
 
@@ -162,8 +199,20 @@ def main():
     if args.rank < 0 or args.rank >= args.global_size:
         raise ValueError(f"Rank ({args.rank}) must be between 0 and global_size-1 ({args.global_size-1})")
 
+    if args.no_upload and not args.output_dir:
+        raise ValueError("--output_dir is required when --no_upload is specified")
+
     # Process the shard
-    process_shard(args.input_dataset, args.rank, args.global_size, args.model_name, args.tp, args.output_dataset)
+    process_shard(
+        args.input_dataset,
+        args.rank,
+        args.global_size,
+        args.model_name,
+        args.tp,
+        args.output_dataset,
+        args.no_upload,
+        args.output_dir,
+    )
 
 
 if __name__ == "__main__":

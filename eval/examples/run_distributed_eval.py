@@ -543,8 +543,7 @@ def main():
     if success:
         if compute_and_upload_scores(tasks, output_dataset, args.model_name):
             print_success(f"Evaluation completed successfully. Results uploaded to {output_dataset}")
-            print_info(f"View the results at: https://huggingface.co/{output_dataset}")
-            print_info(f"Dataset used: {input_dataset}")
+            print_info(f"View the results at: https://huggingface.co/datasets/{output_dataset}")
         else:
             print_error("Failed to compute and upload scores.")
     else:
@@ -552,7 +551,6 @@ def main():
         response = input("Would you like to compute scores anyway? (y/n): ")
         if response.lower() == "y":
             compute_and_upload_scores(tasks, output_dataset, args.model_name)
-            print_info(f"Dataset used: {input_dataset}")
 
 
 if __name__ == "__main__":

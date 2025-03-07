@@ -507,7 +507,7 @@ def upload_shards_to_hub(output_dir, output_repo_id):
     repo_name = parts[1]
 
     # Create the dataset repository if it doesn't exist
-    cmd = f"huggingface-cli repo create {repo_name} --organization {org} --type dataset || echo 'Repository already exists'"
+    cmd = f"huggingface-cli repo create {repo_name} --organization {org} --type dataset -y || echo 'Repository already exists'"
     stdout, stderr, return_code = execute_command(cmd)
 
     if return_code != 0:

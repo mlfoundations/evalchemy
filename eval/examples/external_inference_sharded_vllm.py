@@ -6,6 +6,7 @@ import tempfile
 from datasets import Dataset, load_dataset
 from huggingface_hub import HfApi
 from tenacity import retry, stop_after_attempt, wait_exponential
+from transformers import AutoTokenizer
 from vllm import LLM, SamplingParams
 
 logging.basicConfig(level=logging.INFO)
@@ -58,6 +59,7 @@ def process_shard(
     output_dataset: str = None,
     no_upload: bool = False,
     output_dir: str = None,
+    apply_chat_template: bool = True,
 ) -> None:
     """Process a single shard of the dataset.
 
@@ -71,6 +73,8 @@ def process_shard(
         no_upload: If True, don't upload to Hugging Face Hub and save locally instead.
         output_dir: Directory to save the processed data locally when no_upload is True.
                     If no_upload is False, this can also be specified to save a local copy.
+        apply_chat_template: Whether to apply the model's chat template to the prompts.
+                             Set to False if raw prompts are already formatted.
     """
     # Load the dataset from Hugging Face Hub
     logger.info(f"Loading dataset from {input_dataset}")
@@ -90,6 +94,20 @@ def process_shard(
         gpu_memory_utilization=0.9,
         tensor_parallel_size=tp,
     )
+
+    # Initialize tokenizer for chat templates if needed
+    tokenizer = None
+    if apply_chat_template:
+        logger.info("Initializing tokenizer for chat template application")
+        try:
+            tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+            logger.info(
+                f"Tokenizer successfully loaded with chat template support: {hasattr(tokenizer, 'apply_chat_template')}"
+            )
+        except Exception as e:
+            logger.warning(f"Failed to initialize tokenizer for chat templates: {e}")
+            logger.warning("Proceeding without chat template application")
+            apply_chat_template = False
     # llm = None # test
 
     # Process each example and group by sampling params
@@ -125,7 +143,32 @@ def process_shard(
     processed_examples = [None] * len(ds)  # Pre-allocate list to maintain order
     for param_key, example_group in examples_by_params.items():
         indices, examples, sampling_params = zip(*example_group)
-        prompts = [ex["context"][0]["content"] for ex in examples]
+
+        # Apply chat template if needed
+        if apply_chat_template and tokenizer and hasattr(tokenizer, "apply_chat_template"):
+            prompts = []
+            for ex in examples:
+                # Extract messages from context
+                if "context" in ex and isinstance(ex["context"], list):
+                    messages = ex["context"]
+                    # Check if messages are already in the right format
+                    if all(isinstance(msg, dict) and "role" in msg and "content" in msg for msg in messages):
+                        # Apply chat template
+                        formatted_prompt = tokenizer.apply_chat_template(
+                            messages, tokenize=False, add_generation_prompt=True
+                        )
+                        prompts.append(formatted_prompt)
+                    else:
+                        # Fallback to content if messages don't have the right format
+                        logger.warning(f"Messages don't have the expected format, falling back to raw content")
+                        prompts.append(messages[0]["content"] if len(messages) > 0 else "")
+                else:
+                    # Fallback if context is not as expected
+                    prompts.append("")
+            logger.info(f"Applied chat template to {len(prompts)} prompts")
+        else:
+            # Use raw content as before
+            prompts = [ex["context"][0]["content"] for ex in examples]
 
         logger.info(f"Generating outputs for batch of {len(prompts)} examples with same parameters")
         outputs = llm.generate(prompts, sampling_params[0])  # All sampling_params are the same in the group
@@ -192,6 +235,9 @@ def main():
     parser.add_argument("--tp", type=int, default=1, help="Tensor parallelism size for VLLM")
     parser.add_argument("--no_upload", action="store_true", help="Don't upload results to Hugging Face Hub")
     parser.add_argument("--output_dir", type=str, help="Directory to save the processed data locally")
+    parser.add_argument(
+        "--no_chat_template", action="store_true", help="Disable applying chat templates to the prompts"
+    )
 
     args = parser.parse_args()
 
@@ -212,6 +258,7 @@ def main():
         args.output_dataset,
         args.no_upload,
         args.output_dir,
+        not args.no_chat_template,  # If --no_chat_template is provided, we pass False here
     )
 
 

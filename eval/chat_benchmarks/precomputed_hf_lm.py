@@ -195,7 +195,9 @@ class PrecomputedHFLM(TemplateLM):
         # Simply return the chat history as is
         return chat_history
 
-    def update_repo_readme(self, results: Dict[str, Any], readme_path: Optional[str] = None):
+    def update_repo_readme(
+        self, results: Dict[str, Any], remote_readme_path: str = "README.md", local_readme_path: Optional[str] = None
+    ):
         """
         Updates the README of the original dataset repository with evaluation results.
 
@@ -269,21 +271,20 @@ class PrecomputedHFLM(TemplateLM):
                     results_md += "\n"
 
             # Download the README if path not provided
-            if not readme_path:
+            if not local_readme_path:
                 try:
-                    readme_path = hf_hub_download(
+                    local_readme_path = hf_hub_download(
                         repo_id=self.repo_id, filename="README.md", repo_type="dataset", token=self.token
                     )
                     self.logger.info(f"Downloaded README from {self.repo_id}")
                 except Exception as e:
                     self.logger.warning(f"Could not download README: {e}. Creating new README.")
-                    readme_path = "README.md"
-                    with open(readme_path, "w") as f:
+                    with open(local_readme_path, "w") as f:
                         f.write(f"# {self.repo_id}\n\nPrecomputed model outputs for evaluation.\n")
 
             # Read existing README
             try:
-                with open(readme_path, "r") as f:
+                with open(local_readme_path, "r") as f:
                     readme_content = f.read()
             except FileNotFoundError:
                 readme_content = f"# {self.repo_id}\n\nPrecomputed model outputs for evaluation.\n"
@@ -309,16 +310,16 @@ class PrecomputedHFLM(TemplateLM):
                 updated_readme = readme_content + results_md
 
             # Write updated README
-            with open(readme_path, "w") as f:
+            with open(local_readme_path, "w") as f:
                 f.write(updated_readme)
 
-            self.logger.info(f"Updated README with evaluation results at {readme_path}")
+            self.logger.info(f"Updated README with evaluation results at {local_readme_path}")
 
             # Optionally push the updated README to HF Hub
             try:
                 self.api.upload_file(
-                    path_or_fileobj=readme_path,
-                    path_in_repo="README.md",
+                    path_or_fileobj=local_readme_path,
+                    path_in_repo=remote_readme_path,
                     repo_id=self.repo_id,
                     repo_type="dataset",
                     token=self.token,

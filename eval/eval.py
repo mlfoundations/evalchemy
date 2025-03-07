@@ -231,7 +231,10 @@ def evaluate(
     if lm is not None and hasattr(lm, "update_repo_readme") and callable(lm.update_repo_readme):
         try:
             eval_logger.info("Updating repository README with evaluation results...")
-            lm.update_repo_readme(results)
+            local_readme_path = os.path.join(
+                args.output_path, args.model_args.strip("repo_id=").replace("/", "__") + "_README.md"
+            )
+            lm.update_repo_readme(results, local_readme_path=local_readme_path)
         except Exception as e:
             eval_logger.error(f"Error updating repository README: {str(e)}")
             import traceback

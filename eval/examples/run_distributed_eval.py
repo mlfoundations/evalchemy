@@ -482,7 +482,7 @@ def upload_shards_to_hub(output_dir, output_repo_id):
     """Upload all locally saved shards to HuggingFace Hub."""
     print_header("Uploading Results to HuggingFace Hub")
 
-    if not os.path.exists(output_dir):
+    if not os.path.exists(os.path.expanduser(output_dir)):
         print_error(f"Output directory {output_dir} does not exist")
         return False
 

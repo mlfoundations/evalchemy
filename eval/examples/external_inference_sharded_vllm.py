@@ -193,10 +193,6 @@ def process_shard(
     # Extract model name for the output repo ID (use last part of path)
     model_short_name = model_name.split("/")[-1]
 
-    # Use provided output_repo_id or generate default one
-    if output_dataset is None:
-        output_dataset = f"{input_dataset}_{global_size}shards_{model_short_name}"
-
     # Format the shard filename
     shard_filename = f"train-{rank:05d}-of-{global_size:05d}.parquet"
 
@@ -209,6 +205,9 @@ def process_shard(
 
     # Upload to HF Hub if not disabled
     if not no_upload:
+        # Use provided output_repo_id or generate default one
+        if output_dataset is None:
+            output_dataset = f"{input_dataset}_{global_size}shards_{model_short_name}"
         try:
             upload_shard(output_ds, output_dataset, rank, global_size)
             logger.info(f"Shard {rank} pushed to hub as {output_dataset}")
@@ -229,7 +228,7 @@ def main():
         "--output_dataset",
         type=str,
         required=False,
-        help="Hugging Face Hub repository ID. If not provided, a default name will be generated.",
+        help="Hugging Face Hub repository ID. If not provided, a default name will be generated. Not required if --no_upload is True.",
     )
     parser.add_argument("--model_name", type=str, required=True, help="Name or path of the model for VLLM")
     parser.add_argument("--tp", type=int, default=1, help="Tensor parallelism size for VLLM")
@@ -247,7 +246,10 @@ def main():
         raise ValueError(f"Rank ({args.rank}) must be between 0 and global_size-1 ({args.global_size-1})")
 
     if args.no_upload and not args.output_dir:
-        raise ValueError("--output_dir is required when --no_upload is specified")
+        raise ValueError("--output_dir is required when --no_upload is set")
+
+    if not args.no_upload and not args.output_dataset:
+        raise ValueError("--output_dataset is required (set --no_upload to True to skip uploading)")
 
     # Process the shard
     process_shard(

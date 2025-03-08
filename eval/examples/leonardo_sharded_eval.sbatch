@@ -13,23 +13,17 @@ module load cuda/12.1
 module load gcc/12.2.0
 module load nccl
 
-# MAIN EVALCHEMY DIRECTORY
-export EVALCHEMY="$WORK/DCFT_shared/evalchemy"
+# DIRECTORIES
+export DCFT="$WORK/DCFT_shared"
+export EVALCHEMY="$DCFT/evalchemy"
+export HF_HUB_CACHE="$DCFT/hub"
 
 # CONDA
 source $EVALCHEMY/env/miniconda/bin/activate 
 
-# HUGGINGFACE
-export HF_HUB_CACHE="$WORK/DCFT_shared/hub"
-huggingface-cli login --token $HF_TOKEN
-
-# LOAD IN ENVIRONMENT VARIABLES FROM .ENV FILE
-export $(grep -v '^#' $EVALCHEMY/.env | xargs)
-
 # SHARDED INFERENCE ARGUEMENTS
-export TASK="AIME24"
-export INPUT_DATASET="mlfoundations-dev/evalset_2870" #AIME24
-export MODEL_NAME="Qwen/Qwen2.5-7B-Instruct"
+export MODEL_NAME="$HF_HUB_CACHE/models--Qwen--Qwen2.5-7B-Instruct"
+export INPUT_DATASET="$HF_HUB_CACHE/datasets--mlfoundations-dev--evalset_2870"
 export MODEL_NAME_SHORT=${MODEL_NAME##*/}
 export GLOBAL_SIZE=$SLURM_ARRAY_TASK_COUNT
 export RANK=$SLURM_ARRAY_TASK_ID

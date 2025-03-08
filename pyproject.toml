@@ -74,7 +74,7 @@ dependencies = [
     "reka-api",
     "together",
     "dashscope",
-    "fschat @ file:eval/chat_benchmarks/MTBench",  # Changed to match the likely package name
+    "fschat @ file:eval/chat_benchmarks/MTBench",  # Use relative path that pip will resolve during installation
     
     # Cloud & Storage
     "gcsfs",
@@ -94,7 +94,7 @@ dependencies = [
     "tree_sitter",
     "asttokens",
     "mypy_extensions",
-    "pyext@git+https://github.com/penfever/PyExt",
+    "pyext @ git+https://github.com/penfever/PyExt",
     
     # Web & API
     "fastapi>=0.101.0",
@@ -154,7 +154,7 @@ dependencies = [
     "swebench>=3.0.4",
 
     # LM Eval
-    "lm-eval[vllm]@git+https://github.com/EtashGuha/lm-evaluation-harness@etashg/tokenize_fix",
+    "lm-eval[vllm] @ git+https://github.com/EtashGuha/lm-evaluation-harness@etashg/tokenize_fix",
 ]
 
 [project.urls]

@@ -207,7 +207,8 @@ def prepare_for_sbatch(input_repo_id, output_repo_id, model_name):
 
     # Download the dataset
     print_info(f"Downloading dataset from: {input_repo_id}")
-    cmd = f"huggingface-cli download {input_repo_id} --repo-type dataset"
+    hf_hub = os.environ.get("HF_HUB")
+    cmd = f"huggingface-cli download {input_repo_id} --repo-type dataset --cache-dir {hf_hub}"
     stdout, stderr, return_code = execute_command(cmd)
 
     if return_code != 0:
@@ -220,7 +221,7 @@ def prepare_for_sbatch(input_repo_id, output_repo_id, model_name):
     # cmd = f"python -c \"from transformers import AutoTokenizer; AutoTokenizer.from_pretrained('{model_name}')\""
     # stdout, stderr, return_code = execute_command(cmd)
     print_info(f"Downloading model from: {model_name}")
-    cmd = f"huggingface-cli download {model_name}"
+    cmd = f"huggingface-cli download {model_name} --cache-dir {hf_hub}"
     stdout, stderr, return_code = execute_command(cmd)
 
     if return_code != 0:
@@ -515,8 +516,11 @@ def upload_shards_to_hub(output_dir, output_repo_id):
     org = parts[0]
     repo_name = parts[1]
 
+    # Get HF_HUB value
+    hf_hub = os.environ.get("HF_HUB")
+
     # Create the dataset repository if it doesn't exist
-    cmd = f"huggingface-cli repo create {repo_name} --organization {org} --type dataset -y || echo 'Repository already exists'"
+    cmd = f"huggingface-cli repo create {repo_name} --organization {org} --type dataset -y --cache-dir {hf_hub} || echo 'Repository already exists'"
     stdout, stderr, return_code = execute_command(cmd)
 
     if return_code != 0:
@@ -524,7 +528,7 @@ def upload_shards_to_hub(output_dir, output_repo_id):
 
     # Upload all files
     print_info(f"Uploading files from {output_dir} to {output_repo_id}...")
-    cmd = f"huggingface-cli upload {output_repo_id} {output_dir} --repo-type dataset"
+    cmd = f"huggingface-cli upload {output_repo_id} {output_dir} --repo-type dataset --cache-dir {hf_hub}"
     stdout, stderr, return_code = execute_command(cmd)
 
     if return_code != 0:

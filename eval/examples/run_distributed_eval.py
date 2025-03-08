@@ -469,10 +469,13 @@ def check_job_completion(job_id, output_dir=None):
         }}
         END {{
             avg = total/count;
-            printf "Min: %02d:%02d:%02d, Max: %02d:%02d:%02d, Mean: %02d:%02d:%02d\\n", 
+            total_hours = total / 3600;
+            gpu_hours = int(total_hours + 0.5);  # Round to nearest integer
+            printf "Min: %02d:%02d:%02d, Max: %02d:%02d:%02d, Mean: %02d:%02d:%02d, Total: %d GPU hours\\n", 
                 int(min/3600), int((min%3600)/60), min%60,
                 int(max/3600), int((max%3600)/60), max%60,
-                int(avg/3600), int((avg%3600)/60), avg%60
+                int(avg/3600), int((avg%3600)/60), avg%60,
+                gpu_hours
         }}'"""
 
         stdout, _, _ = execute_command(cmd)

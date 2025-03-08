@@ -1,10 +1,9 @@
 #!/bin/bash
+#SBATCH --array=0-1
 #SBATCH --nodes=1            
 #SBATCH --ntasks=1           
-#SBATCH --cpus-per-task=8      
 #SBATCH --gres=gpu:1           
 #SBATCH --time=01:00:00        
-#SBATCH --array=0-1                   # Number of shards (independent tasks with 1 GPU each)
 #SBATCH --account=EUHPC_E03_068
 #SBATCH --partition=boost_usr_prod
 

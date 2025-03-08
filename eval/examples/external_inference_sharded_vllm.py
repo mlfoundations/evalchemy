@@ -237,9 +237,16 @@ def main():
     parser.add_argument(
         "--no_chat_template", action="store_true", help="Disable applying chat templates to the prompts"
     )
+    parser.add_argument("--offline", action="store_true", help="Run in offline mode without internet access")
 
     args = parser.parse_args()
     logger.info(f"Parsed arguments: {args}")
+
+    # Set offline mode if requested
+    if args.offline:
+        os.environ["HF_HUB_OFFLINE"] = "1"
+        os.environ["TRANSFORMERS_OFFLINE"] = "1"
+        logger.info("Running in offline mode")
 
     # Validate arguments
     if args.rank < 0 or args.rank >= args.global_size:

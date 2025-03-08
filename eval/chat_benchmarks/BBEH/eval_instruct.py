@@ -9,7 +9,7 @@ from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
 from collections import defaultdict
 from eval.task import BaseBenchmark
-from evaluate import preprocess_sample, preprocess_reference, fuzzy_match
+from eval.chat_benchmarks.BBEH.evaluate import preprocess_sample, preprocess_reference, fuzzy_match
 
 import lm_eval.models
 from lm_eval.models.vllm_causallms import VLLM

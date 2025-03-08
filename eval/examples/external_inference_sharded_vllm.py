@@ -246,7 +246,8 @@ def main():
     if args.offline:
         os.environ["HF_HUB_OFFLINE"] = "1"
         os.environ["TRANSFORMERS_OFFLINE"] = "1"
-        logger.info("Running in offline mode")
+        HF_HUB_CACHE = os.environ["HF_HUB_CACHE"]
+        logger.info(f"Running in offline mode, will use $HF_HUB_CACHE: {HF_HUB_CACHE} as cache directory")
 
     # Validate arguments
     if args.rank < 0 or args.rank >= args.global_size:

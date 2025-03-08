@@ -114,6 +114,8 @@ class BBEHBenchmark(BaseBenchmark):
 
         return {"examples": examples}
 
+    def evaluate_responses(self, results: Dict[str, Any]) -> Dict[str, float]:
+        
         """Evaluate the generated solution completions."""
 
         # Handle None result from non-primary ranks

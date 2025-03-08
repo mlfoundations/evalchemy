@@ -9,7 +9,7 @@ from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
 from collections import defaultdict
 from eval.task import BaseBenchmark
-
+from evaluate import preprocess_sample, preprocess_reference, fuzzy_match
 
 import lm_eval.models
 from lm_eval.models.vllm_causallms import VLLM
@@ -45,8 +45,8 @@ class BBEHBenchmark(BaseBenchmark):
         self.data_file = data_file
         self.debug = debug
         self.seed = seed
-        # self.max_new_tokens = 32768  # set higher to avoid truncation for reasoning models
-        self.max_new_tokens = 1024  # set higher to avoid truncation for reasoning models
+        self.max_new_tokens = 32768  # set higher to avoid truncation for reasoning models
+        # self.max_new_tokens = 1024  
         self.n_repeat = 1
 
     def generate_responses(self, model: LM) -> Dict[str, Any]:
@@ -110,7 +110,7 @@ class BBEHBenchmark(BaseBenchmark):
 
         for example, outputs in zip(examples, zip(*all_outputs)):
             example["model_outputs"] = list(outputs)
-            example["model_answers"] = [self.extract_answer(o) for o in outputs]
+            example["model_answers"] = [preprocess_sample(o) for o in outputs]
 
         return {"examples": examples}
 
@@ -130,18 +130,20 @@ class BBEHBenchmark(BaseBenchmark):
             task_performance_total = defaultdict(int)
             for example in examples:
                 task = example["task"]
-                task_performance[task] += (example["target"] == example["model_answers"][i])
+                processed_target = preprocess_reference(example["target"])
+                task_performance[task] += (fuzzy_match(example["model_answers"][i], processed_target))
                 task_performance_total[task] += 1
             
             task_result = {}
-            harmonic_mean_acc = []
+            scores = []
             for task in task_performance:
                 performance_task = 100 * task_performance[task] / task_performance_total[task]
                 task_result[task] = performance_task
-                harmonic_mean_acc.append(performance_task)
+                scores.append(performance_task)
             
-            ## Avoid division by zero
-            harmonic_mean_acc  = [x + 1 if x == 0 else x for x in harmonic_mean_acc]
+            task_result["micro_accuracy"] = sum(scores) / len(scores)
+            ## Original paper adds 1 to each subtask to avoid division by zero in harmonic mean calc
+            harmonic_mean_acc  = [x + 1 for x in scores]
             harmonic_mean_acc = hmean(harmonic_mean_acc)
             task_result["harmonic_accuracy"] = harmonic_mean_acc
             task_result["repetition"] = i + 1
@@ -151,13 +153,18 @@ class BBEHBenchmark(BaseBenchmark):
         harmonic_accuracy_avg = np.mean([result["harmonic_accuracy"] for result in all_results])
         harmonic_accuracy_std = np.std([result["harmonic_accuracy"] for result in all_results])
         harmonic_accuracy_std_err = np.std([result["harmonic_accuracy"] for result in all_results]) / np.sqrt(self.n_repeat)
+        micro_accuracy_avg = np.mean([result["micro_accuracy"] for result in all_results])
+        micro_accuracy_std = np.std([result["micro_accuracy"] for result in all_results])
+        micro_accuracy_std_err = np.std([result["micro_accuracy"] for result in all_results]) / np.sqrt(self.n_repeat)
 
         results.update(
             {
                 "num_total": num_questions,
                 "run_stats": all_results,
-                "accuracy_avg": harmonic_accuracy_avg,
-                "accuracy_std_err": harmonic_accuracy_std_err,
+                "harmonic_accuracy_avg": harmonic_accuracy_avg,
+                "harmonic_accuracy_std_err": harmonic_accuracy_std_err,
+                "micro_accuracy_avg": micro_accuracy_avg,
+                "micro_accuracy_std_err": micro_accuracy_std_err,
                 "num_repeat": self.n_repeat,
             }
         )
@@ -173,30 +180,5 @@ class BBEHBenchmark(BaseBenchmark):
                 subtask_data = json.load(f)['examples']
                 subtask_data = [{"input": example["input"], "target": example["target"], "task": subtask} for example in subtask_data]
                 questions = questions + subtask_data
-        # import random
-        # random.shuffle(questions)
-        # questions = questions[:1000]
         self.logger.info(f"Loaded {len(questions)} questions from {self.data_file}")
         return questions
-
-    def extract_answer(self, output: str) -> str:
-        """Extract the final answer from a model-generated solution.
-
-        Args:
-            output (str): Model-generated solution text
-
-        Returns:
-            str: Extracted final answer. Returns empty string if no answer found in \boxed.
-        """
-        try:
-            answer = output.split("The answer is:")[1].strip()
-            if answer == "":
-                answer = output.split("The answer is ")[1].strip()
-            
-            ## 3. -> 3
-            if answer.endswith("."):
-                answer = answer[:-1]
-
-            return answer
-        except:
-            return ""

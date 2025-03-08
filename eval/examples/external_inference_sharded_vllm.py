@@ -240,6 +240,7 @@ def main():
     )
 
     args = parser.parse_args()
+    print("Parsed arguments: ", args)
 
     # Validate arguments
     if args.rank < 0 or args.rank >= args.global_size:

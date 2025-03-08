@@ -78,8 +78,13 @@ git clone git@github.com:mlfoundations/evalchemy.git
 cd evalchemy
 
 # Install dependencies
-pip install -e ".[eval]"
+pip install -e .
 pip install -e eval/chat_benchmarks/alpaca_eval
+
+# Note: On some HPC systems (like Leonardo), you may need to modify pyproject.toml 
+# to use absolute paths for the fschat dependency:
+# Change: "fschat @ file:eval/chat_benchmarks/MTBench"
+# To:     "fschat @ file:///absolute/path/to/evalchemy/eval/chat_benchmarks/MTBench"
 
 # Log into HuggingFace for datasets and models.
 huggingface-cli login

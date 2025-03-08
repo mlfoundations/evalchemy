@@ -59,6 +59,10 @@ def execute_command(cmd, env=None, verbose=True):
     if verbose:
         print_info(f"Running: {cmd}")
 
+    # If env is None, copy the current environment including HF_HUB
+    if env is None:
+        env = os.environ.copy()
+
     process = subprocess.Popen(
         cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env, universal_newlines=True
     )
@@ -83,6 +87,13 @@ def check_required_env_vars():
     for var in required_vars:
         if os.environ.get(var) is None:
             missing_vars.append(var)
+
+    # Set HF_HUB environment variable
+    default_hub = os.environ.get("HF_HOME", "/data/horse/ws/ryma833h-DCFT_Shared/hub")
+    if os.environ.get("HF_HUB") is not None and os.environ.get("HF_HUB") != default_hub:
+        print_warning(f"Overwriting existing HF_HUB value '{os.environ.get('HF_HUB')}' with '{default_hub}'")
+    os.environ["HF_HUB"] = default_hub
+    print_info(f"HF_HUB set to: {default_hub}")
 
     if missing_vars:
         print_error(f"Missing required environment variables: {', '.join(missing_vars)}")
@@ -193,11 +204,6 @@ def prepare_for_sbatch(input_repo_id, output_repo_id, model_name):
     logs_dir = os.path.join("logs", repo_name)
     os.makedirs(logs_dir, exist_ok=True)
     print_success(f"Created logs directory: {logs_dir}")
-
-    # Set HF_HUB environment variable
-    hf_hub = os.environ.get("HF_HOME", "/data/horse/ws/ryma833h-DCFT_Shared/hub")
-    os.environ["HF_HUB"] = hf_hub
-    print_success(f"Set HF_HUB to: {hf_hub}")
 
     # Download the dataset
     print_info(f"Downloading dataset from: {input_repo_id}")

@@ -527,7 +527,7 @@ def handle_evaluation_output(
             Function handles outputs via side effects (logging, saving files)
             rather than returning values.
     """
-    if not args.log_samples:
+    if args.log_samples:
         samples = results.pop("samples")
 
     dumped = json.dumps(results, indent=2, default=handle_non_serializable, ensure_ascii=False)

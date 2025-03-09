@@ -3,22 +3,17 @@
 import argparse
 import datetime
 import hashlib
-import json
 import os
 import re
-import signal
 import subprocess
 import sys
 import time
-from pathlib import Path
-from typing import Any, Dict, List, Optional
 
 import colorama
 from colorama import Fore, Style
 from dotenv import load_dotenv
 from huggingface_hub import HfApi
 
-# Initialize colorama
 colorama.init()
 
 
@@ -227,32 +222,10 @@ def download_dataset(dataset_name, cache_dir):
         sys.exit(1)
 
 
-def prepare_for_sbatch(input_repo_id, output_repo_id, model_name):
-    """Prepare for the sbatch job."""
-    print_header("Preparing for SBATCH Job")
-
-    # Extract the repository name without the organization
-    repo_name = output_repo_id.split("/")[-1]
-
-    # Create a logs directory
-    logs_dir = os.path.join("logs", repo_name)
-    os.makedirs(logs_dir, exist_ok=True)
-    print_success(f"Created logs directory: {logs_dir}")
-
-    # Download the dataset
-    hf_hub = os.environ.get("HF_HUB")
-    dataset_path = download_dataset(input_repo_id, hf_hub)
-
-    # Download the target model
-    model_path = download_model(model_name, hf_hub)
-
-    return logs_dir, model_path
-
-
 def launch_sbatch(
     model_path,
     input_dataset,
-    output_dataset,
+    output_dataset_dir,
     num_shards,
     logs_dir,
     max_job_duration=None,
@@ -278,15 +251,12 @@ def launch_sbatch(
     with open(sbatch_script, "r") as f:
         sbatch_content = f.read()
 
-    # Get the output directory path for saving results locally
-    # Extract repo name from output_dataset to use in local path
-    repo_name = output_dataset.split("/")[-1]
-    output_dir = os.path.join("$WORK", "evalchemy_results", repo_name)
-
     # Replace parameters in the sbatch script using regex pattern matching
     sbatch_content = re.sub(r"#SBATCH --array=.*", f"#SBATCH --array=0-{num_shards-1}", sbatch_content)
     sbatch_content = re.sub(r"export INPUT_DATASET=.*", f'export INPUT_DATASET="{input_dataset}"', sbatch_content)
-    sbatch_content = re.sub(r"export OUTPUT_DATASET=.*", f'export OUTPUT_DATASET="{output_dataset}"', sbatch_content)
+    sbatch_content = re.sub(
+        r"export OUTPUT_DATASET=.*", f'export OUTPUT_DATASET="{output_dataset_dir}"', sbatch_content
+    )
     sbatch_content = re.sub(r"export MODEL_NAME=.*", f'export MODEL_NAME="{model_path}"', sbatch_content)
     sbatch_content = re.sub(r"(^#!.*\n)", r"\1#SBATCH --output=" + logs_dir + r"/%A_%a.out\n", sbatch_content)
 
@@ -300,7 +270,7 @@ def launch_sbatch(
         f.write(sbatch_content)
 
     print_success(f"Created temporary sbatch file: {temp_sbatch_file}")
-    print_info(f"Results will be saved locally to: {output_dir}")
+    print_info(f"Results will be saved locally to: {output_dataset_dir}")
 
     # Launch the sbatch job
     cmd = f"sbatch {temp_sbatch_file}"
@@ -315,10 +285,10 @@ def launch_sbatch(
     if job_id_match:
         job_id = job_id_match.group(1)
         print_success(f"SBATCH job submitted with ID: {job_id}")
-        return job_id, output_dir
+        return job_id
     else:
         print_error("Could not determine job ID from sbatch output.")
-        return None, None
+        return None
 
 
 def monitor_job(job_id, logs_dir, num_shards, watchdog_interval_min=1):
@@ -646,14 +616,27 @@ def main():
     if not input_dataset:
         sys.exit(1)
 
-    # Prepare for sbatch job
-    logs_dir, model_path = prepare_for_sbatch(input_dataset, output_dataset, args.model_name)
+    print_header("Preparing for SBATCH Job")
+
+    # Output directories
+    repo_name = output_dataset.split("/")[-1]
+    logs_dir = os.path.join("logs", repo_name)
+    os.makedirs(logs_dir, exist_ok=True)
+    print_success(f"Created logs directory: {logs_dir}")
+    output_dataset_dir = os.path.join("$WORK", "evalchemy_results", repo_name)
+    os.makedirs(output_dataset_dir, exist_ok=True)
+    print_success(f"Created output dataset directory: {output_dataset_dir}")
+
+    # Download the dataset and model
+    hf_hub = os.environ.get("HF_HUB")
+    _ = download_dataset(input_dataset, hf_hub)
+    model_path = download_model(args.model_name, hf_hub)
 
     # Launch sbatch job with the dataset repo but save to output repo
-    job_id, output_dir = launch_sbatch(
+    job_id = launch_sbatch(
         model_path,
         input_dataset,
-        output_dataset,
+        output_dataset_dir,
         args.num_shards,
         logs_dir,
         args.max_job_duration,
@@ -670,7 +653,7 @@ def main():
 
     # Show different info based on upload mode
     if not args.upload_from_worker:
-        print_info(f"Results will be saved locally to: {output_dir}")
+        print_info(f"Results will be saved locally to: {output_dataset_dir}")
         print_info(f"After completion, results will be uploaded to: https://huggingface.co/datasets/{output_dataset}")
     else:
         print_info(f"Watch shards get uploaded: https://huggingface.co/datasets/{output_dataset}/tree/main")
@@ -685,14 +668,14 @@ def main():
     monitor_job(job_id, logs_dir, args.num_shards)
 
     # Check job completion
-    success = check_job_completion(job_id, output_dir)
+    success = check_job_completion(job_id, output_dataset_dir)
 
     # Only upload shards if using login node uploads (not worker uploads)
     upload_shards = not args.upload_from_worker
 
     # Compute and upload scores
     if success:
-        if compute_and_upload_scores(tasks, output_dataset, args.model_name, output_dir, upload_shards):
+        if compute_and_upload_scores(tasks, output_dataset, args.model_name, output_dataset_dir, upload_shards):
             print_success(f"Evaluation completed successfully. Results uploaded to {output_dataset}")
             print_info(f"View the results at: https://huggingface.co/datasets/{output_dataset}")
         else:
@@ -701,7 +684,7 @@ def main():
         print_warning("Some jobs failed. You may want to check the logs before computing scores.")
         response = input("Would you like to compute scores anyway? (y/n): ")
         if response.lower() == "y":
-            compute_and_upload_scores(tasks, output_dataset, args.model_name, output_dir, upload_shards)
+            compute_and_upload_scores(tasks, output_dataset, args.model_name, output_dataset_dir, upload_shards)
 
 
 if __name__ == "__main__":

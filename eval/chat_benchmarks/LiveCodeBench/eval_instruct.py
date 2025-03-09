@@ -291,8 +291,6 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
     def load_questions(self) -> Dataset:
         """Load LiveCodeBench questions from source."""
         self.logger.info("Loading and decompressing LiveCodeBench questions from source...")
-        # ds = load_dataset("mlfoundations-dev/lcbv2_processed", split="test", trust_remote_code=True)
-        # return ds
         cpu_count = os.cpu_count()
         ds = load_dataset(
             "livecodebench/code_generation_lite", version_tag="release_v2", split="test", trust_remote_code=True

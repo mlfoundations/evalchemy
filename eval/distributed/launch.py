@@ -543,8 +543,6 @@ def compute_and_upload_scores(tasks, output_repo_id, model_name):
     if "LiveCodeBench" in tasks:
         print_warning("LiveCodeBench evaluation takes ~15mins")
 
-    # replace / with __ in model_name
-    model_name = model_name.replace("/", "__")
     tasks_str = ",".join(tasks)
     cmd = f'OPENAI_API_KEY=NONE python -m eval.eval --model precomputed_hf --model_args "repo_id={output_repo_id}",model="{model_name}" --tasks {tasks_str} --output_path logs --use_database'
 

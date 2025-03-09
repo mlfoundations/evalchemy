@@ -238,11 +238,11 @@ def launch_sbatch(
     hostname, _, _ = execute_command(cmd, verbose=False)
     print_info(f"Using $HOSTNAME: {hostname} to determine which sbatch script to use")
     if "c1" in hostname:
-        sbatch_script = "eval/examples/capella_sharded_eval.sbatch"
-        print_info("Detected Capella environment, using capella_sharded_eval.sbatch")
+        sbatch_script = "eval/distributed/process_shards_capella.sbatch"
+        print_info("Detected Capella environment, using process_shards_capella.sbatch")
     elif "leonardo" in hostname:
-        sbatch_script = "eval/examples/leonardo_sharded_eval.sbatch"
-        print_info("Detected Leonardo environment, using leonardo_sharded_eval.sbatch")
+        sbatch_script = "eval/distributed/process_shards_leonardo.sbatch"
+        print_info("Detected Leonardo environment, using process_shards_leonardo.sbatch")
     else:
         raise ValueError(f"Unknown hostname: {hostname}, can't determine which sbatch script to use")
 

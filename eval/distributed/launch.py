@@ -592,7 +592,7 @@ def main():
         sys.exit(1)
 
     # Generate timestamp and repository ID for results
-    timestamp = datetime.datetime.now().strftime("%m-%d-%y_%H-%M")
+    timestamp = datetime.datetime.now().strftime("%m-%d-%y_%H-%M-%S")
     model_name_short = args.model_name.split("/")[-1]
     task_hash = generate_task_hash(tasks)
     output_dataset = f"mlfoundations-dev/{model_name_short}_eval_{timestamp}_{task_hash}"

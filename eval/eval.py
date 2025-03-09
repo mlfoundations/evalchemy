@@ -527,6 +527,7 @@ def handle_evaluation_output(
             Function handles outputs via side effects (logging, saving files)
             rather than returning values.
     """
+    args.log_samples = False
     if args.log_samples:
         samples = results.pop("samples")
 

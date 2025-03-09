@@ -208,6 +208,7 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
             return None
 
         self.logger.info(f"Evaluating {len(responses['examples'])} examples...")
+        self.logger.warning(f"Expect some output leaks from the code / test execution into stdout")
 
         # First, organize completions by repeat index
         examples_by_repeat = defaultdict(list)

@@ -409,7 +409,7 @@ def monitor_job(job_id, logs_dir, num_shards, watchdog_interval_min=1):
                 ("Shards started", f'grep -l "processing shard" {log_pattern} | wc -l'),
                 ("Models loading", f'grep -l "Starting to load model" {log_pattern} | wc -l'),
                 ("Engines initialized", f'grep -l "init engine" {log_pattern} | wc -l'),
-                ("Completed shards", f'grep -l "Processed prompts: 100%" {log_pattern} | wc -l'),
+                ("Completed shards", f'grep -l "Shard successfully processed" {log_pattern} | wc -l'),
             ]
 
             for label, cmd in progress_metrics:

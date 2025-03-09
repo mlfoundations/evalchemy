@@ -193,6 +193,40 @@ def create_evaluation_dataset(tasks):
     return cached_dataset_id
 
 
+def download_model(model_name, cache_dir):
+    """Download a model from Hugging Face."""
+    print_info(f"Downloading model: {model_name}")
+
+    try:
+        # Import here to avoid dependency if the user doesn't want to download a model
+        from huggingface_hub import snapshot_download
+
+        print(f"Downloading to {cache_dir}...")
+        model_path = snapshot_download(repo_id=model_name, cache_dir=cache_dir)
+        print_success(f"Model downloaded successfully to: {model_path}")
+        return model_path
+    except Exception as e:
+        print_error(f"Failed to download model: {str(e)}")
+        sys.exit(1)
+
+
+def download_dataset(dataset_name, cache_dir):
+    """Download a dataset from Hugging Face."""
+    print_info(f"Downloading dataset: {dataset_name}")
+
+    try:
+        # Import here to avoid dependency if the user doesn't want to download a dataset
+        from huggingface_hub import snapshot_download
+
+        print(f"Downloading to {cache_dir}...")
+        dataset_path = snapshot_download(repo_id=dataset_name, repo_type="dataset", cache_dir=cache_dir)
+        print_success(f"Dataset downloaded successfully to: {dataset_path}")
+        return dataset_path
+    except Exception as e:
+        print_error(f"Failed to download dataset: {str(e)}")
+        sys.exit(1)
+
+
 def prepare_for_sbatch(input_repo_id, output_repo_id, model_name):
     """Prepare for the sbatch job."""
     print_header("Preparing for SBATCH Job")
@@ -206,33 +240,18 @@ def prepare_for_sbatch(input_repo_id, output_repo_id, model_name):
     print_success(f"Created logs directory: {logs_dir}")
 
     # Download the dataset
-    print_info(f"Downloading dataset from: {input_repo_id}")
     hf_hub = os.environ.get("HF_HUB")
-    cmd = f"huggingface-cli download {input_repo_id} --repo-type dataset --cache-dir {hf_hub}"
-    stdout, stderr, return_code = execute_command(cmd)
-
-    if return_code != 0:
-        print_warning(f"Dataset download may have issues: {stderr}")
-    else:
-        print_success("Dataset downloaded successfully.")
+    dataset_path = download_dataset(input_repo_id, hf_hub)
 
     # Download the target model
-    # print_info(f"Ensuring model is available: {model_name}")
-    # cmd = f"python -c \"from transformers import AutoTokenizer; AutoTokenizer.from_pretrained('{model_name}')\""
-    # stdout, stderr, return_code = execute_command(cmd)
-    print_info(f"Downloading model from: {model_name}")
-    cmd = f"huggingface-cli download {model_name} --cache-dir {hf_hub}"
-    stdout, stderr, return_code = execute_command(cmd)
+    model_path = download_model(model_name, hf_hub)
 
-    if return_code != 0:
-        print_warning(f"Model download may have issues: {stderr}")
-    else:
-        print_success("Model download check successful.")
-
-    return logs_dir
+    return logs_dir, model_path
 
 
-def launch_sbatch(model_name, input_dataset, output_dataset, num_shards, logs_dir, tasks_str, upload_from_worker=False):
+def launch_sbatch(
+    model_name, model_path, input_dataset, output_dataset, num_shards, logs_dir, tasks_str, upload_from_worker=False
+):
     """Launch the sbatch job."""
     print_header("Launching SBATCH Job")
 
@@ -271,6 +290,8 @@ def launch_sbatch(model_name, input_dataset, output_dataset, num_shards, logs_di
     sbatch_content = sbatch_content.replace(
         'export OUTPUT_DIR="$WORK/evalchemy_results/${TASK}/${MODEL_NAME_SHORT}"', f'export OUTPUT_DIR="{output_dir}"'
     )
+    # Add the model path to the sbatch script
+    sbatch_content = sbatch_content.replace('export MODEL_PATH=""', f'export MODEL_PATH="{model_path}"')
 
     # Add output log path
     sbatch_content = sbatch_content.replace(
@@ -619,11 +640,18 @@ def main():
         sys.exit(1)
 
     # Prepare for sbatch job
-    logs_dir = prepare_for_sbatch(input_dataset, output_dataset, args.model_name)
+    logs_dir, model_path = prepare_for_sbatch(input_dataset, output_dataset, args.model_name)
 
     # Launch sbatch job with the dataset repo but save to output repo
     job_id, output_dir = launch_sbatch(
-        args.model_name, input_dataset, output_dataset, args.num_shards, logs_dir, args.tasks, args.upload_from_worker
+        args.model_name,
+        model_path,
+        input_dataset,
+        output_dataset,
+        args.num_shards,
+        logs_dir,
+        args.tasks,
+        args.upload_from_worker,
     )
     if not job_id:
         sys.exit(1)

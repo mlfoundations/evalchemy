@@ -25,8 +25,7 @@ source ${SHARED_MAMBA_INSTALL}/bin/activate ${SHARED_EVALCHEMY_GPU_ENV}
 # SHARDED INFERENCE ARGUMENTS
 export GLOBAL_SIZE=$SLURM_ARRAY_TASK_COUNT
 export RANK=$SLURM_ARRAY_TASK_ID
-# export MODEL_NAME="$HF_HUB_CACHE/models--Qwen--Qwen2.5-7B-Instruct"
-export MODEL_NAME="Qwen/Qwen2.5-7B-Instruct"
+export MODEL_NAME="$HF_HUB_CACHE/models--open-thoughts--OpenThinker-7B/snapshots/5a931fd3fa8618acda2da8eaec4a3f10ee009739"
 export INPUT_DATASET="$HF_HUB_CACHE/datasets--mlfoundations-dev--evalset_2870"
 export OUTPUT_DIR="$EVALCHEMY/results/${MODEL_NAME##*--}_${INPUT_DATASET##*--}"
 

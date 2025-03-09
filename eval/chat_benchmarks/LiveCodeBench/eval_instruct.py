@@ -203,6 +203,10 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
 
     def evaluate_responses(self, responses: Dict[str, Any]) -> Dict[str, float]:
         """Evaluate the generated solution completions in parallel using threads."""
+        # Handle None result from non-primary ranks
+        if responses is None:
+            return None
+
         self.logger.info(f"Evaluating {len(responses['examples'])} examples...")
 
         # First, organize completions by repeat index
@@ -220,6 +224,8 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
 
         # Evaluate each set of completions separately
         all_metrics = []
+        run_stats = []
+        num_questions = len(responses["examples"])
 
         for repeat_idx, examples in examples_by_repeat.items():
             # Use ThreadPoolExecutor with limited concurrency
@@ -276,6 +282,16 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
 
             all_metrics.append(metrics)
 
+            # Add to run_stats for precomputed_hf_lm.py compatibility
+            run_stats.append(
+                {
+                    "repetition": repeat_idx + 1,
+                    "num_total": total_finish,
+                    "num_solved": total_correct,
+                    "accuracy": total_correct / total_finish,
+                }
+            )
+
         final_metrics = {}
 
         # Calculate stats for overall accuracy
@@ -302,6 +318,17 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
         # Include raw results and examples in final metrics
         final_metrics["raw_metrics"] = all_metrics
         final_metrics["examples"] = [result for result, _ in results]  # Include last run's examples
+
+        # Add compatibility with precomputed_hf_lm.py
+        solved_avg = np.mean([result["num_solved"] for result in run_stats])
+        final_metrics.update(
+            {
+                "num_total": num_questions,
+                "solved_avg": solved_avg,
+                "run_stats": run_stats,
+                "num_repeat": self.n_repeat,
+            }
+        )
 
         return final_metrics
 

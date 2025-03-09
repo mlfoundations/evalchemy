@@ -513,7 +513,10 @@ def upload_shards_to_hub(output_dir, output_repo_id):
     """Upload all locally saved shards to HuggingFace Hub."""
     print_header("Uploading Results to HuggingFace Hub")
 
-    if not os.path.exists(os.path.expanduser(output_dir)):
+    # Check if output directory exists using shell command
+    cmd = f"test -d {output_dir} && echo 'exists' || echo 'not exists'"
+    stdout, _, _ = execute_command(cmd)
+    if stdout.strip() == "not exists":
         print_error(f"Output directory {output_dir} does not exist")
         return False
 
@@ -549,7 +552,7 @@ def upload_shards_to_hub(output_dir, output_repo_id):
 
     # Upload all files
     print_info(f"Uploading files from {output_dir} to {output_repo_id}...")
-    cmd = f"huggingface-cli upload {output_repo_id} {output_dir} --repo-type dataset --cache-dir {hf_hub}"
+    cmd = f"huggingface-cli upload {output_repo_id} {output_dir} --repo-type dataset"
     stdout, stderr, return_code = execute_command(cmd)
 
     if return_code != 0:

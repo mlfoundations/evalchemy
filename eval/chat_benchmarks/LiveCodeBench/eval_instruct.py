@@ -1,12 +1,13 @@
 import copy
 import logging
+import os
 import re
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any, Dict, List, Optional
 
 import numpy as np
-from datasets import load_dataset
+from datasets import Dataset, concatenate_datasets, load_dataset
 from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
 
@@ -304,31 +305,23 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
 
         return final_metrics
 
-    def load_questions(self) -> List[Dict[str, str]]:
+    def load_questions(self) -> Dataset:
         """Load LiveCodeBench questions from source."""
-        # Load dataset in smaller chunks and combine
-        all_examples = []
-        chunk_size = 200  # Process 200 examples at a time
-
-        for i in range(0, 511, chunk_size):  # Assuming total size is 511
-            try:
-                dataset = load_dataset(
-                    "livecodebench/code_generation_lite",
-                    version_tag="release_v2",
-                    split=f"test[{i}:{i+chunk_size}]",
-                    trust_remote_code=True,
-                )
-
-                # Process chunk
-                dataset = dataset.map(
-                    lambda example: {"private_test_cases": translate_private_test_cases(example["private_test_cases"])}
-                )
-                dataset = dataset.map(map_to_example, remove_columns=dataset.column_names)
-
-                all_examples.extend(dataset)
-
-            except ValueError:
-                # We've reached the end of the dataset
-                break
-
-        return all_examples
+        self.logger.info("Loading and decompressing LiveCodeBench questions from source...")
+        cpu_count = os.cpu_count()
+        ds = load_dataset(
+            "livecodebench/code_generation_lite", version_tag="release_v2", split="test", trust_remote_code=True
+        )
+        # Avoids "pyarrow.lib.ArrowInvalid: offset overflow while concatenating arrays" when mapping
+        processed_shards = []
+        num_shards = 4
+        for i in range(num_shards):
+            shard = ds.shard(num_shards=num_shards, index=i)
+            shard = shard.map(
+                lambda example: {"private_test_cases": translate_private_test_cases(example["private_test_cases"])},
+                num_proc=cpu_count,
+            )
+            shard = shard.map(map_to_example, remove_columns=ds.column_names)
+            processed_shards.append(shard)
+        ds = concatenate_datasets(processed_shards)
+        return ds

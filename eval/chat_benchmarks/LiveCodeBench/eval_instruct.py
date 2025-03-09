@@ -281,22 +281,22 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
         # Calculate stats for overall accuracy
         acc_values = [m["accuracy"] for m in all_metrics]
         mean_acc, stderr_acc = calc_stats(acc_values)
-        final_metrics["accuracy_mean"] = mean_acc
-        final_metrics["accuracy_stderr"] = stderr_acc
+        final_metrics["accuracy_avg"] = mean_acc
+        final_metrics["accuracy_std_err"] = stderr_acc
+        self.logger.info(f"Overall accuracy: {mean_acc:.2%} ± {stderr_acc:.2%}")
 
         # Calculate stats for each difficulty level
         difficulties = all_metrics[0]["per_difficulty_correct"].keys()
         for diff in difficulties:
             acc_values = [m[f"accuracy_{diff}"] for m in all_metrics]
             mean_acc, stderr_acc = calc_stats(acc_values)
-            final_metrics[f"accuracy_{diff}_mean"] = mean_acc
-            final_metrics[f"accuracy_{diff}_stderr"] = stderr_acc
+            final_metrics[f"accuracy_{diff}_avg"] = mean_acc
+            final_metrics[f"accuracy_{diff}_std_err"] = stderr_acc
 
         # Log results
-        self.logger.info(f"Overall accuracy: {mean_acc:.2%} ± {stderr_acc:.2%}")
         for diff in difficulties:
-            mean = final_metrics[f"accuracy_{diff}_mean"]
-            stderr = final_metrics[f"accuracy_{diff}_stderr"]
+            mean = final_metrics[f"accuracy_{diff}_avg"]
+            stderr = final_metrics[f"accuracy_{diff}_std_err"]
             self.logger.info(f"Accuracy {diff}: {mean:.2%} ± {stderr:.2%}")
 
         # Include raw results and examples in final metrics

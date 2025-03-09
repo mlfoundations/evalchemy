@@ -540,9 +540,8 @@ def upload_shards_to_hub(output_dir, output_repo_id):
 def compute_and_upload_scores(tasks, output_repo_id, model_name):
     """Compute and upload scores."""
     print_header("Computing and Uploading Scores")
-    print_warning(
-        "This may take a while the first time the eval datasets are downloaded and parsed. Consider running locally with more cpus."
-    )
+    if "LiveCodeBench" in tasks:
+        print_warning("LiveCodeBench evaluation takes ~15mins")
 
     # replace / with __ in model_name
     model_name = model_name.replace("/", "__")

@@ -250,7 +250,15 @@ def prepare_for_sbatch(input_repo_id, output_repo_id, model_name):
 
 
 def launch_sbatch(
-    model_name, model_path, input_dataset, output_dataset, num_shards, logs_dir, tasks_str, upload_from_worker=False
+    model_name,
+    model_path,
+    input_dataset,
+    output_dataset,
+    num_shards,
+    logs_dir,
+    tasks_str,
+    upload_from_worker=False,
+    max_job_duration=None,
 ):
     """Launch the sbatch job."""
     print_header("Launching SBATCH Job")
@@ -292,6 +300,13 @@ def launch_sbatch(
     )
     # Add the model path to the sbatch script
     sbatch_content = sbatch_content.replace('export MODEL_PATH=""', f'export MODEL_PATH="{model_path}"')
+
+    # Update job duration if specified
+    if max_job_duration:
+        # Format the duration as HH:MM:00
+        formatted_duration = f"{max_job_duration:02d}:00:00"
+        sbatch_content = sbatch_content.replace("#SBATCH --time=01:00:00", f"#SBATCH --time={formatted_duration}")
+        print_info(f"Setting job duration to {formatted_duration}")
 
     # Add output log path
     sbatch_content = sbatch_content.replace(
@@ -611,6 +626,12 @@ def main():
         action="store_true",
         help="Enable upload from worker nodes (default: False - save locally and upload from login node)",
     )
+    parser.add_argument(
+        "--max-job-duration",
+        type=int,
+        default=None,
+        help="Maximum job duration in hours (default: use sbatch script default)",
+    )
 
     args = parser.parse_args()
 
@@ -655,6 +676,7 @@ def main():
         logs_dir,
         args.tasks,
         args.upload_from_worker,
+        args.max_job_duration,
     )
     if not job_id:
         sys.exit(1)

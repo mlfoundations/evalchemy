@@ -250,13 +250,11 @@ def prepare_for_sbatch(input_repo_id, output_repo_id, model_name):
 
 
 def launch_sbatch(
-    model_name,
     model_path,
     input_dataset,
     output_dataset,
     num_shards,
     logs_dir,
-    tasks_str,
     max_job_duration=None,
 ):
     """Launch the sbatch job."""
@@ -285,36 +283,18 @@ def launch_sbatch(
     repo_name = output_dataset.split("/")[-1]
     output_dir = os.path.join("$WORK", "evalchemy_results", repo_name)
 
-    # Replace parameters in the sbatch script
-    sbatch_content = sbatch_content.replace("#SBATCH --array=0-127", f"#SBATCH --array=0-{num_shards-1}")
-    sbatch_content = sbatch_content.replace('export TASK="REASONING"', f'export TASK="{tasks_str}"')
-    sbatch_content = sbatch_content.replace(
-        'export INPUT_DATASET="mlfoundations-dev/${TASK}_evalchemy"', f'export INPUT_DATASET="{input_dataset}"'
-    )
-    sbatch_content = sbatch_content.replace(
-        'export OUTPUT_DATASET="mlfoundations-dev/${TASK}_evalchemy_${GLOBAL_SIZE}shards_${MODEL_NAME_SHORT}"',
-        f'export OUTPUT_DATASET="{output_dataset}"',
-    )
-    sbatch_content = sbatch_content.replace(
-        'export MODEL_NAME="Qwen/Qwen2.5-7B-Instruct"', f'export MODEL_NAME="{model_name}"'
-    )
-    sbatch_content = sbatch_content.replace(
-        'export OUTPUT_DIR="$WORK/evalchemy_results/${TASK}/${MODEL_NAME_SHORT}"', f'export OUTPUT_DIR="{output_dir}"'
-    )
-    # Add the model path to the sbatch script
-    sbatch_content = sbatch_content.replace('export MODEL_PATH=""', f'export MODEL_PATH="{model_path}"')
+    # Replace parameters in the sbatch script using regex pattern matching
+    sbatch_content = re.sub(r"#SBATCH --array=.*", f"#SBATCH --array=0-{num_shards-1}", sbatch_content)
+    sbatch_content = re.sub(r"export INPUT_DATASET=.*", f'export INPUT_DATASET="{input_dataset}"', sbatch_content)
+    sbatch_content = re.sub(r"export OUTPUT_DATASET=.*", f'export OUTPUT_DATASET="{output_dataset}"', sbatch_content)
+    sbatch_content = re.sub(r"export MODEL_NAME=.*", f'export MODEL_NAME="{model_path}"', sbatch_content)
+    sbatch_content = re.sub(r"(^#!.*\n)", r"\1#SBATCH --output=" + logs_dir + r"/%A_%a.out\n", sbatch_content)
 
     # Update job duration if specified
     if max_job_duration:
-        # Format the duration as HH:MM:00
         formatted_duration = f"{max_job_duration:02d}:00:00"
-        sbatch_content = sbatch_content.replace("#SBATCH --time=01:00:00", f"#SBATCH --time={formatted_duration}")
+        sbatch_content = re.sub(r"#SBATCH --time=.*", f"#SBATCH --time={formatted_duration}", sbatch_content)
         print_info(f"Setting job duration to {formatted_duration}")
-
-    # Add output log path
-    sbatch_content = sbatch_content.replace(
-        "#SBATCH --mem=64G", f"#SBATCH --mem=64G\n#SBATCH --output={logs_dir}/%A_%a.out"
-    )
 
     with open(temp_sbatch_file, "w") as f:
         f.write(sbatch_content)
@@ -671,13 +651,11 @@ def main():
 
     # Launch sbatch job with the dataset repo but save to output repo
     job_id, output_dir = launch_sbatch(
-        args.model_name,
         model_path,
         input_dataset,
         output_dataset,
         args.num_shards,
         logs_dir,
-        args.tasks,
         args.max_job_duration,
     )
     if not job_id:

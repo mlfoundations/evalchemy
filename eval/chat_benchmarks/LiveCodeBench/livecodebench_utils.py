@@ -10,7 +10,6 @@ import faulthandler
 import io
 import json
 import multiprocessing
-import os
 import pickle
 import sys
 import time
@@ -231,52 +230,37 @@ def prepare_test_input_output_functional(test_case, is_extracted):
 
 
 def run_tests_for_one_example(test_cases, completion, result_list, is_extracted):
-    # Redirect stdout/stderr to prevent leakage
-    original_stdout = sys.stdout
-    original_stderr = sys.stderr
-    null_output = open(os.devnull, "w")
-    sys.stdout = null_output
-    sys.stderr = null_output
-
-    try:
-        time_elapsed = float("inf")
-        test_type = test_cases[0]["testtype"]
-        reliability_guard()
-        for i, test_case in enumerate(test_cases):
-            output_error = ""
-            output_value = ""
-            try:
-                time_start = time.time()
-                if test_type == "functional":
-                    test_input, test_output = prepare_test_input_output_functional(test_case, is_extracted)
-                    passed, output_value = run_test_func(
-                        completion, is_extracted, copy.deepcopy(test_input), copy.deepcopy(test_output)
-                    )
-                else:
-                    test_input, test_output = prepare_test_input_output_std(test_case)
-                    passed, output_value = run_test_std(
-                        completion, copy.deepcopy(test_input), copy.deepcopy(test_output)
-                    )
-                time_elapsed = time.time() - time_start
-                if not passed:
-                    output_error = (
-                        f"For test input: {test_input}. Expected output is: {test_output}, but got: {output_value}."
-                    )
-
-            except Exception as e:
-                passed = False
-                output_error = f"For test input: {test_input}. Expected output is: {test_output}, but got error: {e}."
-                output_value = f"Error: {e}."
-            if output_error == "":
-                output_error = f"For test input: {test_input}. Expected output is: {test_output}, your solution correctly passes this test with output {output_value}."
-            result_list.append((passed, output_error, output_value, time_elapsed))
+    time_elapsed = float("inf")
+    test_type = test_cases[0]["testtype"]
+    reliability_guard()
+    for i, test_case in enumerate(test_cases):
+        output_error = ""
+        output_value = ""
+        try:
+            time_start = time.time()
+            if test_type == "functional":
+                test_input, test_output = prepare_test_input_output_functional(test_case, is_extracted)
+                passed, output_value = run_test_func(
+                    completion, is_extracted, copy.deepcopy(test_input), copy.deepcopy(test_output)
+                )
+            else:
+                test_input, test_output = prepare_test_input_output_std(test_case)
+                passed, output_value = run_test_std(completion, copy.deepcopy(test_input), copy.deepcopy(test_output))
+            time_elapsed = time.time() - time_start
             if not passed:
-                return
-    finally:
-        # Restore stdout/stderr
-        sys.stdout = original_stdout
-        sys.stderr = original_stderr
-        null_output.close()
+                output_error = (
+                    f"For test input: {test_input}. Expected output is: {test_output}, but got: {output_value}."
+                )
+
+        except Exception as e:
+            passed = False
+            output_error = f"For test input: {test_input}. Expected output is: {test_output}, but got error: {e}."
+            output_value = f"Error: {e}."
+        if output_error == "":
+            output_error = f"For test input: {test_input}. Expected output is: {test_output}, your solution correctly passes this test with output {output_value}."
+        result_list.append((passed, output_error, output_value, time_elapsed))
+        if not passed:
+            return
 
 
 def lcb_run(problem, completion, timeout, is_extracted):

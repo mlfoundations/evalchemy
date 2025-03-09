@@ -257,23 +257,26 @@ def launch_sbatch(
     num_shards,
     logs_dir,
     tasks_str,
-    upload_from_worker=False,
     max_job_duration=None,
 ):
     """Launch the sbatch job."""
     print_header("Launching SBATCH Job")
 
+    # Check hostname to determine which sbatch script to use
+    cmd = "echo $HOSTNAME"
+    hostname, _, _ = execute_command(cmd, verbose=False)
+    print_info(f"Using $HOSTNAME: {hostname} to determine which sbatch script to use")
+    if "c1" in hostname:
+        sbatch_script = "eval/examples/capella_sharded_eval.sbatch"
+        print_info("Detected Capella environment, using capella_sharded_eval.sbatch")
+    elif "leonardo" in hostname:
+        sbatch_script = "eval/examples/leonardo_sharded_eval.sbatch"
+        print_info("Detected Leonardo environment, using leonardo_sharded_eval.sbatch")
+    else:
+        raise ValueError(f"Unknown hostname: {hostname}, can't determine which sbatch script to use")
+
     # Create a temporary sbatch script with the correct parameters
     temp_sbatch_file = os.path.join(logs_dir, "job.sbatch")
-
-    # Use the appropriate sbatch script based on upload mode
-    if upload_from_worker:
-        sbatch_script = "eval/examples/zih_sharded_ALL_job_array.sbatch"
-        print_info("Using worker upload mode (uploading from worker nodes)")
-    else:
-        sbatch_script = "eval/examples/zih_sharded_ALL_job_array_no_upload.sbatch"
-        print_info("Using local save mode (saving locally and uploading from login node)")
-
     with open(sbatch_script, "r") as f:
         sbatch_content = f.read()
 
@@ -675,7 +678,6 @@ def main():
         args.num_shards,
         logs_dir,
         args.tasks,
-        args.upload_from_worker,
         args.max_job_duration,
     )
     if not job_id:

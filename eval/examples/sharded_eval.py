@@ -292,7 +292,7 @@ def launch_sbatch(
     print_info(f"[Job status] squeue -j {job_id}")
     print_info(f"[Job status] sacct -j {job_id} -X --format=JobID,JobName,State,Elapsed")
     print_info(f"[Cancel job] scancel {job_id}")
-    print_info(f"[View logs] tail -f {logs_dir}/{job_id}_*.out")
+    print_info(f"[View logs] tail {logs_dir}/{job_id}_*.out")
 
     return job_id
 

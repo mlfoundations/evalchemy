@@ -127,7 +127,7 @@ def process_shard(
 
     # Process outputs and store results
     outputs_text = [output.outputs[0].text for output in outputs]
-    ds.add_column("model_outputs", outputs_text)
+    ds = ds.add_column("model_outputs", outputs_text)
     logger.info(f"Shard successfully processed and loaded into dataset: {len(ds)} examples")
 
     # Upload to HF Hub or save locally

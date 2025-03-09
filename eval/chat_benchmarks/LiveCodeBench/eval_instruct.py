@@ -1,5 +1,6 @@
 import copy
 import logging
+import multiprocessing
 import os
 import re
 from collections import defaultdict
@@ -224,30 +225,12 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
         for repeat_idx, examples in examples_by_repeat.items():
             # Use ThreadPoolExecutor with limited concurrency
             results = []
-            with ThreadPoolExecutor(max_workers=32) as executor:
-                future_to_example = {}
-                for i, example in enumerate(examples):
-                    future = executor.submit(self.evaluate_single_example, example)
-                    future_to_example[future] = (i, example)
+            with multiprocessing.Pool(processes=min(32, multiprocessing.cpu_count())) as pool:
+                # Map the evaluation function to all examples
+                mapped_results = pool.map(self.evaluate_single_example, examples)
 
-                # Collect results as they complete
-                results = [None] * len(examples)
-                for future in as_completed(future_to_example):
-                    idx, example = future_to_example[future]
-                    try:
-                        result = future.result()
-                        results[idx] = (result, example)
-                    except Exception as e:
-                        self.logger.error(f"Future error for example {idx}: {str(e)}")
-                        results[idx] = (
-                            {
-                                "content": example["model_answer"],
-                                "difficulty": example["difficulty"],
-                                "correctness": False,
-                                "reason": f"Future error: {str(e)}",
-                            },
-                            example,
-                        )
+                # Combine results with examples
+                results = list(zip(mapped_results, examples))
 
             # Calculate metrics for this repeat
             total_correct = sum(1 for result, _ in results if result["correctness"])
@@ -308,6 +291,8 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
     def load_questions(self) -> Dataset:
         """Load LiveCodeBench questions from source."""
         self.logger.info("Loading and decompressing LiveCodeBench questions from source...")
+        # ds = load_dataset("mlfoundations-dev/lcbv2_processed", split="test", trust_remote_code=True)
+        # return ds
         cpu_count = os.cpu_count()
         ds = load_dataset(
             "livecodebench/code_generation_lite", version_tag="release_v2", split="test", trust_remote_code=True

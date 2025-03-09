@@ -1,4 +1,3 @@
-import json
 import logging
 import random
 from typing import Any, Dict, List, Optional
@@ -8,7 +7,6 @@ import numpy as np
 from datasets import load_dataset
 from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
-from lm_eval.models.vllm_causallms import VLLM
 
 from eval.task import BaseBenchmark
 

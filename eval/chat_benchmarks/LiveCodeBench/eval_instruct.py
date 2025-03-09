@@ -1,26 +1,18 @@
-import base64
 import copy
-import json
 import logging
-import pickle
 import re
-import zlib
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from multiprocessing import Pool, cpu_count
 from typing import Any, Dict, List, Optional
 
-import lm_eval.models
 import numpy as np
 from datasets import load_dataset
 from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
-from lm_eval.models.vllm_causallms import VLLM
-from lm_eval.tasks.hendrycks_math.utils import is_equiv, last_boxed_only_string, remove_boxed
 
 from eval.task import BaseBenchmark
 
-from .livecodebench_utils import has_test_type, lcb_run, map_to_example, post_process_code, translate_private_test_cases
+from .livecodebench_utils import lcb_run, map_to_example, post_process_code, translate_private_test_cases
 
 
 def has_code(response):

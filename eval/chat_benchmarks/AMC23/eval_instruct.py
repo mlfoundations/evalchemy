@@ -6,7 +6,6 @@ import lm_eval.models
 import numpy as np
 from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
-from lm_eval.models.vllm_causallms import VLLM
 from lm_eval.tasks.hendrycks_math.utils import is_equiv, last_boxed_only_string, remove_boxed
 
 from eval.task import BaseBenchmark

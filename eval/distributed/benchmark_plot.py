@@ -25,6 +25,9 @@ min_times_min = [time_to_minutes(t) for t in min_times]
 max_times_min = [time_to_minutes(t) for t in max_times]
 mean_times_min = [time_to_minutes(t) for t in mean_times]
 
+# Convert max times to hours for Pareto plot
+max_times_hours = [t / 60 for t in max_times_min]
+
 
 # Create a formatter for the y-axis to display time in hours format (whole numbers only)
 def format_time(x, pos):
@@ -47,11 +50,12 @@ plt.rcParams.update(
     }
 )
 
-# Set up subplot layout
-fig = plt.figure(figsize=(10, 12))
-gs = fig.add_gridspec(2, 1, height_ratios=[2, 1], hspace=0.3)
+# Set up subplot layout with 3 plots
+fig = plt.figure(figsize=(10, 18))
+gs = fig.add_gridspec(3, 1, height_ratios=[2, 1, 2], hspace=0.3)
 ax1 = fig.add_subplot(gs[0])
 ax2 = fig.add_subplot(gs[1])
+ax3 = fig.add_subplot(gs[2])
 
 # Plot 1: Execution Times
 ax1.plot(shards, min_times_min, "o-", color="#1f77b4", label="Min Time", linewidth=2, markersize=6)
@@ -92,12 +96,34 @@ ax2.grid(True, linestyle="--", alpha=0.7)
 
 # Add annotation for optimal point
 ax2.annotate(
-    "Resource efficiency\noptimal point",
+    "Increasing initialization\n and underutilization",
     xy=(8, 10.6),
     xytext=(8, 15),
     fontsize=10,
     bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="gray", alpha=0.8),
 )
+
+# Plot 3: GPU Hours vs Wall Clock Hours
+ax3.plot(max_times_hours, gpu_hours, "o-", color="#9467bd", linewidth=2, markersize=8)
+
+# Add shard number annotations to each point
+for i, (x, y, s) in enumerate(zip(max_times_hours, gpu_hours, shards)):
+    label = f"{s} (selected as default)" if s == 8 else f"{s}"
+    ax3.annotate(
+        label,
+        xy=(x, y),
+        xytext=(5, 5),
+        textcoords="offset points",
+        fontsize=10,
+        bbox=dict(boxstyle="round,pad=0.2", fc="white", ec="gray", alpha=0.7),
+    )
+
+ax3.set_xlabel("Max Shard Execution Time in Hours")
+ax3.set_ylabel("Total GPU Hours")
+ax3.set_title("Resource Usage vs. Wall Clock")
+# Set y-axis limits to reduce blank space
+ax3.set_ylim(8, 35)
+ax3.grid(True, linestyle="--", alpha=0.7)
 
 # Add text explaining the benchmark
 benchmark_text = (

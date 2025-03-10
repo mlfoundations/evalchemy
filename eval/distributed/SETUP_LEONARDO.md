@@ -131,16 +131,16 @@ Our benchmarks on Leonardo with a standard reasoning evaluation workload show:
 
 <img src="./benchmarking_leonardo.png" alt="Benchmarking Example" width="50%"/>
 
-| **Shards** | **Max Time** | **Min Time** | **Mean Time** | **Total GPU Hours** | **HuggingFace Link** |
-|------------|--------------|--------------|---------------|---------------------|----------------------|
-| 128        | 00:19:01     | 00:08:04     | 00:15:13      | 32.5                | [03-10-25_06-59-06](https://huggingface.co/datasets/mlfoundations-dev/OpenThinker-7B_eval_03-10-25_06-59-06_0981) |
-| 64         | 00:23:15     | 00:11:45     | 00:18:39      | 19.9                | [03-10-25_06-54-44](https://huggingface.co/datasets/mlfoundations-dev/OpenThinker-7B_eval_03-10-25_06-54-44_0981) |
-| 32         | 00:37:13     | 00:13:21     | 00:25:59      | 13.9                | [03-10-25_06-55-57](https://huggingface.co/datasets/mlfoundations-dev/OpenThinker-7B_eval_03-10-25_06-55-57_0981) |
-| 16         | 01:03:31     | 00:16:48     | 00:43:05      | 11.5                | [03-10-25_06-56-31](https://huggingface.co/datasets/mlfoundations-dev/OpenThinker-7B_eval_03-10-25_06-56-31_0981) |
-| 8          | 01:50:33     | 00:25:12     | 01:19:29      | 10.6                | [03-10-25_06-56-40](https://huggingface.co/datasets/mlfoundations-dev/OpenThinker-7B_eval_03-10-25_06-56-40_0981) |
-| 4          | 03:40:57     | 01:00:18     | 02:36:41      | 10.4                | [03-10-25_06-57-11](https://huggingface.co/datasets/mlfoundations-dev/OpenThinker-7B_eval_03-10-25_06-57-11_0981) |
-| 2          | 06:56:54     | 03:08:48     | 05:02:51      | 10.1                | [03-10-25_06-57-20](https://huggingface.co/datasets/mlfoundations-dev/OpenThinker-7B_eval_03-10-25_06-57-20_0981) |
-| 1          | 10:14:50     | 10:14:50     | 10:14:50      | 10.2                | [03-10-25_08-29-49](https://huggingface.co/datasets/mlfoundations-dev/OpenThinker-7B_eval_03-10-25_08-29-49_0981) |
+| **Shards** | **Max Time** | **Min Time** | **Mean Time** | **Total GPU Hours** | **Huggingface** |
+|------------|--------------|--------------|---------------|---------------------|-----------------|
+| 128        | 00:19:01     | 00:08:04     | 00:15:13      | 32.5                | [06:59:06](https://huggingface.co/datasets/mlfoundations-dev/OpenThinker-7B_eval_03-10-25_06-59-06_0981) |
+| 64         | 00:23:15     | 00:11:45     | 00:18:39      | 19.9                | [06:54:44](https://huggingface.co/datasets/mlfoundations-dev/OpenThinker-7B_eval_03-10-25_06-54-44_0981) |
+| 32         | 00:37:13     | 00:13:21     | 00:25:59      | 13.9                | [06:55:57](https://huggingface.co/datasets/mlfoundations-dev/OpenThinker-7B_eval_03-10-25_06-55-57_0981) |
+| 16         | 01:03:31     | 00:16:48     | 00:43:05      | 11.5                | [06:56:31](https://huggingface.co/datasets/mlfoundations-dev/OpenThinker-7B_eval_03-10-25_06-56-31_0981) |
+| 8          | 01:50:33     | 00:25:12     | 01:19:29      | 10.6                | [06:56:40](https://huggingface.co/datasets/mlfoundations-dev/OpenThinker-7B_eval_03-10-25_06-56-40_0981) |
+| 4          | 03:40:57     | 01:00:18     | 02:36:41      | 10.4                | [06:57:11](https://huggingface.co/datasets/mlfoundations-dev/OpenThinker-7B_eval_03-10-25_06-57-11_0981) |
+| 2          | 06:56:54     | 03:08:48     | 05:02:51      | 10.1                | [06:57:20](https://huggingface.co/datasets/mlfoundations-dev/OpenThinker-7B_eval_03-10-25_06-57-20_0981) |
+| 1          | 10:14:50     | 10:14:50     | 10:14:50      | 10.2                | [08:29:49](https://huggingface.co/datasets/mlfoundations-dev/OpenThinker-7B_eval_03-10-25_08-29-49_0981) |
 
 Key insights from benchmarking:
 - 8 shards provides a good balance between execution time and GPU efficiency

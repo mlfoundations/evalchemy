@@ -14,11 +14,11 @@ def time_to_minutes(time_str):
 
 
 # Data from the benchmarks
-shards = [2, 4, 8, 16, 32, 64, 128]
-min_times = ["03:08:48", "01:00:18", "00:25:12", "00:16:48", "00:13:21", "00:11:45", "00:08:04"]
-max_times = ["06:56:54", "03:40:57", "01:50:33", "01:03:31", "00:37:13", "00:23:15", "00:19:01"]
-mean_times = ["05:02:51", "02:36:41", "01:19:29", "00:43:05", "00:25:59", "00:18:39", "00:15:13"]
-gpu_hours = [10.1, 10.4, 10.6, 11.5, 13.9, 19.9, 32.5]
+shards = [1, 2, 4, 8, 16, 32, 64, 128]
+min_times = ["10:14:50", "03:08:48", "01:00:18", "00:25:12", "00:16:48", "00:13:21", "00:11:45", "00:08:04"]
+max_times = ["10:14:50", "06:56:54", "03:40:57", "01:50:33", "01:03:31", "00:37:13", "00:23:15", "00:19:01"]
+mean_times = ["10:14:50", "05:02:51", "02:36:41", "01:19:29", "00:43:05", "00:25:59", "00:18:39", "00:15:13"]
+gpu_hours = [10.1, 10.1, 10.4, 10.6, 11.5, 13.9, 19.9, 32.5]
 
 # Convert times to minutes
 min_times_min = [time_to_minutes(t) for t in min_times]
@@ -107,8 +107,7 @@ ax2.annotate(
 ax3.plot(max_times_hours, gpu_hours, "o-", color="#9467bd", linewidth=2, markersize=8)
 
 # Add shard number annotations to each point
-for i, (x, y, s) in enumerate(zip(max_times_hours, gpu_hours, shards)):
-    label = f"{s} (selected as default)" if s == 8 else f"{s}"
+for i, (x, y, label) in enumerate(zip(max_times_hours, gpu_hours, shards)):
     ax3.annotate(
         label,
         xy=(x, y),

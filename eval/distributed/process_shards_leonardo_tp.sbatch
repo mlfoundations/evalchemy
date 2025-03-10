@@ -3,7 +3,7 @@
 #SBATCH --nodes=1            
 #SBATCH --ntasks=1           
 #SBATCH --gres=gpu:4           
-#SBATCH --time=02:00:00        
+#SBATCH --time=04:00:00        
 #SBATCH --cpus-per-task=32
 #SBATCH --account=EUHPC_E03_068
 #SBATCH --partition=boost_usr_prod

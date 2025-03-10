@@ -140,7 +140,7 @@ def check_conda_env(watchdog=False):
         activate_cmd = "source /data/horse/ws/ryma833h-DCFT_Shared/miniconda3/bin/activate && conda activate evalchemy"
         print_info(f"Detected Capella environment, checking python path: {python_path}")
     elif "leonardo" in hostname:
-        python_path = "/leonardo_work/EUHPC_E03_068/DCFT_shared/miniconda3/envs/evalchemy/bin/python3.10"
+        python_path = "/leonardo_work/EUHPC_E03_068/DCFT_shared/evalchemy/env/cpu-evalchemy/bin/python3.10"
         activate_cmd = "source /leonardo_work/EUHPC_E03_068/DCFT_shared/mamba/bin/activate /leonardo_work/EUHPC_E03_068/DCFT_shared/evalchemy/env/cpu-evalchemy"
         print_info(f"Detected Leonardo environment, checking python path: {python_path}")
     else:
@@ -148,7 +148,7 @@ def check_conda_env(watchdog=False):
 
     if return_code != 0 or stdout != python_path:
         if watchdog:
-            print_error(f"You have not activated the correct conda environment. Your python path is: {stdout}.")
+            print_error(f"You have not activated the correct conda environment. Your python path is: {stdout}")
             print_error("This is necessary when '--watchdog' is used. Please activate the evalchemy conda environment:")
             print_error(activate_cmd)
             return False

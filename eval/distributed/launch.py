@@ -148,9 +148,9 @@ def check_conda_env(watchdog=False):
 
     if return_code != 0 or stdout != python_path:
         if watchdog:
-            print_error(
-                f"You have not activated the correct conda environment. This is necessary when '--watchdog' is used. Please activate the evalchemy conda environment using the following command: {activate_cmd}"
-            )
+            print_error(f"You have not activated the correct conda environment. Your python path is: {stdout}.")
+            print_error("This is necessary when '--watchdog' is used. Please activate the evalchemy conda environment:")
+            print_error(activate_cmd)
             return False
         else:
             print_warning(f"You are not using the suggested conda environment. Your python path is: {stdout}")

@@ -114,7 +114,7 @@ SHARDS=N && cd $EVALCHEMY && source /leonardo_work/EUHPC_E03_068/DCFT_shared/mam
 
 Our benchmarks on Leonardo with a standard reasoning evaluation workload show:
 
-![Leonardo Benchmarking](/Users/ryan/evalchemy/eval/distributed/benchmarking_leonardo.png)
+![Leonardo Benchmarking](./benchmarking_leonardo.png)
 
 Key insights from benchmarking:
 - 8 shards provides a good balance between execution time and GPU efficiency

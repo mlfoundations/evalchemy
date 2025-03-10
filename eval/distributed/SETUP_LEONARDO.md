@@ -79,7 +79,6 @@ source ${DCFT_MAMBA}/bin/activate ${EVALCHEMY_CPU_ENV}
 pip uninstall -y torch torchvision torchaudio && pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
 
 # Test CPU environment
-export HF_HUB_CACHE="$DCFT/hub"
 OPENAI_API_KEY=NONE python -m eval.eval --model upload_to_hf --tasks AIME25 --model_args repo_id=mlfoundations-dev/AIME25_evalchemy
 
 # Install the right torch for GPU env

@@ -12,7 +12,7 @@ import time
 import colorama
 from colorama import Fore, Style
 from dotenv import load_dotenv
-from huggingface_hub import HfApi
+from huggingface_hub import HfApi, snapshot_download
 
 colorama.init()
 
@@ -201,13 +201,7 @@ def create_evaluation_dataset(tasks):
 def download_model(model_name):
     """Download a model from Hugging Face."""
     print_info(f"Downloading model: {model_name}")
-
     try:
-        # Could also use 'huggingface-cli download <repo_id> --cache-dir <cache_dir>'
-        # Which also returns the snapshot dir
-        # Import here to avoid dependency if the user doesn't want to download a model
-        from huggingface_hub import snapshot_download
-
         model_path = snapshot_download(repo_id=model_name)
         print_success(f"Model downloaded successfully to: {model_path}")
         return model_path
@@ -219,13 +213,7 @@ def download_model(model_name):
 def download_dataset(dataset_name):
     """Download a dataset from Hugging Face."""
     print_info(f"Downloading dataset: {dataset_name}")
-
     try:
-        # Could also use 'huggingface-cli download <repo_id> --cache-dir <cache_dir> --repo-type dataset'
-        # Which also returns the snapshot dir
-        # Import here to avoid dependency if the user doesn't want to download a dataset
-        from huggingface_hub import snapshot_download
-
         dataset_path = snapshot_download(repo_id=dataset_name, repo_type="dataset")
         print_success(f"Dataset downloaded successfully to: {dataset_path}")
         return dataset_path

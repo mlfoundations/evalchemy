@@ -117,9 +117,9 @@ def check_required_env_vars():
     return True
 
 
-def activate_conda_env():
-    """Activate the conda environment."""
-    print_header("Activating Conda Environment")
+def check_conda_env(watchdog=False):
+    """Check if the conda environment is activated."""
+    print_header("Checking Conda Environment")
 
     # Check if we're already in the evalchemy conda environment
     current_env = os.environ.get("CONDA_DEFAULT_ENV")
@@ -135,13 +135,32 @@ def activate_conda_env():
 
     # Since we can't directly activate conda environment in a script,
     # we'll check if the environment exists
-    cmd = "conda env list | grep evalchemy"
+    cmd = "readlink -f $(which python)"
     stdout, _, return_code = execute_command(cmd)
 
-    if return_code != 0 or "evalchemy" not in stdout:
-        print_error("evalchemy conda environment not found.")
-        print_info("Please create and activate the evalchemy conda environment manually.")
-        return False
+    # Check hostname to determine which HF_HUB_CACHE to use
+    cmd = "echo $HOSTNAME"
+    hostname, _, _ = execute_command(cmd, verbose=False)
+    print_info(f"Using $HOSTNAME: {hostname} to determine which conda environment we should be in")
+    if "c1" in hostname:
+        python_path = "/data/horse/ws/ryma833h-DCFT_Shared/miniconda3/envs/evalchemy/bin/python3.10"
+        activate_cmd = "source /data/horse/ws/ryma833h-DCFT_Shared/miniconda3/bin/activate && conda activate evalchemy"
+        print_info(f"Detected Capella environment, checking python path: {python_path}")
+    elif "leonardo" in hostname:
+        python_path = "/leonardo_work/EUHPC_E03_068/DCFT_shared/miniconda3/envs/evalchemy/bin/python3.10"
+        activate_cmd = "source /leonardo_work/EUHPC_E03_068/DCFT_shared/mamba/bin/activate /leonardo_work/EUHPC_E03_068/DCFT_shared/evalchemy/env/cpu-evalchemy"
+        print_info(f"Detected Leonardo environment, checking python path: {python_path}")
+    else:
+        raise ValueError(f"Unknown hostname: {hostname}, can't determine which HF_HUB_CACHE to use")
+
+    if return_code != 0 or stdout != python_path:
+        if watchdog:
+            print_error(
+                f"You have not activated the correct conda environment. This is necessary when '--watchdog' is used. Please activate the evalchemy conda environment using the following command: {activate_cmd}"
+            )
+            return False
+        else:
+            print_warning(f"You are not using the suggested conda environment. Your python path is: {stdout}")
 
     print_warning("Script is running in conda environment: " + current_env)
     print_info("This script cannot automatically activate a different conda environment.")
@@ -589,7 +608,7 @@ def main():
         sys.exit(1)
 
     # Activate conda environment
-    if not activate_conda_env():
+    if not check_conda_env(args.watchdog):
         sys.exit(1)
 
     # Generate timestamp and repository ID for results

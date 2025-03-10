@@ -4,6 +4,7 @@
 #SBATCH --ntasks=1           
 #SBATCH --gres=gpu:4           
 #SBATCH --time=02:00:00        
+#SBATCH --mem=512G
 #SBATCH --account=EUHPC_E03_068
 #SBATCH --partition=boost_usr_prod
 

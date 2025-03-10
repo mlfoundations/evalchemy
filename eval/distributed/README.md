@@ -54,8 +54,8 @@ cd /leonardo_work/EUHPC_E03_068/DCFT_shared/evalchemy/
 For instructions on setting up a new cluster environment, see the [Adding a New Environment](#adding-a-new-environment) section below.
 
 For detailed setup instructions for specific clusters, see:
-- [Leonardo Setup](LEONARDO_SETUP.md)
-- [Capella Setup](CAPELLA_SETUP.md)
+- [Leonardo Setup](SETUP_LEONARDO.md)
+- [Capella Setup](SETUP_CAPELLA.md)
 
 ## Distributed Evaluation
 
@@ -124,6 +124,6 @@ To add support for a new HPC cluster:
      - Path configurations
 
 4. **Document Setup**:
-   - Create a detailed setup guide (`[CLUSTER]_SETUP.md`)
+   - Create a detailed setup guide (`SETUP_[CLUSTER].md`)
    - Include all necessary setup steps
    - Document any cluster-specific quirks or requirements

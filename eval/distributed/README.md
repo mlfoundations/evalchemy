@@ -93,6 +93,30 @@ The distributed evaluation system creates precomputed answers that can be reused
 - They can be inspected on the HuggingFace data studio
 - Metrics are added to the repo README for easy viewing
 
+## Benchmarking Performance
+
+Before deploying at scale, it's important to benchmark your distributed evaluation setup to determine the optimal number of shards for your workload. This helps balance execution time against resource efficiency.
+
+### Running Benchmarks
+
+Use the following command to benchmark with different shard counts:
+
+```bash
+# Replace N with the number of shards to test (e.g., 2, 4, 8, 16, 32, 64, 128)
+SHARDS=N && python eval/distributed/launch.py --model_name [model-name] --tasks [task-list] --num_shards $SHARDS --watchdog
+```
+
+![Benchmarking Example](/Users/ryan/evalchemy/eval/distributed/benchmarking_leonardo.png)
+
+### Benchmarking Results Analysis
+
+When analyzing benchmark results, look for:
+
+1. **Diminishing returns on time reduction**: The point where adding more shards produces minimal time savings
+2. **Resource efficiency**: Total GPU hours used across all shards (lower is better)
+3. **Initialization overhead**: As shards increase, the time spent loading models and libraries becomes significant
+4. **Utilization**: At higher shard counts, vLLM might not fully utilize GPU resources due to smaller batch sizes per shard and increased overhead
+
 ## Adding a New Environment
 
 To add support for a new HPC cluster:
@@ -123,7 +147,13 @@ To add support for a new HPC cluster:
      - Environment setup
      - Path configurations
 
-4. **Document Setup**:
+4. **Benchmark Performance**:
+   - Run the benchmark command with different shard counts
+   - Analyze the trade-off between execution time and total GPU hours
+   - Set an optimal default in `launch.py` based on your results
+
+5. **Document Setup**:
    - Create a detailed setup guide (`SETUP_[CLUSTER].md`)
    - Include all necessary setup steps
    - Document any cluster-specific quirks or requirements
+   - Add benchmarking results and insights

@@ -99,6 +99,28 @@ sbatch eval/distributed/process_shards_leonardo.sbatch
 rm *.out
 ```
 
+## Benchmarking Shard Performance
+
+Before running full distributed evaluations, it's recommended to benchmark performance with different shard counts to determine the optimal configuration for your workload. The benchmark helps identify the best trade-off between wall-clock time and total GPU hours.
+
+```bash
+# Activate the CPU environment 
+source /leonardo_work/EUHPC_E03_068/DCFT_shared/mamba/bin/activate /leonardo_work/EUHPC_E03_068/DCFT_shared/evalchemy/env/cpu-evalchemy
+
+# Run benchmark with different shard counts
+# Replace N with the number of shards to test (e.g., 2, 4, 8, 16, 32, 64, 128)
+SHARDS=N && cd $EVALCHEMY && source /leonardo_work/EUHPC_E03_068/DCFT_shared/mamba/bin/activate /leonardo_work/EUHPC_E03_068/DCFT_shared/evalchemy/env/cpu-evalchemy && python eval/distributed/launch.py --model_name open-thoughts/OpenThinker-7B --tasks LiveCodeBench,AIME24,AIME25,AMC23,GPQADiamond,MATH500 --num_shards $SHARDS --watchdog 
+```
+
+Our benchmarks on Leonardo with a standard reasoning evaluation workload show:
+
+![Leonardo Benchmarking](/Users/ryan/evalchemy/eval/distributed/benchmarking_leonardo.png)
+
+Key insights from benchmarking:
+- 8 shards provides a good balance between execution time and GPU efficiency
+- More than 64 shards shows diminishing returns on time reduction
+- Total GPU hours increases significantly with more than 16 shards
+
 ## Running Distributed Evaluations
 
 To run a distributed evaluation on Leonardo:

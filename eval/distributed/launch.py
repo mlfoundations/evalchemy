@@ -122,18 +122,11 @@ def check_conda_env(watchdog=False):
     print_header("Checking Conda Environment")
 
     # Check if we're already in the evalchemy conda environment
-    current_env = os.environ.get("CONDA_DEFAULT_ENV")
-    if current_env == "evalchemy":
-        print_success("Already in evalchemy conda environment.")
-        return True
+    # current_env = os.environ.get("CONDA_DEFAULT_ENV")
+    # if current_env == "evalchemy":
+    #     print_success("Already in evalchemy conda environment.")
+    #     return True
 
-    # Try to activate the evalchemy conda environment
-    conda_prefix = os.environ.get("CONDA_PREFIX_1", os.environ.get("CONDA_PREFIX"))
-    if not conda_prefix:
-        print_error("Conda environment not detected.")
-        return False
-
-    # Since we can't directly activate conda environment in a script,
     # we'll check if the environment exists
     cmd = "readlink -f $(which python)"
     stdout, _, return_code = execute_command(cmd)

@@ -233,7 +233,7 @@ def download_dataset(dataset_name):
 
 def launch_sbatch(
     model_path,
-    input_dataset,
+    dataset_path,
     output_dataset_dir,
     num_shards,
     logs_dir,
@@ -262,7 +262,7 @@ def launch_sbatch(
 
     # Replace parameters in the sbatch script using regex pattern matching
     sbatch_content = re.sub(r"#SBATCH --array=.*", f"#SBATCH --array=0-{num_shards-1}", sbatch_content)
-    sbatch_content = re.sub(r"export INPUT_DATASET=.*", f'export INPUT_DATASET="{input_dataset}"', sbatch_content)
+    sbatch_content = re.sub(r"export INPUT_DATASET=.*", f'export INPUT_DATASET="{dataset_path}"', sbatch_content)
     sbatch_content = re.sub(
         r"export OUTPUT_DATASET=.*", f'export OUTPUT_DATASET="{output_dataset_dir}"', sbatch_content
     )
@@ -624,13 +624,13 @@ def main():
     print_info(f"Output dataset directory: {output_dataset_dir}")
 
     # Download the dataset and model
-    _ = download_dataset(input_dataset)
+    dataset_path = download_dataset(input_dataset)
     model_path = download_model(args.model_name)
 
     # Launch sbatch job with the dataset repo but save to output repo
     job_id = launch_sbatch(
         model_path,
-        input_dataset,
+        dataset_path,
         output_dataset_dir,
         args.num_shards,
         logs_dir,

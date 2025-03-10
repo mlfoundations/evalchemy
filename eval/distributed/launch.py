@@ -412,7 +412,7 @@ def check_job_completion(job_id, output_dir=None):
     ]
 
     # Get detailed job information
-    cmd = f"sacct -j {job_id} --format=JobID%20,JobName,Elapsed,State,ExitCode --noheader"
+    cmd = f"sacct -j {job_id} -X --format=JobID%20,JobName,Elapsed,State,ExitCode --noheader"
     stdout, _, _ = execute_command(cmd)
 
     # Parse the output and count jobs by state

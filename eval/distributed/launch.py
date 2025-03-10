@@ -441,6 +441,10 @@ def check_job_completion(job_id, output_dir=None):
             if len(failed_lines) > 3:
                 print_warning(f"    ... and {len(failed_lines) - 3} more {failure_type} jobs")
 
+            # Special message for TIMEOUT failures
+            if failure_type == "TIMEOUT":
+                print_error("Jobs timed out! Use --max-job-duration parameter to increase the time limit.")
+
     if completed_jobs == total_jobs:
         print_success("All jobs completed successfully.")
     else:

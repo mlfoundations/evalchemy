@@ -83,12 +83,22 @@ def check_required_env_vars():
         if os.environ.get(var) is None:
             missing_vars.append(var)
 
-    # Set HF_HUB environment variable
-    default_hub = os.environ.get("HF_HOME", "/data/horse/ws/ryma833h-DCFT_Shared/hub")
-    if os.environ.get("HF_HUB") is not None and os.environ.get("HF_HUB") != default_hub:
-        print_warning(f"Overwriting existing HF_HUB value '{os.environ.get('HF_HUB')}' with '{default_hub}'")
-    os.environ["HF_HUB"] = default_hub
-    print_info(f"HF_HUB set to: {default_hub}")
+    # Check hostname to determine which HF_HUB_CACHE to use
+    cmd = "echo $HOSTNAME"
+    hostname, _, _ = execute_command(cmd, verbose=False)
+    print_info(f"Using $HOSTNAME: {hostname} to determine which HF_HUB_CACHE to use")
+    if "c1" in hostname:
+        hf_hub_cache = "/data/horse/ws/ryma833h-DCFT_Shared/huggingface/hub"
+        print_info(f"Detected Capella environment, using HF_HUB_CACHE: {hf_hub_cache}")
+    elif "leonardo" in hostname:
+        hf_hub_cache = "/leonardo_work/EUHPC_E03_068/DCFT_shared/hub"
+        print_info(f"Detected Leonardo environment, using HF_HUB_CACHE: {hf_hub_cache}")
+    else:
+        raise ValueError(f"Unknown hostname: {hostname}, can't determine which HF_HUB_CACHE to use")
+    current_hub_cache = os.environ.get("HF_HUB_CACHE")
+    if current_hub_cache is not None and current_hub_cache != hf_hub_cache:
+        print_warning(f"Overwriting existing HF_HUB_CACHE value '{current_hub_cache}' with '{hf_hub_cache}'")
+    os.environ["HF_HUB_CACHE"] = hf_hub_cache
 
     if missing_vars:
         print_error(f"Missing required environment variables: {', '.join(missing_vars)}")
@@ -188,16 +198,17 @@ def create_evaluation_dataset(tasks):
     return cached_dataset_id
 
 
-def download_model(model_name, cache_dir):
+def download_model(model_name):
     """Download a model from Hugging Face."""
     print_info(f"Downloading model: {model_name}")
 
     try:
+        # Could also use 'huggingface-cli download <repo_id> --cache-dir <cache_dir>'
+        # Which also returns the snapshot dir
         # Import here to avoid dependency if the user doesn't want to download a model
         from huggingface_hub import snapshot_download
 
-        print(f"Downloading to {cache_dir}...")
-        model_path = snapshot_download(repo_id=model_name, cache_dir=cache_dir)
+        model_path = snapshot_download(repo_id=model_name)
         print_success(f"Model downloaded successfully to: {model_path}")
         return model_path
     except Exception as e:
@@ -205,16 +216,17 @@ def download_model(model_name, cache_dir):
         sys.exit(1)
 
 
-def download_dataset(dataset_name, cache_dir):
+def download_dataset(dataset_name):
     """Download a dataset from Hugging Face."""
     print_info(f"Downloading dataset: {dataset_name}")
 
     try:
+        # Could also use 'huggingface-cli download <repo_id> --cache-dir <cache_dir> --repo-type dataset'
+        # Which also returns the snapshot dir
         # Import here to avoid dependency if the user doesn't want to download a dataset
         from huggingface_hub import snapshot_download
 
-        print(f"Downloading to {cache_dir}...")
-        dataset_path = snapshot_download(repo_id=dataset_name, repo_type="dataset", cache_dir=cache_dir)
+        dataset_path = snapshot_download(repo_id=dataset_name, repo_type="dataset")
         print_success(f"Dataset downloaded successfully to: {dataset_path}")
         return dataset_path
     except Exception as e:
@@ -517,11 +529,8 @@ def upload_shards_to_hub(output_dir, output_repo_id):
     org = parts[0]
     repo_name = parts[1]
 
-    # Get HF_HUB value
-    hf_hub = os.environ.get("HF_HUB")
-
     # Create the dataset repository if it doesn't exist
-    cmd = f"huggingface-cli repo create {repo_name} --organization {org} --type dataset -y --cache-dir {hf_hub} || echo 'Repository already exists'"
+    cmd = f"huggingface-cli repo create {repo_name} --organization {org} --type dataset -y || echo 'Repository already exists'"
     stdout, stderr, return_code = execute_command(cmd)
 
     if return_code != 0:
@@ -618,9 +627,8 @@ def main():
     print_info(f"Output dataset directory: {output_dataset_dir}")
 
     # Download the dataset and model
-    hf_hub = os.environ.get("HF_HUB")
-    _ = download_dataset(input_dataset, hf_hub)
-    model_path = download_model(args.model_name, hf_hub)
+    _ = download_dataset(input_dataset)
+    model_path = download_model(args.model_name)
 
     # Launch sbatch job with the dataset repo but save to output repo
     job_id = launch_sbatch(

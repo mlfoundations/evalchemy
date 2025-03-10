@@ -1,33 +1,33 @@
 import argparse
+import concurrent.futures
 import json
 import logging
 import os
 import sys
 import time
-import yaml
-from typing import Optional, List, Dict, Union
+from typing import Dict, List, Optional, Union
 
-import concurrent.futures
-import torch.distributed as dist
-
-from lm_eval import utils
-from lm_eval import evaluator as pretrain_evaluator
-from lm_eval.tasks import TaskManager as PretrainTaskManager
-from lm_eval.api.model import LM
-from lm_eval.loggers import EvaluationTracker, WandbLogger
-from lm_eval.loggers.utils import add_env_info, add_tokenizer_info, get_git_commit_hash
-from lm_eval.utils import handle_non_serializable, simple_parse_args_string, sanitize_model_name
-from lm_eval.__main__ import setup_parser, parse_eval_args
 import lm_eval.api.metrics
 import lm_eval.api.registry
 import lm_eval.api.task
 import lm_eval.models
+import torch.distributed as dist
+import yaml
+from lm_eval import evaluator as pretrain_evaluator
+from lm_eval import utils
+from lm_eval.__main__ import parse_eval_args, setup_parser
+from lm_eval.api.model import LM
+from lm_eval.loggers import EvaluationTracker, WandbLogger
+from lm_eval.loggers.utils import add_env_info, add_tokenizer_info, get_git_commit_hash
+from lm_eval.tasks import TaskManager as PretrainTaskManager
+from lm_eval.utils import handle_non_serializable, sanitize_model_name, simple_parse_args_string
 
 from eval.chat_benchmarks.curator_lm import CuratorAPIModel  # register curator model
-from eval.task import TaskManager as InstructTaskManager
-from eval.eval_tracker import DCEvaluationTracker
-
+from eval.chat_benchmarks.precomputed_hf_lm import PrecomputedHFLM  # register precomputed_hf model
+from eval.chat_benchmarks.upload_to_hf_lm import UploadInstancesToHF  # register upload_to_hf model
 from eval.constants import LIST_OPENAI_MODELS
+from eval.eval_tracker import DCEvaluationTracker
+from eval.task import TaskManager as InstructTaskManager
 
 
 def setup_custom_parser():
@@ -215,6 +215,31 @@ def evaluate(
                     results["results"].update(pretrain_results.get("results", {}))
         except Exception as e:
             eval_logger.error(f"Error in pretrain evaluation: {str(e)}")
+
+    # If we're using UploadInstancesToHF, make sure to call upload_to_hub
+    if lm is not None and hasattr(lm, "upload_to_hub") and callable(lm.upload_to_hub):
+        try:
+            eval_logger.info("Uploading accumulated instances to HuggingFace Hub...")
+            lm.upload_to_hub()
+        except Exception as e:
+            eval_logger.error(f"Error uploading instances to HF: {str(e)}")
+            import traceback
+
+            traceback.print_exc()
+
+    # If we're using PrecomputedHFLM, update the README with evaluation results
+    if lm is not None and hasattr(lm, "update_repo_readme") and callable(lm.update_repo_readme):
+        try:
+            eval_logger.info("Updating repository README with evaluation results...")
+            local_readme_path = os.path.join(
+                args.output_path, args.model_args.strip("repo_id=").replace("/", "__") + "_README.md"
+            )
+            lm.update_repo_readme(results, local_readme_path=local_readme_path)
+        except Exception as e:
+            eval_logger.error(f"Error updating repository README: {str(e)}")
+            import traceback
+
+            traceback.print_exc()
 
     return results
 
@@ -446,7 +471,9 @@ def add_results_metadata(results: Dict, batch_sizes_list: List[int], args: argpa
         "model": (
             args.model
             if isinstance(args.model, str)
-            else args.model.config._name_or_path if hasattr(args.model, "config") else type(args.model).__name__
+            else args.model.config._name_or_path
+            if hasattr(args.model, "config")
+            else type(args.model).__name__
         ),
         "model_args": args.model_args,
         "tasks": args.tasks,

@@ -1,0 +1,112 @@
+"""
+SHARDS=N && cd $EVALCHEMY && source /leonardo_work/EUHPC_E03_068/DCFT_shared/mamba/bin/activate /leonardo_work/EUHPC_E03_068/DCFT_shared/evalchemy/env/cpu-evalchemy && python eval/distributed/launch.py --model_name open-thoughts/OpenThinker-7B --tasks LiveCodeBench,AIME24,AIME25,AMC23,GPQADiamond,MATH500 --num_shards $SHARDS --watchdog 
+"""
+
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.ticker import FuncFormatter
+
+
+# Function to convert time strings to minutes
+def time_to_minutes(time_str):
+    hours, minutes, seconds = map(int, time_str.split(":"))
+    return hours * 60 + minutes + seconds / 60
+
+
+# Data from the benchmarks
+shards = [2, 4, 8, 16, 32, 64, 128]
+min_times = ["03:08:48", "01:00:18", "00:25:12", "00:16:48", "00:13:21", "00:11:45", "00:08:04"]
+max_times = ["06:56:54", "03:40:57", "01:50:33", "01:03:31", "00:37:13", "00:23:15", "00:19:01"]
+mean_times = ["05:02:51", "02:36:41", "01:19:29", "00:43:05", "00:25:59", "00:18:39", "00:15:13"]
+gpu_hours = [10.1, 10.4, 10.6, 11.5, 13.9, 19.9, 32.5]
+
+# Convert times to minutes
+min_times_min = [time_to_minutes(t) for t in min_times]
+max_times_min = [time_to_minutes(t) for t in max_times]
+mean_times_min = [time_to_minutes(t) for t in mean_times]
+
+
+# Create a formatter for the y-axis to display time in hours format (whole numbers only)
+def format_time(x, pos):
+    hours = x / 60  # Convert minutes to hours
+    return f"{int(hours)}"  # Convert to integer to remove decimal places
+
+
+time_formatter = FuncFormatter(format_time)
+
+# Set up the figure with academic style
+plt.figure(figsize=(10, 8))
+plt.rcParams.update(
+    {
+        "font.family": "serif",
+        "font.size": 12,
+        "axes.labelsize": 14,
+        "axes.titlesize": 16,
+        "xtick.labelsize": 12,
+        "ytick.labelsize": 12,
+    }
+)
+
+# Set up subplot layout
+fig = plt.figure(figsize=(10, 12))
+gs = fig.add_gridspec(2, 1, height_ratios=[2, 1], hspace=0.3)
+ax1 = fig.add_subplot(gs[0])
+ax2 = fig.add_subplot(gs[1])
+
+# Plot 1: Execution Times
+ax1.plot(shards, min_times_min, "o-", color="#1f77b4", label="Min Time", linewidth=2, markersize=6)
+ax1.plot(shards, max_times_min, "o-", color="#d62728", label="Max Time", linewidth=2, markersize=6)
+ax1.plot(shards, mean_times_min, "o-", color="#2ca02c", label="Mean Time", linewidth=2, markersize=6)
+
+ax1.set_xscale("log", base=2)
+ax1.set_xticks(shards)
+ax1.set_xticklabels(shards)
+ax1.set_ylabel("Execution Time in Hours")
+ax1.set_xlabel("Number of Shards (log₂ scale)")
+ax1.set_title("Shard Execution Time vs. Number of Shards")
+ax1.yaxis.set_major_formatter(time_formatter)
+# Set y-axis ticks at whole number hours
+max_hours = max(max_times_min) / 60
+ax1.set_yticks(np.arange(0, max_hours + 1, 1) * 60)  # Convert hours to minutes for the ticks
+ax1.grid(True, linestyle="--", alpha=0.7)
+ax1.legend(frameon=True, loc="upper right")
+
+# Add annotations for inflection points
+ax1.annotate(
+    "Diminishing returns\non time reduction",
+    xy=(64, time_to_minutes("00:18:39")),
+    xytext=(64, time_to_minutes("01:00:00")),
+    fontsize=10,
+    bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="gray", alpha=0.8),
+)
+
+# Plot 2: GPU Hours
+ax2.plot(shards, gpu_hours, "o-", color="#ff7f0e", linewidth=2, markersize=6)
+ax2.set_xscale("log", base=2)
+ax2.set_xticks(shards)
+ax2.set_xticklabels(shards)
+ax2.set_ylabel("Total GPU Hours")
+ax2.set_xlabel("Number of Shards (log₂ scale)")
+ax2.set_title("Total GPU Hours vs. Number of Shards")
+ax2.grid(True, linestyle="--", alpha=0.7)
+
+# Add annotation for optimal point
+ax2.annotate(
+    "Resource efficiency\noptimal point",
+    xy=(8, 10.6),
+    xytext=(8, 15),
+    fontsize=10,
+    bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="gray", alpha=0.8),
+)
+
+# Add text explaining the benchmark
+benchmark_text = (
+    "Benchmark Details:\n"
+    "GPU: 1x A100 64GB per shard (Leonardo CINECA)\n"
+    "Model: open-thoughts/OpenThinker-7B\n"
+    "Tasks: LiveCodeBench, AIME24, AIME25, AMC23, GPQADiamond, MATH500 (3,127 instances)"
+)
+fig.text(0.13, 0.01, benchmark_text, fontsize=10, ha="left")
+
+plt.tight_layout(rect=[0, 0.05, 1, 0.95])
+plt.savefig("eval/distributed/benchmarking_leonardo.png", dpi=300, bbox_inches="tight")

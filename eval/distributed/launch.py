@@ -155,9 +155,6 @@ def check_conda_env(watchdog=False):
         else:
             print_warning(f"You are not using the suggested conda environment. Your python path is: {stdout}")
 
-    print_warning("Script is running in conda environment: " + current_env)
-    print_info("This script cannot automatically activate a different conda environment.")
-    print_info("Please run this script from the evalchemy conda environment.")
     return True
 
 

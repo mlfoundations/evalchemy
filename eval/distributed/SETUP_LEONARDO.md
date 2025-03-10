@@ -92,6 +92,7 @@ Before running full distributed evaluations, test the setup with:
 
 ```bash
 # Download necessary datasets and models on the login node
+# Note that HF_HUB_CACHE needs to be set as it is above
 huggingface-cli download mlfoundations-dev/evalset_2870 --repo-type dataset
 huggingface-cli download open-thoughts/OpenThinker-7B
 

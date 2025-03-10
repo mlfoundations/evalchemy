@@ -106,7 +106,7 @@ Use the following command to benchmark with different shard counts:
 SHARDS=N && python eval/distributed/launch.py --model_name [model-name] --tasks [task-list] --num_shards $SHARDS --watchdog
 ```
 
-![Benchmarking Example](./benchmarking_leonardo.png)
+<img src="./benchmarking_leonardo.png" alt="Benchmarking Example" width="50%"/>
 
 ### Benchmarking Results Analysis
 

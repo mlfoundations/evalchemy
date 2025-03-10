@@ -20,8 +20,22 @@ EVALCHEMY=$DCFT/evalchemy/
 DCFT_MAMBA=$DCFT/mamba
 EVALCHEMY_GPU_ENV=$EVALCHEMY/env/cu121-evalchemy
 EVALCHEMY_CPU_ENV=$EVALCHEMY/env/cpu-evalchemy
+HF_HUB_CACHE=$DCFT/hub
 EOF
 source ~/.bashrc
+
+# Clone repo and create conda environment
+git clone git@github.com:mlfoundations/evalchemy.git $EVALCHEMY
+cd $EVALCHEMY
+
+# Create huggingface cache dir
+mkdir -p $HF_HUB_CACHE
+
+# Set appropriate permissions for collaboration
+# Owner and group get full access, others have no access
+chmod -R u+rwX,g+rwX,o-rwx $DCFT
+# Set default ACLs for new files to maintain these permissions
+setfacl -R -d -m u::rwX,g::rwX,o::- $DCFT
 
 # Install Mamba (following Jenia's guide: https://iffmd.fz-juelich.de/e-hu5RBHRXG6DTgD9NVjig#Creating-env)
 SHELL_NAME=bash
@@ -52,16 +66,6 @@ rm ./Mambaforge-${VERSION}-$(uname)-$(uname -m).sh
 eval "$(${DCFT_MAMBA}/bin/conda shell.${SHELL_NAME} hook)"
 ${DCFT_MAMBA}/bin/mamba create -y --prefix ${EVALCHEMY_GPU_ENV} --clone base
 source ${DCFT_MAMBA}/bin/activate ${EVALCHEMY_GPU_ENV}
-
-# Set appropriate permissions for collaboration
-# Owner and group get full access, others have no access
-chmod -R u+rwX,g+rwX,o-rwx $DCFT
-# Set default ACLs for new files to maintain these permissions
-setfacl -R -d -m u::rwX,g::rwX,o::- $DCFT
-
-# Clone repo and create conda environment
-git clone git@github.com:mlfoundations/evalchemy.git $DCFT/evalchemy
-cd $DCFT/evalchemy
 
 # Fix path resolution issue in the installation
 sed -i 's|"fschat @ file:eval/chat_benchmarks/MTBench"|"fschat @ file:///leonardo_work/EUHPC_E03_068/DCFT_shared/evalchemy/eval/chat_benchmarks/MTBench"|g' /leonardo_work/EUHPC_E03_068/DCFT_shared/evalchemy/pyproject.toml

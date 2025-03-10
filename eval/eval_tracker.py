@@ -1,29 +1,22 @@
-import json
 import getpass
+import json
 import re
+import subprocess
 import time
-from dataclasses import asdict, dataclass
-from huggingface_hub import model_info
-from datetime import datetime
-from pathlib import Path
 import uuid
 from contextlib import contextmanager
-from typing import Tuple, Dict, Any, Optional
+from dataclasses import asdict, dataclass
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, Optional, Tuple
 
 import torch
-
-from lm_eval.utils import (
-    eval_logger,
-    handle_non_serializable,
-    hash_string,
-)
+from huggingface_hub import model_info
 from lm_eval.loggers.evaluation_tracker import GeneralConfigTracker
-from lm_eval.utils import simple_parse_args_string
+from lm_eval.utils import eval_logger, handle_non_serializable, hash_string, simple_parse_args_string
 
-from database.models import Dataset, Model, EvalResult, EvalSetting
-from database.utils import create_db_engine, create_tables, sessionmaker, get_or_add_model_by_name, get_model_from_db
-
-import subprocess
+from database.models import Dataset, EvalResult, EvalSetting, Model
+from database.utils import create_db_engine, create_tables, get_model_from_db, get_or_add_model_by_name, sessionmaker
 
 
 def flatten_dict(d: Dict[str, Any], parent_key: str = "", sep: str = "/") -> Dict[str, Any]:
@@ -314,7 +307,7 @@ class DCEvaluationTracker:
                     session.add(eval_result)
                     eval_logger.info(f"Added {key}:{score} to the database.")
                 else:
-                    eval_logger.warning(f"Omitting '{key}' with score {score} (type: {type(score).__name__})")
+                    eval_logger.warning(f"Omitting '{key}' with (type: {type(score).__name__})")
             session.commit()
         except Exception as e:
             session.rollback()

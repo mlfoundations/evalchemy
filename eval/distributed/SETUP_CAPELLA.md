@@ -29,6 +29,9 @@ chmod -R u+rwX,g+rwX,o-rwx $DCFT
 # Set default ACLs for new files to maintain these permissions
 setfacl -R -d -m u::rwX,g::rwX,o::- $DCFT
 
+# Create evalchemy results dir
+mkdir -p $DCFT/evalchemy_results
+
 # Set up conda in the shared workspace
 mkdir -p $DCFT/miniconda3
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O $DCFT/miniconda3/miniconda.sh

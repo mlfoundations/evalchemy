@@ -619,7 +619,7 @@ def main():
     logs_dir = os.path.join("logs", repo_name)
     os.makedirs(logs_dir, exist_ok=True)
     print_info(f"Logs directory: {logs_dir}")
-    output_dataset_dir = os.path.join("$WORK", "evalchemy_results", repo_name)
+    output_dataset_dir = os.path.join("results", repo_name)
     os.makedirs(output_dataset_dir, exist_ok=True)
     print_info(f"Output dataset directory: {output_dataset_dir}")
 

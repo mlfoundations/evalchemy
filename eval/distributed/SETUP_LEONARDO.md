@@ -31,6 +31,9 @@ cd $EVALCHEMY
 # Create huggingface cache dir
 mkdir -p $HF_HUB_CACHE
 
+# Create evalchemy_results dir
+mkdir -p $DCFT/evalchemy_results
+
 # Set appropriate permissions for collaboration
 # Owner and group get full access, others have no access
 chmod -R u+rwX,g+rwX,o-rwx $DCFT

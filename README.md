@@ -427,7 +427,7 @@ Please follow [these instructions](CONTRIBUTING.md) on how to contribute.
 If you find Evalchemy useful, please consider citing us!
 
 ```
-@software{Evalchemy,
+@software{Evalchemy: Automatic evals for LLMs,
   author = {Guha, Etash and Raoof, Negin and Mercat, Jean and Marten, Ryan and Frankel, Eric and Keh, Sedrick and Grover, Sachin and Smyrnis, George and Vu, Trung and Saad-Falcon, Jon and Choi, Caroline and Arora, Kushal and Merrill, Mike and Deng, Yichuan and Suvarna, Ashima and Bansal, Hritik and Nezhurina, Marianna and Choi, Yejin and Heckel, Reinhard and Oh, Seewong and Hashimoto, Tatsunori and Jitsev, Jenia and Shankar, Vaishaal and Dimakis, Alex and Sathiamoorthy, Mahesh and Schmidt, Ludwig},
   month = nov,
   title = {{Evalchemy}},

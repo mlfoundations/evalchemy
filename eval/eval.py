@@ -165,21 +165,23 @@ def evaluate(
                 generation_results.append(result)
                 valid_tasks.append(task)
         # Get evaluation methods only for valid tasks
-        evaluate_methods = task_manager.get_list_evaluates(valid_tasks)
-        cpu_count = os.cpu_count()
 
-        max_workers = min(len(valid_tasks), cpu_count * 2)
-        if lm.world_size <= 1 or lm.rank == 0:
-            with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-                evaluate_results = list(
-                    executor.map(
-                        lambda func_args: func_args[0](func_args[1]), zip(evaluate_methods, generation_results)
+        if lm is not None and not hasattr(lm, "upload_to_hub"):
+            evaluate_methods = task_manager.get_list_evaluates(valid_tasks)
+            cpu_count = os.cpu_count()
+
+            max_workers = min(len(valid_tasks), cpu_count * 2)
+            if lm.world_size <= 1 or lm.rank == 0:
+                with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+                    evaluate_results = list(
+                        executor.map(
+                            lambda func_args: func_args[0](func_args[1]), zip(evaluate_methods, generation_results)
+                        )
                     )
-                )
 
-            # Store results using valid tasks for correct mapping
-            for task, result in zip(valid_tasks, evaluate_results):
-                results["results"][task] = result
+                # Store results using valid tasks for correct mapping
+                for task, result in zip(valid_tasks, evaluate_results):
+                    results["results"][task] = result
 
     # Run pretrain evaluations if any exist
     if pretrain_tasks and args is not None:

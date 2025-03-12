@@ -204,10 +204,7 @@ Key features:
 - Automatic cluster detection and configuration
 - Efficient result collection and scoring
 
-Refer to the [distributed README](eval/distributed/README.md) for detailed setup instructions, including:
-- [Capella cluster setup](eval/distributed/SETUP_CAPELLA.md)
-- [Leonardo cluster setup](eval/distributed/SETUP_LEONARDO.md)
-- Benchmarking data and optimization guidelines
+Refer to the [distributed README](eval/distributed/README.md) for more details. 
 
 NOTE: This can be adapted for a non-HPC setup via `CUDA_VISIBLE_DEVICES`. If there is interest we can create a similar launch script for this setup. 
 

@@ -396,6 +396,25 @@ sudo apt-get -y install cuda-toolkit-12-4
 ## 🏆 Leaderboard Integration
 To track experiments and evaluations, we support logging results to a PostgreSQL database. Details on the entry schemas and database setup can be found in [`database/`](database/).
 
+## 🌐 Distributed Evaluation
+For running evaluations at scale across multiple nodes on HPC (High-Performance Computing) clusters, Evalchemy provides a distributed evaluation system:
+
+```bash
+python eval/distributed/launch.py --model_name <model_id> --tasks <task_list> --num_shards <n> --watchdog
+```
+
+Key features:
+- Run evaluations in parallel across multiple compute nodes
+- Dramatically reduce wall clock time for large benchmarks
+- Offline mode support for environments without internet access on GPU nodes
+- Automatic cluster detection and configuration
+- Efficient result collection and scoring
+
+Refer to the [distributed README](eval/distributed/README.md) for detailed setup instructions, including:
+- [Capella cluster setup](eval/distributed/SETUP_CAPELLA.md)
+- [Leonardo cluster setup](eval/distributed/SETUP_LEONARDO.md)
+- Benchmarking data and optimization guidelines
+
 ## Contributing
 Thank you to all the contributors for making this project possible!
 Please follow [these instructions](CONTRIBUTING.md) on how to contribute.

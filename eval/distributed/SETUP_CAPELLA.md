@@ -7,6 +7,7 @@ This document details the setup process for running distributed evaluations on t
 - **Internet access**: Unlike Leonardo, Capella compute nodes have internet access
 - **Shared workspace**: Setup uses a shared workspace for collaboration and efficient resource usage
 - **Standard conda**: Uses standard Miniconda instead of Mamba
+- **H100 GPUs**: Capella provides NVIDIA H100 80GB GPUs, which offer improved performance compared to A100s
 
 ## Environment Setup
 
@@ -106,3 +107,39 @@ sacct -j <job_id> -X --format=JobID,JobName,State,Elapsed
 # Cancel a job if needed
 scancel <job_id>
 ```
+
+## Benchmarking Shard Performance
+
+We conducted a benchmarking study on Capella to understand the scaling behavior of our distributed evaluation framework. Below are the results for various shard configurations:
+
+| **Shards** | **Max Time** | **Min Time** | **Mean Time** | **Total GPU Hours** | **Huggingface** |
+|------------|--------------|--------------|---------------|---------------------|-----------------|
+| 128        | 00:14:54     | 00:03:12     | 00:09:48      | 20.9                | [15-56-58](https://huggingface.co/datasets/mlfoundations-dev/OpenThinker-7B_eval_03-11-25_15-56-58_0981) |
+| 64         | 00:15:07     | 00:04:32     | 00:11:07      | 11.9                | [18-36-38](https://huggingface.co/datasets/mlfoundations-dev/OpenThinker-7B_eval_03-11-25_18-36-38_0981) |
+| 32         | 00:20:55     | 00:08:35     | 00:15:19      | 8.2                 | [18-36-16](https://huggingface.co/datasets/mlfoundations-dev/OpenThinker-7B_eval_03-11-25_18-36-16_0981) |
+| 16         | 00:37:29     | 00:11:31     | 00:25:37      | 6.8                 | [18-35-50](https://huggingface.co/datasets/mlfoundations-dev/OpenThinker-7B_eval_03-11-25_18-35-50_0981) |
+| 8          | 01:03:20     | 00:16:56     | 00:44:00      | 5.9                 | [15-56-57](https://huggingface.co/datasets/mlfoundations-dev/OpenThinker-7B_eval_03-11-25_15-56-57_0981) |
+| 4          | 02:01:38     | 00:33:22     | 01:25:02      | 5.7                 | [15-56-57](https://huggingface.co/datasets/mlfoundations-dev/OpenThinker-7B_eval_03-11-25_15-56-57_0981) |
+| 2          | 03:51:51     | 01:34:58     | 02:43:24      | 5.4                 | [18-35-31](https://huggingface.co/datasets/mlfoundations-dev/OpenThinker-7B_eval_03-11-25_18-35-31_0981) |
+| 1          | 05:18:37     | 05:18:37     | 05:18:37      | 5.3                 | [18-35-01](https://huggingface.co/datasets/mlfoundations-dev/OpenThinker-7B_eval_03-11-25_18-35-01_0981) |
+
+<img src="./benchmarking_capella.png" alt="Benchmarking Example" width="50%"/>
+
+To run your own benchmarks with different shard counts:
+
+```bash
+# Activate the environment
+source /data/horse/ws/ryma833h-DCFT_Shared/miniconda3/bin/activate
+conda activate evalchemy
+cd /data/horse/ws/ryma833h-DCFT_Shared/evalchemy
+
+# Run with different shard counts (replace N with the shard count)
+SHARDS=N && python eval/distributed/launch.py --model_name open-thoughts/OpenThinker-7B --tasks LiveCodeBench,AIME24,AIME25,AMC23,GPQADiamond,MATH500 --num_shards $SHARDS --watchdog
+```
+
+Key insights from benchmarking:
+- H100 GPUs show significantly better performance than A100s on Leonardo (5:18 vs. 10:14 for single-shard runs)
+- 8 shards is recommended as the default for a good balance of resource efficiency and job scheduling ease
+- 16-32 shards provides a good tradeoff between execution time and GPU efficiency
+- More than 64 shards shows diminishing returns on time reduction
+- For fastest results (under 15 minutes), 64-128 shards is recommended but incurs higher GPU hour costs

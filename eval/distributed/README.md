@@ -51,6 +51,10 @@ source /leonardo_work/EUHPC_E03_068/DCFT_shared/mamba/bin/activate /leonardo_wor
 cd /leonardo_work/EUHPC_E03_068/DCFT_shared/evalchemy/
 ```
 
+<img src="./benchmarking_comparison.png" alt="Cluster Comparison" width="50%"/>
+
+Using `--num_shards 8` is suggested for the best resource efficiency and job scheduling ease, however more shards can be used for "rush jobs" where you are willing to pay a premium (and there are enough GPUs available). 
+
 For instructions on setting up a new cluster environment, see the [Adding a New Environment](#adding-a-new-environment) section below.
 
 For detailed setup instructions for specific clusters, see:

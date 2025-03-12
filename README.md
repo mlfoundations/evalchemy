@@ -206,7 +206,7 @@ Key features:
 
 Refer to the [distributed README](eval/distributed/README.md) for more details. 
 
-NOTE: This can be adapted for a non-HPC setup via `CUDA_VISIBLE_DEVICES`. If there is interest we can create a similar launch script for this setup. 
+NOTE: This is configured for specific HPC clusters, but can easily be adapted. Furthermore it can be adapted for a non-HPC setup using `CUDA_VISIBLE_DEVICES` instead of SLURM job arrays. 
 
 
 ### Multi-GPU Evaluation 

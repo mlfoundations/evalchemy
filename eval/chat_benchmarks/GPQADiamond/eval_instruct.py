@@ -1,14 +1,12 @@
-import json
 import logging
 import random
 from typing import Any, Dict, List, Optional
 
 import lm_eval.models
+import numpy as np
 from datasets import load_dataset
 from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
-from lm_eval.models.vllm_causallms import VLLM
-import numpy as np
 
 from eval.task import BaseBenchmark
 
@@ -18,7 +16,6 @@ PROMPT = """Return your final response within \\boxed{{}} and only include the l
 Problem: {problem}
 Options: {options}
 Answer:"""
-
 
 class GPQADiamondBenchmark(BaseBenchmark):
     """
@@ -58,6 +55,10 @@ class GPQADiamondBenchmark(BaseBenchmark):
             Dictionary containing generated responses and examples
         """
         examples = self.load_questions()
+        for example in examples:
+            multiple_choice_string, correct_answer = self.generate_multiple_choice_answers(example)
+            example["multiple_choice_string"] = multiple_choice_string
+            example["answer"] = correct_answer
 
         if isinstance(model, lm_eval.models.huggingface.HFLM):
             model_name = model.pretrained
@@ -73,34 +74,31 @@ class GPQADiamondBenchmark(BaseBenchmark):
             seed = [s + i for s in self.seed]
 
             for idx, example in enumerate(examples):
-                multiple_choice_string, correct_answer = self.generate_multiple_choice_answers(example)
-                example["answer"] = correct_answer
-
                 messages = [
                     {
                         "role": "user",
-                        "content": PROMPT.format(problem=example["Question"], options=multiple_choice_string),
+                        "content": PROMPT.format(problem=example["Question"], options=example["multiple_choice_string"]),
                     },
                 ]
 
                 templated_messages = model.apply_chat_template(messages)
 
-                all_instances.append(
-                    Instance(
-                        "generate_until",
-                        example,
-                        (
-                            templated_messages,
-                            {
-                                "do_sample": True,
-                                "temperature": 0.7,
-                                "max_new_tokens": self.max_new_tokens,
-                                "seed": seed,
-                            },
-                        ),
-                        idx,
-                    )
+                instance = Instance(
+                    "generate_until",
+                    example,
+                    (
+                        templated_messages,
+                        {
+                            "do_sample": True,
+                            "temperature": 0.7,
+                            "max_new_tokens": self.max_new_tokens,
+                            "seed": seed,
+                        },
+                    ),
+                    idx,
                 )
+                instance.repeat_idx = i
+                all_instances.append(instance)
 
             # Generate model responses
             self.logger.info("Generating responses for GPQADiamond...")
@@ -128,7 +126,6 @@ class GPQADiamondBenchmark(BaseBenchmark):
         # Calculate accuracy for each repetition
         all_results = []
         for i in range(self.n_repeat):
-
             solved = sum([example["answer"] == example["model_answers"][i] for example in examples])
 
             all_results.append(
@@ -149,7 +146,7 @@ class GPQADiamondBenchmark(BaseBenchmark):
         results.update(
             {
                 "num_total": num_questions,
-                "solved_avg": solved,
+                "solved_avg": solved_avg,
                 "run_stats": all_results,
                 "accuracy_avg": accuracy_avg,
                 "accuracy_std_err": accuracy_std_err,

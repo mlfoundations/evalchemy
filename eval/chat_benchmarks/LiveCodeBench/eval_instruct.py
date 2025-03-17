@@ -1,30 +1,19 @@
-from collections import defaultdict
-import json
+import copy
 import logging
+import os
+import re
+from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any, Dict, List, Optional
-import numpy as np
 
+import numpy as np
+from datasets import Dataset, concatenate_datasets, load_dataset
 from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
-from lm_eval.tasks.hendrycks_math.utils import is_equiv, last_boxed_only_string, remove_boxed
-
-import base64
-import zlib
-import pickle
-import json
-import copy
-from .livecodebench_utils import lcb_run, map_to_example, has_test_type, post_process_code, translate_private_test_cases
 
 from eval.task import BaseBenchmark
-from datasets import load_dataset
 
-import lm_eval.models
-from lm_eval.models.vllm_causallms import VLLM
-
-
-import re
-from multiprocessing import Pool, cpu_count
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from .livecodebench_utils import lcb_run, map_to_example, post_process_code, translate_private_test_cases
 
 
 def has_code(response):
@@ -104,22 +93,22 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
 
                 templated_messages = model.apply_chat_template(messages)
 
-                all_instances.append(
-                    Instance(
-                        "generate_until",
-                        example,
-                        (
-                            templated_messages,
-                            {
-                                "do_sample": False,
-                                "max_new_tokens": self.max_new_tokens,
-                                "temperature": 0.7,
-                                "seed": seed,
-                            },
-                        ),
-                        idx,
-                    )
+                instance = Instance(
+                    "generate_until",
+                    example,
+                    (
+                        templated_messages,
+                        {
+                            "do_sample": False,
+                            "max_new_tokens": self.max_new_tokens,
+                            "temperature": 0.7,
+                            "seed": seed,
+                        },
+                    ),
+                    idx,
                 )
+                instance.repeat_idx = i
+                all_instances.append(instance)
 
             # Generate model responses
             self.logger.info("Generating responses for LiveCodeBench...")
@@ -214,7 +203,12 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
 
     def evaluate_responses(self, responses: Dict[str, Any]) -> Dict[str, float]:
         """Evaluate the generated solution completions in parallel using threads."""
+        # Handle None result from non-primary ranks
+        if responses is None:
+            return None
+
         self.logger.info(f"Evaluating {len(responses['examples'])} examples...")
+        self.logger.warning(f"Expect some output leaks from the code / test execution into stdout")
 
         # First, organize completions by repeat index
         examples_by_repeat = defaultdict(list)
@@ -231,6 +225,8 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
 
         # Evaluate each set of completions separately
         all_metrics = []
+        run_stats = []
+        num_questions = len(responses["examples"])
 
         for repeat_idx, examples in examples_by_repeat.items():
             # Use ThreadPoolExecutor with limited concurrency
@@ -287,60 +283,73 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
 
             all_metrics.append(metrics)
 
+            # Add to run_stats for precomputed_hf_lm.py compatibility
+            run_stats.append(
+                {
+                    "repetition": repeat_idx + 1,
+                    "num_total": total_finish,
+                    "num_solved": total_correct,
+                    "accuracy": total_correct / total_finish,
+                }
+            )
+
         final_metrics = {}
 
         # Calculate stats for overall accuracy
         acc_values = [m["accuracy"] for m in all_metrics]
         mean_acc, stderr_acc = calc_stats(acc_values)
-        final_metrics["accuracy_mean"] = mean_acc
-        final_metrics["accuracy_stderr"] = stderr_acc
+        final_metrics["accuracy_avg"] = mean_acc
+        final_metrics["accuracy_std_err"] = stderr_acc
+        self.logger.info(f"Overall accuracy: {mean_acc:.2%} ± {stderr_acc:.2%}")
 
         # Calculate stats for each difficulty level
         difficulties = all_metrics[0]["per_difficulty_correct"].keys()
         for diff in difficulties:
             acc_values = [m[f"accuracy_{diff}"] for m in all_metrics]
             mean_acc, stderr_acc = calc_stats(acc_values)
-            final_metrics[f"accuracy_{diff}_mean"] = mean_acc
-            final_metrics[f"accuracy_{diff}_stderr"] = stderr_acc
+            final_metrics[f"accuracy_{diff}_avg"] = mean_acc
+            final_metrics[f"accuracy_{diff}_std_err"] = stderr_acc
 
         # Log results
-        self.logger.info(f"Overall accuracy: {mean_acc:.2%} ± {stderr_acc:.2%}")
         for diff in difficulties:
-            mean = final_metrics[f"accuracy_{diff}_mean"]
-            stderr = final_metrics[f"accuracy_{diff}_stderr"]
+            mean = final_metrics[f"accuracy_{diff}_avg"]
+            stderr = final_metrics[f"accuracy_{diff}_std_err"]
             self.logger.info(f"Accuracy {diff}: {mean:.2%} ± {stderr:.2%}")
 
         # Include raw results and examples in final metrics
         final_metrics["raw_metrics"] = all_metrics
         final_metrics["examples"] = [result for result, _ in results]  # Include last run's examples
 
+        # Add compatibility with precomputed_hf_lm.py
+        solved_avg = np.mean([result["num_solved"] for result in run_stats])
+        final_metrics.update(
+            {
+                "num_total": num_questions,
+                "solved_avg": solved_avg,
+                "run_stats": run_stats,
+                "num_repeat": self.n_repeat,
+            }
+        )
+
         return final_metrics
 
-    def load_questions(self) -> List[Dict[str, str]]:
+    def load_questions(self) -> Dataset:
         """Load LiveCodeBench questions from source."""
-        # Load dataset in smaller chunks and combine
-        all_examples = []
-        chunk_size = 200  # Process 200 examples at a time
-
-        for i in range(0, 511, chunk_size):  # Assuming total size is 511
-            try:
-                dataset = load_dataset(
-                    "livecodebench/code_generation_lite",
-                    version_tag="release_v2",
-                    split=f"test[{i}:{i+chunk_size}]",
-                    trust_remote_code=True,
-                )
-
-                # Process chunk
-                dataset = dataset.map(
-                    lambda example: {"private_test_cases": translate_private_test_cases(example["private_test_cases"])}
-                )
-                dataset = dataset.map(map_to_example, remove_columns=dataset.column_names)
-
-                all_examples.extend(dataset)
-
-            except ValueError:
-                # We've reached the end of the dataset
-                break
-
-        return all_examples
+        self.logger.info("Loading LiveCodeBench questions from source and converting to dataset...")
+        cpu_count = os.cpu_count()
+        ds = load_dataset(
+            "livecodebench/code_generation_lite", version_tag="release_v2", split="test", trust_remote_code=True
+        )
+        # Avoids "pyarrow.lib.ArrowInvalid: offset overflow while concatenating arrays" when mapping
+        processed_shards = []
+        num_shards = 4
+        for i in range(num_shards):
+            shard = ds.shard(num_shards=num_shards, index=i)
+            shard = shard.map(
+                lambda example: {"private_test_cases": translate_private_test_cases(example["private_test_cases"])},
+                num_proc=cpu_count,
+            )
+            shard = shard.map(map_to_example, remove_columns=ds.column_names)
+            processed_shards.append(shard)
+        ds = concatenate_datasets(processed_shards)
+        return ds

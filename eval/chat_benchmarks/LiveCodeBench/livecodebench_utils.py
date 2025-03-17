@@ -2,20 +2,20 @@
 Code from https://github.com/NovaSky-AI/SkyThought/blob/main/skythought/tools/util/livecodebench/testing_util.py
 """
 
-from typing import Optional, Callable, Dict
 import ast
+import base64
+import builtins
 import copy
 import faulthandler
 import io
-import multiprocessing
-
 import json
-import sys
-import builtins
-import time
-import base64
-import zlib
+import multiprocessing
 import pickle
+import sys
+import time
+import zlib
+from typing import Callable, Dict, Optional
+
 import scipy.stats as stats
 
 

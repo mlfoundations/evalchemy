@@ -278,7 +278,7 @@ def get_or_add_model_by_name(model: str, model_source: str = "hf"):
         model (str): The path or identifier for the Hugging Face or other model.
         model_source (str): Source of the model (as model arg in lm_eval or eval.py)
     """
-    if model_source in ["hf", "vllm"]:
+    if model_source in ["hf", "vllm", "precomputed_hf"]:
         git_commit_hash = HfApi().model_info(model).sha
     else:
         if "openai" in model_source:
@@ -294,7 +294,7 @@ def get_or_add_model_by_name(model: str, model_source: str = "hf"):
         )
         model_instances = [i.to_dict() for i in model_instances]
 
-    if len(model_instances) == 0 and model_source in ["hf", "vllm"]:
+    if len(model_instances) == 0 and model_source in ["hf", "vllm", "precomputed_hf"]:
         print(f"{model} doesn't exist in database. Creating entry:")
         return register_hf_model_to_db(model)
     elif len(model_instances) == 0:

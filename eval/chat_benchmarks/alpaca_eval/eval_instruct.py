@@ -17,6 +17,8 @@ class AlpacaBenchmark(BaseBenchmark):
     Alpaca benchmark for evaluating language model responses on instruction following.
     """
 
+    REQUIRES_OPENAI_ANNOTATOR = True
+
     ANNOTATOR_CONFIG_MAP = {
         "gpt-4o-mini-2024-07-18": "weighted_alpaca_eval_gpt-4o-mini-2024-07-18",
         "gpt-4-1106-preview": "weighted_alpaca_eval_gpt4_turbo",

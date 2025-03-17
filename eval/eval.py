@@ -325,10 +325,6 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
         args.model_args = update_model_args_with_name(args.model_args or "", model_name)
 
     # Initialize tasks
-    if args.annotator_model in LIST_OPENAI_MODELS:
-        if not os.getenv("OPENAI_API_KEY"):
-            raise ValueError("Please set OPENAI_API_KEY")
-
     task_manager = InstructTaskManager(
         annotator_model=args.annotator_model, debug=args.debug, seed=args.seed, task_list=task_list
     )

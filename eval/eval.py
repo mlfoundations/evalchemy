@@ -230,15 +230,15 @@ def evaluate(
             traceback.print_exc()
 
     # If we're using PrecomputedHFLM, update the README with evaluation results
-    if lm is not None and hasattr(lm, "update_repo_readme") and callable(lm.update_repo_readme):
+    if lm is not None and hasattr(lm, "update_repo") and callable(lm.update_repo):
         try:
-            eval_logger.info("Updating repository README with evaluation results...")
+            eval_logger.info("Updating repository with evaluation results...")
             local_readme_path = os.path.join(
                 args.output_path, args.model_args.strip("repo_id=").replace("/", "__") + "_README.md"
             )
-            lm.update_repo_readme(results, local_readme_path=local_readme_path)
+            lm.update_repo(results, local_readme_path=local_readme_path)
         except Exception as e:
-            eval_logger.error(f"Error updating repository README: {str(e)}")
+            eval_logger.error(f"Error updating repository: {str(e)}")
             import traceback
 
             traceback.print_exc()
@@ -488,7 +488,9 @@ def add_results_metadata(results: Dict, batch_sizes_list: List[int], args: argpa
         "model": (
             args.model
             if isinstance(args.model, str)
-            else args.model.config._name_or_path if hasattr(args.model, "config") else type(args.model).__name__
+            else args.model.config._name_or_path
+            if hasattr(args.model, "config")
+            else type(args.model).__name__
         ),
         "model_args": args.model_args,
         "tasks": args.tasks,

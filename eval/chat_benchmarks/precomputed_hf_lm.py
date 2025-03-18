@@ -195,6 +195,14 @@ class PrecomputedHFLM(TemplateLM):
         # Simply return the chat history as is
         return chat_history
 
+    def update_repo(
+        self, results: Dict[str, Any], remote_readme_path: str = "README.md", local_readme_path: Optional[str] = None
+    ):
+        """
+        Updates the dataset, adding the column of model_answers and model_answers_correctness
+        """
+        pass
+
     def update_repo_readme(
         self, results: Dict[str, Any], remote_readme_path: str = "README.md", local_readme_path: Optional[str] = None
     ):

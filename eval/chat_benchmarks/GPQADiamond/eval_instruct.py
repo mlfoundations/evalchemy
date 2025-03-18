@@ -17,6 +17,7 @@ Problem: {problem}
 Options: {options}
 Answer:"""
 
+
 class GPQADiamondBenchmark(BaseBenchmark):
     """
     GPQADiamond Benchmark for evaluating multiple choice reasoning of LLMs.
@@ -59,6 +60,9 @@ class GPQADiamondBenchmark(BaseBenchmark):
             multiple_choice_string, correct_answer = self.generate_multiple_choice_answers(example)
             example["multiple_choice_string"] = multiple_choice_string
             example["answer"] = correct_answer
+            example["problem_id"] = f"{str(idx).zfill(3)}--{str(example['Subdomain'])}"
+            example["expected_answer"] = str(example["answer"])
+            example["reference_solution"] = str(example["Explanation"])
 
         if isinstance(model, lm_eval.models.huggingface.HFLM):
             model_name = model.pretrained
@@ -77,7 +81,9 @@ class GPQADiamondBenchmark(BaseBenchmark):
                 messages = [
                     {
                         "role": "user",
-                        "content": PROMPT.format(problem=example["Question"], options=example["multiple_choice_string"]),
+                        "content": PROMPT.format(
+                            problem=example["Question"], options=example["multiple_choice_string"]
+                        ),
                     },
                 ]
 
@@ -98,6 +104,11 @@ class GPQADiamondBenchmark(BaseBenchmark):
                     idx,
                 )
                 instance.repeat_idx = i
+                instance.metadata = {
+                    "problem_id": example["problem_id"],
+                    "expected_answer": example["answer"],
+                    "reference_solution": example["reference_solution"],
+                }
                 all_instances.append(instance)
 
             # Generate model responses
@@ -126,7 +137,11 @@ class GPQADiamondBenchmark(BaseBenchmark):
         # Calculate accuracy for each repetition
         all_results = []
         for i in range(self.n_repeat):
-            solved = sum([example["answer"] == example["model_answers"][i] for example in examples])
+            solved = 0
+            for example in examples:
+                correct = example["answer"] == example["model_answers"][i]
+                example.get("model_answers_correctness", []).append(correct)
+                solved += correct
 
             all_results.append(
                 {

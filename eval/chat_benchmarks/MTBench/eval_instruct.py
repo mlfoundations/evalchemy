@@ -72,6 +72,7 @@ class MTBenchBenchmark(BaseBenchmark):
         debug: bool = False,
         annotator_model: str = "gpt-4o-mini-2024-07-18",
         logger: Optional[logging.Logger] = None,
+        system_instruction: Optional[str] = None,
     ):
         """
         Initialize MTBench benchmark.
@@ -81,8 +82,9 @@ class MTBenchBenchmark(BaseBenchmark):
             config: MTBench configuration object
             debug: If True, run in debug mode on 2 samples
             logger: Optional logger instance
+            system_instruction: Optional system instruction for the model
         """
-        super().__init__(logger)
+        super().__init__(logger=logger, system_instruction=system_instruction)
         self.base_path = Path(base_path)
         if annotator_model == "auto":
             annotator_model = "gpt-4"
@@ -127,7 +129,7 @@ class MTBenchBenchmark(BaseBenchmark):
                     all_convs[q_idx].append({"role": "user", "content": question["turns"][turn_num]})
 
                     # Prepare model input
-                    prompt = model.apply_chat_template(all_convs[q_idx])
+                    prompt = self._prepare_messages(all_convs[q_idx], model)
                     batch_instances.append(
                         Instance(
                             "generate_until",

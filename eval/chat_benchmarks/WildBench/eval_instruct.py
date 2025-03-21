@@ -79,6 +79,7 @@ class WildBenchBenchmark(BaseBenchmark):
         annotator_model: str = "gpt-4o-mini-2024-07-18",
         debug: bool = False,
         logger: Optional[logging.Logger] = None,
+        system_instruction: Optional[str] = None,
     ):
         """
         Initialize WildBench benchmark.
@@ -88,7 +89,7 @@ class WildBenchBenchmark(BaseBenchmark):
             debug: If True, run in debug mode on 2 samples
             logger: Optional logger instance
         """
-        super().__init__(logger)
+        super().__init__(logger=logger, system_instruction=system_instruction)
         if annotator_model == "auto":
             annotator_model = "gpt-4-1106-preview"
         if config:
@@ -174,7 +175,7 @@ class WildBenchBenchmark(BaseBenchmark):
             ]
 
             # Prepare model inputs
-            model_inputs = [model.apply_chat_template(chat) for chat in simplified_extracted_chats]
+            model_inputs = [self._prepare_messages(chat, model) for chat in simplified_extracted_chats]
 
             # Create temporary directory
             temp_dir_obj = tempfile.TemporaryDirectory()

@@ -51,6 +51,7 @@ class MixEvalBenchmark(BaseBenchmark):
         verbose: bool = False,
         debug: bool = False,
         logger: Optional[logging.Logger] = None,
+        system_instruction: Optional[str] = None,
     ):
         """
         Initialize MixEval benchmark.
@@ -67,8 +68,9 @@ class MixEvalBenchmark(BaseBenchmark):
             verbose: Whether to print verbose output
             debug: If set, only evaluate on 2 examples
             logger: Optional logger instance
+            system_instruction: Optional system instruction for the model
         """
-        super().__init__(logger)
+        super().__init__(logger=logger, system_instruction=system_instruction)
         os.makedirs(output_dir, exist_ok=True)
         if annotator_model == "auto":
             annotator_model = "gpt-3.5-turbo-0125"
@@ -174,7 +176,7 @@ class MixEvalBenchmark(BaseBenchmark):
         all_instances = []
 
         for idx, instruction in enumerate(all_prompts):
-            formatted_instruction = model.apply_chat_template([{"role": "user", "content": instruction}])
+            formatted_instruction = self._prepare_messages([{"role": "user", "content": instruction}], model)
 
             all_instances.append(
                 Instance(

@@ -137,6 +137,7 @@ class CruxEvalBenchmark(BaseBenchmark):
         timeout: float = 120,
         debug: bool = False,
         logger: Optional[logging.Logger] = None,
+        system_instruction: Optional[str] = None,
     ):
         """
         Initialize CruxEval benchmark.
@@ -148,8 +149,9 @@ class CruxEvalBenchmark(BaseBenchmark):
             timeout: Timeout for code execution
             debug: If True, only evaluate first 2 examples
             logger: Optional logger instance
+            system_instruction: Optional system instruction for the model
         """
-        super().__init__(logger)
+        super().__init__(logger=logger, system_instruction=system_instruction)
         self.language = "python"
         os.makedirs(data_dir, exist_ok=True)
         self.data_dir = data_dir
@@ -202,7 +204,7 @@ class CruxEvalBenchmark(BaseBenchmark):
                         task_prompt = make_cot_input_prompt((code, output))
                     else:
                         task_prompt = make_cot_output_prompt((code, inp))
-                    inputs = model.apply_chat_template([{"role": "user", "content": task_prompt}])
+                    inputs = self._prepare_messages([{"role": "user", "content": task_prompt}], model)
                     formatted_inputs.append(inputs)
 
                     all_instances.append(

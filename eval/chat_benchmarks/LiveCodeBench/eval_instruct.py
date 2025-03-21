@@ -42,6 +42,7 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
         debug: bool = False,
         seed: List[int] = [0, 1234, 1234, 1234],
         logger: Optional[logging.Logger] = None,
+        system_instruction: Optional[str] = None,
     ):
         """
         Initialize LiveCodeBench benchmark.
@@ -50,8 +51,9 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
             debug: If set, only evaluate on 2 examples
             seed: Random seed for reproducibility. Default is [0, 1234, 1234, 1234] for lm-eval-harness.
             logger: Optional logger instance
+            system_instruction: Optional system instruction for the model
         """
-        super().__init__(logger)
+        super().__init__(logger=logger, system_instruction=system_instruction)
         self.debug = debug
         self.max_new_tokens = 32768  # set higher to avoid truncation for reasoning models
         self.seed = seed
@@ -91,7 +93,7 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
                     )
                 messages = [{"role": "user", "content": prompt_text}]
 
-                templated_messages = model.apply_chat_template(messages)
+                templated_messages = self._prepare_messages(messages, model)
 
                 instance = Instance(
                     "generate_until",

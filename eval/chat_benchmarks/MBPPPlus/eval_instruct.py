@@ -27,6 +27,7 @@ class MBPPPlusBenchmark(BaseBenchmark):
         timeout: float = 3.0,
         debug: bool = False,
         logger: Optional[logging.Logger] = None,
+        system_instruction: Optional[str] = None,
     ):
         """
         Initialize MBPPPlus benchmark.
@@ -38,8 +39,9 @@ class MBPPPlusBenchmark(BaseBenchmark):
             timeout: Timeout for code execution
             debug: If True, only evaluate first 2 examples
             logger: Optional logger instance
+            system_instruction: Optional system instruction for the model
         """
-        super().__init__(logger)
+        super().__init__(logger=logger, system_instruction=system_instruction)
         self.data_dir = data_dir
         self.max_tokens = max_tokens
         self.num_workers = num_workers
@@ -137,7 +139,7 @@ Here is my problem:
             all_instances = []
             for idx, example in enumerate(examples):
                 try:
-                    inputs = model.apply_chat_template([{"role": "user", "content": example["prompt"]}])
+                    inputs = self._prepare_messages([{"role": "user", "content": example["prompt"]}], model)
 
                     all_instances.append(
                         Instance(

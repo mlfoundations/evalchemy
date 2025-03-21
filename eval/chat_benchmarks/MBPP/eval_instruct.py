@@ -28,6 +28,7 @@ class MBPPBenchmark(BaseBenchmark):
         end_idx: int = 510,
         debug: bool = False,
         logger: Optional[logging.Logger] = None,
+        system_instruction: Optional[str] = None,
     ):
         """
         Initialize MBPP benchmark.
@@ -40,8 +41,9 @@ class MBPPBenchmark(BaseBenchmark):
             end_idx: End index for evaluation examples
             debug: If set, only evaluate on 2 examples
             logger: Optional logger instance
+            system_instruction: Optional system instruction for the model
         """
-        super().__init__(logger)
+        super().__init__(logger=logger, system_instruction=system_instruction)
         self.data_dir = data_dir
         self.max_tokens = max_tokens
         self.num_examples = num_examples
@@ -137,7 +139,7 @@ Here is my problem:
             all_instances = []
             for idx, example in enumerate(examples):
                 try:
-                    inputs = model.apply_chat_template([{"role": "user", "content": example["prompt"]}])
+                    inputs = self._prepare_messages([{"role": "user", "content": example["prompt"]}], model)
 
                     all_instances.append(
                         Instance(

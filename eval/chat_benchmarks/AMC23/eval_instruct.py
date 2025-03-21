@@ -30,6 +30,7 @@ class AMC23Benchmark(BaseBenchmark):
         debug: bool = False,
         seed: List[int] = [0, 1234, 1234, 1234],
         logger: Optional[logging.Logger] = None,
+        system_instruction: Optional[str] = None,
     ):
         """
         Initialize AMC23 benchmark.
@@ -39,8 +40,9 @@ class AMC23Benchmark(BaseBenchmark):
             debug: If set, only evaluate on 2 examples
             seed: Random seed for reproducibility. Default is [0, 1234, 1234, 1234] for lm-eval-harness.
             logger: Optional logger instance
+            system_instruction: Optional system instruction for the model
         """
-        super().__init__(logger)
+        super().__init__(logger=logger, system_instruction=system_instruction)
         self.data_file = data_file
         self.debug = debug
         self.seed = seed
@@ -78,7 +80,7 @@ class AMC23Benchmark(BaseBenchmark):
                     {"role": "user", "content": PROMPT.format(problem=example["question"])},
                 ]
 
-                templated_messages = model.apply_chat_template(messages)
+                templated_messages = self._prepare_messages(messages, model)
 
                 instance = Instance(
                     "generate_until",

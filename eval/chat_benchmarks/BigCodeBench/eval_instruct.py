@@ -79,6 +79,7 @@ class BigCodeBenchBenchmark(BaseBenchmark):
         response_prefix: str = None,
         safe_mode: bool = False,
         check_ground_truth: bool = False,
+        system_instruction: Optional[str] = None,
     ):
         """
         Initialize BigCodeBench benchmark.
@@ -91,8 +92,9 @@ class BigCodeBenchBenchmark(BaseBenchmark):
             timeout: Timeout for code execution
             debug: If True, only evaluate first 2 examples
             logger: Optional logger instance
+            system_instruction: Optional system instruction for the model
         """
-        super().__init__(logger)
+        super().__init__(logger=logger, system_instruction=system_instruction)
         self.language = language
         os.makedirs(data_dir, exist_ok=True)
         self.data_dir = data_dir
@@ -154,7 +156,7 @@ class BigCodeBenchBenchmark(BaseBenchmark):
                             {self.instruction_prefix}
                             {prompt.strip()}
                             """
-                    inputs = task_prompt = model.apply_chat_template([{"role": "user", "content": task_prompt}])
+                    inputs = task_prompt = self._prepare_messages([{"role": "user", "content": task_prompt}], model)
                     formatted_inputs.append(inputs)
 
                     all_instances.append(

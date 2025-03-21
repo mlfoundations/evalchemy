@@ -17,6 +17,7 @@ Problem: {problem}
 Options: {options}
 Answer:"""
 
+
 class GPQADiamondBenchmark(BaseBenchmark):
     """
     GPQADiamond Benchmark for evaluating multiple choice reasoning of LLMs.
@@ -78,7 +79,9 @@ class GPQADiamondBenchmark(BaseBenchmark):
                 messages = [
                     {
                         "role": "user",
-                        "content": PROMPT.format(problem=example["Question"], options=example["multiple_choice_string"]),
+                        "content": PROMPT.format(
+                            problem=example["Question"], options=example["multiple_choice_string"]
+                        ),
                     },
                 ]
 

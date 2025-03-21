@@ -20,7 +20,7 @@ class AIWBenchmark(BaseBenchmark):
 
     def __init__(
         self,
-        data_file: str = "eval/chat_benchmarks/AIW/data/aiw.json",
+        data_file: str = "eval/chat_benchmarks/AIW/data/aiw_data.json",
         debug: bool = False,
         seed: List[int] = [0, 1234, 1234, 1234],
         logger: Optional[logging.Logger] = None,

@@ -71,11 +71,7 @@ class AIME24Benchmark(BaseBenchmark):
                     {"role": "user", "content": PROMPT.format(problem=example["problem"])},
                 ]
 
-                try:
-                    templated_messages = self._prepare_messages(messages, model)
-                except Exception as e:
-                    print(f"Error preparing messages: {e}")
-                    templated_messages = messages
+                templated_messages = self._prepare_messages(messages, model)
 
                 instance = Instance(
                     "generate_until",

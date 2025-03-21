@@ -58,22 +58,24 @@ class BaseBenchmark(ABC):
                     instance.args[1]["max_new_tokens"] = max_new_tokens
         return instances
 
-    def _prepare_messages(self, messages: List[Dict[str, str]], model: Optional[LM] = None) -> Union[List[Dict[str, str]], str]:
+    def _prepare_messages(
+        self, messages: List[Dict[str, str]], model: Optional[LM] = None
+    ) -> Union[List[Dict[str, str]], str]:
         """Prepare messages with system instruction if available and apply chat template if model is provided.
-        
+
         Args:
             messages: List of message dictionaries
             model: Optional language model instance for applying chat template
-            
+
         Returns:
             If model is provided, returns the templated string. Otherwise returns the prepared message list.
         """
         if self.system_instruction:
             messages.insert(0, {"role": "system", "content": self.system_instruction})
-        
+
         if model is not None:
             return model.apply_chat_template(messages)
-            
+
         return messages
 
     def compute(self, model: LM, inputs: List[Instance], do_slice: bool = True) -> List[str]:

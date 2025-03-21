@@ -70,7 +70,7 @@ class BaseBenchmark(ABC):
         """
         if self.system_instruction:
             messages.insert(0, {"role": "system", "content": self.system_instruction})
-            
+        
         if model is not None:
             return model.apply_chat_template(messages)
             

@@ -20,10 +20,11 @@ class AIWBenchmark(BaseBenchmark):
 
     def __init__(
         self,
-        data_file: str = "eval/chat_benchmarks/AIW/data/aiw_data.json",
+        data_file: str = "eval/chat_benchmarks/AIW/data/aiw.json",
         debug: bool = False,
         seed: List[int] = [0, 1234, 1234, 1234],
         logger: Optional[logging.Logger] = None,
+        system_instruction: Optional[str] = None,
         n_trials: int = 100,  # Run 100 trials
     ):
         """
@@ -34,8 +35,9 @@ class AIWBenchmark(BaseBenchmark):
             debug: If set, only evaluate on 2 examples
             seed: Random seed
             logger: Optional logger instance
+            system_instruction: Optional system instruction for the model
         """
-        super().__init__(logger)
+        super().__init__(logger=logger, system_instruction=system_instruction)
         self.data_file = data_file
         self.debug = debug
         self.max_new_tokens = 32768  # Prevent truncation
@@ -70,9 +72,9 @@ class AIWBenchmark(BaseBenchmark):
             for example in examples:
                 messages = [{"role": "user", "content": example["prompt"]}]
                 try:
-                    templated_messages = model.apply_chat_template(messages)
+                    templated_messages = self._prepare_messages(messages, model)
                 except Exception as e:
-                    print(f"Error applying chat template: {e}")
+                    print(f"Error preparing messages: {e}")
                     templated_messages = messages
 
                 all_instances.append(

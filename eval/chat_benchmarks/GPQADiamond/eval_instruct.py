@@ -28,6 +28,7 @@ class GPQADiamondBenchmark(BaseBenchmark):
         debug: bool = False,
         seed: List[int] = [0, 1234, 1234, 1234],
         logger: Optional[logging.Logger] = None,
+        system_instruction: Optional[str] = None,
     ):
         """
         Initialize GPQADiamond benchmark.
@@ -37,7 +38,7 @@ class GPQADiamondBenchmark(BaseBenchmark):
             seed: Random seed for reproducibility. Default is [0, 1234, 1234, 1234] for lm-eval-harness.
             logger: Optional logger instance
         """
-        super().__init__(logger)
+        super().__init__(logger=logger, system_instruction=system_instruction)
         self.dataset_name = "Idavidrein/gpqa"
         self.debug = debug
         self.seed = seed
@@ -81,7 +82,7 @@ class GPQADiamondBenchmark(BaseBenchmark):
                     },
                 ]
 
-                templated_messages = model.apply_chat_template(messages)
+                templated_messages = self._prepare_messages(messages, model)
 
                 instance = Instance(
                     "generate_until",

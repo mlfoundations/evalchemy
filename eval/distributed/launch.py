@@ -136,7 +136,7 @@ def check_conda_env(watchdog=False):
     hostname, _, _ = execute_command(cmd, verbose=False)
     print_info(f"Using $HOSTNAME: {hostname} to determine which conda environment we should be in")
     if "c1" in hostname or "c2" in hostname:
-        python_path = "//data/horse/ws/ryma833h-DCFT_Shared/evalchemy/env/evalchemy/bin/python3.10"
+        python_path = "/data/horse/ws/ryma833h-DCFT_Shared/evalchemy/env/evalchemy/bin/python3.10"
         activate_cmd = "source /data/horse/ws/ryma833h-DCFT_Shared/miniconda3/bin/activate /data/horse/ws/ryma833h-DCFT_Shared/evalchemy/env/evalchemy"
         print_info(f"Detected Capella environment, checking python path: {python_path}")
     elif "leonardo" in hostname:

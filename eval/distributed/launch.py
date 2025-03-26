@@ -158,10 +158,10 @@ def check_conda_env(watchdog=False):
     return True
 
 
-def generate_task_hash(tasks):
-    """Generate a 4-character hash from the task list."""
+def generate_evaluation_dataset_hash(tasks, system_instruction=None):
+    """Generate a 4-character hash from the task list and system instruction."""
     tasks_str = ",".join(sorted(tasks))
-    hash_obj = hashlib.md5(tasks_str.encode())
+    hash_obj = hashlib.md5((tasks_str + (system_instruction or "")).encode())
     return hash_obj.hexdigest()[:4]
 
 
@@ -175,13 +175,13 @@ def check_dataset_exists(repo_id):
         return False
 
 
-def create_evaluation_dataset(tasks):
+def create_evaluation_dataset(tasks, system_instruction=None):
     """Create or use cached evaluation dataset."""
     print_header("Preparing Evaluation Dataset")
 
     # Generate a cached dataset name based on tasks
-    task_hash = generate_task_hash(tasks)
-    cached_dataset_id = f"mlfoundations-dev/evalset_{task_hash}"
+    eval_dataset_hash = generate_evaluation_dataset_hash(tasks, system_instruction)
+    cached_dataset_id = f"mlfoundations-dev/evalset_{eval_dataset_hash}"
 
     # Check if the cached dataset exists
     if check_dataset_exists(cached_dataset_id):
@@ -194,7 +194,10 @@ def create_evaluation_dataset(tasks):
         "This may take a while the first time the eval datasets are downloaded and parsed. Consider running locally with more cpus."
     )
     tasks_str = ",".join(tasks)
-    cmd = f"python -m eval.eval --model upload_to_hf --tasks {tasks_str} --model_args repo_id={cached_dataset_id} --output_path logs"
+    if system_instruction:
+        cmd = f"python -m eval.eval --model upload_to_hf --tasks {tasks_str} --model_args repo_id={cached_dataset_id} --output_path logs --system_instruction '{system_instruction}'"
+    else:
+        cmd = f"python -m eval.eval --model upload_to_hf --tasks {tasks_str} --model_args repo_id={cached_dataset_id} --output_path logs"
 
     stdout, stderr, return_code = execute_command(cmd)
 
@@ -583,6 +586,7 @@ def main():
         default=None,
         help="Maximum job duration in hours (default: use sbatch script default)",
     )
+    parser.add_argument("--system_instruction", type=str, default=None, help="System instruction for the model")
 
     args = parser.parse_args()
 
@@ -610,7 +614,7 @@ def main():
     output_dataset = f"mlfoundations-dev/{model_name_short}{suffix}"
 
     # Create or get cached evaluation dataset
-    input_dataset = create_evaluation_dataset(tasks)
+    input_dataset = create_evaluation_dataset(tasks, args.system_instruction)
     if not input_dataset:
         sys.exit(1)
 

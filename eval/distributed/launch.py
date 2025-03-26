@@ -88,7 +88,7 @@ def check_required_env_vars():
     hostname, _, _ = execute_command(cmd, verbose=False)
     print_info(f"Using $HOSTNAME: {hostname} to determine which HF_HUB_CACHE to use")
     if "c1" in hostname or "c2" in hostname:
-        hf_hub_cache = "/data/horse/ws/ryma833h-DCFT_Shared/hub"
+        hf_hub_cache = "/data/horse/ws/ryma833h-DCFT_Shared/huggingface/hub"
         print_info(f"Detected Capella environment, using HF_HUB_CACHE: {hf_hub_cache}")
     elif "leonardo" in hostname:
         hf_hub_cache = "/leonardo_work/EUHPC_E03_068/DCFT_shared/hub"

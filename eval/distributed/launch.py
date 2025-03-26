@@ -206,7 +206,7 @@ def create_evaluation_dataset(tasks, system_instruction=None):
         print_error(f"Error: {stderr}")
         return False
 
-    print_success(f"Evaluation dataset created at: {cached_dataset_id}")
+    print_success(f"Evaluation dataset created at: https://huggingface.co/datasets/{cached_dataset_id}")
     return cached_dataset_id
 
 

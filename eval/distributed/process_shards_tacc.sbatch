@@ -10,7 +10,7 @@
 #SBATCH --job-name=process_shards
 #SBATCH --exclude=c610-021,c611-011
 #SBATCH --account CCR24067
-#SBATCH --output=slurm_logs/%x_%j.out
+
 
 # MODULES
 module load cuda/12.4 nccl/12.4

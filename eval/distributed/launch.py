@@ -136,7 +136,7 @@ def check_conda_env(watchdog=False):
     hostname, _, _ = execute_command(cmd, verbose=False)
     print_info(f"Using $HOSTNAME: {hostname} to determine which conda environment we should be in")
     if "c1" in hostname or "c2" in hostname:
-        python_path = "/data/horse/ws/ryma833h-DCFT_Shared/evalchemy/env/evalchemy/bin/python"
+        python_path = "//data/horse/ws/ryma833h-DCFT_Shared/evalchemy/env/evalchemy/bin/python3.10"
         activate_cmd = "source /data/horse/ws/ryma833h-DCFT_Shared/miniconda3/bin/activate /data/horse/ws/ryma833h-DCFT_Shared/evalchemy/env/evalchemy"
         print_info(f"Detected Capella environment, checking python path: {python_path}")
     elif "leonardo" in hostname:
@@ -586,6 +586,7 @@ def main():
         default=None,
         help="Maximum job duration in hours (default: use sbatch script default)",
     )
+    parser.add_argument("--no_sanity", action="store_true", help="Skip environment sanity checks")
     parser.add_argument("--system_instruction", type=str, default=None, help="System instruction for the model")
 
     args = parser.parse_args()
@@ -597,13 +598,14 @@ def main():
     tasks = [task.strip() for task in args.tasks.split(",")]
     print_info(f"Tasks to evaluate: {', '.join(tasks)}")
 
-    # Check required environment variables
-    if not check_required_env_vars():
-        sys.exit(1)
+    if not args.no_sanity:
+        # Check required environment variables
+        if not check_required_env_vars():
+            sys.exit(1)
 
-    # Activate conda environment
-    if not check_conda_env(args.watchdog):
-        sys.exit(1)
+        # Activate conda environment
+        if not check_conda_env(args.watchdog):
+            sys.exit(1)
 
     # Generate timestamp and repository ID for results
     timestamp = str(int(time.time()))

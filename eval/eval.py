@@ -326,7 +326,11 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
 
     # Initialize tasks
     task_manager = InstructTaskManager(
-        annotator_model=args.annotator_model, debug=args.debug, seed=args.seed, task_list=task_list
+        annotator_model=args.annotator_model,
+        debug=args.debug,
+        seed=args.seed,
+        task_list=task_list,
+        system_instruction=args.system_instruction,
     )
     pretrain_task_manager = PretrainTaskManager(args.verbosity, include_path=args.include_path)
 

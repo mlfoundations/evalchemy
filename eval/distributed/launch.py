@@ -136,8 +136,8 @@ def check_conda_env(watchdog=False):
     hostname, _, _ = execute_command(cmd, verbose=False)
     print_info(f"Using $HOSTNAME: {hostname} to determine which conda environment we should be in")
     if "c1" in hostname or "c2" in hostname:
-        python_path = "/data/horse/ws/ryma833h-DCFT_Shared/miniconda3/envs/evalchemy/bin/python3.10"
-        activate_cmd = "source /data/horse/ws/ryma833h-DCFT_Shared/miniconda3/bin/activate && conda activate evalchemy"
+        python_path = "/data/horse/ws/ryma833h-DCFT_Shared/evalchemy/env/evalchemy/bin/python3.10"
+        activate_cmd = "source /data/horse/ws/ryma833h-DCFT_Shared/miniconda3/bin/activate /data/horse/ws/ryma833h-DCFT_Shared/evalchemy/env/evalchemy"
         print_info(f"Detected Capella environment, checking python path: {python_path}")
     elif "leonardo" in hostname:
         python_path = "/leonardo_work/EUHPC_E03_068/DCFT_shared/evalchemy/env/cpu-evalchemy/bin/python3.10"
@@ -158,10 +158,10 @@ def check_conda_env(watchdog=False):
     return True
 
 
-def generate_task_hash(tasks):
-    """Generate a 4-character hash from the task list."""
+def generate_evaluation_dataset_hash(tasks, system_instruction=None):
+    """Generate a 4-character hash from the task list and system instruction."""
     tasks_str = ",".join(sorted(tasks))
-    hash_obj = hashlib.md5(tasks_str.encode())
+    hash_obj = hashlib.md5((tasks_str + (system_instruction or "")).encode())
     return hash_obj.hexdigest()[:4]
 
 
@@ -175,13 +175,13 @@ def check_dataset_exists(repo_id):
         return False
 
 
-def create_evaluation_dataset(tasks):
+def create_evaluation_dataset(tasks, system_instruction=None):
     """Create or use cached evaluation dataset."""
     print_header("Preparing Evaluation Dataset")
 
     # Generate a cached dataset name based on tasks
-    task_hash = generate_task_hash(tasks)
-    cached_dataset_id = f"mlfoundations-dev/evalset_{task_hash}"
+    eval_dataset_hash = generate_evaluation_dataset_hash(tasks, system_instruction)
+    cached_dataset_id = f"mlfoundations-dev/evalset_{eval_dataset_hash}"
 
     # Check if the cached dataset exists
     if check_dataset_exists(cached_dataset_id):
@@ -194,7 +194,10 @@ def create_evaluation_dataset(tasks):
         "This may take a while the first time the eval datasets are downloaded and parsed. Consider running locally with more cpus."
     )
     tasks_str = ",".join(tasks)
-    cmd = f"python -m eval.eval --model upload_to_hf --tasks {tasks_str} --model_args repo_id={cached_dataset_id} --output_path logs"
+    if system_instruction:
+        cmd = f"python -m eval.eval --model upload_to_hf --tasks {tasks_str} --model_args repo_id={cached_dataset_id} --output_path logs --system_instruction '{system_instruction}'"
+    else:
+        cmd = f"python -m eval.eval --model upload_to_hf --tasks {tasks_str} --model_args repo_id={cached_dataset_id} --output_path logs"
 
     stdout, stderr, return_code = execute_command(cmd)
 
@@ -203,7 +206,7 @@ def create_evaluation_dataset(tasks):
         print_error(f"Error: {stderr}")
         return False
 
-    print_success(f"Evaluation dataset created at: {cached_dataset_id}")
+    print_success(f"Evaluation dataset created at: https://huggingface.co/datasets/{cached_dataset_id}")
     return cached_dataset_id
 
 
@@ -583,6 +586,8 @@ def main():
         default=None,
         help="Maximum job duration in hours (default: use sbatch script default)",
     )
+    parser.add_argument("--no_sanity", action="store_true", help="Skip environment sanity checks")
+    parser.add_argument("--system_instruction", type=str, default=None, help="System instruction for the model")
 
     args = parser.parse_args()
 
@@ -593,24 +598,25 @@ def main():
     tasks = [task.strip() for task in args.tasks.split(",")]
     print_info(f"Tasks to evaluate: {', '.join(tasks)}")
 
-    # Check required environment variables
-    if not check_required_env_vars():
-        sys.exit(1)
+    if not args.no_sanity:
+        # Check required environment variables
+        if not check_required_env_vars():
+            sys.exit(1)
 
-    # Activate conda environment
-    if not check_conda_env(args.watchdog):
-        sys.exit(1)
+        # Activate conda environment
+        if not check_conda_env(args.watchdog):
+            sys.exit(1)
 
     # Generate timestamp and repository ID for results
     timestamp = str(int(time.time()))
-    task_hash = generate_task_hash(tasks)
-    suffix = f"_{timestamp}_eval_{task_hash}"
+    evaluation_dataset_hash = generate_evaluation_dataset_hash(tasks, args.system_instruction)
+    suffix = f"_{timestamp}_eval_{evaluation_dataset_hash}"
     remaining_characters = 96 - len(suffix)
     model_name_short = args.model_name.split("/")[-1][:remaining_characters]
     output_dataset = f"mlfoundations-dev/{model_name_short}{suffix}"
 
     # Create or get cached evaluation dataset
-    input_dataset = create_evaluation_dataset(tasks)
+    input_dataset = create_evaluation_dataset(tasks, args.system_instruction)
     if not input_dataset:
         sys.exit(1)
 

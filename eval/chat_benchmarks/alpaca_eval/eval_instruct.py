@@ -37,6 +37,7 @@ class AlpacaBenchmark(BaseBenchmark):
         debug: bool = False,
         annotator_model: str = "gpt-4o-mini-2024-07-18",
         logger: Optional[logging.Logger] = None,
+        system_instruction: Optional[str] = None,
     ):
         """
         Initialize Alpaca benchmark.
@@ -50,8 +51,9 @@ class AlpacaBenchmark(BaseBenchmark):
             do_sample: Whether to use sampling for generation
             debug: debug: If True, only evaluate first 2 examples
             logger: Optional logger instance
+            system_instruction: Optional system instruction for the model
         """
-        super().__init__(logger)
+        super().__init__(logger=logger, system_instruction=system_instruction)
         self.dataset_name = dataset_name
         self.subset = subset
         self.split = split
@@ -94,7 +96,7 @@ class AlpacaBenchmark(BaseBenchmark):
             for idx, example in enumerate(eval_set):
                 try:
                     instruction = example["instruction"]
-                    formatted_instruction = model.apply_chat_template([{"role": "user", "content": instruction}])
+                    formatted_instruction = self._prepare_messages([{"role": "user", "content": instruction}], model)
 
                     all_instances.append(
                         Instance(

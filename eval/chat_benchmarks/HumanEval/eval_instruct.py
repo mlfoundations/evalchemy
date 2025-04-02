@@ -27,6 +27,7 @@ class HumanEvalBenchmark(BaseBenchmark):
         timeout: float = 3.0,
         debug: bool = False,
         logger: Optional[logging.Logger] = None,
+        system_instruction: Optional[str] = None,
     ):
         """
         Initialize HumanEval benchmark.
@@ -39,8 +40,9 @@ class HumanEvalBenchmark(BaseBenchmark):
             timeout: Timeout for code execution
             debug: If True, only evaluate first 2 examples
             logger: Optional logger instance
+            system_instruction: Optional system instruction for the model
         """
-        super().__init__(logger)
+        super().__init__(logger=logger, system_instruction=system_instruction)
         self.languages = languages
         self.data_dir = data_dir
         self.max_tokens = max_tokens
@@ -93,7 +95,7 @@ Please continue to complete the function. You are not allowed to modify the give
                     prompt = self.build_deepseekcoder_instruction(
                         language_settings[lang]["full_name"], example["prompt"]
                     )
-                    inputs = model.apply_chat_template([{"role": "user", "content": prompt}])
+                    inputs = self._prepare_messages([{"role": "user", "content": prompt}], model)
 
                     all_instances.append(
                         Instance(

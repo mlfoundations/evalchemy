@@ -158,6 +158,28 @@ class HLESubsetBenchmark(BaseBenchmark):
 
         self.logger.info(f"Evaluating {num_questions} examples...")
 
+        dataset = self.load_questions()
+        if self.debug:
+            dataset = dataset.select(range(2))
+            self.logger.info(f"Debug mode: using 2 examples")
+
+        dataset = dataset.to_dict()
+        questions = [dict(zip(dataset.keys(), values)) for values in zip(*dataset.values())]
+
+        for example in examples:
+            example["judge_responses"] = []
+
+        for i in range(self.n_repeat):
+            predictions = {example["id"]: {"response": example["model_outputs"][i]} for example in examples}
+
+            eval_results = asyncio.run(
+                judge_all_responses(questions, predictions, num_workers=2, judge="gpt-4o-mini-2024-07-18")
+            )
+
+            for i, (unique_id, predictions) in enumerate(eval_results):
+                if unique_id is not None:
+                    examples[i]["judge_responses"].append(predictions["judge_response"])
+
         results.update(
             {
                 "num_total": num_questions,

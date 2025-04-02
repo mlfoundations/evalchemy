@@ -46,11 +46,11 @@ class ExtractedAnswer(BaseModel):
     strict: Literal[True]  # 100% reliability
 
 
-async def extract_answer(question, correct_answer, response):
+async def extract_answer(question, correct_answer, response, judge):
     prompt = JUDGE_PROMPT.format(question=question, correct_answer=correct_answer, response=response)
     try:
         response = await client.beta.chat.completions.parse(
-            model=args.judge,
+            model=judge,
             max_completion_tokens=4096,  # overkill for judge
             messages=[{"role": "user", "content": prompt}],
             response_format=ExtractedAnswer,
@@ -68,7 +68,7 @@ async def extract_answer(question, correct_answer, response):
         return None
 
 
-async def add_judge_response(question, predictions):
+async def add_judge_response(question, predictions, judge):
     unique_id = question["id"]
     prediction = copy.deepcopy(predictions[unique_id])  # not in-place
     question_text = question["question"]
@@ -78,7 +78,7 @@ async def add_judge_response(question, predictions):
         return unique_id, prediction
 
     response = prediction["response"]
-    content = await extract_answer(question_text, correct_answer, response)
+    content = await extract_answer(question_text, correct_answer, response, judge)
 
     if content is not None:
         prediction["judge_response"] = content  # local in-place
@@ -87,10 +87,10 @@ async def add_judge_response(question, predictions):
         return None, None
 
 
-async def judge_all_responses(questions, predictions, num_workers):
+async def judge_all_responses(questions, predictions, num_workers, judge):
     async def bound_func(question):
         async with semaphore:
-            content = await add_judge_response(question, predictions)
+            content = await add_judge_response(question, predictions, judge)
             return content
 
     semaphore = asyncio.Semaphore(num_workers)

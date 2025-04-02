@@ -1,3 +1,4 @@
+import asyncio
 import copy
 import logging
 import os
@@ -10,6 +11,7 @@ import numpy as np
 from datasets import Dataset, concatenate_datasets, load_dataset
 from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
+from run_judge_results import judge_all_responses
 
 from eval.task import BaseBenchmark
 
@@ -143,6 +145,27 @@ class HLESubsetBenchmark(BaseBenchmark):
             examples_list.append(example)
 
         return {"examples": examples_list}
+
+    def evaluate_responses(self, results: Dict[str, Any]) -> Dict[str, float]:
+        """Evaluate the generated solution completions."""
+
+        # Handle None result from non-primary ranks
+        if results is None:
+            return None
+
+        examples = results["examples"]
+        num_questions = len(examples)
+
+        self.logger.info(f"Evaluating {num_questions} examples...")
+
+        results.update(
+            {
+                "num_total": num_questions,
+                "num_repeat": self.n_repeat,
+            }
+        )
+
+        return results
 
     def load_questions(self) -> Dataset:
         """

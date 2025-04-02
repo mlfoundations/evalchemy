@@ -87,13 +87,13 @@ async def add_judge_response(question, predictions):
         return None, None
 
 
-async def judge_all_responses(questions, predictions):
+async def judge_all_responses(questions, predictions, num_workers):
     async def bound_func(question):
         async with semaphore:
             content = await add_judge_response(question, predictions)
             return content
 
-    semaphore = asyncio.Semaphore(args.num_workers)
+    semaphore = asyncio.Semaphore(num_workers)
     async with semaphore:
         tasks = [bound_func(q) for q in questions]
         results = await tqdm_asyncio.gather(*tasks)
@@ -185,7 +185,7 @@ def main(args):
     questions = [q for q in questions if q["id"] in predictions and q["id"] not in judged_predictions]
 
     # API will only be called for unjudged responses
-    results = asyncio.run(judge_all_responses(questions, predictions))
+    results = asyncio.run(judge_all_responses(questions, predictions, args.num_workers))
 
     for unique_id, predictions in results:
         if unique_id is not None:
@@ -195,18 +195,17 @@ def main(args):
     with open(output_filepath, "w") as f:
         json.dump(judged_predictions, f, indent=4)
 
-    dump_metrics(judged_predictions, n=total_questions)
+    # dump_metrics(judged_predictions, n=total_questions)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset", type=str, help="HLE HF Dataset")
-    parser.add_argument("--predictions", type=str, help="Model Predictions")
+    parser.add_argument("--predictions", type=str, default="logs/foo.json", help="Model Predictions")
     parser.add_argument(
-        "--num_workers", type=int, default=100, help="Async semaphore size. This depends on your rate limit."
+        "--num_workers", type=int, default=2, help="Async semaphore size. This depends on your rate limit."
     )
-    parser.add_argument(
-        "--judge", type=str, default="o3-mini-2025-01-31", help="Judge model"
-    )  # prev: "gpt-4o-2024-08-06"
+    parser.add_argument("--judge", type=str, default="gpt-4o-mini-2024-07-18", help="Judge model")
     args = parser.parse_args()
+    print(args)
     main(args)

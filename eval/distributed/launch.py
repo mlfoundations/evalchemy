@@ -93,6 +93,9 @@ def check_required_env_vars():
     elif "leonardo" in hostname:
         hf_hub_cache = "/leonardo_work/EUHPC_E03_068/DCFT_shared/hub"
         print_info(f"Detected Leonardo environment, using HF_HUB_CACHE: {hf_hub_cache}")
+    elif "tacc" in hostname:
+        hf_hub_cache = "/scratch/08134/negin/hf_home/"
+        print_info(f"Detected TACC environment, using HF_HUB_CACHE: {hf_hub_cache}")
     else:
         raise ValueError(f"Unknown hostname: {hostname}, can't determine which HF_HUB_CACHE to use")
     current_hub_cache = os.environ.get("HF_HUB_CACHE")
@@ -143,6 +146,10 @@ def check_conda_env(watchdog=False):
         python_path = "/leonardo_work/EUHPC_E03_068/DCFT_shared/evalchemy/env/cpu-evalchemy/bin/python3.10"
         activate_cmd = "source /leonardo_work/EUHPC_E03_068/DCFT_shared/mamba/bin/activate /leonardo_work/EUHPC_E03_068/DCFT_shared/evalchemy/env/cpu-evalchemy"
         print_info(f"Detected Leonardo environment, checking python path: {python_path}")
+    elif "tacc" in hostname:
+        python_path = "/work/08134/negin/anaconda3/envs/evalchemy/bin/python3.10"
+        activate_cmd = "source /work/08134/negin/anaconda3/bin/activate evalchemy"
+        print_info(f"Detected TACC environment, checking python path: {python_path}")
     else:
         raise ValueError(f"Unknown hostname: {hostname}, can't determine which HF_HUB_CACHE to use")
 
@@ -199,6 +206,7 @@ def create_evaluation_dataset(tasks, system_instruction=None):
     else:
         cmd = f"python -m eval.eval --model upload_to_hf --tasks {tasks_str} --model_args repo_id={cached_dataset_id} --output_path logs"
 
+    print_warning(f"Running command: {cmd}")
     stdout, stderr, return_code = execute_command(cmd)
 
     if return_code != 0:
@@ -258,12 +266,17 @@ def launch_sbatch(
             sbatch_script = "eval/distributed/process_shards_capella.sbatch"
             print_info("Detected Capella environment, using process_shards_capella.sbatch")
     elif "leonardo" in hostname:
+        sbatch_script = "eval/distributed/process_shards_leonardo.sbatch"
+        print_info("Detected Leonardo environment, using process_shards_leonardo.sbatch")
         if tp4:
             sbatch_script = "eval/distributed/process_shards_leonardo_tp.sbatch"
             print_info("Detected Leonardo environment with TP4, using process_shards_leonardo_tp.sbatch")
         else:
             sbatch_script = "eval/distributed/process_shards_leonardo.sbatch"
             print_info("Detected Leonardo environment, using process_shards_leonardo.sbatch")
+    elif "tacc" in hostname:
+        sbatch_script = "eval/distributed/process_shards_tacc.sbatch"
+        print_info("Detected TACC environment, using process_shards_tacc.sbatch")
     else:
         raise ValueError(f"Unknown hostname: {hostname}, can't determine which sbatch script to use")
 

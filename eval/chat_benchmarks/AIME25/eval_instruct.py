@@ -28,6 +28,7 @@ class AIME25Benchmark(BaseBenchmark):
         debug: bool = False,
         seed: List[int] = [0, 1234, 1234, 1234],
         logger: Optional[logging.Logger] = None,
+        system_instruction: Optional[str] = None,
     ):
         """
         Initialize AIME25 benchmark.
@@ -38,7 +39,7 @@ class AIME25Benchmark(BaseBenchmark):
             seed: Random seed for reproducibility. Default is [0, 1234, 1234, 1234] for lm-eval-harness.
             logger: Optional logger instance
         """
-        super().__init__(logger)
+        super().__init__(logger=logger, system_instruction=system_instruction)
         self.data_file = data_file
         self.debug = debug
         self.max_new_tokens = 32768  # set higher to avoid truncation for reasoning models
@@ -69,7 +70,7 @@ class AIME25Benchmark(BaseBenchmark):
                     {"role": "user", "content": PROMPT.format(problem=example["problem"])},
                 ]
 
-                templated_messages = model.apply_chat_template(messages)
+                templated_messages = self._prepare_messages(messages, model)
 
                 instance = Instance(
                     "generate_until",

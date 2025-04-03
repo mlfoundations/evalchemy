@@ -46,7 +46,7 @@ class MATH500x2Benchmark(BaseBenchmark):
         self.debug = debug
         self.seed = seed
         self.max_new_tokens = 32768  # set higher to avoid truncation for reasoning models
-        self.n_repeat = 5
+        self.n_repeat = 2
 
     def generate_responses(self, model: LM) -> Dict[str, Any]:
         """

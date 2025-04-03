@@ -177,7 +177,8 @@ class GPQADiamondBenchmark(BaseBenchmark):
             data["Incorrect Answer 2"],
             data["Incorrect Answer 3"],
         ]
-        random.shuffle(answers)
+        rnd = random.Random(42)
+        rnd.shuffle(answers)
 
         options = ["A", "B", "C", "D"]
         options_to_answers = {letter: answer for letter, answer in zip(options, answers)}

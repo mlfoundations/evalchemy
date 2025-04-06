@@ -1,19 +1,16 @@
 import asyncio
-import copy
 import logging
-import os
-import re
-from collections import defaultdict
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any, Dict, List, Optional
 
 import numpy as np
-from datasets import Dataset, concatenate_datasets, load_dataset
+from datasets import Dataset, load_dataset
 from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
 from run_judge_results import judge_all_responses
 
 from eval.task import BaseBenchmark
+
+from .testing_utils import get_multiple_choice_answer
 
 ########################################################################
 
@@ -74,7 +71,7 @@ class HLESubsetBenchmark(BaseBenchmark):
         self.debug = debug
         self.max_new_tokens = 32768  # set higher to avoid truncation for reasoning models
         self.seed = seed
-        self.n_repeat = 1
+        self.n_repeat = 3
 
     def generate_responses(self, model: LM) -> Dict[str, Any]:
         """
@@ -141,13 +138,59 @@ class HLESubsetBenchmark(BaseBenchmark):
 
         for example, outputs in zip(examples, zip(*all_outputs)):
             example["model_outputs"] = list(outputs)
-            # example["model_answers"] = ... # this needs to be parsed with LM-judge
+            example["model_answers"] = [get_multiple_choice_answer(o) for o in outputs]
             examples_list.append(example)
 
         return {"examples": examples_list}
 
     def evaluate_responses(self, results: Dict[str, Any]) -> Dict[str, float]:
         """Evaluate the generated solution completions."""
+
+        if results is None:
+            return None
+
+        examples = results["examples"]
+        num_questions = len(examples)
+
+        # Calculate accuracy for each repetition
+        all_results = []
+        for i in range(self.n_repeat):
+            solved = sum([example["answer"] == example["model_answers"][i] for example in examples])
+
+            all_results.append(
+                {
+                    "repetition": i + 1,
+                    "num_total": num_questions,
+                    "num_solved": solved,
+                    "accuracy": solved / num_questions,
+                }
+            )
+
+        # Calculate overall statistics
+        solved_avg = np.mean([result["num_solved"] for result in all_results])
+        accuracy_avg = np.mean([result["accuracy"] for result in all_results])
+        accuracy_std = np.std([result["accuracy"] for result in all_results])
+        accuracy_std_err = np.std([result["accuracy"] for result in all_results]) / np.sqrt(self.n_repeat)
+
+        results.update(
+            {
+                "num_total": num_questions,
+                "solved_avg": solved_avg,
+                "run_stats": all_results,
+                "accuracy_avg": accuracy_avg,
+                "accuracy_std_err": accuracy_std_err,
+                "num_repeat": self.n_repeat,
+            }
+        )
+
+        return results
+
+    def evaluate_responses_judge(
+        self, results: Dict[str, Any], judge: str = "gpt-4o-mini-2024-07-18"
+    ) -> Dict[str, float]:
+        """
+        Evaluate the generated solution completions using LM-Judge, as in original HLE.
+        """
 
         # Handle None result from non-primary ranks
         if results is None:
@@ -172,9 +215,7 @@ class HLESubsetBenchmark(BaseBenchmark):
         for i in range(self.n_repeat):
             predictions = {example["id"]: {"response": example["model_outputs"][i]} for example in examples}
 
-            eval_results = asyncio.run(
-                judge_all_responses(questions, predictions, num_workers=2, judge="gpt-4o-mini-2024-07-18")
-            )
+            eval_results = asyncio.run(judge_all_responses(questions, predictions, num_workers=2, judge=judge))
 
             for i, (unique_id, predictions) in enumerate(eval_results):
                 if unique_id is not None:

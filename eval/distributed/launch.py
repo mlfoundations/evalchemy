@@ -241,6 +241,7 @@ def launch_sbatch(
     num_shards,
     logs_dir,
     max_job_duration=None,
+    tp4=False,
 ):
     """Launch the sbatch job."""
     print_header("Launching SBATCH Job")
@@ -250,11 +251,19 @@ def launch_sbatch(
     hostname, _, _ = execute_command(cmd, verbose=False)
     print_info(f"Using $HOSTNAME: {hostname} to determine which sbatch script to use")
     if "c1" in hostname or "c2" in hostname:
-        sbatch_script = "eval/distributed/process_shards_capella.sbatch"
-        print_info("Detected Capella environment, using process_shards_capella.sbatch")
+        if tp4:
+            sbatch_script = "eval/distributed/process_shards_capella_tp.sbatch"
+            print_info("Detected Capella environment with TP4, using process_shards_capella_tp.sbatch")
+        else:
+            sbatch_script = "eval/distributed/process_shards_capella.sbatch"
+            print_info("Detected Capella environment, using process_shards_capella.sbatch")
     elif "leonardo" in hostname:
-        sbatch_script = "eval/distributed/process_shards_leonardo.sbatch"
-        print_info("Detected Leonardo environment, using process_shards_leonardo.sbatch")
+        if tp4:
+            sbatch_script = "eval/distributed/process_shards_leonardo_tp.sbatch"
+            print_info("Detected Leonardo environment with TP4, using process_shards_leonardo_tp.sbatch")
+        else:
+            sbatch_script = "eval/distributed/process_shards_leonardo.sbatch"
+            print_info("Detected Leonardo environment, using process_shards_leonardo.sbatch")
     else:
         raise ValueError(f"Unknown hostname: {hostname}, can't determine which sbatch script to use")
 
@@ -588,6 +597,7 @@ def main():
     )
     parser.add_argument("--no_sanity", action="store_true", help="Skip environment sanity checks")
     parser.add_argument("--system_instruction", type=str, default=None, help="System instruction for the model")
+    parser.add_argument("--tp4", action="store_true", help="Use Tensor Parallelism with 4 GPUs")
 
     args = parser.parse_args()
 
@@ -643,6 +653,7 @@ def main():
         args.num_shards,
         logs_dir,
         args.max_job_duration,
+        args.tp4,
     )
     if not job_id:
         sys.exit(1)

@@ -1,5 +1,5 @@
 """
-Code from https://github.com/NovaSky-AI/SkyThought/blob/main/skythought/tools/util/livecodebench/testing_util.py
+Code from LiveCodeBench utils
 """
 
 import ast
@@ -18,6 +18,15 @@ from typing import Callable, Dict, Optional
 
 import scipy.stats as stats
 
+def rating_to_difficulty(rating):
+    if rating < 1000:
+        return 'Easy'
+    if rating < 1300:
+        return 'Medium'
+    if rating <= 3500:
+        return 'Hard'
+
+    return 'Easy'
 
 def reliability_guard(maximum_memory_bytes: Optional[int] = None):
     """

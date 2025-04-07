@@ -13,7 +13,7 @@ from lm_eval.api.model import LM
 
 from eval.task import BaseBenchmark
 
-from .codeelo_utils import codeelo_run, post_process_code
+from .codeelo_utils import codeelo_run, post_process_code, rating_to_difficulty
 
 def has_code(response):
     pattern = r"```(?:[a-zA-Z]*)\n(.*?)```"
@@ -33,7 +33,7 @@ class CodeEloBenchmark(BaseBenchmark):
     """
     CodeElo Benchmark for evaluating the code reasoning of LLMs.
 
-    Follows the evaluation logic of livecodebench + what code elo requires.
+    Follows the evaluation logic of CodeElo + what code elo requires.
     """
 
     def __init__(
@@ -44,7 +44,7 @@ class CodeEloBenchmark(BaseBenchmark):
         system_instruction: Optional[str] = None,
     ):
         """
-        Initialize LiveCodeBench benchmark.
+        Initialize CodeElo benchmark.
 
         Args:
             debug: If set, only evaluate on 2 examples
@@ -57,6 +57,7 @@ class CodeEloBenchmark(BaseBenchmark):
         self.max_new_tokens = 32768  # set higher to avoid truncation for reasoning models
         self.seed = seed
         self.n_repeat = 3
+        self.filter_interaction_questions = True
 
     def generate_responses(self, model: LM) -> Dict[str, Any]:
         """
@@ -73,19 +74,48 @@ class CodeEloBenchmark(BaseBenchmark):
         if self.debug:
             examples = examples[:10]
 
+        # TODO - figure out how to support these?
+        if self.filter_interaction_questions:
+            examples = [x for x in examples if not x['interaction']]
+
         all_outputs = []
 
         # Taken from the original code / paper
         def make_html_problem(problem):
+            tests = problem["examples"]
+            test_cases = []
+            for tc in tests:
+                ins = tc[0]
+                outs = tc[1]
+                testtype = "stdin"
+
+                test_cases.append({
+                    "input": ins,
+                    "output": outs,
+                    "testtype": testtype,
+                })
+
             title = problem["title"]
             html_output = '<html><body>'
             html_output += f"<h1>{title}</h1>"
+            html_output += f'<div>Time limit per test: {problem["time_limit_ms"]} ms</div>'
             html_output += f"<h2>Description</h2>"
             html_output += f"<div>{problem['description']}</div>"
             html_output += f"<h2>Input</h2>"
             html_output += f"<div>{problem['input']}</div>"
             html_output += f"<h2>Output</h2>"
             html_output += f"<div>{problem['output']}</div>"
+            html_output += f"<h2>Example</h2>"
+            html_output += f"<h3>Input</h3>"
+            html_output += f"<div>{test_cases[0]['input']}</div>"
+            html_output += f"<h3>Output</h3>"
+            html_output += f"<div>{test_cases[0]['output']}</div>"
+            if problem['interaction']:
+                html_output += f"<h2>Interaction</h2>"
+                html_output += f"<div>{problem['interaction']}</div>"
+            if problem['note']:
+                html_output += f"<h2>Note</h2>"
+                html_output += f"<div>{problem['note']}</div>"
             html_output += '</body></html>'
             return html_output
 
@@ -119,7 +149,7 @@ class CodeEloBenchmark(BaseBenchmark):
                 all_instances.append(instance)
 
             # Generate model responses
-            self.logger.info("Generating responses for LiveCodeBench...")
+            self.logger.info("Generating responses for CodeElo...")
             outputs = self.compute(model, all_instances)
             all_outputs.append(outputs)
 
@@ -160,6 +190,7 @@ class CodeEloBenchmark(BaseBenchmark):
         try:
             response_entry = {
                 "content": example["model_answer"],
+                "difficulty": rating_to_difficulty(example["rating"]),
                 "correctness": None,
                 "reason": None,
             }
@@ -203,6 +234,7 @@ class CodeEloBenchmark(BaseBenchmark):
             self.logger.error(f"Outer error in evaluate_single_example: {str(outer_e)}")
             return {
                 "content": example.get("model_answer"),
+                "difficulty": rating_to_difficulty(example.get("rating")),
                 "correctness": False,
                 "reason": f"Critical error: {str(outer_e)}",
             }
@@ -255,6 +287,7 @@ class CodeEloBenchmark(BaseBenchmark):
                         results[idx] = (
                             {
                                 "content": example["model_answer"],
+                                "difficulty": rating_to_difficulty(example["rating"]),
                                 "correctness": False,
                                 "reason": f"Future error: {str(e)}",
                             },
@@ -265,11 +298,26 @@ class CodeEloBenchmark(BaseBenchmark):
             total_correct = sum(1 for result, _ in results if result["correctness"])
             total_finish = len(results)
 
+            per_difficulty_correct = defaultdict(int)
+            per_difficulty_total = defaultdict(int)
+
+            for result, example in results:
+                per_difficulty_correct[example["difficulty"]] += result["correctness"]
+                per_difficulty_total[example["difficulty"]] += 1
+
             metrics = {
                 "total_correct": total_correct,
                 "total_finish": total_finish,
                 "accuracy": total_correct / total_finish,
+                "per_difficulty_correct": dict(per_difficulty_correct),
+                "per_difficulty_total": dict(per_difficulty_total),
             }
+
+            # Add per-difficulty accuracies
+            for difficulty in per_difficulty_correct.keys():
+                metrics[f"accuracy_{difficulty}"] = (
+                    per_difficulty_correct[difficulty] / per_difficulty_total[difficulty]
+                )
 
             all_metrics.append(metrics)
 
@@ -292,6 +340,20 @@ class CodeEloBenchmark(BaseBenchmark):
         final_metrics["accuracy_std_err"] = stderr_acc
         self.logger.info(f"Overall accuracy: {mean_acc:.2%} ± {stderr_acc:.2%}")
 
+        # Calculate stats for each difficulty level
+        difficulties = all_metrics[0]["per_difficulty_correct"].keys()
+        for diff in difficulties:
+            acc_values = [m[f"accuracy_{diff}"] for m in all_metrics]
+            mean_acc, stderr_acc = calc_stats(acc_values)
+            final_metrics[f"accuracy_{diff}_avg"] = mean_acc
+            final_metrics[f"accuracy_{diff}_std_err"] = stderr_acc
+
+        # Log results
+        for diff in difficulties:
+            mean = final_metrics[f"accuracy_{diff}_avg"]
+            stderr = final_metrics[f"accuracy_{diff}_std_err"]
+            self.logger.info(f"Accuracy {diff}: {mean:.2%} ± {stderr:.2%}")
+
         # Include raw results and examples in final metrics
         final_metrics["raw_metrics"] = all_metrics
         final_metrics["examples"] = [result for result, _ in results]  # Include last run's examples
@@ -311,6 +373,7 @@ class CodeEloBenchmark(BaseBenchmark):
 
     def load_questions(self) -> Dataset:
         """Load CodeElo questions from source."""
-        self.logger.info("Loading LiveCodeBench questions from source and converting to dataset...")
+        self.logger.info("Loading CodeElo questions from source and converting to dataset...")
         ds = load_dataset('Qwen/CodeElo')['test'].to_list()
+        ds = [{**x, 'difficulty': rating_to_difficulty(x['rating'])} for x in ds]
         return ds

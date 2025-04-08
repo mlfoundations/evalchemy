@@ -14,7 +14,7 @@ from eval.task import BaseBenchmark
 class MMLUProSubsetBenchmark(BaseBenchmark):
     """
     MMLUProSubset Benchmark for evaluating multiple choice reasoning of LLMs.
-    https://huggingface.co/datasets/mlfoundations-dev/mmlu_pro_eval_subset
+    https://huggingface.co/datasets/mlfoundations-dev/mmlu_pro_eval_500subset
     """
 
     def __init__(
@@ -33,7 +33,7 @@ class MMLUProSubsetBenchmark(BaseBenchmark):
             logger: Optional logger instance
         """
         super().__init__(logger=logger, system_instruction=system_instruction)
-        self.dataset_name = "mlfoundations-dev/mmlu_pro_eval_subset"
+        self.dataset_name = "mlfoundations-dev/mmlu_pro_eval_500subset"
         self.debug = debug
         self.seed = seed
         self.max_new_tokens = 32768

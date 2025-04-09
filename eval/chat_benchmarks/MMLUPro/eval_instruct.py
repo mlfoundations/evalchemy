@@ -9,12 +9,13 @@ from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
 
 from eval.task import BaseBenchmark
+from .testing_utils import get_multiple_choice_answer
 
 
-class MMLUProSubsetBenchmark(BaseBenchmark):
+class MMLUProBenchmark(BaseBenchmark):
     """
-    MMLUProSubset Benchmark for evaluating multiple choice reasoning of LLMs.
-    https://huggingface.co/datasets/mlfoundations-dev/mmlu_pro_eval_subset
+    MMLUPro (500 subset) Benchmark for evaluating multiple choice reasoning of LLMs.
+    https://huggingface.co/datasets/mlfoundations-dev/mmlu_pro_eval_500subset
     """
 
     def __init__(
@@ -25,7 +26,7 @@ class MMLUProSubsetBenchmark(BaseBenchmark):
         system_instruction: Optional[str] = None,
     ):
         """
-        Initialize MMLUProSubset  benchmark.
+        Initialize MMLUPro (500 subset) benchmark.
 
         Args:
             debug: If set, only evaluate on 2 examples
@@ -33,7 +34,7 @@ class MMLUProSubsetBenchmark(BaseBenchmark):
             logger: Optional logger instance
         """
         super().__init__(logger=logger, system_instruction=system_instruction)
-        self.dataset_name = "mlfoundations-dev/mmlu_pro_eval_subset"
+        self.dataset_name = "mlfoundations-dev/mmlu_pro_eval_500subset"
         self.debug = debug
         self.seed = seed
         self.max_new_tokens = 32768
@@ -92,7 +93,7 @@ class MMLUProSubsetBenchmark(BaseBenchmark):
                 all_instances.append(instance)
 
             # Generate model responses
-            self.logger.info("Generating responses for MMLUProSubset...")
+            self.logger.info("Generating responses for MMLUPro...")
             outputs = self.compute(model, all_instances)
             all_outputs.append(outputs)
 
@@ -148,7 +149,7 @@ class MMLUProSubsetBenchmark(BaseBenchmark):
         return results
 
     def load_questions(self) -> List[Dict[str, Any]]:
-        """Load MMLUProSubset questions from the dataset."""
+        """Load MMLUPro (500 subset) questions from the dataset."""
         dataset = load_dataset(self.dataset_name)
         questions = [row for row in dataset['test']]
         if self.debug:

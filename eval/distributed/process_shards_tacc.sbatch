@@ -6,7 +6,7 @@
 #SBATCH --cpus-per-task=8 
 #SBATCH --account=EUHPC_E03_068
 #SBATCH --partition=boost_usr_prod
-#SBATCH -p gh-dev
+#SBATCH -p gh
 #SBATCH --job-name=process_shards
 #SBATCH --exclude=c610-021,c611-011
 #SBATCH --account CCR24067
@@ -16,13 +16,13 @@
 module load cuda/12.4 nccl/12.4
 
 # MAIN DIRECTORIES
-export DCFT="$WORK"
+export DCFT="/work/08134/negin/ls6"
 export EVALCHEMY="$DCFT/evalchemy"
 export HF_HUB_CACHE="$SCRATCH/hf_home"
 
 # CONDA
-export PATH="$WORK/anaconda3/condabin/:$PATH"
-source $WORK/anaconda3/etc/profile.d/conda.sh
+export PATH="/work/08134/negin/anaconda3/condabin/:$PATH"
+source /work/08134/negin/anaconda3/etc/profile.d/conda.sh
 conda activate evalchemy
 
 # SHARDED INFERENCE ARGUMENTS

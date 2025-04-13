@@ -1,50 +1,44 @@
-import json
 import logging
+import random
 from typing import Any, Dict, List, Optional
 
+import lm_eval.models
 import numpy as np
+from datasets import load_dataset
 from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
-from lm_eval.tasks.hendrycks_math.utils import is_equiv, last_boxed_only_string, remove_boxed
 
 from eval.task import BaseBenchmark
-
-# Modified version of hendrycks_math with additional instruction to mark the solution with \\boxed
-# https://github.com/mlfoundations/evalchemy/blob/e70a45e41cb2ada273d6bb98e75dba303ec31f8b/eval/chat_benchmarks/AMC23/eval_instruct.py#L15
-PROMPT = """Problem: {problem}\nMark your solution with \\boxed\nAnswer:"""
+from .testing_utils import get_multiple_choice_answer
 
 
-class AIME25Benchmark(BaseBenchmark):
+class MMLUProBenchmark(BaseBenchmark):
     """
-    AIME25 Benchmark for evaluating the math reasoning of LLMs.
-    Link: https://huggingface.co/datasets/zwhe99/aime25
-
-    Follows the evaluation logic of hendrycks_math answer extraction.
+    MMLUPro (500 subset) Benchmark for evaluating multiple choice reasoning of LLMs.
+    https://huggingface.co/datasets/mlfoundations-dev/mmlu_pro_eval_500subset
     """
 
     def __init__(
         self,
-        data_file: str = "eval/chat_benchmarks/AIME25/data/aime25.json",
         debug: bool = False,
         seed: List[int] = [0, 1234, 1234, 1234],
         logger: Optional[logging.Logger] = None,
         system_instruction: Optional[str] = None,
     ):
         """
-        Initialize AIME25 benchmark.
+        Initialize MMLUPro (500 subset) benchmark.
 
         Args:
-            data_file: File containing the AIME25 dataset (id, problem, reference_solution, expected_answer, source)
             debug: If set, only evaluate on 2 examples
             seed: Random seed for reproducibility. Default is [0, 1234, 1234, 1234] for lm-eval-harness.
             logger: Optional logger instance
         """
         super().__init__(logger=logger, system_instruction=system_instruction)
-        self.data_file = data_file
+        self.dataset_name = "mlfoundations-dev/mmlu_pro_eval_500subset"
         self.debug = debug
-        self.max_new_tokens = 32768  # set higher to avoid truncation for reasoning models
         self.seed = seed
-        self.n_repeat = 5
+        self.max_new_tokens = 32768
+        self.n_repeat = 1
 
     def generate_responses(self, model: LM) -> Dict[str, Any]:
         """
@@ -54,11 +48,17 @@ class AIME25Benchmark(BaseBenchmark):
             model: Language model
 
         Returns:
-            Dictionary containing generated responses and temporary directory,
-            or None for non-primary ranks
+            Dictionary containing generated responses and examples
         """
         examples = self.load_questions()
-        # Prepare instances for model
+
+        if isinstance(model, lm_eval.models.huggingface.HFLM):
+            model_name = model.pretrained
+        elif isinstance(model, lm_eval.models.openai_completions.OpenAIChatCompletion):
+            model_name = str(f"openai/{model.model}")
+        else:
+            model_name = model.model_args["model"]
+
         all_outputs = []
 
         for i in range(self.n_repeat):
@@ -67,7 +67,10 @@ class AIME25Benchmark(BaseBenchmark):
 
             for idx, example in enumerate(examples):
                 messages = [
-                    {"role": "user", "content": PROMPT.format(problem=example["problem"])},
+                    {
+                        "role": "user",
+                        "content": example["prompt"]
+                    },
                 ]
 
                 templated_messages = self._prepare_messages(messages, model)
@@ -78,43 +81,34 @@ class AIME25Benchmark(BaseBenchmark):
                     (
                         templated_messages,
                         {
-                            "do_sample": False,
-                            "max_new_tokens": self.max_new_tokens,
+                            "do_sample": True,
                             "temperature": 0.7,
+                            "max_new_tokens": self.max_new_tokens,
                             "seed": seed,
                         },
                     ),
                     idx,
                 )
-
-                # Add repetition information to instance metadata
                 instance.repeat_idx = i
-                instance.metadata = {
-                    "problem_id": str(example["id"]) if "id" in example else str(idx),
-                    "expected_answer": str(example["answer"]),
-                    "reference_solution": str(example["solution"]) if "solution" in example else "",
-                }
-
                 all_instances.append(instance)
 
             # Generate model responses
-            self.logger.info("Generating responses for AIME25...")
+            self.logger.info("Generating responses for MMLUPro...")
             outputs = self.compute(model, all_instances)
             all_outputs.append(outputs)
+
         # Return None early for non-primary ranks
         if model.rank != 0:
             return None
 
         for example, outputs in zip(examples, zip(*all_outputs)):
             example["model_outputs"] = list(outputs)
-            example["model_answers"] = [self.extract_answer(o) for o in outputs]
+            example["model_answers"] = [get_multiple_choice_answer(o) for o in outputs]
 
         return {"examples": examples}
 
     def evaluate_responses(self, results: Dict[str, Any]) -> Dict[str, float]:
         """Evaluate the generated solution completions."""
-
-        # Handle None result from non-primary ranks
         if results is None:
             return None
 
@@ -124,7 +118,8 @@ class AIME25Benchmark(BaseBenchmark):
         # Calculate accuracy for each repetition
         all_results = []
         for i in range(self.n_repeat):
-            solved = sum([is_equiv(str(example["answer"]), example["model_answers"][i]) for example in examples])
+            solved = sum([example["answer"] == example["model_answers"][i] for example in examples])
+
             all_results.append(
                 {
                     "repetition": i + 1,
@@ -143,7 +138,7 @@ class AIME25Benchmark(BaseBenchmark):
         results.update(
             {
                 "num_total": num_questions,
-                "solved_avg": solved,
+                "solved_avg": solved_avg,
                 "run_stats": all_results,
                 "accuracy_avg": accuracy_avg,
                 "accuracy_std_err": accuracy_std_err,
@@ -153,26 +148,11 @@ class AIME25Benchmark(BaseBenchmark):
 
         return results
 
-    def load_questions(self) -> List[Dict[str, str]]:
-        """Load AIME25 questions from the data file."""
-        with open(self.data_file, "r") as f:
-            questions = [json.loads(x) for x in f]
-        self.logger.info(f"Loaded {len(questions)} questions from {self.data_file}")
+    def load_questions(self) -> List[Dict[str, Any]]:
+        """Load MMLUPro (500 subset) questions from the dataset."""
+        dataset = load_dataset(self.dataset_name)
+        questions = [row for row in dataset['test']]
+        if self.debug:
+            questions = questions[:2]
+        self.logger.info(f"Loaded {len(questions)} questions from {self.dataset_name}")
         return questions
-
-    def extract_answer(self, output: str) -> str:
-        """Extract the final answer from a model-generated solution, which is expected to be in the format of \boxed{answer}.
-
-        Uses the same logic as hendrycks_math.
-
-        Args:
-            output (str): Model-generated solution text
-
-        Returns:
-            str: Extracted final answer. Returns empty string if no answer found in \boxed.
-        """
-        try:
-            answer = remove_boxed(last_boxed_only_string(output))
-            return answer
-        except:
-            return ""

@@ -49,6 +49,7 @@ class LiveBenchBenchmark(BaseBenchmark):
         remove_existing_file: bool = True,
         seed: List[int] = [0, 1234, 1234, 1234],
         logger: Optional[logging.Logger] = None,
+        system_instruction: Optional[str] = None,
     ):
         """
         Initialize LiveBench benchmark.
@@ -56,8 +57,9 @@ class LiveBenchBenchmark(BaseBenchmark):
         Args:
             dataset_name: Name of the dataset
             logger: Optional logger instance
+            system_instruction: Optional system instruction for the model
         """
-        super().__init__(logger)
+        super().__init__(logger=logger, system_instruction=system_instruction)
         self.dataset_name = dataset_name
         self.question_source = question_source
         self.do_sample = do_sample
@@ -179,7 +181,7 @@ class LiveBenchBenchmark(BaseBenchmark):
                         messages = [
                             {"role": "user", "content": all_convs[idx].get_prompt()},
                         ]
-                        templated_messages = model.apply_chat_template(messages)
+                        templated_messages = self._prepare_messages(messages, model)
 
                         all_instances.append(
                             Instance(

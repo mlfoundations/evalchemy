@@ -94,12 +94,15 @@ def check_required_env_vars(mode="auto"):
     cmd = "echo $HOSTNAME"
     hostname, _, _ = execute_command(cmd, verbose=False)
     print_info(f"Using $HOSTNAME: {hostname} to determine which HF_HUB_CACHE to use")
-    if "c1" in hostname:
+    if "c1" in hostname or "c2" in hostname:
         hf_hub_cache = "/data/horse/ws/ryma833h-DCFT_Shared/huggingface/hub"
         print_info(f"Detected Capella environment, using HF_HUB_CACHE: {hf_hub_cache}")
     elif "leonardo" in hostname:
         hf_hub_cache = "/leonardo_work/EUHPC_E03_068/DCFT_shared/hub"
         print_info(f"Detected Leonardo environment, using HF_HUB_CACHE: {hf_hub_cache}")
+    elif "tacc" in hostname:
+        hf_hub_cache = "/scratch/08134/negin/hf_home/"
+        print_info(f"Detected TACC environment, using HF_HUB_CACHE: {hf_hub_cache}")
     else:
         # Use the default cache location for local environments
         home_dir = os.path.expanduser("~")
@@ -147,15 +150,18 @@ def check_conda_env(mode="auto", watchdog=False):
     cmd = "echo $HOSTNAME"
     hostname, _, _ = execute_command(cmd, verbose=False)
     print_info(f"Using $HOSTNAME: {hostname} to determine which conda environment we should be in")
-    
-    if "c1" in hostname:
-        python_path = "/data/horse/ws/ryma833h-DCFT_Shared/miniconda3/envs/evalchemy/bin/python3.10"
-        activate_cmd = "source /data/horse/ws/ryma833h-DCFT_Shared/miniconda3/bin/activate && conda activate evalchemy"
+    if "c1" in hostname or "c2" in hostname:
+        python_path = "/data/horse/ws/ryma833h-DCFT_Shared/evalchemy/env/evalchemy/bin/python3.10"
+        activate_cmd = "source /data/horse/ws/ryma833h-DCFT_Shared/miniconda3/bin/activate /data/horse/ws/ryma833h-DCFT_Shared/evalchemy/env/evalchemy"
         print_info(f"Detected Capella environment, checking python path: {python_path}")
     elif "leonardo" in hostname:
         python_path = "/leonardo_work/EUHPC_E03_068/DCFT_shared/evalchemy/env/cpu-evalchemy/bin/python3.10"
         activate_cmd = "source /leonardo_work/EUHPC_E03_068/DCFT_shared/mamba/bin/activate /leonardo_work/EUHPC_E03_068/DCFT_shared/evalchemy/env/cpu-evalchemy"
         print_info(f"Detected Leonardo environment, checking python path: {python_path}")
+    elif "tacc" in hostname:
+        python_path = "/work/08134/negin/anaconda3/envs/evalchemy/bin/python3.10"
+        activate_cmd = "source /work/08134/negin/anaconda3/bin/activate evalchemy"
+        print_info(f"Detected TACC environment, checking python path: {python_path}")
     else:
         # For local environments, we don't enforce a specific Python path
         print_info(f"Local environment detected, not enforcing specific conda environment")
@@ -187,10 +193,10 @@ def check_conda_env(mode="auto", watchdog=False):
     return True
 
 
-def generate_task_hash(tasks):
-    """Generate a 4-character hash from the task list."""
+def generate_evaluation_dataset_hash(tasks, system_instruction=None):
+    """Generate a 4-character hash from the task list and system instruction."""
     tasks_str = ",".join(sorted(tasks))
-    hash_obj = hashlib.md5(tasks_str.encode())
+    hash_obj = hashlib.md5((tasks_str + (system_instruction or "")).encode())
     return hash_obj.hexdigest()[:4]
 
 
@@ -204,13 +210,13 @@ def check_dataset_exists(repo_id):
         return False
 
 
-def create_evaluation_dataset(tasks):
+def create_evaluation_dataset(tasks, system_instruction=None):
     """Create or use cached evaluation dataset."""
     print_header("Preparing Evaluation Dataset")
 
     # Generate a cached dataset name based on tasks
-    task_hash = generate_task_hash(tasks)
-    cached_dataset_id = f"mlfoundations-dev/evalset_{task_hash}"
+    eval_dataset_hash = generate_evaluation_dataset_hash(tasks, system_instruction)
+    cached_dataset_id = f"mlfoundations-dev/evalset_{eval_dataset_hash}"
 
     # Check if the cached dataset exists
     if check_dataset_exists(cached_dataset_id):
@@ -223,8 +229,12 @@ def create_evaluation_dataset(tasks):
         "This may take a while the first time the eval datasets are downloaded and parsed. Consider running locally with more cpus."
     )
     tasks_str = ",".join(tasks)
-    cmd = f"python -m eval.eval --model upload_to_hf --tasks {tasks_str} --model_args repo_id={cached_dataset_id} --output_path logs"
+    if system_instruction:
+        cmd = f"python -m eval.eval --model upload_to_hf --tasks {tasks_str} --model_args repo_id={cached_dataset_id} --output_path logs --system_instruction '{system_instruction}'"
+    else:
+        cmd = f"python -m eval.eval --model upload_to_hf --tasks {tasks_str} --model_args repo_id={cached_dataset_id} --output_path logs"
 
+    print_warning(f"Running command: {cmd}")
     stdout, stderr, return_code = execute_command(cmd)
 
     if return_code != 0:
@@ -232,7 +242,7 @@ def create_evaluation_dataset(tasks):
         print_error(f"Error: {stderr}")
         return False
 
-    print_success(f"Evaluation dataset created at: {cached_dataset_id}")
+    print_success(f"Evaluation dataset created at: https://huggingface.co/datasets/{cached_dataset_id}")
     return cached_dataset_id
 
 
@@ -328,6 +338,7 @@ def launch_sbatch(
     num_shards,
     logs_dir,
     max_job_duration=None,
+    tp4=False,
 ):
     """Launch the sbatch job."""
     print_header("Launching SBATCH Job")
@@ -336,12 +347,25 @@ def launch_sbatch(
     cmd = "echo $HOSTNAME"
     hostname, _, _ = execute_command(cmd, verbose=False)
     print_info(f"Using $HOSTNAME: {hostname} to determine which sbatch script to use")
-    if "c1" in hostname:
-        sbatch_script = "eval/distributed/process_shards_capella.sbatch"
-        print_info("Detected Capella environment, using process_shards_capella.sbatch")
+    if "c1" in hostname or "c2" in hostname:
+        if tp4:
+            sbatch_script = "eval/distributed/process_shards_capella_tp.sbatch"
+            print_info("Detected Capella environment with TP4, using process_shards_capella_tp.sbatch")
+        else:
+            sbatch_script = "eval/distributed/process_shards_capella.sbatch"
+            print_info("Detected Capella environment, using process_shards_capella.sbatch")
     elif "leonardo" in hostname:
         sbatch_script = "eval/distributed/process_shards_leonardo.sbatch"
         print_info("Detected Leonardo environment, using process_shards_leonardo.sbatch")
+        if tp4:
+            sbatch_script = "eval/distributed/process_shards_leonardo_tp.sbatch"
+            print_info("Detected Leonardo environment with TP4, using process_shards_leonardo_tp.sbatch")
+        else:
+            sbatch_script = "eval/distributed/process_shards_leonardo.sbatch"
+            print_info("Detected Leonardo environment, using process_shards_leonardo.sbatch")
+    elif "tacc" in hostname:
+        sbatch_script = "eval/distributed/process_shards_tacc.sbatch"
+        print_info("Detected TACC environment, using process_shards_tacc.sbatch")
     else:
         print_warning(f"Unknown hostname: {hostname}, defaulting to local processing")
         return launch_local(model_path, dataset_path, output_dataset_dir, num_shards, logs_dir)
@@ -786,6 +810,9 @@ def main():
         action="store_true",
         help="Do not upload results to Hugging Face (useful for local testing)",
     )
+    parser.add_argument("--no_sanity", action="store_true", help="Skip environment sanity checks")
+    parser.add_argument("--system_instruction", type=str, default=None, help="System instruction for the model")
+    parser.add_argument("--tp4", action="store_true", help="Use Tensor Parallelism with 4 GPUs")
 
     args = parser.parse_args()
 
@@ -803,17 +830,25 @@ def main():
     # Activate conda environment
     if not check_conda_env(args.mode, args.watchdog):
         sys.exit(1)
+    if not args.no_sanity:
+        # Check required environment variables
+        if not check_required_env_vars():
+            sys.exit(1)
+
+        # Activate conda environment
+        if not check_conda_env(args.watchdog):
+            sys.exit(1)
 
     # Generate timestamp and repository ID for results
     timestamp = str(int(time.time()))
-    task_hash = generate_task_hash(tasks)
-    suffix = f"_{timestamp}_eval_{task_hash}"
+    evaluation_dataset_hash = generate_evaluation_dataset_hash(tasks, args.system_instruction)
+    suffix = f"_{timestamp}_eval_{evaluation_dataset_hash}"
     remaining_characters = 96 - len(suffix)
     model_name_short = args.model_name.split("/")[-1][:remaining_characters]
     output_dataset = f"mlfoundations-dev/{model_name_short}{suffix}"
 
     # Create or get cached evaluation dataset
-    input_dataset = create_evaluation_dataset(tasks)
+    input_dataset = create_evaluation_dataset(tasks, args.system_instruction)
     if not input_dataset:
         sys.exit(1)
 
@@ -864,6 +899,7 @@ def main():
             logs_dir,
         )
     else:  # slurm mode
+        # Launch sbatch job with the dataset repo but save to output repo
         job_id = launch_sbatch(
             model_path,
             dataset_path,
@@ -871,6 +907,7 @@ def main():
             args.num_shards,
             logs_dir,
             args.max_job_duration,
+            args.tp4,
         )
     
     if not job_id:

@@ -17,7 +17,7 @@ The distributed evaluation system allows you to run model evaluations in paralle
 
 2. **Example command**:
    ```bash
-   python eval/distributed/launch.py --model_name open-thoughts/OpenThinker-7B --tasks AIME24,AIME25,AMC23,MATH500,GPQADiamond,LiveCodeBench --num_shards 8 --max-job-duration 3 --watchdog
+   python eval/distributed/launch.py --model_name open-thoughts/OpenThinker-7B --tasks AIME24,AIME25,AMC23,MATH500,GPQADiamond,LiveCodeBench --num_shards 8 --max-job-duration 4 --watchdog
    ```
 
 3. **Launch script arguments**:

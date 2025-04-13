@@ -6,7 +6,7 @@ import random
 import sys
 from abc import ABC, abstractmethod
 from itertools import islice
-from typing import Any, Callable, Dict, List, Optional, Type
+from typing import Any, Callable, Dict, List, Optional, Type, Union
 
 import lm_eval.models as lm_eval_models
 import numpy as np
@@ -19,8 +19,9 @@ from lm_eval.api.model import LM
 class BaseBenchmark(ABC):
     """Abstract base class for implementing LLM evaluation benchmarks."""
 
-    def __init__(self, logger: Optional[logging.Logger] = None):
+    def __init__(self, logger: Optional[logging.Logger] = None, system_instruction: Optional[str] = None):
         self.logger = logger or logging.getLogger(self.__class__.__name__)
+        self.system_instruction = system_instruction
 
     def _normalize_model_args(self, model: LM, instances: List[Instance]) -> List[Instance]:
         for instance in instances:
@@ -56,6 +57,26 @@ class BaseBenchmark(ABC):
                 else:  # Huggingface does not support seed
                     instance.args[1]["max_new_tokens"] = max_new_tokens
         return instances
+
+    def _prepare_messages(
+        self, messages: List[Dict[str, str]], model: Optional[LM] = None
+    ) -> Union[List[Dict[str, str]], str]:
+        """Prepare messages with system instruction if available and apply chat template if model is provided.
+
+        Args:
+            messages: List of message dictionaries
+            model: Optional language model instance for applying chat template
+
+        Returns:
+            If model is provided, returns the templated string. Otherwise returns the prepared message list.
+        """
+        if self.system_instruction:
+            messages.insert(0, {"role": "system", "content": self.system_instruction})
+
+        if model is not None:
+            return model.apply_chat_template(messages)
+
+        return messages
 
     def compute(self, model: LM, inputs: List[Instance], do_slice: bool = True) -> List[str]:
         inputs = self._normalize_model_args(model, inputs)
@@ -217,6 +238,10 @@ class TaskManager:
                 if param_name in self.benchmark_kwargs:
                     valid_kwargs[param_name] = self.benchmark_kwargs[param_name]
                     self.logger.debug(f"Passing {param_name} to {name} benchmark")
+
+            # Ensure system_instruction is passed if available
+            if "system_instruction" in self.benchmark_kwargs:
+                valid_kwargs["system_instruction"] = self.benchmark_kwargs["system_instruction"]
 
             instance = benchmark_class(**valid_kwargs)
 

@@ -66,7 +66,7 @@ Before running full distributed evaluations, test the setup:
 
 ```bash
 # Test the basic installation with a simple task
-OPENAI_API_KEY=NONE python -m eval.eval --model upload_to_hf --tasks AIME25 --model_args repo_id=mlfoundations-dev/AIME25_evalchemy
+python -m eval.eval --model upload_to_hf --tasks AIME24 --model_args repo_id=mlfoundations-dev/evalset_2870
 
 # Test the launcher with minimal configuration
 python eval/distributed/launch.py --model_name open-thoughts/OpenThinker-7B --tasks AIME24 --num_shards 1 --watchdog

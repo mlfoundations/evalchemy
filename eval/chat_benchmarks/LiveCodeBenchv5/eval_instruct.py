@@ -30,9 +30,9 @@ def calc_stats(values):
     return mean, stderr
 
 
-class LiveCodeBenchBenchmark(BaseBenchmark):
+class LiveCodeBenchV5Benchmark(BaseBenchmark):
     """
-    LiveCodeBench Benchmark for evaluating the math reasoning of LLMs.
+    LiveCodeBench v5 - v2 Benchmark for evaluating the math reasoning of LLMs.
 
     Follows the evaluation logic of hendrycks_math answer extraction.
     """
@@ -45,7 +45,7 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
         system_instruction: Optional[str] = None,
     ):
         """
-        Initialize LiveCodeBench benchmark.
+        Initialize LiveCodeBenchV5 benchmark.
 
         Args:
             debug: If set, only evaluate on 2 examples
@@ -113,7 +113,7 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
                 all_instances.append(instance)
 
             # Generate model responses
-            self.logger.info("Generating responses for LiveCodeBench...")
+            self.logger.info("Generating responses for LiveCodeBenchiV5...")
             outputs = self.compute(model, all_instances)
             all_outputs.append(outputs)
 
@@ -336,11 +336,11 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
         return final_metrics
 
     def load_questions(self) -> Dataset:
-        """Load LiveCodeBench questions from source."""
-        self.logger.info("Loading LiveCodeBench questions from source and converting to dataset...")
+        """Load LiveCodeBenchV5 questions from source."""
+        self.logger.info("Loading LiveCodeBenchV5 questions from source and converting to dataset...")
         cpu_count = os.cpu_count()
         ds = load_dataset(
-            "livecodebench/code_generation_lite", version_tag="release_v2", split="test", trust_remote_code=True
+            "mlfoundations-dev/LCBv5-v2", split="test", trust_remote_code=True
         )
         # Avoids "pyarrow.lib.ArrowInvalid: offset overflow while concatenating arrays" when mapping
         processed_shards = []

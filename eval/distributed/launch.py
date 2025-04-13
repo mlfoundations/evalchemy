@@ -611,6 +611,7 @@ def main():
     parser.add_argument("--no_sanity", action="store_true", help="Skip environment sanity checks")
     parser.add_argument("--system_instruction", type=str, default=None, help="System instruction for the model")
     parser.add_argument("--tp4", action="store_true", help="Use Tensor Parallelism with 4 GPUs")
+    parser.add_argument("--timestamp", action="store_true", help="Add a timestamp to the output evaluation dataset")
 
     args = parser.parse_args()
 
@@ -633,7 +634,10 @@ def main():
     # Generate timestamp and repository ID for results
     timestamp = str(int(time.time()))
     evaluation_dataset_hash = generate_evaluation_dataset_hash(tasks, args.system_instruction)
-    suffix = f"_{timestamp}_eval_{evaluation_dataset_hash}"
+    if args.timestamp:
+        suffix = f"_{timestamp}_eval_{evaluation_dataset_hash}"
+    else:
+        suffix = f"_eval_{evaluation_dataset_hash}"
     remaining_characters = 96 - len(suffix)
     model_name_short = args.model_name.split("/")[-1][:remaining_characters]
     output_dataset = f"mlfoundations-dev/{model_name_short}{suffix}"

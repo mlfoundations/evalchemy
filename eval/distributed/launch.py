@@ -428,6 +428,9 @@ def monitor_local_job(job_id, logs_dir, num_shards, watchdog_interval_min=1):
     # Determine the log file pattern based on the job ID
     log_file = f"{logs_dir}/{job_id}.out"
     
+    # Make sure there's enough time for jobs to start
+    time.sleep(5)
+
     counter = 0
     try:
         while True:

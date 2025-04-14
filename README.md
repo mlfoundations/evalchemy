@@ -222,4 +222,231 @@ Key features:
 
 Refer to the [distributed README](eval/distributed/README.md) for more details. 
 
-NOTE: This is configured for specific HPC clusters, but can easily be adapted. Furthermore it can be adapted for a non-HPC setup using `CUDA_VISIBLE_DEVICES`
+NOTE: This is configured for specific HPC clusters, but can easily be adapted. Furthermore it can be adapted for a non-HPC setup using `CUDA_VISIBLE_DEVICES` instead of SLURM job arrays. 
+
+
+### Multi-GPU Evaluation 
+
+NOTE: this is slower than doing fully data parallel evaluation (see previous section)
+
+```bash
+accelerate launch --num-processes <num-gpus> --num-machines <num-nodes> \
+    --multi-gpu -m eval.eval \
+    --model hf \
+    --tasks MTBench,alpaca_eval \
+    --model_args 'pretrained=mistralai/Mistral-7B-Instruct-v0.3' \
+    --batch_size 2 \
+    --output_path logs
+```
+
+### Large Model Evaluation
+
+For models that don't fit on a single GPU, use model parallelism:
+
+```bash
+python -m eval.eval \
+    --model hf \
+    --tasks MTBench,alpaca_eval \
+    --model_args 'pretrained=mistralai/Mistral-7B-Instruct-v0.3,parallelize=True' \
+    --batch_size 2 \
+    --output_path logs
+```
+
+> **💡 Note**: While "auto" batch size is supported, we recommend manually tuning the batch size for optimal performance. The optimal batch size depends on the model size, GPU memory, and the specific benchmark. We used a maximum of 32 and a minimum of 4 (for RepoBench) to evaluate Llama-3-8B-Instruct on 8xH100 GPUs.
+
+### Output Log Structure
+
+Our generated logs include critical information about each evaluation to help inform your experiments. We highlight important items in our generated logs. 
+
+- Model Configuration
+  - `model`: Model framework used
+  - `model_args`: Model arguments for the model framework
+  - `batch_size`: Size of processing batches
+  - `device`: Computing device specification
+  - `annotator_model`: Model used for annotation ("gpt-4o-mini-2024-07-18")
+- Seed Configuration
+  - `random_seed`: General random seed
+  - `numpy_seed`: NumPy-specific seed
+  - `torch_seed`: PyTorch-specific seed
+  - `fewshot_seed`: Seed for few-shot examples
+- Model Details
+  - `model_num_parameters`: Number of model parameters
+  - `model_dtype`: Model data type
+  - `model_revision`: Model version
+  - `model_sha`: Model commit hash
+
+- Version Control
+  - `git_hash`: Repository commit hash
+  - `date`: Unix timestamp of evaluation
+  - `transformers_version`: Hugging Face Transformers version
+- Tokenizer Configuration
+  - `tokenizer_pad_token`: Padding token details
+  - `tokenizer_eos_token`: End of sequence token
+  - `tokenizer_bos_token`: Beginning of sequence token
+  - `eot_token_id`: End of text token ID
+  - `max_length`: Maximum sequence length
+- Model Settings
+  - `model_source`: Model source platform
+  - `model_name`: Full model identifier
+  - `model_name_sanitized`: Sanitized model name for file system usage
+  - `chat_template`: Conversation template
+  - `chat_template_sha`: Template hash
+- Timing Information
+  - `start_time`: Evaluation start timestamp
+  - `end_time`: Evaluation end timestamp
+  - `total_evaluation_time_seconds`: Total duration
+- Hardware Environment
+  - PyTorch version and build configuration
+  - Operating system details
+  - GPU configuration
+  - CPU specifications
+  - CUDA and driver versions
+  - Relevant library versions
+
+### Customizing Evaluation
+
+#### 🤖 Change Annotator Model
+
+As part of Evalchemy, we want to make swapping in different Language Model Judges for standard benchmarks easy. Currently, we support two judge settings. The first is the default setting, where we use a benchmark's default judge. To activate this, you can either do nothing or pass in
+```bash
+--annotator_model auto
+```
+In addition to the default assignments, we support using gpt-4o-mini-2024-07-18 as a judge:
+
+```bash
+--annotator_model gpt-4o-mini-2024-07-18
+```
+
+We are planning on adding support for different judges in the future!
+
+### ⏱️ Runtime and Cost Analysis
+
+Evalchemy makes running common benchmarks simple, fast, and versatile! We list the speeds and costs for each benchmark we achieve with Evalchemy for Meta-Llama-3-8B-Instruct on 8xH100 GPUs.
+
+| Benchmark | Runtime (8xH100) | Batch Size | Total Tokens | Default Judge Cost ($) | GPT-4o-mini Judge Cost ($) | Notes |
+|-----------|------------------|------------|--------------|----------------|-------------------|--------|
+| MTBench | 14:00 | 32 | ~196K | 6.40 | 0.05 | |
+| WildBench | 38:00 | 32 | ~2.2M | 30.00 | 0.43 | Using GPT-4-mini judge |
+| RepoBench | 46:00 | 4 | - | - | - | Lower batch size due to memory |
+| MixEval | 13:00 | 32 | ~4-6M | 3.36 | 0.76 | Varies by judge model |
+| AlpacaEval | 16:00 | 32 | ~936K | 9.40 | 0.14 | |
+| HumanEval | 4:00 | 32 | - | - | - | No API costs |
+| IFEval | 1:30 | 32 | - | - | - | No API costs |
+| ZeroEval | 1:44:00 | 32 | - | - | - | Longest runtime |
+| MBPP | 6:00 | 32 | - | - | - | No API costs |
+| MMLU | 7:00 | 32 | - | - | - | No API costs |
+| ARC | 4:00 | 32 | - | - | - | No API costs |
+| DROP | 20:00 | 32 | - | - | - | No API costs |
+
+**Notes:**
+- Runtimes measured using 8x H100 GPUs with Meta-Llama-3-8B-Instruct model
+- Batch sizes optimized for memory and speed
+- API costs vary based on judge model choice
+
+**Cost-Saving Tips:**
+- Use gpt-4o-mini-2024-07-18 judge when possible for significant cost savings
+- Adjust batch size based on available memory
+- Consider using data-parallel evaluation for faster results
+
+### 🔐 Special Access Requirements
+
+#### ZeroEval Access
+To run ZeroEval benchmarks, you need to:
+
+1. Request access to the [ZebraLogicBench-private dataset](https://huggingface.co/datasets/allenai/ZebraLogicBench-private) on Hugging Face
+2. Accept the terms and conditions
+3. Log in to your Hugging Face account when running evaluations
+
+## 🛠️ Implementing Custom Evaluations
+
+To add a new evaluation system:
+
+1. Create a new directory under `eval/chat_benchmarks/`
+2. Implement `eval_instruct.py` with two required functions:
+   - `eval_instruct(model)`: Takes an LM Eval Model, returns results dict
+   - `evaluate(results)`: Takes results dictionary, returns evaluation metrics
+
+### Adding External Evaluation Repositories
+
+Use git subtree to manage external evaluation code:
+
+```bash
+# Add external repository
+git subtree add --prefix=eval/chat_benchmarks/new_eval https://github.com/original/repo.git main --squash
+
+# Pull updates
+git subtree pull --prefix=eval/chat_benchmarks/new_eval https://github.com/original/repo.git main --squash
+
+# Push contributions back
+git subtree push --prefix=eval/chat_benchmarks/new_eval https://github.com/original/repo.git contribution-branch
+```
+
+### 🔍 Debug Mode
+
+To run evaluations in debug mode, add the `--debug` flag:
+
+```bash
+python -m eval.eval \
+    --model hf \
+    --tasks MTBench \
+    --model_args "pretrained=mistralai/Mistral-7B-Instruct-v0.3" \
+    --batch_size 2 \
+    --output_path logs \
+    --debug
+```
+
+This is particularly useful when testing new evaluation implementations, debugging model configurations, verifying dataset access, and testing database connectivity.
+
+### 🚀 Performance Tips
+
+1. Utilize batch processing for faster evaluation:
+```python
+all_instances.append(
+    Instance(
+        "generate_until",
+        example,
+        (
+            inputs,
+            {
+                "max_new_tokens": 1024,
+                "do_sample": False,
+            },
+        ),
+        idx,
+    )
+)
+
+outputs = self.compute(model, all_instances)
+```
+
+2. Use the LM-eval logger for consistent logging across evaluations
+
+### 🔧 Troubleshooting
+Evalchemy has been tested on CUDA 12.4. If you run into issues like this: `undefined symbol: __nvJitLinkComplete_12_4, version libnvJitLink.so.12`, try updating your CUDA version:
+```bash
+wget https://developer.download.nvidia.com/compute/cuda/repos/debian11/x86_64/cuda-keyring_1.1-1_all.deb
+sudo dpkg -i cuda-keyring_1.1-1_all.deb
+sudo add-apt-repository contrib
+sudo apt-get update
+sudo apt-get -y install cuda-toolkit-12-4
+```
+
+## 🏆 Leaderboard Integration
+To track experiments and evaluations, we support logging results to a PostgreSQL database. Details on the entry schemas and database setup can be found in [`database/`](database/).
+
+
+## Contributing
+Thank you to all the contributors for making this project possible!
+Please follow [these instructions](CONTRIBUTING.md) on how to contribute.
+
+## Citation
+If you find Evalchemy useful, please consider citing us!
+
+```
+@software{Evalchemy: Automatic evals for LLMs,
+  author = {Guha, Etash and Raoof, Negin and Mercat, Jean and Marten, Ryan and Frankel, Eric and Keh, Sedrick and Grover, Sachin and Smyrnis, George and Vu, Trung and Saad-Falcon, Jon and Choi, Caroline and Arora, Kushal and Merrill, Mike and Deng, Yichuan and Suvarna, Ashima and Bansal, Hritik and Nezhurina, Marianna and Choi, Yejin and Heckel, Reinhard and Oh, Seewong and Hashimoto, Tatsunori and Jitsev, Jenia and Shankar, Vaishaal and Dimakis, Alex and Sathiamoorthy, Mahesh and Schmidt, Ludwig},
+  month = nov,
+  title = {{Evalchemy}},
+  year = {2024}
+}
+```

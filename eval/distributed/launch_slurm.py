@@ -159,6 +159,9 @@ def launch_sbatch(
     else:
         raise ValueError(f"Unknown hostname: {hostname}, can't determine which sbatch script to use")
 
+    if tp4:
+        sbatch_script = sbatch_script.replace(".sbatch", "_tp4.sbatch")
+
     # Create a temporary sbatch script with the correct parameters
     temp_sbatch_file = os.path.join(logs_dir, "job.sbatch")
     with open(sbatch_script, "r") as f:
@@ -304,6 +307,7 @@ def main():
     )
     parser.add_argument("--system_instruction", type=str, default=None, help="System instruction for the model")
     parser.add_argument("--timestamp", action="store_true", help="Add a timestamp to the output evaluation dataset")
+    parser.add_argument("--tp4", action="store_true", help="Use TP4")
     args = parser.parse_args()
 
     # Load environment variables from .env file
@@ -341,7 +345,7 @@ def main():
     model_path = download_model(args.model_name)
 
     # Launch sbatch job with the dataset repo but save to output repo
-    job_id = launch_sbatch(
+    launch_sbatch(
         model_path,
         dataset_path,
         output_dataset_dir,
@@ -350,20 +354,6 @@ def main():
         args.max_job_duration,
         args.tp4,
     )
-
-    # If watchdog flag is not set, exit
-    if not args.watchdog:
-        print("Watchdog mode not enabled. Exiting.")
-        exit(0)
-
-    # Monitor job
-    print("Watchdog mode enabled. Monitoring job progress...")
-    monitor_job(job_id, logs_dir, args.num_shards)
-
-    # Check completion
-    if not check_job_completion(job_id, output_dataset_dir):
-        print("Some jobs failed.")
-        exit(1)
 
     # Upload shards
     upload_shards_to_hub(output_dataset_dir, output_dataset)

@@ -2,10 +2,8 @@
 #SBATCH --array=0
 #SBATCH --nodes=1            
 #SBATCH --ntasks-per-node 1         
-#SBATCH --time=01:00:00        
-#SBATCH --cpus-per-task=8 
-#SBATCH --account=EUHPC_E03_068
-#SBATCH --partition=boost_usr_prod
+#SBATCH --time=01:00:00     
+#SBATCH --cpus-per-task=72
 #SBATCH -p gh
 #SBATCH --job-name=process_shards
 #SBATCH --exclude=c610-021,c611-011

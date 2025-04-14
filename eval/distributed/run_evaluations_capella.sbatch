@@ -1,18 +1,16 @@
 #!/bin/bash
-#SBATCH --nodes=1            
-#SBATCH --ntasks-per-node=1         
-#SBATCH --time=01:00:00        
-#SBATCH --cpus-per-task=144
-#SBATCH -p gg
-#SBATCH --job-name=run_evaluations
-#SBATCH --account CCR24067
-
-# MODULES
-module load cuda/12.4 nccl/12.4
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --time=01:00:00
+#SBATCH --mem=512G
+#SBATCH --cpus-per-task=32
+#SBATCH --account=p_finetuning
 
 # CONDA
-export PATH="/work/08134/negin/anaconda3/condabin/:$PATH"
-source /work/08134/negin/anaconda3/etc/profile.d/conda.sh
+export DCFT=/data/horse/ws/ryma833h-DCFT_Shared
+export EVALCHEMY=/data/horse/ws/ryma833h-DCFT_Shared/evalchemy/
+export PATH="$DCFT/miniconda3/condabin:$PATH"
+source $DCFT/miniconda3/etc/profile.d/conda.sh
 conda activate evalchemy
 
 # EVAL SCORING COMMAND

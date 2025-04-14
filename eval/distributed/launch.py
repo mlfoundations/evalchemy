@@ -242,11 +242,9 @@ def download_dataset(dataset_name):
         sys.exit(1)
 
 
-def launch_eval_sbatch(cmd, logs_dir):
+def launch_eval_sbatch(cmd, logs_dir, sbatch_script):
     """Launch the sbatch job for evaluation step."""
     print_header("Launching SBATCH Job")
-
-    sbatch_script = "eval/distributed/run_evaluations_tacc.sbatch" 
     # Create a temporary sbatch script with the correct parameters
     temp_sbatch_file = os.path.join(logs_dir, "job.sbatch")
     with open(sbatch_script, "r") as f:
@@ -283,6 +281,7 @@ def launch_eval_sbatch(cmd, logs_dir):
     print_info(f"[View logs] tail {logs_dir}/{job_id}_*.out")
 
     return job_id
+
 
 def launch_sbatch(
     model_path,
@@ -614,7 +613,7 @@ def upload_shards_to_hub(output_dir, output_repo_id):
     return True
 
 
-def compute_and_upload_scores(tasks, output_repo_id, model_name, logs_dir):
+def compute_and_upload_scores(tasks, output_repo_id, model_name, logs_dir, on_login):
     """Compute and upload scores."""
     print_header("Computing and Uploading Scores")
     if "LiveCodeBench" in tasks:
@@ -627,9 +626,13 @@ def compute_and_upload_scores(tasks, output_repo_id, model_name, logs_dir):
     hostname_cmd = "echo $HOSTNAME"
     hostname, _, _ = execute_command(hostname_cmd, verbose=False)
     print_info(f"Using $HOSTNAME: {hostname} to determine cluster environment.")
-    if "tacc" in hostname:
-        print_info("Detected TACC environment. Computing scores on TACC.")
-        job_id = launch_eval_sbatch(cmd, logs_dir)
+    if not on_login and ("tacc" in hostname or "c1" in hostname or "c2" in hostname):
+        if "tacc" in hostname:
+            sbatch_script = "eval/distributed/run_evaluations_tacc.sbatch"
+        elif "c1" in hostname or "c2" in hostname:
+            sbatch_script = "eval/distributed/run_evaluations_capella.sbatch"
+        print_info("Computing scores on node")
+        job_id = launch_eval_sbatch(cmd, logs_dir, sbatch_script)
         if not job_id:
             return False
 
@@ -641,6 +644,7 @@ def compute_and_upload_scores(tasks, output_repo_id, model_name, logs_dir):
             print_error("Some jobs failed. Failed to compute and upload scores.")
             return False
     else:
+        print_info("Computing scores on login node")
         stdout, stderr, return_code = execute_command(cmd)
 
         if return_code != 0:
@@ -672,6 +676,7 @@ def main():
     parser.add_argument("--system_instruction", type=str, default=None, help="System instruction for the model")
     parser.add_argument("--tp4", action="store_true", help="Use Tensor Parallelism with 4 GPUs")
     parser.add_argument("--timestamp", action="store_true", help="Add a timestamp to the output evaluation dataset")
+    parser.add_argument("--on_login", action="store_true", help="Run on login node instead of sbatch job")
 
     args = parser.parse_args()
 
@@ -753,7 +758,7 @@ def main():
     upload_shards_to_hub(output_dataset_dir, output_dataset)
 
     # Compute and upload scores
-    if compute_and_upload_scores(tasks, output_dataset, args.model_name, logs_dir):
+    if compute_and_upload_scores(tasks, output_dataset, args.model_name, logs_dir, on_login=args.on_login):
         print_success(f"Evaluation completed successfully. Results uploaded to {output_dataset}")
         print_info(f"View the results at: https://huggingface.co/datasets/{output_dataset}")
     else:

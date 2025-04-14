@@ -240,26 +240,14 @@ def compute_and_upload_scores(tasks, output_repo_id, model_name, logs_dir, on_lo
     hostname_cmd = "echo $HOSTNAME"
     hostname, _, _ = execute_command(hostname_cmd, verbose=False)
     print(f"Using $HOSTNAME: {hostname} to determine cluster environment.")
-    if not on_login and ("tacc" in hostname or "c1" in hostname or "c2" in hostname):
-        if "tacc" in hostname:
-            sbatch_script = "eval/distributed/run_evaluations_tacc.sbatch"
-        elif "c1" in hostname or "c2" in hostname:
-            sbatch_script = "eval/distributed/run_evaluations_capella.sbatch"
-        print("Computing scores on node")
-        job_id = launch_cpu_sbatch(cmd, logs_dir, sbatch_script)
-        if not job_id:
-            return False
-
-        print("Watchdog mode enabled. Monitoring job progress...")
-        monitor_job(job_id, logs_dir, 1)
-
-        # Check completion
-        if not check_job_completion(job_id):
-            print("Some jobs failed. Failed to compute and upload scores.")
-            return False
-    else:
-        print("Computing scores on login node")
-        execute_command(cmd)
+    if "tacc" in hostname:
+        sbatch_script = "eval/distributed/run_evaluations_tacc.sbatch"
+    elif "c1" in hostname or "c2" in hostname:
+        sbatch_script = "eval/distributed/run_evaluations_capella.sbatch"
+    print("Computing scores on node")
+    job_id = launch_cpu_sbatch(cmd, logs_dir, sbatch_script)
+    if not job_id:
+        return False
 
     print("Scores computed and uploaded successfully.")
     return True

@@ -26,62 +26,111 @@ class CuratorAPIModel(TemplateLM):
         max_tokens_per_minute: int = None,
         seconds_to_pause_on_rate_limit: int = None,
         batch: bool = False,
+        temperature: float = 0.0,
+        top_p: float = 0.95,
         **kwargs,
     ):
         super().__init__()
 
+        if tokenized_requests:
+            raise NotImplementedError("Tokenized requests not implemented for curator.")
+        self.tokenized_requests = False
+
         self.model_name = model or pretrained
+        self.max_length = max_length
+        self.is_batch_request = batch
+        self._configure_params(
+            max_length=max_length,
+            max_retries=max_retries,
+            timeout=timeout,
+            max_requests_per_minute=max_requests_per_minute,
+            max_tokens_per_minute=max_tokens_per_minute,
+            seconds_to_pause_on_rate_limit=seconds_to_pause_on_rate_limit,
+            temperature=temperature,
+            top_p=top_p,
+            **kwargs,
+        )
 
-        self.model_args = kwargs
+        self.llm = None # Initialize lazily
+        self.eos = None # Will be set during LLM initialization if needed
 
-        self.gen_kwargs = {"batch": batch}
-        if "gemini" in self.model_name and "thinking" in self.model_name:
-            max_requests_per_minute = max_requests_per_minute or 200
-            max_tokens_per_minute = max_tokens_per_minute or 400_000
-        elif "gemini" in self.model_name:
-            max_requests_per_minute = max_requests_per_minute or 2000
-            max_tokens_per_minute = max_tokens_per_minute or 4_000_000
+        # Disable cache since it is not necessary
+        os.environ["CURATOR_DISABLE_CACHE"] = "true"
+
+    def _configure_params(
+        self,
+        max_length: int,
+        max_retries: int,
+        timeout: int,
+        max_requests_per_minute: Optional[int],
+        max_tokens_per_minute: Optional[int],
+        seconds_to_pause_on_rate_limit: Optional[int],
+        temperature: float,
+        top_p: float,
+        **kwargs,
+    ):
+        """Sets up gen_kwargs and backend_params based on model name and init args."""
+        self.gen_kwargs = {
+            "max_completion_tokens": max_length,
+            "temperature": temperature,
+            "top_p": top_p,
+            "stop": None, # Will be set later if needed based on request
+        }
+        self.backend_params = {
+            "invalid_finish_reasons": ["content_filter"],
+            "require_all_responses": False,
+            "request_timeout": timeout,
+            "max_retries": max_retries,
+        }
+        self.additional_llm_args = {} # For args passed directly to curator.LLM constructor
+
+        # Model-specific adjustments
+        is_thinking_model = "thinking" in self.model_name
+
+        if "gemini" in self.model_name:
+            if is_thinking_model:
+                max_requests_per_minute = max_requests_per_minute or 200
+                max_tokens_per_minute = max_tokens_per_minute or 400_000
+            else:
+                max_requests_per_minute = max_requests_per_minute or 2000
+                max_tokens_per_minute = max_tokens_per_minute or 4_000_000
         elif "claude" in self.model_name:
             max_requests_per_minute = max_requests_per_minute or 2000
             max_tokens_per_minute = max_tokens_per_minute or 80_000
-            if "thinking" in self.model_name:
-                self.gen_kwargs["thinking"] = {"type": "enabled", "budget_tokens": max_length - 4096}
+            # Claude uses 'max_tokens' instead of 'max_completion_tokens'
+            self.gen_kwargs["max_tokens"] = self.gen_kwargs.pop("max_completion_tokens")
+            self.gen_kwargs.pop("stop", None) # Claude doesn't support stop sequences via API arg
+
+            if is_thinking_model:
+                # Adjust name and set thinking params
                 self.model_name = (
                     self.model_name.replace("-thinking-", "")
                     .replace("-thinking", "")
                     .replace("thinking-", "")
                     .replace("thinking", "")
                 )
+                # Thinking budget calculation depends on final max_tokens
+                thinking_budget = self.gen_kwargs["max_tokens"] - 4096
+                self.gen_kwargs["thinking"] = {"type": "enabled", "budget_tokens": thinking_budget}
+                # API requirements for thinking mode
+                self.gen_kwargs["temperature"] = 1.0
+                self.gen_kwargs.pop("top_p", None)
+        elif "deepseek" in self.model_name:
+            self.additional_llm_args["backend"] = "openai"
+            self.backend_params["base_url"] = "https://api.deepseek.com/"
+            self.backend_params["api_key"] = os.environ["DEEPSEEK_API_KEY"]
+            max_requests_per_minute = 2_500 # Override rate limits
+            max_tokens_per_minute = 1_000_000_000
+            self.gen_kwargs["temperature"] = 0 # Override temperature
+        elif "o1" in self.model_name or "o3" in self.model_name:
+             # o1/o3 don't support these
+            print(f"Warning: Model {self.model_name} does not support top_p, stop, or temperature. Ignoring them.")
+            self.gen_kwargs.pop("top_p", None)
+            self.gen_kwargs.pop("stop", None)
+            self.gen_kwargs.pop("temperature", None)
 
-        self.model_args.update(
-            {
-                "model": self.model_name,
-                "pretrained": pretrained,
-                "max_length": max_length,
-                "max_retries": max_retries,
-                "timeout": timeout,
-                "tokenized_requests": tokenized_requests,
-            }
-        )
 
-        if tokenized_requests:
-            raise NotImplementedError("Tokenized requests not implemented for curator.")
-        self.tokenized_requests = False
-        self.max_length = max_length
-        self.llm = None
-        self.eos = None
-        if "temperature" in kwargs:
-            self.gen_kwargs["temperature"] = kwargs["temperature"]
-        if "top_p" in kwargs:
-            self.gen_kwargs["top_p"] = kwargs["top_p"]
-        self.backend_params = {
-            "invalid_finish_reasons": [
-                "content_filter"
-            ],  # So it doesn't retry on `length` finish reason, but retries on "content_filter"}
-            "require_all_responses": False,
-            "request_timeout": timeout,
-            "max_retries": max_retries,
-        }
+        # Apply rate limits if provided and not overridden by model specifics
         if max_requests_per_minute is not None:
             self.backend_params["max_requests_per_minute"] = max_requests_per_minute
         if max_tokens_per_minute is not None:
@@ -89,91 +138,64 @@ class CuratorAPIModel(TemplateLM):
         if seconds_to_pause_on_rate_limit is not None:
             self.backend_params["seconds_to_pause_on_rate_limit"] = seconds_to_pause_on_rate_limit
 
-        # Disable cache since it is not necessary
-        os.environ["CURATOR_DISABLE_CACHE"] = "true"
+        # Handle batch mode specifics
+        if self.is_batch_request:
+            # Rate limiting params are incompatible with batch requests in curator
+            self.backend_params = {"require_all_responses": True}
+            self.additional_llm_args["batch"] = True
 
-    def _create_payload(
-        self,
-        messages: Union[List[List[int]], List[dict], List[str], str],
-        *,
-        generate: bool = False,
-        gen_kwargs: Optional[dict] = None,
-        eos=None,
-        **kwargs,
-    ) -> dict:
-        assert generate, "Curator only supports generation."
-        # Create the payload for the API request
-        max_tokens = self.max_length or gen_kwargs.get("max_gen_toks", self.max_length)
-        temperature = self.gen_kwargs.get("temperature", gen_kwargs.get("temperature", 0))
-        top_p = self.gen_kwargs.get("top_p", gen_kwargs.get("top_p", 0.95))
-        stop = handle_stop_sequences(gen_kwargs.get("until", None), eos)
-        gen_kwargs = {
-            "max_completion_tokens": max_tokens,
-            "temperature": temperature,
-            "top_p": top_p,
-            "stop": stop,
-        }
-        additional_args = {}
-        backend_params = self.backend_params.copy()
-        if self.gen_kwargs.get("batch", False):
-            # backend_params for rate limiting are not compatible with batch requests
-            backend_params = {"require_all_responses": True}
-            additional_args["batch"] = True
-        if "deepseek" in self.model_name:
-            additional_args["backend"] = "openai"
-            backend_params["max_requests_per_minute"] = 2_500
-            backend_params["max_tokens_per_minute"] = 1_000_000_000
-            backend_params["base_url"] = "https://api.deepseek.com/"
-            backend_params["api_key"] = os.environ["DEEPSEEK_API_KEY"]
-            gen_kwargs["temperature"] = 0
-        if "o1" or "o3" in self.model_name:
-            print("Warning: O1 model does not support top_p, stop, or temperature. Ignoring them.")
-            gen_kwargs.pop("top_p", None)
-            gen_kwargs.pop("stop", None)
-            gen_kwargs.pop("temperature", None)
-        if "claude" in self.model_name:
-            gen_kwargs.pop("max_completion_tokens", None)
-            gen_kwargs.pop("stop", None)
-            gen_kwargs["max_tokens"] = max_tokens
-            if "thinking" in self.gen_kwargs:
-                gen_kwargs["thinking"] = self.gen_kwargs["thinking"]
-                gen_kwargs["thinking"]["budget_tokens"] = max_tokens - 4096
-                # `temperature` may only be set to 1 when thinking is enabled.
-                # Please consult our documentation at https://docs.anthropic.com/en/docs/build-with-claude/extended-thinking#important-considerations-when-using-extended-thinking'
-                gen_kwargs["temperature"] = 1
-                # `top_p` must be unset when thinking is enabled. (same documentation)
-                gen_kwargs.pop("top_p", None)
+
+    def _ensure_llm_initialized(self, eos=None):
+        """Initializes the curator.LLM object if it hasn't been already."""
         if self.llm is None:
-            self.eos = eos
-            self.gen_kwargs = gen_kwargs.copy()
+            # Update stop sequences based on the current request if needed
+            # This assumes EOS is consistent for the lifetime of the model instance
+            if eos and self.gen_kwargs.get("stop") is None:
+                 self.eos = eos # Store for potential future reference if needed
+                 # Handle potential list of stop sequences
+                 stop_sequences = handle_stop_sequences(None, eos) # Pass current eos
+                 # Only update if stop sequences are actually needed and supported
+                 if stop_sequences and "stop" in self.gen_kwargs:
+                     self.gen_kwargs["stop"] = stop_sequences
+                 elif stop_sequences and "max_tokens" in self.gen_kwargs and "claude" not in self.model_name:
+                     # Only warn if stop sequences were provided but the param doesn't exist
+                     # (like for Claude, which was handled in _configure_params)
+                     print(f"Warning: Stop sequences provided but 'stop' generation parameter is not available for {self.model_name}.")
+
+
+            print(f"Initializing curator.LLM with: model_name='{self.model_name}', generation_params={self.gen_kwargs}, backend_params={self.backend_params}, additional_args={self.additional_llm_args}")
             self.llm = curator.LLM(
                 model_name=self.model_name,
-                generation_params=gen_kwargs,
-                backend_params=backend_params,
-                **additional_args,
+                generation_params=self.gen_kwargs,
+                backend_params=self.backend_params,
+                **self.additional_llm_args,
             )
-        else:
-            if self.gen_kwargs != gen_kwargs:
-                print(
-                    "Recreating curator LLM with new generation parameters, make sure this doesn't happen at every request"
-                )
-                self.gen_kwargs = gen_kwargs.copy()
-                self.llm = curator.LLM(
-                    model_name=self.model_name,
-                    generation_params=gen_kwargs,
-                    backend_params=backend_params,
-                    **additional_args,
-                )
-        return messages
 
     def create_message(
-        self, messages: Union[List[List[int]], List[str], List[JsonChatStr]], generate=False
-    ) -> Union[List[List[int]], List[dict], List[str], str]:
-        # Convert messages to the format expected by the API
+        self, messages: Union[List[List[int]], List[str], List[JsonChatStr]], generate=False # generate arg seems unused now
+    ) -> List[dict]: # Always return the list of dicts format curator expects
+        """Converts various message formats into the list of dicts format for curator."""
         if isinstance(messages, list) and all(isinstance(m, JsonChatStr) for m in messages):
-            return [json.loads(m.prompt) for m in messages]
+            # Directly parse the JSON string stored in JsonChatStr
+            try:
+                return [json.loads(m.prompt) for m in messages]
+            except json.JSONDecodeError as e:
+                 raise ValueError(f"Failed to parse JSON from JsonChatStr: {e}. Content: {[m.prompt for m in messages]}")
+            except Exception as e:
+                 raise ValueError(f"Error processing JsonChatStr messages: {e}")
+        elif isinstance(messages, list) and all(isinstance(m, dict) for m in messages):
+             # If it's already in the correct list-of-dicts format
+             return messages
+        elif isinstance(messages, list) and all(isinstance(m, str) for m in messages):
+             # Handle simple list of strings if needed (e.g., for non-chat models, although curator usually expects dicts)
+             # This might need adjustment depending on how non-chat prompts are formatted.
+             # Assuming a simple conversion for now.
+             print("Warning: Converting list of strings to basic 'user' messages. Verify format.")
+             return [{"role": "user", "content": m} for m in messages]
         else:
-            raise ValueError("Messages must be a list of JsonChatStr objects")
+            # Add more specific checks or raise error for unsupported formats
+            raise ValueError(f"Unsupported messages format: {type(messages)}. Expected List[JsonChatStr], List[dict], or List[str].")
+
 
     @staticmethod
     def parse_logprobs(
@@ -192,20 +214,49 @@ class CuratorAPIModel(TemplateLM):
     @staticmethod
     def parse_generations(outputs: Union[Any, List[Any]], **kwargs) -> List[str]:
         # Parse the generated outputs from the API
-        return [output["response"] for output in outputs]
+        # Assuming outputs is the direct list of response dicts from curator
+        if isinstance(outputs, list) and all(isinstance(item, dict) for item in outputs):
+             return [output.get("response", "") for output in outputs] # Use .get for safety
+        else:
+             # Handle unexpected output format
+             print(f"Warning: Unexpected output format in parse_generations: {type(outputs)}. Expected List[dict].")
+             return []
+
 
     @property
     def tokenizer_name(self) -> str:
         return self.model_name
 
     def apply_chat_template(self, chat_history: List[Dict[str, str]]) -> Union[str, JsonChatStr]:
-        # Convert chat history to the required format
+        # Convert chat history to the required JsonChatStr format
         return JsonChatStr(json.dumps(chat_history))
 
     def model_call(self, messages: Union[List[List[int]], List[str], List[JsonChatStr]], **kwargs) -> Optional[dict]:
-        payload = self._create_payload(self.create_message(messages), **kwargs)
-        response = self.llm(payload)["response"]
-        return response
+         # Deprecated or needs rework? generate_until is the primary method used by lm-eval harness.
+         # This method seems designed for single requests, while generate_until handles batches.
+         # If needed, it should also use _ensure_llm_initialized and create_message.
+        print("Warning: model_call is likely deprecated for lm-eval tasks. Use generate_until.")
+        self._ensure_llm_initialized() # Make sure LLM is ready
+        # Ensure messages is a list, as curator expects a list of prompts
+        if not isinstance(messages, list):
+             messages = [messages]
+
+        formatted_messages = self.create_message(messages)
+        # Assuming model_call handles a single prompt, curator expects a list
+        if not formatted_messages:
+             return None # Or raise error
+
+        # Curator returns a dictionary with a 'response' key containing a list of outputs
+        response_data = self.llm(formatted_messages)
+
+        # Extract the actual response content for the single prompt
+        if response_data and "response" in response_data and isinstance(response_data["response"], list) and len(response_data["response"]) > 0:
+             # Return the first response dictionary (or just the text?)
+             return response_data["response"][0] # Returning the dict like {'response': 'text'}
+        else:
+             print(f"Warning: Unexpected response structure from curator in model_call: {response_data}")
+             return None
+
 
     def _loglikelihood_tokens(self, requests, **kwargs) -> List[Tuple[float, bool]]:
         raise NotImplementedError("Log likelihood tokens not implemented for curator.")
@@ -220,27 +271,61 @@ class CuratorAPIModel(TemplateLM):
 
     @property
     def eot_token_id(self) -> Optional[int]:
-        # Assuming the model has a specific end-of-text token ID
-        return self.llm.eot_token_id  # Replace with actual method to get EOT token ID
+        # Curator doesn't directly expose tokenizer or token IDs.
+        # Need to rely on underlying model specifics if absolutely necessary,
+        # but lm-eval generally handles this via stop sequences.
+        print("Warning: eot_token_id is not directly available via Curator API.")
+        return None # Cannot reliably get this from curator
 
     def generate_until(self, requests: List[Instance], disable_tqdm: bool = False) -> List[str]:
-        # Tokenize contexts if required
-        if self.tokenized_requests:
-            raise NotImplementedError("Tokenized requests not implemented for curator.")
+        if not requests:
+            return []
 
-        # Extract contexts and generation kwargs from the Instance objects
+        # Ensure LLM is initialized, passing eos from the first request's gen_kwargs
+        # Assumes eos is consistent across the batch, which is reasonable for lm-eval.
+        first_req_kwargs = requests[0].args[1] if len(requests[0].args) > 1 else {}
+        self._ensure_llm_initialized(eos=first_req_kwargs.get("until"))
+
+        # Extract contexts (already in JsonChatStr format expected by create_message)
         contexts = [req.args[0] for req in requests]
-        gen_kwargs = [req.args[1] for req in requests]
 
-        # Assert all gen_kwargs are the same
-        assert all(
-            gen_kwargs[0] == gkw for gkw in gen_kwargs
-        ), "Generation parameters must be the same for all requests in curator"
+        # Validate generation kwargs consistency (already done partially in lm-eval harness)
+        # We rely on the __init__ configuration for gen_kwargs now.
+        # We could add an assertion here to double-check if request-specific kwargs match self.gen_kwargs if needed.
+        # For now, we assume the instance's configuration is the source of truth.
+        # Example check (optional):
+        # for req in requests:
+        #     req_kwargs = req.args[1]
+        #     # Compare relevant keys, skipping 'until' as it's handled separately for eos
+        #     if req_kwargs.get('temperature', self.gen_kwargs.get('temperature')) != self.gen_kwargs.get('temperature') or \
+        #        req_kwargs.get('top_p', self.gen_kwargs.get('top_p')) != self.gen_kwargs.get('top_p') # Add other relevant keys
+        #        # raise ValueError("Request generation kwargs deviate from initialized model kwargs.")
 
-        contexts_dataset = self.create_message(contexts)
-        payload = self._create_payload(contexts_dataset, generate=True, gen_kwargs=gen_kwargs[0])
-        response = self.llm(payload)["response"]
-        return response
+
+        # Format messages for curator
+        formatted_messages = self.create_message(contexts)
+
+        # Make the call to curator
+        start_time = time.time()
+        response_data = self.llm(formatted_messages)
+        end_time = time.time()
+        print(f"Curator call took {end_time - start_time:.2f} seconds for {len(requests)} requests.")
+
+
+        # Parse the generations
+        # response_data is expected to be like {'response': [{'response': 'text1'}, {'response': 'text2'}, ...]}
+        if response_data and "response" in response_data and isinstance(response_data["response"], list):
+             parsed_generations = self.parse_generations(response_data["response"])
+             # Ensure the number of results matches the number of requests
+             if len(parsed_generations) != len(requests):
+                 print(f"Warning: Mismatch between number of requests ({len(requests)}) and responses ({len(parsed_generations)}). Padding with empty strings.")
+                 # Pad with empty strings to match the expected length
+                 parsed_generations.extend([""] * (len(requests) - len(parsed_generations)))
+             return parsed_generations
+        else:
+             print(f"Error: Unexpected response structure from curator: {response_data}. Returning empty strings.")
+             return [""] * len(requests)
+
 
     def loglikelihood_rolling(self, requests, disable_tqdm: bool = False) -> List[float]:
         raise NotImplementedError("Log likelihood rolling not implemented for curator.")
@@ -253,4 +338,4 @@ class CuratorAPIModel(TemplateLM):
 
     def tok_encode(self, string: str, **kwargs) -> List[int]:
         raise NotImplementedError("Token encoding not implemented for curator.")
-        return self.llm.tokenizer.encode(string)  # Replace with actual method to tokenize
+        # return self.llm.tokenizer.encode(string) # Cannot access tokenizer directly

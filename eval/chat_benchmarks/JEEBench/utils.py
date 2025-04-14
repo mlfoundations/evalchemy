@@ -49,6 +49,8 @@ def compute_score(gold, resp, question_type):
     """
     from https://github.com/dair-iitd/jeebench/blob/main/compute_metrics.py
     """
+    if resp is None:
+        return 0
     assert question_type in QUES_TYPES
     if question_type == "MCQ(multiple)":
         gold = set([c for c in ["A", "B", "C", "D"] if c in gold])

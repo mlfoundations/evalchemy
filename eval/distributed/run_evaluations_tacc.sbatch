@@ -14,8 +14,6 @@
 module load cuda/12.4 nccl/12.4
 
 # MAIN DIRECTORIES
-export DCFT="/work/08134/negin/ls6"
-export EVALCHEMY="$DCFT/evalchemy"
 export HF_HUB_CACHE="$SCRATCH/hf_home"
 
 # CONDA

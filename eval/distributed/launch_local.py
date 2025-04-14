@@ -72,13 +72,20 @@ def execute_command(cmd, env=None, verbose=True):
     return stdout.strip(), stderr.strip(), return_code
 
 
-def check_required_env_vars():
+def check_required_env_vars(mode="auto"):
     """Check if required environment variables are set."""
     print_header("Checking Environment Variables")
 
+    # Determine if we're in local mode
+    if mode == "auto":
+        cmd = "echo $HOSTNAME"
+        hostname, _, _ = execute_command(cmd, verbose=False)
+        is_local = not ("c1" in hostname or "leonardo" in hostname)
+    else:
+        is_local = (mode == "local")
+    
     required_vars = ["HF_TOKEN", "DB_PASSWORD", "DB_HOST", "DB_PORT", "DB_NAME", "DB_USER"]
     missing_vars = []
-
     for var in required_vars:
         if os.environ.get(var) is None:
             missing_vars.append(var)
@@ -97,7 +104,13 @@ def check_required_env_vars():
         hf_hub_cache = "/scratch/08134/negin/hf_home/"
         print_info(f"Detected TACC environment, using HF_HUB_CACHE: {hf_hub_cache}")
     else:
-        raise ValueError(f"Unknown hostname: {hostname}, can't determine which HF_HUB_CACHE to use")
+        # Use the default cache location for local environments
+        home_dir = os.path.expanduser("~")
+        hf_hub_cache = os.path.join(home_dir, ".cache/huggingface/hub")
+        print_info(f"No specific cluster detected, using default local HF_HUB_CACHE: {hf_hub_cache}")
+        # Ensure the directory exists
+        os.makedirs(hf_hub_cache, exist_ok=True)
+    
     current_hub_cache = os.environ.get("HF_HUB_CACHE")
     if current_hub_cache is not None and current_hub_cache != hf_hub_cache:
         print_warning(f"Overwriting existing HF_HUB_CACHE value '{current_hub_cache}' with '{hf_hub_cache}'")
@@ -111,30 +124,29 @@ def check_required_env_vars():
         print_info(
             "3. Set them in .env file in evalchemy root (not recommended for sensitive tokens on shared systems)"
         )
-        print_info("")
-        print_info("IMPORTANT: These variables will be automatically passed to worker nodes via SLURM's")
-        print_info("environment propagation (e.g. #SBATCH --export=ALL) which is the default behavior.")
+        if not is_local:
+            print_info("")
+            print_info("IMPORTANT: These variables will be automatically passed to worker nodes via SLURM's")
+            print_info("environment propagation (e.g. #SBATCH --export=ALL) which is the default behavior.")
         return False
 
     print_success("All required environment variables are set.")
     return True
 
 
-def check_conda_env(watchdog=False):
+def check_conda_env(mode="auto", watchdog=False):
     """Check if the conda environment is activated."""
     print_header("Checking Conda Environment")
 
-    # Check if we're already in the evalchemy conda environment
-    # current_env = os.environ.get("CONDA_DEFAULT_ENV")
-    # if current_env == "evalchemy":
-    #     print_success("Already in evalchemy conda environment.")
-    #     return True
+    # Check if we're in local mode
+    if mode == "auto":
+        cmd = "echo $HOSTNAME"
+        hostname, _, _ = execute_command(cmd, verbose=False)
+        is_local = not ("c1" in hostname or "leonardo" in hostname)
+    else:
+        is_local = (mode == "local")
 
-    # we'll check if the environment exists
-    cmd = "readlink -f $(which python)"
-    stdout, _, return_code = execute_command(cmd)
-
-    # Check hostname to determine which HF_HUB_CACHE to use
+    # Check hostname to determine which conda environment we should be in
     cmd = "echo $HOSTNAME"
     hostname, _, _ = execute_command(cmd, verbose=False)
     print_info(f"Using $HOSTNAME: {hostname} to determine which conda environment we should be in")
@@ -151,7 +163,23 @@ def check_conda_env(watchdog=False):
         activate_cmd = "source /work/08134/negin/anaconda3/bin/activate evalchemy"
         print_info(f"Detected TACC environment, checking python path: {python_path}")
     else:
-        raise ValueError(f"Unknown hostname: {hostname}, can't determine which HF_HUB_CACHE to use")
+        # For local environments, we don't enforce a specific Python path
+        print_info(f"Local environment detected, not enforcing specific conda environment")
+        
+        # If watchdog is enabled, just check if Python is accessible
+        if watchdog and is_local:
+            cmd = "which python"
+            stdout, _, return_code = execute_command(cmd)
+            if return_code != 0:
+                print_error("Python not found. Please make sure Python is installed and available in your PATH.")
+                return False
+            print_info(f"Using Python from: {stdout}")
+        
+        return True
+
+    # we'll check if the environment exists
+    cmd = "readlink -f $(which python)"
+    stdout, _, return_code = execute_command(cmd)
 
     if return_code != 0 or stdout != python_path:
         if watchdog:
@@ -242,6 +270,67 @@ def download_dataset(dataset_name):
         sys.exit(1)
 
 
+def launch_local(
+    model_path,
+    dataset_path,
+    output_dataset_dir,
+    num_shards,
+    logs_dir,
+):
+    """Launch local job processing using the local shell script."""
+    print_header("Launching Local Processing Job")
+
+    local_script = "eval/distributed/process_shards_local.sh"
+    print_info("Using process_shards_local.sh for local processing")
+
+    # Create a temporary script file with the correct parameters
+    temp_script_file = os.path.join(logs_dir, "job_local.sh")
+    with open(local_script, "r") as f:
+        script_content = f.read()
+
+    # Replace parameters in the script using regex pattern matching
+    script_content = re.sub(r"export GLOBAL_SIZE=.*", f'export GLOBAL_SIZE={num_shards}', script_content)
+    script_content = re.sub(r"export MODEL_NAME=.*", f'export MODEL_NAME="{model_path}"', script_content)
+    script_content = re.sub(r"export INPUT_DATASET=.*", f'export INPUT_DATASET="{dataset_path}"', script_content)
+    script_content = re.sub(r"export OUTPUT_DATASET=.*", f'export OUTPUT_DATASET="{output_dataset_dir}"', script_content)
+
+    # Update the GPU range in the for loop based on num_shards
+    gpu_range_pattern = r"for RANK in \{.*\}; do"
+    gpu_range = f"for RANK in {{0..{min(num_shards-1, 7)}}}; do"  # Limit to 8 GPUs by default
+    script_content = re.sub(gpu_range_pattern, gpu_range, script_content)
+
+    with open(temp_script_file, "w") as f:
+        f.write(script_content)
+
+    print_success(f"Created temporary script file: {temp_script_file}")
+    os.chmod(temp_script_file, 0o755)  # Make it executable
+
+    # Launch the local job
+    job_id = f"local_{int(time.time())}"
+    log_file = os.path.join(logs_dir, f"{job_id}.out")
+    cmd = f"bash {temp_script_file} > {log_file} 2>&1 &"
+    stdout, stderr, return_code = execute_command(cmd)
+
+    if return_code != 0:
+        print_error(f"Failed to launch local job: {stderr}")
+        return None
+
+    # Get the process ID of the background job
+    cmd = "echo $!"
+    stdout, _, _ = execute_command(cmd)
+    if stdout.strip():
+        process_id = stdout.strip()
+        print_success(f"Local job launched with process ID: {process_id}")
+    else:
+        process_id = "unknown"
+        print_warning("Could not determine process ID for local job")
+
+    print_info(f"Results will be saved locally to {output_dataset_dir}")
+    print_info(f"[View logs] tail -f {log_file}")
+
+    return job_id
+
+
 def launch_eval_sbatch(cmd, logs_dir):
     """Launch the sbatch job for evaluation step."""
     print_header("Launching SBATCH Job")
@@ -320,7 +409,8 @@ def launch_sbatch(
         sbatch_script = "eval/distributed/process_shards_tacc.sbatch"
         print_info("Detected TACC environment, using process_shards_tacc.sbatch")
     else:
-        raise ValueError(f"Unknown hostname: {hostname}, can't determine which sbatch script to use")
+        print_warning(f"Unknown hostname: {hostname}, defaulting to local processing")
+        return launch_local(model_path, dataset_path, output_dataset_dir, num_shards, logs_dir)
 
     # Create a temporary sbatch script with the correct parameters
     temp_sbatch_file = os.path.join(logs_dir, "job.sbatch")
@@ -373,8 +463,66 @@ def launch_sbatch(
     return job_id
 
 
+def monitor_local_job(job_id, logs_dir, num_shards, watchdog_interval_min=1):
+    """Monitor a local job's progress."""
+    print_header("Monitoring Local Job Progress")
+
+    # Determine the log file pattern based on the job ID
+    log_file = f"{logs_dir}/{job_id}.out"
+    
+    # Make sure there's enough time for jobs to start
+    time.sleep(5)
+
+    counter = 0
+    try:
+        while True:
+            # Check if the job is still running by checking for process activity
+            cmd = "ps aux | grep process_shard.py | grep -v grep | wc -l"
+            stdout, _, _ = execute_command(cmd, verbose=False)
+            running_count = int(stdout.strip())
+            
+            # Count various progress indicators
+            progress_metrics = [
+                ("Shards started", f'grep -c "processing shard" {log_file}'),
+                ("Models loading", f'grep -c "Starting to load model" {log_file}'),
+                ("Engines initialized", f'grep -c "init engine" {log_file}'),
+                ("Completed shards", f'grep -c "Shard successfully processed" {log_file}'),
+            ]
+            
+            results = {}
+            for label, cmd in progress_metrics:
+                stdout, _, _ = execute_command(cmd, verbose=False)
+                count = int(stdout.strip()) if stdout.strip().isdigit() else 0
+                results[label] = count
+                
+            print_info(f"({counter*watchdog_interval_min}m) Local Job Status: {results['Completed shards']} completed, {running_count} processes running")
+            
+            for label, count in results.items():
+                percentage = (count / num_shards) * 100
+                print(f"  {label}: {count}/{num_shards} ({percentage:.1f}%)")
+                
+            # Check if all shards are completed
+            if results['Completed shards'] >= num_shards or running_count == 0:
+                if results['Completed shards'] >= num_shards:
+                    print_success("All shards have been processed")
+                else:
+                    print_warning("No processes running but not all shards completed")
+                break
+                
+            # Wait before checking again
+            time.sleep(watchdog_interval_min * 60)
+            counter += 1
+    except KeyboardInterrupt:
+        print_warning("Monitoring interrupted. Job may still be running.")
+        return
+
+
 def monitor_job(job_id, logs_dir, num_shards, watchdog_interval_min=1):
     """Monitor the slurm job and show progress."""
+    # Check if this is a local job
+    if job_id.startswith("local_"):
+        return monitor_local_job(job_id, logs_dir, num_shards, watchdog_interval_min)
+        
     print_header("Monitoring Job Progress")
 
     # Determine the log file pattern based on the job ID
@@ -461,8 +609,46 @@ def monitor_job(job_id, logs_dir, num_shards, watchdog_interval_min=1):
         return
 
 
+def check_local_job_completion(job_id, output_dir=None):
+    """Check if a local job completed successfully."""
+    print_header("Checking Local Job Completion")
+    
+    # Check if the output directory contains parquet files
+    if output_dir:
+        cmd = f"ls -1 {output_dir}/*.parquet 2>/dev/null | wc -l"
+        stdout, _, _ = execute_command(cmd)
+        file_count = int(stdout.strip())
+        print_info(f"Found {file_count} parquet files in {output_dir}")
+        
+        # Check the log file for errors
+        log_file = f"logs/{output_dir.split('/')[-1]}/{job_id}.out"
+        cmd = f"grep -c 'ERROR' {log_file}"
+        stdout, _, _ = execute_command(cmd)
+        error_count = int(stdout.strip()) if stdout.strip().isdigit() else 0
+        
+        if error_count > 0:
+            print_warning(f"Found {error_count} errors in log file")
+            # Show a sample of errors
+            cmd = f"grep 'ERROR' {log_file} | head -5"
+            stdout, _, _ = execute_command(cmd)
+            if stdout.strip():
+                print_warning("Sample errors:")
+                for line in stdout.strip().split("\n"):
+                    print_warning(f"  {line}")
+        
+        # Return true if we have a reasonable number of parquet files
+        # This is a heuristic - adjust based on your needs
+        return file_count > 0
+    
+    return False
+
+
 def check_job_completion(job_id, output_dir=None):
     """Check if all array jobs completed successfully and report detailed status."""
+    # Check if this is a local job
+    if job_id.startswith("local_"):
+        return check_local_job_completion(job_id, output_dir)
+    
     print_header("Checking Job Completion")
 
     # Define job states
@@ -614,14 +800,15 @@ def upload_shards_to_hub(output_dir, output_repo_id):
     return True
 
 
-def compute_and_upload_scores(tasks, output_repo_id, model_name, logs_dir):
+def compute_and_upload_scores(tasks, output_repo_id, model_name, logs_dir, use_database=True):
     """Compute and upload scores."""
     print_header("Computing and Uploading Scores")
     if "LiveCodeBench" in tasks:
         print_warning("LiveCodeBench evaluation takes ~15mins")
 
     tasks_str = ",".join(tasks)
-    cmd = f'python -m eval.eval --model precomputed_hf --model_args "repo_id={output_repo_id}",model="{model_name}" --tasks {tasks_str} --output_path logs --use_database'
+    db_flag = "--use_database" if use_database else ""
+    cmd = f'python -m eval.eval --model precomputed_hf --model_args "repo_id={output_repo_id}",model="{model_name}" --tasks {tasks_str} --output_path logs {db_flag}'
 
     # Check hostname to determine which sbatch script to use
     hostname_cmd = "echo $HOSTNAME"
@@ -668,6 +855,24 @@ def main():
         default=None,
         help="Maximum job duration in hours (default: use sbatch script default)",
     )
+    parser.add_argument(
+        "--mode",
+        type=str,
+        choices=["auto", "slurm", "local"],
+        default="auto",
+        help="Deployment mode: auto (detect), slurm (use sbatch), or local (use shell script)",
+    )
+    parser.add_argument(
+        "--num_gpus",
+        type=int,
+        default=8,
+        help="Number of GPUs to use for local processing (ignored in slurm mode)",
+    )
+    parser.add_argument(
+        "--no-upload",
+        action="store_true",
+        help="Do not upload results to Hugging Face (useful for local testing)",
+    )
     parser.add_argument("--no_sanity", action="store_true", help="Skip environment sanity checks")
     parser.add_argument("--system_instruction", type=str, default=None, help="System instruction for the model")
     parser.add_argument("--tp4", action="store_true", help="Use Tensor Parallelism with 4 GPUs")
@@ -682,6 +887,13 @@ def main():
     tasks = [task.strip() for task in args.tasks.split(",")]
     print_info(f"Tasks to evaluate: {', '.join(tasks)}")
 
+    # Check required environment variables
+    if not check_required_env_vars(args.mode):
+        sys.exit(1)
+
+    # Activate conda environment
+    if not check_conda_env(args.mode, args.watchdog):
+        sys.exit(1)
     if not args.no_sanity:
         # Check required environment variables
         if not check_required_env_vars():
@@ -707,7 +919,7 @@ def main():
     if not input_dataset:
         sys.exit(1)
 
-    print_header("Preparing for SBATCH Job")
+    print_header("Preparing for Distributed Evaluation Job")
 
     # Output directories
     output_dataset_repo_name = output_dataset.split("/")[-1]
@@ -722,16 +934,49 @@ def main():
     dataset_path = download_dataset(input_dataset)
     model_path = download_model(args.model_name)
 
-    # Launch sbatch job with the dataset repo but save to output repo
-    job_id = launch_sbatch(
-        model_path,
-        dataset_path,
-        output_dataset_dir,
-        args.num_shards,
-        logs_dir,
-        args.max_job_duration,
-        args.tp4,
-    )
+    # Determine processing mode
+    if args.mode == "auto":
+        # Check hostname to determine which mode to use
+        cmd = "echo $HOSTNAME"
+        hostname, _, _ = execute_command(cmd, verbose=False)
+        if "c1" in hostname or "leonardo" in hostname:
+            print_info(f"Detected cluster environment on {hostname}, using SLURM mode")
+            processing_mode = "slurm"
+        else:
+            print_info(f"No cluster environment detected, using local mode")
+            processing_mode = "local"
+    else:
+        processing_mode = args.mode
+        print_info(f"Using user-specified {processing_mode} mode")
+
+    # Adjust number of shards for local processing if needed
+    local_num_shards = args.num_shards
+    if processing_mode == "local":
+        if local_num_shards > args.num_gpus:
+            print_warning(f"Limiting number of shards to {args.num_gpus} for local processing (number of available GPUs)")
+            local_num_shards = args.num_gpus
+
+    # Launch job with the dataset repo but save to output repo
+    if processing_mode == "local":
+        job_id = launch_local(
+            model_path,
+            dataset_path,
+            output_dataset_dir,
+            local_num_shards,
+            logs_dir,
+        )
+    else:  # slurm mode
+        # Launch sbatch job with the dataset repo but save to output repo
+        job_id = launch_sbatch(
+            model_path,
+            dataset_path,
+            output_dataset_dir,
+            args.num_shards,
+            logs_dir,
+            args.max_job_duration,
+            args.tp4,
+        )
+    
     if not job_id:
         sys.exit(1)
 
@@ -742,7 +987,7 @@ def main():
 
     # Monitor job
     print_info("Watchdog mode enabled. Monitoring job progress...")
-    monitor_job(job_id, logs_dir, args.num_shards)
+    monitor_job(job_id, logs_dir, args.num_shards if processing_mode == "slurm" else local_num_shards)
 
     # Check completion
     if not check_job_completion(job_id, output_dataset_dir):

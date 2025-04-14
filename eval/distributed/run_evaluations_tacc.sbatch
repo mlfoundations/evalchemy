@@ -13,9 +13,6 @@
 # MODULES
 module load cuda/12.4 nccl/12.4
 
-# MAIN DIRECTORIES
-export HF_HUB_CACHE="$SCRATCH/hf_home"
-
 # CONDA
 export PATH="/work/08134/negin/anaconda3/condabin/:$PATH"
 source /work/08134/negin/anaconda3/etc/profile.d/conda.sh

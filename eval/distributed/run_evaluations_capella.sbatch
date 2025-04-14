@@ -2,6 +2,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --time=01:00:00
+#SBATCH --gres=gpu:1 # MinTRES is gres/gpu=1
 #SBATCH --mem=512G
 #SBATCH --cpus-per-task=32
 #SBATCH --account=p_finetuning

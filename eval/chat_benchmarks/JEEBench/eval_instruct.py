@@ -5,6 +5,7 @@ import numpy as np
 from datasets import Dataset, load_dataset
 from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
+from utils import compute_score, last_boxed_only_string, remove_boxed
 
 from eval.task import BaseBenchmark
 
@@ -13,7 +14,7 @@ from eval.task import BaseBenchmark
 # Adapted from https://github.com/dair-iitd/jeebench/blob/main/inference.py
 
 
-prompt_library = {
+PROMPT_LIBRARY = {
     "MCQ": "In this problem, only one option will be correct. Give a detailed solution and end the solution with the final answer.",
     "MCQ(multiple)": "In this problem, multiple options can be correct. Give a detailed solution and end the solution with the final answer.",
     "Integer": "In this problem, the final answer will be a non-negative integer. Give a detailed solution and end the solution with the final answer.",
@@ -21,11 +22,11 @@ prompt_library = {
 }
 
 
-def format_message(question):
+def format_message(question, prompt_library):
     prefix_prompt = prompt_library[question["type"]]
     suffix_prompt = ""
 
-    stripped_question = question.replace("\n\n", "\n").strip()
+    stripped_question = question["question"].replace("\n\n", "\n").strip()
 
     prompt = prefix_prompt + "\n\n" + "Problem: " + stripped_question + suffix_prompt
 
@@ -38,8 +39,26 @@ def format_message(question):
 ########################################################################
 
 
-def extract_answer(output: str) -> str:
-    raise NotImplementedError
+def prompt_for_boxed_answer(prompt_library):
+    """
+    Mofify prompt_library in-place to elicit final answer in parseable boxed format.
+    """
+
+    EXPECTED_KEYS = {"MCQ", "MCQ(multiple)", "Integer", "Numeric"}
+    assert (
+        set(prompt_library.keys()) == EXPECTED_KEYS
+    ), f"Unexpected keys in prompt_library: {set(prompt_library.keys())}"
+
+    prompt_library[
+        "MCQ"
+    ] += " Mark your solution, which should be exactly one multiple-choice letter, with \\boxed\nAnswer:"
+    prompt_library[
+        "MCQ(multiple)"
+    ] += " Mark your solution, which should be one or more multiple-choice letter(s), with \\boxed\nAnswer:"
+    prompt_library["Integer"] += " Mark your solution with \\boxed\nAnswer:"
+    prompt_library["Numeric"] += " Mark your solution with \\boxed\nAnswer:"
+
+    return prompt_library
 
 
 class JEEBenchBenchmark(BaseBenchmark):
@@ -59,7 +78,7 @@ class JEEBenchBenchmark(BaseBenchmark):
         Initialize JEEBench benchmark.
 
         Args:
-            debug: If set, only evaluate on 2 examples
+            debug: If set, only evaluate on 3 examples
             seed: Random seed for reproducibility. Default is [0, 1234, 1234, 1234] for lm-eval-harness.
             logger: Optional logger instance
         """
@@ -68,6 +87,8 @@ class JEEBenchBenchmark(BaseBenchmark):
         self.max_new_tokens = 32768  # set higher to avoid truncation for reasoning models
         self.seed = seed
         self.n_repeat = 3
+
+        self.prompt_library = prompt_for_boxed_answer(PROMPT_LIBRARY)
 
     def generate_responses(self, model: LM) -> Dict[str, Any]:
         """
@@ -85,8 +106,8 @@ class JEEBenchBenchmark(BaseBenchmark):
 
         examples = self.load_questions()
         if self.debug:
-            examples = examples.select(range(2))
-            self.logger.info(f"Debug mode: using 2 examples")
+            examples = examples.select(range(3))
+            self.logger.info(f"Debug mode: using 3 examples")
 
         # Prepare instances for model
         all_outputs = []
@@ -96,7 +117,7 @@ class JEEBenchBenchmark(BaseBenchmark):
             seed = [s + i for s in self.seed]
 
             for idx, example in enumerate(examples):
-                messages = format_message(example)
+                messages = format_message(example, self.prompt_library)
 
                 templated_messages = self._prepare_messages(messages, model)
 
@@ -138,7 +159,7 @@ class JEEBenchBenchmark(BaseBenchmark):
 
         for example, outputs in zip(examples, zip(*all_outputs)):
             example["model_outputs"] = list(outputs)
-            example["model_answers"] = [extract_answer(o) for o in outputs]
+            example["model_answers"] = [self.extract_answer(o) for o in outputs]
             examples_list.append(example)
 
         return {"examples": examples_list}
@@ -149,7 +170,45 @@ class JEEBenchBenchmark(BaseBenchmark):
         if results is None:
             return None
 
-        # TODO
+        examples = results["examples"]
+        num_questions = len(examples)
+
+        # Calculate accuracy for each example and repetition
+        for example in examples:
+            example["score"] = [
+                compute_score(example["gold"], example["model_answers"][i], example["type"])
+                for i in range(self.n_repeat)
+            ]
+
+        # Calculate accuracy for each repetition
+        all_results = []
+        for i in range(self.n_repeat):
+            solved = sum([example["score"][i] for example in examples])
+            all_results.append(
+                {
+                    "repetition": i + 1,
+                    "num_total": num_questions,
+                    "num_solved": solved,
+                    "accuracy": solved / num_questions,
+                }
+            )
+
+        # Calculate overall statistics
+        solved_avg = np.mean([result["num_solved"] for result in all_results])
+        accuracy_avg = np.mean([result["accuracy"] for result in all_results])
+        accuracy_std = np.std([result["accuracy"] for result in all_results])
+        accuracy_std_err = np.std([result["accuracy"] for result in all_results]) / np.sqrt(self.n_repeat)
+
+        results.update(
+            {
+                "num_total": num_questions,
+                "solved_avg": solved_avg,
+                "run_stats": all_results,
+                "accuracy_avg": accuracy_avg,
+                "accuracy_std_err": accuracy_std_err,
+                "num_repeat": self.n_repeat,
+            }
+        )
 
         return results
 
@@ -161,3 +220,20 @@ class JEEBenchBenchmark(BaseBenchmark):
         dataset = load_dataset("daman1209arora/jeebench", split="test")
         self.logger.info(f"{len(dataset)} examples retrieved.")
         return dataset
+
+    def extract_answer(self, output: str) -> str:
+        """Extract the final answer from a model-generated solution, which is expected to be in the format of \boxed{answer}.
+
+        Uses the same logic as hendrycks_math.
+
+        Args:
+            output (str): Model-generated solution text
+
+        Returns:
+            str: Extracted final answer. Returns empty string if no answer found in \boxed.
+        """
+        try:
+            answer = remove_boxed(last_boxed_only_string(output))
+            return answer
+        except:
+            return ""

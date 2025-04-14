@@ -66,5 +66,9 @@ def compute_score(gold, resp, question_type):
     else:
         if resp == "None":
             return 0.0
-        g, r = float(gold), float(resp)
-        return int(abs(g - r) <= 0.01)
+        g = float(gold)
+        try:
+            r = float(resp)
+            return int(abs(g - r) <= 0.01)
+        except:  # failed to parse resp
+            return 0

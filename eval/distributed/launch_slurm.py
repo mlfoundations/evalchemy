@@ -30,6 +30,9 @@ def execute_command(cmd, env=None, verbose=True):
         print(f"Command failed with return code {return_code}")
         print(f"Error: {stderr.strip()}")
 
+    if return_code != 0:
+        raise Exception(f"Command {cmd} failed with return code {return_code}: {stderr.strip()}")
+
     return stdout.strip(), stderr.strip(), return_code
 
 
@@ -50,14 +53,11 @@ def check_dataset_exists(repo_id):
         return False
 
 
-def create_evaluation_dataset(tasks, system_instruction=None):
+def create_evaluation_dataset(tasks, eval_dataset_hash, system_instruction=None):
     """Create or use cached evaluation dataset."""
 
-    # Generate a cached dataset name based on tasks
-    eval_dataset_hash = generate_evaluation_dataset_hash(tasks, system_instruction)
-    cached_dataset_id = f"mlfoundations-dev/evalset_{eval_dataset_hash}"
-
     # Check if the cached dataset exists
+    cached_dataset_id = f"mlfoundations-dev/evalset_{eval_dataset_hash}"
     if check_dataset_exists(cached_dataset_id):
         print(f"Using cached evaluation dataset: {cached_dataset_id}")
         return cached_dataset_id
@@ -66,18 +66,10 @@ def create_evaluation_dataset(tasks, system_instruction=None):
     print("Creating new evaluation dataset...")
     print("Coding tasks require heavier processing to generate prompts and may take a little while...")
     tasks_str = ",".join(tasks)
+    cmd = f"python -m eval.eval --model upload_to_hf --tasks {tasks_str} --model_args repo_id={cached_dataset_id} --output_path logs"
     if system_instruction:
-        cmd = f"python -m eval.eval --model upload_to_hf --tasks {tasks_str} --model_args repo_id={cached_dataset_id} --output_path logs --system_instruction '{system_instruction}'"
-    else:
-        cmd = f"python -m eval.eval --model upload_to_hf --tasks {tasks_str} --model_args repo_id={cached_dataset_id} --output_path logs"
-
-    print(f"Running command: {cmd}")
-    stdout, stderr, return_code = execute_command(cmd)
-
-    if return_code != 0:
-        print("Failed to create evaluation dataset.")
-        print(f"Error: {stderr}")
-        return False
+        cmd += f" --system_instruction '{system_instruction}'"
+    execute_command(cmd, verbose=False)
 
     print(f"Evaluation dataset created at: https://huggingface.co/datasets/{cached_dataset_id}")
     return cached_dataset_id
@@ -124,11 +116,7 @@ def launch_eval_sbatch(cmd, logs_dir, sbatch_script):
 
     # Launch the sbatch job
     cmd = f"sbatch {temp_sbatch_file}"
-    stdout, stderr, return_code = execute_command(cmd)
-
-    if return_code != 0:
-        print(f"Failed to launch sbatch job: {stderr}")
-        return None, None
+    stdout, _, _ = execute_command(cmd)
 
     # Extract the job ID from the output
     job_id_match = re.search(r"Submitted batch job (\d+)", stdout)
@@ -198,11 +186,7 @@ def launch_sbatch(
 
     # Launch the sbatch job
     cmd = f"sbatch {temp_sbatch_file}"
-    stdout, stderr, return_code = execute_command(cmd)
-
-    if return_code != 0:
-        print(f"Failed to launch sbatch job: {stderr}")
-        return None, None
+    stdout, _, _ = execute_command(cmd)
 
     # Extract the job ID from the output
     job_id_match = re.search(r"Submitted batch job (\d+)", stdout)
@@ -210,8 +194,7 @@ def launch_sbatch(
         job_id = job_id_match.group(1)
         print(f"SBATCH job submitted with ID: {job_id}")
     else:
-        print("Could not determine job ID from sbatch output.")
-        job_id = None
+        raise Exception("Could not determine job ID from sbatch output.")
 
     print(f"Results will be saved locally to {output_dataset_dir}")
     print(f"[Job status] squeue -j {job_id}")
@@ -254,19 +237,12 @@ def upload_shards_to_hub(output_dir, output_repo_id):
 
     # Create the dataset repository if it doesn't exist
     cmd = f"huggingface-cli repo create {repo_name} --organization {org} --type dataset -y || echo 'Repository already exists'"
-    stdout, stderr, return_code = execute_command(cmd)
-
-    if return_code != 0:
-        print(f"Repository creation returned non-zero status: {stderr}")
+    execute_command(cmd)
 
     # Upload all files
     print(f"Uploading files from {output_dir} to {output_repo_id}...")
     cmd = f"huggingface-cli upload {output_repo_id} {output_dir} --repo-type dataset"
-    stdout, stderr, return_code = execute_command(cmd)
-
-    if return_code != 0:
-        print(f"Failed to upload files: {stderr}")
-        return False
+    execute_command(cmd)
 
     print(f"All files successfully uploaded to {output_repo_id}")
     print(f"View the dataset at https://huggingface.co/datasets/{output_repo_id}")
@@ -304,11 +280,7 @@ def compute_and_upload_scores(tasks, output_repo_id, model_name, logs_dir, on_lo
             return False
     else:
         print("Computing scores on login node")
-        stdout, stderr, return_code = execute_command(cmd)
-
-        if return_code != 0:
-            print(f"Failed to compute and upload scores: {stderr}")
-            return False
+        execute_command(cmd)
 
     print("Scores computed and uploaded successfully.")
     return True
@@ -332,7 +304,6 @@ def main():
     )
     parser.add_argument("--system_instruction", type=str, default=None, help="System instruction for the model")
     parser.add_argument("--timestamp", action="store_true", help="Add a timestamp to the output evaluation dataset")
-
     args = parser.parse_args()
 
     # Load environment variables from .env file
@@ -342,7 +313,7 @@ def main():
     tasks = [task.strip() for task in args.tasks.split(",")]
     print(f"Tasks to evaluate: {', '.join(tasks)}")
 
-    # Generate timestamp and repository ID for results
+    # Generate evaluation dataset hash and output dataset name
     evaluation_dataset_hash = generate_evaluation_dataset_hash(tasks, args.system_instruction)
     if args.timestamp:
         timestamp = str(int(time.time()))
@@ -354,9 +325,7 @@ def main():
     output_dataset = f"mlfoundations-dev/{model_name_short}{suffix}"
 
     # Create or get cached evaluation dataset
-    input_dataset = create_evaluation_dataset(tasks, args.system_instruction)
-    if not input_dataset:
-        sys.exit(1)
+    input_dataset = create_evaluation_dataset(tasks, evaluation_dataset_hash, args.system_instruction)
 
     # Output directories
     output_dataset_repo_name = output_dataset.split("/")[-1]
@@ -381,8 +350,6 @@ def main():
         args.max_job_duration,
         args.tp4,
     )
-    if not job_id:
-        sys.exit(1)
 
     # If watchdog flag is not set, exit
     if not args.watchdog:

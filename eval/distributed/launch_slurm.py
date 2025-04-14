@@ -99,43 +99,47 @@ def download_dataset(dataset_name):
         sys.exit(1)
 
 
-def launch_eval_sbatch(cmd, logs_dir, sbatch_script):
-    """Launch the sbatch job for evaluation step."""
-    # Create a temporary sbatch script with the correct parameters
-    temp_sbatch_file = os.path.join(logs_dir, "job.sbatch")
-    with open(sbatch_script, "r") as f:
-        sbatch_content = f.read()
-
-    sbatch_content = re.sub(r"export EVAL_COMMAND=.*", f'export EVAL_COMMAND="{cmd}"', sbatch_content)
-    sbatch_content = re.sub(r"(^#!.*\n)", r"\1#SBATCH --output=" + logs_dir + r"/%A_%a.out\n", sbatch_content)
-
-    with open(temp_sbatch_file, "w") as f:
+def launch_sbatch(sbatch_content, logs_dir):
+    # Write the sbatch file
+    new_sbatch_file = os.path.join(logs_dir, "job.sbatch")
+    with open(new_sbatch_file, "w") as f:
         f.write(sbatch_content)
-
-    print(f"Created temporary sbatch file: {temp_sbatch_file}")
+    print(f"Created sbatch file: {new_sbatch_file}")
 
     # Launch the sbatch job
-    cmd = f"sbatch {temp_sbatch_file}"
-    stdout, _, _ = execute_command(cmd)
-
-    # Extract the job ID from the output
+    stdout, _, _ = execute_command(f"sbatch {new_sbatch_file}")
     job_id_match = re.search(r"Submitted batch job (\d+)", stdout)
     if job_id_match:
         job_id = job_id_match.group(1)
         print(f"SBATCH job submitted with ID: {job_id}")
     else:
-        print("Could not determine job ID from sbatch output.")
-        job_id = None
-
-    print(f"[Job status] squeue -j {job_id}")
-    print(f"[Job status] sacct -j {job_id} -X --format=JobID,JobName,State,Elapsed")
-    print(f"[Cancel job] scancel {job_id}")
-    print(f"[View logs] tail {logs_dir}/{job_id}_*.out")
-
+        raise Exception("Could not determine job ID from sbatch output.")
     return job_id
 
 
-def launch_sbatch(
+def launch_cpu_sbatch(cmd, logs_dir, sbatch_script):
+    """Launch the sbatch job for cpu steps."""
+    # Check hostname to determine which sbatch script to use
+    hostname, _, _ = execute_command("echo $HOSTNAME", verbose=False)
+    print(f"Using $HOSTNAME: {hostname} to determine which sbatch script to use")
+    if "c1" in hostname or "c2" in hostname:
+        sbatch_script = "eval/distributed/run_cpu_capella.sbatch"
+    elif "tacc" in hostname:
+        sbatch_script = "eval/distributed/run_cpu_tacc.sbatch"
+    else:
+        raise ValueError(f"Unknown hostname: {hostname}")
+
+    # Read and replace in sbatch script
+    with open(sbatch_script, "r") as f:
+        sbatch_content = f.read()
+    sbatch_content = re.sub(r"export COMMAND=.*", f'export COMMAND="{cmd}"', sbatch_content)
+    sbatch_content = re.sub(r"(^#!.*\n)", r"\1#SBATCH --output=" + logs_dir + r"/%A_%a.out\n", sbatch_content)
+
+    # Launch the sbatch job
+    return launch_sbatch(sbatch_content, logs_dir)
+
+
+def launch_inference_sbatch(
     model_path,
     dataset_path,
     output_dataset_dir,
@@ -144,35 +148,29 @@ def launch_sbatch(
     max_job_duration=None,
     tp4=False,
 ):
-    """Launch the sbatch job."""
-
+    """Launch the sbatch job for inference step."""
     # Check hostname to determine which sbatch script to use
-    cmd = "echo $HOSTNAME"
-    hostname, _, _ = execute_command(cmd, verbose=False)
+    hostname, _, _ = execute_command("echo $HOSTNAME", verbose=False)
     print(f"Using $HOSTNAME: {hostname} to determine which sbatch script to use")
     if "c1" in hostname or "c2" in hostname:
         sbatch_script = "eval/distributed/process_shards_capella.sbatch"
-    elif "leonardo" in hostname:
-        sbatch_script = "eval/distributed/process_shards_leonardo.sbatch"
     elif "tacc" in hostname:
         sbatch_script = "eval/distributed/process_shards_tacc.sbatch"
     else:
-        raise ValueError(f"Unknown hostname: {hostname}, can't determine which sbatch script to use")
+        raise ValueError(f"Unknown hostname: {hostname}")
 
+    # TP4 for 32B models, uses a different sbatch template
     if tp4:
         sbatch_script = sbatch_script.replace(".sbatch", "_tp4.sbatch")
 
-    # Create a temporary sbatch script with the correct parameters
-    temp_sbatch_file = os.path.join(logs_dir, "job.sbatch")
+    # Read and replace in sbatch script
     with open(sbatch_script, "r") as f:
         sbatch_content = f.read()
-
-    # Replace parameters in the sbatch script using regex pattern matching
     sbatch_content = re.sub(r"#SBATCH --array=.*", f"#SBATCH --array=0-{num_shards-1}", sbatch_content)
     sbatch_content = re.sub(r"export INPUT_DATASET=.*", f'export INPUT_DATASET="{dataset_path}"', sbatch_content)
     sbatch_content = re.sub(
         r"export OUTPUT_DATASET=.*", f'export OUTPUT_DATASET="{output_dataset_dir}"', sbatch_content
-    )
+    )  # noqa
     sbatch_content = re.sub(r"export MODEL_NAME=.*", f'export MODEL_NAME="{model_path}"', sbatch_content)
     sbatch_content = re.sub(r"(^#!.*\n)", r"\1#SBATCH --output=" + logs_dir + r"/%A_%a.out\n", sbatch_content)
 
@@ -182,30 +180,8 @@ def launch_sbatch(
         sbatch_content = re.sub(r"#SBATCH --time=.*", f"#SBATCH --time={formatted_duration}", sbatch_content)
         print(f"Setting job duration to {formatted_duration}")
 
-    with open(temp_sbatch_file, "w") as f:
-        f.write(sbatch_content)
-
-    print(f"Created temporary sbatch file: {temp_sbatch_file}")
-
     # Launch the sbatch job
-    cmd = f"sbatch {temp_sbatch_file}"
-    stdout, _, _ = execute_command(cmd)
-
-    # Extract the job ID from the output
-    job_id_match = re.search(r"Submitted batch job (\d+)", stdout)
-    if job_id_match:
-        job_id = job_id_match.group(1)
-        print(f"SBATCH job submitted with ID: {job_id}")
-    else:
-        raise Exception("Could not determine job ID from sbatch output.")
-
-    print(f"Results will be saved locally to {output_dataset_dir}")
-    print(f"[Job status] squeue -j {job_id}")
-    print(f"[Job status] sacct -j {job_id} -X --format=JobID,JobName,State,Elapsed")
-    print(f"[Cancel job] scancel {job_id}")
-    print(f"[View logs] tail {logs_dir}/{job_id}_*.out")
-
-    return job_id
+    return launch_sbatch(sbatch_content, logs_dir)
 
 
 def upload_shards_to_hub(output_dir, output_repo_id):
@@ -270,7 +246,7 @@ def compute_and_upload_scores(tasks, output_repo_id, model_name, logs_dir, on_lo
         elif "c1" in hostname or "c2" in hostname:
             sbatch_script = "eval/distributed/run_evaluations_capella.sbatch"
         print("Computing scores on node")
-        job_id = launch_eval_sbatch(cmd, logs_dir, sbatch_script)
+        job_id = launch_cpu_sbatch(cmd, logs_dir, sbatch_script)
         if not job_id:
             return False
 

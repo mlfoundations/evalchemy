@@ -937,7 +937,7 @@ def main():
         print_info("Skipping upload to Hugging Face as requested with --no-upload flag")
 
     # Compute and upload scores - use database only for cluster environments
-    use_database = (processing_mode == "slurm") and not args.no_upload
+    use_database = (processing_mode in ["slurm", "local"]) and not args.no_upload
     if compute_and_upload_scores(tasks, output_dataset, args.model_name, use_database):
         if not args.no_upload:
             print_success(f"Evaluation completed successfully. Results uploaded to {output_dataset}")

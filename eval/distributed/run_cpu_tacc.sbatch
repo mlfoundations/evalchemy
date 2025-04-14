@@ -15,9 +15,9 @@ export PATH="/work/08134/negin/anaconda3/condabin/:$PATH"
 source /work/08134/negin/anaconda3/etc/profile.d/conda.sh
 conda activate evalchemy
 
-# EVAL SCORING COMMAND
-export EVAL_COMMAND="python -m eval.eval --model precomputed_hf --model_args "repo_id=mlfoundations-dev/Qwen2.5-7B-Instruct_1744582706_eval_288a",model="Qwen/Qwen2.5-7B-Instruct" --tasks AIME24,AMC23,MATH500,AIME25,GPQADiamond,MMLUPro,LiveCodeBench,CodeElo --output_path logs --use_database"
+# COMMAND
+export COMMAND="python -m eval.eval --model precomputed_hf --model_args "repo_id=mlfoundations-dev/Qwen2.5-7B-Instruct_1744582706_eval_288a",model="Qwen/Qwen2.5-7B-Instruct" --tasks AIME24,AMC23,MATH500,AIME25,GPQADiamond,MMLUPro,LiveCodeBench,CodeElo --output_path logs --use_database"
 
-# RUN EVAL SCORING
-srun echo -e "EVAL_COMMAND: ${EVAL_COMMAND}"
-srun ${EVAL_COMMAND}
+# RUN COMMAND
+srun echo -e "COMMAND: ${COMMAND}"
+srun ${COMMAND}

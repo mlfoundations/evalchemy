@@ -628,9 +628,9 @@ def compute_and_upload_scores(tasks, output_repo_id, model_name, logs_dir, on_lo
     print_info(f"Using $HOSTNAME: {hostname} to determine cluster environment.")
     if not on_login and ("tacc" in hostname or "c1" in hostname or "c2" in hostname):
         if "tacc" in hostname:
-            sbatch_script = "eval/distributed/run_evaluations_tacc.sbatch"
+            sbatch_script = "eval/distributed/run_cpu_tacc.sbatch"
         elif "c1" in hostname or "c2" in hostname:
-            sbatch_script = "eval/distributed/run_evaluations_capella.sbatch"
+            sbatch_script = "eval/distributed/run_cpu_capella.sbatch"
         print_info("Computing scores on node")
         job_id = launch_eval_sbatch(cmd, logs_dir, sbatch_script)
         if not job_id:

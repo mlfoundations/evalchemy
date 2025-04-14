@@ -155,7 +155,7 @@ def run_test_std(completion, test_input, test_output):
         sys.stdin = io.StringIO(test_input)
         try:
             exec(f'__name__ = "__main__"\n{completion}' if '__name__ == "__main__"' in completion else completion, {})
-            return output.getvalue().strip() == test_output, output.getvalue().strip()
+            return output.getvalue().strip() == test_output.strip().replace('\r', ''), output.getvalue().strip()
         finally:
             sys.stdout = sys.__stdout__
 

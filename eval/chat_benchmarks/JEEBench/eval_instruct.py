@@ -1,53 +1,94 @@
-import json
 import logging
 from typing import Any, Dict, List, Optional
 
-import lm_eval.models
 import numpy as np
+from datasets import Dataset, load_dataset
 from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
-from lm_eval.tasks.hendrycks_math.utils import is_equiv, last_boxed_only_string, remove_boxed
+from utils import compute_score, last_boxed_only_string, remove_boxed
 
 from eval.task import BaseBenchmark
 
-# Modified version of hendrycks_math with additional instruction to mark the solution with \\boxed
-# https://github.com/mlfoundations/evalchemy/blob/e70a45e41cb2ada273d6bb98e75dba303ec31f8b/eval/chat_benchmarks/AMC23/eval_instruct.py#L15
-PROMPT = """Problem: {problem}\nMark your solution with \\boxed\nAnswer:"""
+########################################################################
+
+# Adapted from https://github.com/dair-iitd/jeebench/blob/main/inference.py
 
 
-class AMC23Benchmark(BaseBenchmark):
+PROMPT_LIBRARY = {
+    "MCQ": "In this problem, only one option will be correct. Give a detailed solution and end the solution with the final answer.",
+    "MCQ(multiple)": "In this problem, multiple options can be correct. Give a detailed solution and end the solution with the final answer.",
+    "Integer": "In this problem, the final answer will be a non-negative integer. Give a detailed solution and end the solution with the final answer.",
+    "Numeric": "In this problem, the final will be a numeric value. Give the numerical answer correct upto the 2nd decimal digit. Give a detailed solution and end the solution with the final answer.",
+}
+
+
+def format_message(question, prompt_library):
+    prefix_prompt = prompt_library[question["type"]]
+    suffix_prompt = ""
+
+    stripped_question = question["question"].replace("\n\n", "\n").strip()
+
+    prompt = prefix_prompt + "\n\n" + "Problem: " + stripped_question + suffix_prompt
+
+    content = prompt.strip()
+    messages = [{"role": "user", "content": content}]
+
+    return messages
+
+
+########################################################################
+
+
+def prompt_for_boxed_answer(prompt_library):
     """
-    AMC23 Benchmark for evaluating the math reasoning of LLMs.
-    Link: https://huggingface.co/datasets/zwhe99/amc23
+    Mofify prompt_library in-place to elicit final answer in parseable boxed format.
+    """
 
-    Follows the evaluation logic of hendrycks_math answer extraction.
-    Added additional instruction to the prompt to mark the solution with \\boxed.
+    EXPECTED_KEYS = {"MCQ", "MCQ(multiple)", "Integer", "Numeric"}
+    assert (
+        set(prompt_library.keys()) == EXPECTED_KEYS
+    ), f"Unexpected keys in prompt_library: {set(prompt_library.keys())}"
+
+    prompt_library[
+        "MCQ"
+    ] += " Mark your solution, which should be exactly one multiple-choice letter, with \\boxed\nAnswer:"
+    prompt_library[
+        "MCQ(multiple)"
+    ] += " Mark your solution, which should be one or more multiple-choice letter(s), with \\boxed\nAnswer:"
+    prompt_library["Integer"] += " Mark your solution with \\boxed\nAnswer:"
+    prompt_library["Numeric"] += " Mark your solution with \\boxed\nAnswer:"
+
+    return prompt_library
+
+
+class JEEBenchBenchmark(BaseBenchmark):
+    """
+    JEEBench, comprising "515 challenging preengineering mathematics, physics and chemistry problems from the highly competitive IIT JEE-Advanced exam."
+    Link: https://huggingface.co/datasets/daman1209arora/jeebench
     """
 
     def __init__(
         self,
-        data_file: str = "eval/chat_benchmarks/AMC23/data/amc23.json",
         debug: bool = False,
         seed: List[int] = [0, 1234, 1234, 1234],
         logger: Optional[logging.Logger] = None,
         system_instruction: Optional[str] = None,
     ):
         """
-        Initialize AMC23 benchmark.
+        Initialize JEEBench benchmark.
 
         Args:
-            data_file: File containing the AMC23 dataset (id, problem, reference_solution, expected_answer, source)
-            debug: If set, only evaluate on 2 examples
+            debug: If set, only evaluate on 3 examples
             seed: Random seed for reproducibility. Default is [0, 1234, 1234, 1234] for lm-eval-harness.
             logger: Optional logger instance
-            system_instruction: Optional system instruction for the model
         """
         super().__init__(logger=logger, system_instruction=system_instruction)
-        self.data_file = data_file
         self.debug = debug
-        self.seed = seed
         self.max_new_tokens = 32768  # set higher to avoid truncation for reasoning models
-        self.n_repeat = 5
+        self.seed = seed
+        self.n_repeat = 3
+
+        self.prompt_library = prompt_for_boxed_answer(PROMPT_LIBRARY)
 
     def generate_responses(self, model: LM) -> Dict[str, Any]:
         """
@@ -60,25 +101,23 @@ class AMC23Benchmark(BaseBenchmark):
             Dictionary containing generated responses and temporary directory,
             or None for non-primary ranks
         """
+
+        self.logger.info("Generating responses in 'normal' mode (no CoT, SC, or Exam mode)...")
+
         examples = self.load_questions()
+        if self.debug:
+            examples = examples.select(range(3))
+            self.logger.info(f"Debug mode: using 3 examples")
 
         # Prepare instances for model
-        all_instances = []
-        if isinstance(model, lm_eval.models.huggingface.HFLM):
-            model_name = model.pretrained
-        elif isinstance(model, lm_eval.models.openai_completions.OpenAIChatCompletion):
-            model_name = str(f"openai/{model.model}")
-        else:
-            model_name = model.model_args["model"]
-
         all_outputs = []
+
         for i in range(self.n_repeat):
-            seed = [s + i for s in self.seed]
             all_instances = []
+            seed = [s + i for s in self.seed]
+
             for idx, example in enumerate(examples):
-                messages = [
-                    {"role": "user", "content": PROMPT.format(problem=example["question"])},
-                ]
+                messages = format_message(example, self.prompt_library)
 
                 templated_messages = self._prepare_messages(messages, model)
 
@@ -100,42 +139,51 @@ class AMC23Benchmark(BaseBenchmark):
                 # Add repetition information to instance metadata
                 instance.repeat_idx = i
                 instance.metadata = {
-                    "problem_id": str(example["id"]) if "id" in example else str(idx),
-                    "expected_answer": str(example["answer"]),
-                    "reference_solution": str(example["solution"]) if "solution" in example else "",
+                    "problem_id": str(example["index"]) if "index" in example else str(idx),
+                    "expected_answer": str(example["gold"]),
+                    "subject": str(example["subject"]),
+                    "type": str(example["type"]),
                 }
 
                 all_instances.append(instance)
 
             # Generate model responses
-            self.logger.info("Generating responses for AMC23...")
+            self.logger.info("Generating responses for JEEBench...")
             outputs = self.compute(model, all_instances)
             all_outputs.append(outputs)
-
         # Return None early for non-primary ranks
         if model.rank != 0:
             return None
 
+        examples_list = []
+
         for example, outputs in zip(examples, zip(*all_outputs)):
             example["model_outputs"] = list(outputs)
             example["model_answers"] = [self.extract_answer(o) for o in outputs]
+            examples_list.append(example)
 
-        return {"examples": examples}
+        return {"examples": examples_list}
 
     def evaluate_responses(self, results: Dict[str, Any]) -> Dict[str, float]:
         """Evaluate the generated solution completions."""
 
-        # Handle None result from non-primary ranks
         if results is None:
             return None
 
         examples = results["examples"]
         num_questions = len(examples)
 
+        # Calculate accuracy for each example and repetition
+        for example in examples:
+            example["score"] = [
+                compute_score(example["gold"], example["model_answers"][i], example["type"])
+                for i in range(self.n_repeat)
+            ]
+
         # Calculate accuracy for each repetition
         all_results = []
         for i in range(self.n_repeat):
-            solved = sum([is_equiv(str(example["answer"]), example["model_answers"][i]) for example in examples])
+            solved = sum([example["score"][i] for example in examples])
             all_results.append(
                 {
                     "repetition": i + 1,
@@ -161,14 +209,17 @@ class AMC23Benchmark(BaseBenchmark):
                 "num_repeat": self.n_repeat,
             }
         )
+
         return results
 
-    def load_questions(self) -> List[Dict[str, str]]:
-        """Load AMC23 questions from the data file."""
-        with open(self.data_file, "r") as f:
-            questions = [json.loads(x) for x in f]
-        self.logger.info(f"Loaded {len(questions)} questions from {self.data_file}")
-        return questions
+    def load_questions(self) -> Dataset:
+        """
+        Load JEEBench questions from source.
+        """
+        self.logger.info("Loading JEEBench questions from source...")
+        dataset = load_dataset("daman1209arora/jeebench", split="test")
+        self.logger.info(f"{len(dataset)} examples retrieved.")
+        return dataset
 
     def extract_answer(self, output: str) -> str:
         """Extract the final answer from a model-generated solution, which is expected to be in the format of \boxed{answer}.

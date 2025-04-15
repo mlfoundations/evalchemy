@@ -94,7 +94,7 @@ def check_required_env_vars():
         hf_hub_cache = "/leonardo_work/EUHPC_E03_068/DCFT_shared/hub"
         print_info(f"Detected Leonardo environment, using HF_HUB_CACHE: {hf_hub_cache}")
     elif "tacc" in hostname:
-        hf_hub_cache = "/scratch/08134/negin/hf_home/"
+        hf_hub_cache = "/work/08134/negin/ls6/shared_env/hub"
         print_info(f"Detected TACC environment, using HF_HUB_CACHE: {hf_hub_cache}")
     else:
         raise ValueError(f"Unknown hostname: {hostname}, can't determine which HF_HUB_CACHE to use")

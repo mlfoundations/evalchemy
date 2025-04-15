@@ -62,7 +62,7 @@ def launch_sbatch(sbatch_content, logs_dir):
     print(f"Created sbatch file: {new_sbatch_file}")
 
     # Launch the sbatch job
-    stdout, _, _ = execute_command(f"sbatch {new_sbatch_file}")
+    stdout, _ = execute_command(f"sbatch {new_sbatch_file}")
     job_id_match = re.search(r"Submitted batch job (\d+)", stdout)
     if job_id_match:
         job_id = job_id_match.group(1)

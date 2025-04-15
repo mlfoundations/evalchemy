@@ -32,6 +32,10 @@ srun --nodes=1 huggingface-cli download $INPUT_DATASET --cache-dir $HF_HUB_CACHE
 
 # RUN SHARDED INFERENCE
 GLOBAL_SIZE=$SLURM_JOB_NUM_NODES
+NODELIST=$(scontrol show hostnames $SLURM_JOB_NODELIST | sort)
+CURRENT_HOST=$(hostname)
+SLURM_NODEID=$(echo "$NODELIST" | grep -n "$CURRENT_HOST" | cut -d':' -f1)
+SLURM_NODEID=$((SLURM_NODEID - 1))
 RANK=$SLURM_NODEID
 srun echo -e "GLOBAL_SIZE: ${GLOBAL_SIZE}\nRANK: ${RANK}\nMODEL: ${MODEL_NAME}\nINPUT_DATASET: ${INPUT_DATASET}\nOUTPUT_DATASET: ${OUTPUT_DATASET}"
 srun python $EVALCHEMY/eval/distributed/process_shard.py --global_size ${GLOBAL_SIZE} --rank ${RANK} --input_dataset ${INPUT_DATASET} --model_name ${MODEL_NAME} --output_dataset ${OUTPUT_DATASET} --upload

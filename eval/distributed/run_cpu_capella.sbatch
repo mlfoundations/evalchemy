@@ -19,4 +19,4 @@ export COMMAND="python -m eval.eval --model precomputed_hf --model_args "repo_id
 
 # RUN COMMAND
 srun echo -e "COMMAND: ${COMMAND}"
-srun ${EVAL_COMMAND}
+srun ${COMMAND}

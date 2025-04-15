@@ -256,7 +256,7 @@ def codeforces_run(problem, completion, timeout, is_extracted):
     result = manager.list()
     p = multiprocessing.Process(target=run_tests_for_one_example, args=(test_cases, completion, result, is_extracted))
     p.start()
-    p.join(timeout=(timeout + 50) * len(test_cases) + 5)
+    p.join(timeout=(timeout + 1) * len(test_cases) + 60)
     if p.is_alive():
         p.kill()
 

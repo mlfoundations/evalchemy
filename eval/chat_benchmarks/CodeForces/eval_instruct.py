@@ -115,7 +115,7 @@ class CodeForcesBenchmark(BaseBenchmark):
             html_output += '</body></html>'
             return html_output
 
-        instruction = """"You are a coding expert. Given a competition-level coding problem, you need to write a Python program to solve it. You may start by outlining your thought process. In the end, please provide the complete code in a code block enclosed with ``` ```. The code should take stdin as input and print the output."""
+        instruction = """You are a coding expert. Given a competition-level coding problem, you need to write a Python program to solve it. You may start by outlining your thought process. In the end, please provide the complete code in a code block enclosed with ``` ```. The code should take stdin as input and print the output. Your program should be a Python function generated from the given prompt. Simply call the function after the definition."""
 
         for i in range(self.n_repeat):
             all_instances = []

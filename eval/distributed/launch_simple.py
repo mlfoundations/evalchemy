@@ -32,10 +32,11 @@ def execute_command(cmd):
     process = subprocess.Popen(
         cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=os.environ.copy(), universal_newlines=True
     )  # noqa
-    _, stderr = process.communicate()
+    stdout, stderr = process.communicate()
     return_code = process.returncode
     if return_code != 0:
         raise Exception(f"Command failed with return code {return_code} and error: {stderr.strip()}")
+    return stdout.strip()
 
 
 def create_evaluation_dataset(tasks, eval_dataset_hash, system_instruction=None):
@@ -62,7 +63,7 @@ def launch_sbatch(sbatch_content, logs_dir):
     print(f"Created sbatch file: {new_sbatch_file}")
 
     # Launch the sbatch job
-    stdout, _ = execute_command(f"sbatch {new_sbatch_file}")
+    stdout = execute_command(f"sbatch {new_sbatch_file}")
     job_id_match = re.search(r"Submitted batch job (\d+)", stdout)
     if job_id_match:
         job_id = job_id_match.group(1)

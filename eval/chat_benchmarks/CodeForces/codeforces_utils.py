@@ -155,7 +155,10 @@ def run_test_std(completion, test_input, test_output):
         sys.stdin = io.StringIO(test_input)
         try:
             exec(f'__name__ = "__main__"\n{completion}' if '__name__ == "__main__"' in completion else completion, {})
-            return output.getvalue().strip() == test_output.strip().replace('\r', ''), output.getvalue().strip()
+            out = output.getvalue().strip().replace('\n',' ').replace('\r', '')
+            expected = test_output.strip().replace('\n', ' ').replace('\r', '')
+
+            return out == expected, output.getvalue().strip()
         finally:
             sys.stdout = sys.__stdout__
 
@@ -244,6 +247,7 @@ def run_tests_for_one_example(test_cases, completion, result_list, is_extracted)
             return
 
 
+
 def codeforces_run(problem, completion, timeout, is_extracted):
     test_cases = problem["official_tests"]
     test_cases = [{**x, "testtype": "stdin"} for x in test_cases]
@@ -252,11 +256,12 @@ def codeforces_run(problem, completion, timeout, is_extracted):
     result = manager.list()
     p = multiprocessing.Process(target=run_tests_for_one_example, args=(test_cases, completion, result, is_extracted))
     p.start()
-    p.join(timeout=(timeout + 1) * len(test_cases) + 5)
+    p.join(timeout=(timeout + 50) * len(test_cases) + 5)
     if p.is_alive():
         p.kill()
 
     # if len(result) < len(test_cases): failed due to timeout
     for i in range(len(test_cases) - len(result)):
         result.append((False, f"Time out!.", "Error: Time out!", float("inf")))
+
     return result

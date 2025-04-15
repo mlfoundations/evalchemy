@@ -1,7 +1,6 @@
 #!/bin/bash
 #SBATCH --nodes={num_shards}
-#SBATCH --time={time_limit}   
-#SBATCH --cpus-per-task=72
+#SBATCH --time={time_limit}
 #SBATCH --partition=gh
 #SBATCH --job-name={job_name}
 #SBATCH --output={logs_dir}/%x_%j.out

@@ -1,6 +1,5 @@
 #!/bin/bash
 #SBATCH --nodes={num_shards}
-#SBATCH --ntasks-per-node 1
 #SBATCH --time={time_limit}   
 #SBATCH --cpus-per-task=72
 #SBATCH --partition=gh
@@ -31,11 +30,5 @@ srun --nodes=1 huggingface-cli download $MODEL_NAME --cache-dir $HF_HUB_CACHE
 srun --nodes=1 huggingface-cli download $INPUT_DATASET --cache-dir $HF_HUB_CACHE --repo-type dataset
 
 # RUN SHARDED INFERENCE
-GLOBAL_SIZE=$SLURM_JOB_NUM_NODES
-NODELIST=$(scontrol show hostnames $SLURM_JOB_NODELIST | sort)
-CURRENT_HOST=$(hostname)
-SLURM_NODEID=$(echo "$NODELIST" | grep -n "$CURRENT_HOST" | cut -d':' -f1)
-SLURM_NODEID=$((SLURM_NODEID - 1))
-RANK=$SLURM_NODEID
-srun echo -e "GLOBAL_SIZE: ${GLOBAL_SIZE}\nRANK: ${RANK}\nMODEL: ${MODEL_NAME}\nINPUT_DATASET: ${INPUT_DATASET}\nOUTPUT_DATASET: ${OUTPUT_DATASET}"
-srun python $EVALCHEMY/eval/distributed/process_shard.py --global_size ${GLOBAL_SIZE} --rank ${RANK} --input_dataset ${INPUT_DATASET} --model_name ${MODEL_NAME} --output_dataset ${OUTPUT_DATASET} --upload
+srun --ntasks=${SLURM_JOB_NUM_NODES} --gpus_per_task=1 echo -e "GLOBAL_SIZE: ${SLURM_JOB_NUM_NODES}\nRANK: ${SLURM_PROCID}\nMODEL: ${MODEL_NAME}\nINPUT_DATASET: ${INPUT_DATASET}\nOUTPUT_DATASET: ${OUTPUT_DATASET}"
+# srun python $EVALCHEMY/eval/distributed/process_shard.py --global_size ${SLURM_JOB_NUM_NODES} --rank ${SLURM_PROCID} --input_dataset ${INPUT_DATASET} --model_name ${MODEL_NAME} --output_dataset ${OUTPUT_DATASET} --upload

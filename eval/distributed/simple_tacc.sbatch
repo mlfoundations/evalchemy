@@ -5,6 +5,7 @@
 #SBATCH --cpus-per-task=72
 #SBATCH --partition=gh
 #SBATCH --job-name={job_name}
+#SBATCH --output={logs_dir}/%x_%j.out
 #SBATCH --exclude=c610-021,c611-011
 #SBATCH --account CCR24067
 

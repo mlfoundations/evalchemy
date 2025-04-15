@@ -67,7 +67,6 @@ def launch_sbatch(sbatch_content, logs_dir):
     job_id_match = re.search(r"Submitted batch job (\d+)", stdout)
     if job_id_match:
         job_id = job_id_match.group(1)
-        print(f"SBATCH job submitted with ID: {job_id}")
     else:
         raise Exception("Could not determine job ID from sbatch output.")
     return job_id
@@ -108,12 +107,11 @@ def main():
         suffix = f"_eval_{evaluation_dataset_hash}"
     output_dataset_name = args.model_name.split("/")[-1] + suffix
     output_dataset = f"mlfoundations-dev/{output_dataset_name}"
+    print(f"Output dataset: {output_dataset}")
 
     # Create output log dir
-    print(f"Output dataset: {output_dataset}")
-    logs_dir = os.path.join("logs", output_dataset_name)
+    logs_dir = "logs"
     os.makedirs(logs_dir, exist_ok=True)
-    print(f"Logs directory: {logs_dir}")
 
     # Create sbatch
     args_dict = vars(args)
@@ -121,6 +119,7 @@ def main():
     args_dict["job_name"] = f"{output_dataset_name}"
     args_dict["input_dataset"] = input_dataset
     args_dict["output_dataset"] = output_dataset
+    args_dict["logs_dir"] = logs_dir
     with open("eval/distributed/simple_tacc.sbatch", "r") as f:
         sbatch_content = f.read()
     curly_brace_pattern = r"(?<!\$)\{([^{}]*)\}"
@@ -128,6 +127,7 @@ def main():
 
     # Launch sbatch
     job_id = launch_sbatch(sbatch_content, logs_dir)
+    print(f"Logs: {args_dict['logs_dir']}/{args_dict['job_name']}_{job_id}.out")
     print(f"Launched sbatch job with ID: {job_id}")
 
 

@@ -127,8 +127,8 @@ def main():
 
     # Launch sbatch
     job_id = launch_sbatch(sbatch_content, logs_dir)
-    print(f"Logs: {args_dict['logs_dir']}/{args_dict['job_name']}_{job_id}.out")
     print(f"Launched sbatch job with ID: {job_id}")
+    print(f"Logs: {args_dict['logs_dir']}/{args_dict['job_name']}_{job_id}.out")
 
 
 if __name__ == "__main__":

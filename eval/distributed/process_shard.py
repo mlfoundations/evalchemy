@@ -80,6 +80,7 @@ def process_shard(
     # Load the dataset from Hugging Face Hub
     logger.info(f"Loading dataset from {input_dataset}")
     ds = load_dataset(input_dataset, split="train")
+    ds = ds.shuffle(seed=42)  # shuffle first for fair sharding
 
     # Shard the dataset
     logger.info(f"Sharding dataset: {global_size} shards, processing shard {rank}")
@@ -159,7 +160,8 @@ def main():
     parser.add_argument("--offline", action="store_true", help="Run in offline mode without internet access")
 
     args = parser.parse_args()
-    logger.info(f"Parsed arguments: {args}")
+    parsed_log = "\n".join([x.upper() + ": " + str(v) for x, v in vars(args).items()])
+    logger.info(f"Parsed arguments:\n{parsed_log}")
 
     # Set offline mode if requested
     if args.offline:

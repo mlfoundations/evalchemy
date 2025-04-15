@@ -102,7 +102,8 @@ def main():
         suffix = f"_eval_{evaluation_dataset_hash}"
     remaining_characters = 96 - len(suffix)
     model_name_short = args.model_name.split("/")[-1][:remaining_characters]
-    output_dataset = f"mlfoundations-dev/{model_name_short}{suffix}"
+    output_datset_name = model_name_short + suffix
+    output_dataset = f"mlfoundations-dev/{output_datset_name}"
 
     # Create or get cached evaluation dataset
     input_dataset = create_evaluation_dataset(tasks, evaluation_dataset_hash, args.system_instruction)
@@ -119,6 +120,9 @@ def main():
     # Launch sbatch job
     args_dict = vars(args)
     args_dict["time_limit"] = f"{args.max_job_duration:02d}:00:00"
+    args_dict["job_name"] = f"{output_dataset_repo_name}"
+    args_dict["input_dataset"] = input_dataset
+    args_dict["output_dataset"] = output_dataset
     with open("eval/distributed/simple_tacc.sbatch", "r") as f:
         sbatch_content = f.read()
     curly_brace_pattern = r"(?<!\$)\{([^{}]*)\}"

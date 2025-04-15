@@ -25,7 +25,7 @@ export HF_HUB_CACHE="$DCFT/hub"
 # DOWNLOAD MODEL AND DATASET
 MODEL_NAME={model_name}
 INPUT_DATASET={input_dataset}
-OUTPUT_DATASET="$EVALCHEMY/results/${MODEL_NAME##*--}_${INPUT_DATASET##*--}"
+OUTPUT_DATASET={output_dataset}
 srun --nodes=1 huggingface-cli download $MODEL_NAME --cache-dir $HF_HUB_CACHE
 srun --nodes=1 huggingface-cli download $INPUT_DATASET --cache-dir $HF_HUB_CACHE --repo-type dataset
 

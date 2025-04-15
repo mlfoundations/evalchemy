@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --nodes={num_shards}
-#SBATCH --tasks={num_shards}
+#SBATCH --ntasks={num_shards}
 #SBATCH --time={time_limit}   
 #SBATCH --cpus-per-task=72
 #SBATCH --partition=gg
@@ -27,8 +27,8 @@ export HF_HUB_CACHE="$DCFT/hub"
 MODEL_NAME={model_name}
 INPUT_DATASET={input_dataset}
 OUTPUT_DATASET={output_dataset}
-srun --nodes=1 --tasks=1 huggingface-cli download $MODEL_NAME --cache-dir $HF_HUB_CACHE
-srun --nodes=1 --tasks=1 huggingface-cli download $INPUT_DATASET --cache-dir $HF_HUB_CACHE --repo-type dataset
+srun --nodes=1 --ntasks=1 huggingface-cli download $MODEL_NAME --cache-dir $HF_HUB_CACHE
+srun --nodes=1 --ntasks=1 huggingface-cli download $INPUT_DATASET --cache-dir $HF_HUB_CACHE --repo-type dataset
 
 # RUN SHARDED INFERENCE
 # # Create a SLURM_NODEID equivalent

@@ -11,6 +11,7 @@ from huggingface_hub import HfApi
 
 def generate_evaluation_dataset_hash(tasks, system_instruction=None):
     """Generate a 4-character hash from the task list and system instruction."""
+    print(f"Tasks to evaluate: {', '.join(tasks)}")
     tasks_str = ",".join(sorted(tasks))
     hash_obj = hashlib.md5((tasks_str + (system_instruction or "")).encode())
     return hash_obj.hexdigest()[:4]
@@ -93,40 +94,34 @@ def main():
 
     # Generate evaluation dataset hash and output dataset name
     tasks = [task.strip() for task in args.tasks.split(",")]
-    print(f"Tasks to evaluate: {', '.join(tasks)}")
     evaluation_dataset_hash = generate_evaluation_dataset_hash(tasks, args.system_instruction)
+
+    # Create or get cached evaluation dataset
+    input_dataset = create_evaluation_dataset(tasks, evaluation_dataset_hash, args.system_instruction)
+
+    # Outputs
     if args.timestamp:
         timestamp = str(int(time.time()))
         suffix = f"_{timestamp}_eval_{evaluation_dataset_hash}"
     else:
         suffix = f"_eval_{evaluation_dataset_hash}"
-    remaining_characters = 96 - len(suffix)
-    model_name_short = args.model_name.split("/")[-1][:remaining_characters]
-    output_datset_name = model_name_short + suffix
-    output_dataset = f"mlfoundations-dev/{output_datset_name}"
-
-    # Create or get cached evaluation dataset
-    input_dataset = create_evaluation_dataset(tasks, evaluation_dataset_hash, args.system_instruction)
-
-    # Output directories
-    output_dataset_repo_name = output_dataset.split("/")[-1]
-    logs_dir = os.path.join("logs", output_dataset_repo_name)
+    output_dataset_name = args.model_name.split("/")[-1] + suffix
+    output_dataset = f"mlfoundations-dev/{output_dataset_name}"
+    print(f"Output dataset: {output_dataset}")
+    logs_dir = os.path.join("logs", output_dataset_name)
     os.makedirs(logs_dir, exist_ok=True)
     print(f"Logs directory: {logs_dir}")
-    output_dataset_dir = os.path.join("results", output_dataset_repo_name)
-    os.makedirs(output_dataset_dir, exist_ok=True)
-    print(f"Output dataset directory: {output_dataset_dir}")
 
     # Launch sbatch job
     args_dict = vars(args)
     args_dict["time_limit"] = f"{args.max_job_duration:02d}:00:00"
-    args_dict["job_name"] = f"{output_dataset_repo_name}"
+    args_dict["job_name"] = f"{output_dataset_name}"
     args_dict["input_dataset"] = input_dataset
     args_dict["output_dataset"] = output_dataset
     with open("eval/distributed/simple_tacc.sbatch", "r") as f:
         sbatch_content = f.read()
     curly_brace_pattern = r"(?<!\$)\{([^{}]*)\}"
-    sbatch_content = re.sub(curly_brace_pattern, lambda m: args_dict[m.group(1)], sbatch_content)
+    sbatch_content = re.sub(curly_brace_pattern, lambda m: str(args_dict[m.group(1)]), sbatch_content)
     job_id = launch_sbatch(sbatch_content, logs_dir)
     print(f"Launched sbatch job with ID: {job_id}")
 

@@ -1,0 +1,36 @@
+#!/bin/bash
+#SBATCH --nodes={num_shards}
+#SBATCH --ntasks-per-node 1
+#SBATCH --time={time_limit}   
+#SBATCH --cpus-per-task=72
+#SBATCH --partition=gh
+#SBATCH --job-name={job_name}
+#SBATCH --exclude=c610-021,c611-011
+#SBATCH --account CCR24067
+
+# EXIT ON ERROR
+set -e
+
+# MODULES
+module load cuda/12.4 nccl/12.4
+
+# CONDA
+source /work/08134/negin/anaconda3/bin/activate evalchemy
+
+# DCFT DIRECTORIES
+export DCFT="/work/08134/negin/ls6/shared_env/"
+export EVALCHEMY="$DCFT/evalchemy"
+export HF_HUB_CACHE="$DCFT/hub"
+
+# DOWNLOAD MODEL AND DATASET
+MODEL_NAME={model_name}
+INPUT_DATASET={input_dataset}
+OUTPUT_DATASET="$EVALCHEMY/results/${MODEL_NAME##*--}_${INPUT_DATASET##*--}"
+srun --nodes=1 huggingface-cli download $MODEL_NAME --cache-dir $HF_HUB_CACHE
+srun --nodes=1 huggingface-cli download $INPUT_DATASET --cache-dir $HF_HUB_CACHE --repo-type dataset
+
+# RUN SHARDED INFERENCE
+GLOBAL_SIZE=$SLURM_JOB_NUM_NODES
+RANK=$SLURM_PROCID
+srun echo -e "GLOBAL_SIZE: ${GLOBAL_SIZE}\nRANK: ${RANK}\nMODEL: ${MODEL_NAME}\nINPUT_DATASET: ${INPUT_DATASET}\nOUTPUT_DATASET: ${OUTPUT_DATASET}"
+srun python $EVALCHEMY/eval/distributed/process_shard.py --global_size ${GLOBAL_SIZE} --rank ${RANK} --input_dataset ${INPUT_DATASET} --model_name ${MODEL_NAME} --output_dataset ${OUTPUT_DATASET} --upload

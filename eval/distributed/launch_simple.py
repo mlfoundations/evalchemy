@@ -55,9 +55,8 @@ def create_evaluation_dataset(tasks, eval_dataset_hash, system_instruction=None)
     return cached_dataset_id
 
 
-def launch_sbatch(sbatch_content, logs_dir):
+def launch_sbatch(sbatch_content, new_sbatch_file):
     # Write the sbatch file
-    new_sbatch_file = os.path.join(logs_dir, "job.sbatch")
     with open(new_sbatch_file, "w") as f:
         f.write(sbatch_content)
     print(f"Created sbatch file: {new_sbatch_file}")
@@ -126,7 +125,8 @@ def main():
     sbatch_content = re.sub(curly_brace_pattern, lambda m: str(args_dict[m.group(1)]), sbatch_content)
 
     # Launch sbatch
-    job_id = launch_sbatch(sbatch_content, logs_dir)
+    new_sbatch_file = os.path.join(logs_dir, f"{output_dataset_name}.sbatch")
+    job_id = launch_sbatch(sbatch_content, new_sbatch_file)
     print(f"Launched sbatch job with ID: {job_id}")
     print(f"Logs: {args_dict['logs_dir']}/{args_dict['job_name']}_{job_id}.out")
 

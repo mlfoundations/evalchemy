@@ -92,14 +92,14 @@ def main():
     parser.add_argument("--timestamp", action="store_true", help="Add a timestamp to the output evaluation dataset")
     args = parser.parse_args()
 
-    # Generate evaluation dataset hash and output dataset name
+    # Generate evaluation dataset hash
     tasks = [task.strip() for task in args.tasks.split(",")]
     evaluation_dataset_hash = generate_evaluation_dataset_hash(tasks, args.system_instruction)
 
-    # Create or get cached evaluation dataset
+    # Download or create input dataset
     input_dataset = create_evaluation_dataset(tasks, evaluation_dataset_hash, args.system_instruction)
 
-    # Outputs
+    # Create output dataset name
     if args.timestamp:
         timestamp = str(int(time.time()))
         suffix = f"_{timestamp}_eval_{evaluation_dataset_hash}"
@@ -107,12 +107,14 @@ def main():
         suffix = f"_eval_{evaluation_dataset_hash}"
     output_dataset_name = args.model_name.split("/")[-1] + suffix
     output_dataset = f"mlfoundations-dev/{output_dataset_name}"
+
+    # Create output log dir
     print(f"Output dataset: {output_dataset}")
     logs_dir = os.path.join("logs", output_dataset_name)
     os.makedirs(logs_dir, exist_ok=True)
     print(f"Logs directory: {logs_dir}")
 
-    # Launch sbatch job
+    # Create sbatch
     args_dict = vars(args)
     args_dict["time_limit"] = f"{args.max_job_duration:02d}:00:00"
     args_dict["job_name"] = f"{output_dataset_name}"
@@ -122,6 +124,8 @@ def main():
         sbatch_content = f.read()
     curly_brace_pattern = r"(?<!\$)\{([^{}]*)\}"
     sbatch_content = re.sub(curly_brace_pattern, lambda m: str(args_dict[m.group(1)]), sbatch_content)
+
+    # Launch sbatch
     job_id = launch_sbatch(sbatch_content, logs_dir)
     print(f"Launched sbatch job with ID: {job_id}")
 

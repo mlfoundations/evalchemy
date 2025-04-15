@@ -119,7 +119,7 @@ def main():
     args_dict["input_dataset"] = input_dataset
     args_dict["output_dataset"] = output_dataset
     args_dict["logs_dir"] = logs_dir
-    args_dict["output_repo_id"] = output_dataset_name
+    args_dict["output_dataset_name"] = output_dataset_name
     args_dict["tasks_str"] = args.tasks
     with open("eval/distributed/simple_tacc.sbatch", "r") as f:
         sbatch_content = f.read()

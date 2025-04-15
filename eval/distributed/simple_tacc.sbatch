@@ -3,7 +3,7 @@
 #SBATCH --tasks={num_shards}
 #SBATCH --time={time_limit}   
 #SBATCH --cpus-per-task=72
-#SBATCH --partition=gh
+#SBATCH --partition=gg
 #SBATCH --job-name={job_name}
 #SBATCH --output={logs_dir}/%x_%j.out
 #SBATCH --exclude=c610-021,c611-011

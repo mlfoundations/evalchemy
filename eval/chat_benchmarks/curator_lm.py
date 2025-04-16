@@ -128,6 +128,8 @@ class CuratorAPIModel(TemplateLM):
             self.gen_kwargs.pop("top_p", None)
             self.gen_kwargs.pop("stop", None)
             self.gen_kwargs.pop("temperature", None)
+        elif "xai" in self.model_name:
+            self.gen_kwargs["max_tokens"] = self.gen_kwargs.pop("max_completion_tokens", max_length)
 
 
         # Apply rate limits if provided and not overridden by model specifics
@@ -214,14 +216,7 @@ class CuratorAPIModel(TemplateLM):
     @staticmethod
     def parse_generations(outputs: Union[Any, List[Any]], **kwargs) -> List[str]:
         # Parse the generated outputs from the API
-        # Assuming outputs is the direct list of response dicts from curator
-        if isinstance(outputs, list) and all(isinstance(item, dict) for item in outputs):
-             return [output.get("response", "") for output in outputs] # Use .get for safety
-        else:
-             # Handle unexpected output format
-             print(f"Warning: Unexpected output format in parse_generations: {type(outputs)}. Expected List[dict].")
-             return []
-
+        return [output["response"] for output in outputs]
 
     @property
     def tokenizer_name(self) -> str:
@@ -289,43 +284,16 @@ class CuratorAPIModel(TemplateLM):
         # Extract contexts (already in JsonChatStr format expected by create_message)
         contexts = [req.args[0] for req in requests]
 
-        # Validate generation kwargs consistency (already done partially in lm-eval harness)
-        # We rely on the __init__ configuration for gen_kwargs now.
-        # We could add an assertion here to double-check if request-specific kwargs match self.gen_kwargs if needed.
-        # For now, we assume the instance's configuration is the source of truth.
-        # Example check (optional):
-        # for req in requests:
-        #     req_kwargs = req.args[1]
-        #     # Compare relevant keys, skipping 'until' as it's handled separately for eos
-        #     if req_kwargs.get('temperature', self.gen_kwargs.get('temperature')) != self.gen_kwargs.get('temperature') or \
-        #        req_kwargs.get('top_p', self.gen_kwargs.get('top_p')) != self.gen_kwargs.get('top_p') # Add other relevant keys
-        #        # raise ValueError("Request generation kwargs deviate from initialized model kwargs.")
-
-
         # Format messages for curator
         formatted_messages = self.create_message(contexts)
 
         # Make the call to curator
         start_time = time.time()
-        response_data = self.llm(formatted_messages)
+        response_data = self.llm(formatted_messages)["response"]
         end_time = time.time()
         print(f"Curator call took {end_time - start_time:.2f} seconds for {len(requests)} requests.")
 
-
-        # Parse the generations
-        # response_data is expected to be like {'response': [{'response': 'text1'}, {'response': 'text2'}, ...]}
-        if response_data and "response" in response_data and isinstance(response_data["response"], list):
-             parsed_generations = self.parse_generations(response_data["response"])
-             # Ensure the number of results matches the number of requests
-             if len(parsed_generations) != len(requests):
-                 print(f"Warning: Mismatch between number of requests ({len(requests)}) and responses ({len(parsed_generations)}). Padding with empty strings.")
-                 # Pad with empty strings to match the expected length
-                 parsed_generations.extend([""] * (len(requests) - len(parsed_generations)))
-             return parsed_generations
-        else:
-             print(f"Error: Unexpected response structure from curator: {response_data}. Returning empty strings.")
-             return [""] * len(requests)
-
+        return response_data
 
     def loglikelihood_rolling(self, requests, disable_tqdm: bool = False) -> List[float]:
         raise NotImplementedError("Log likelihood rolling not implemented for curator.")
@@ -338,4 +306,4 @@ class CuratorAPIModel(TemplateLM):
 
     def tok_encode(self, string: str, **kwargs) -> List[int]:
         raise NotImplementedError("Token encoding not implemented for curator.")
-        # return self.llm.tokenizer.encode(string) # Cannot access tokenizer directly
+        return self.llm.tokenizer.encode(string)  # Replace with actual method to tokenize

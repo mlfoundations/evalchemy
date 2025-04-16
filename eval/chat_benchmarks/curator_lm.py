@@ -174,30 +174,13 @@ class CuratorAPIModel(TemplateLM):
             )
 
     def create_message(
-        self, messages: Union[List[List[int]], List[str], List[JsonChatStr]], generate=False # generate arg seems unused now
-    ) -> List[dict]: # Always return the list of dicts format curator expects
-        """Converts various message formats into the list of dicts format for curator."""
+        self, messages: Union[List[List[int]], List[str], List[JsonChatStr]], generate=False
+    ) -> Union[List[List[int]], List[dict], List[str], str]:
+        # Convert messages to the format expected by the API
         if isinstance(messages, list) and all(isinstance(m, JsonChatStr) for m in messages):
-            # Directly parse the JSON string stored in JsonChatStr
-            try:
-                return [json.loads(m.prompt) for m in messages]
-            except json.JSONDecodeError as e:
-                 raise ValueError(f"Failed to parse JSON from JsonChatStr: {e}. Content: {[m.prompt for m in messages]}")
-            except Exception as e:
-                 raise ValueError(f"Error processing JsonChatStr messages: {e}")
-        elif isinstance(messages, list) and all(isinstance(m, dict) for m in messages):
-             # If it's already in the correct list-of-dicts format
-             return messages
-        elif isinstance(messages, list) and all(isinstance(m, str) for m in messages):
-             # Handle simple list of strings if needed (e.g., for non-chat models, although curator usually expects dicts)
-             # This might need adjustment depending on how non-chat prompts are formatted.
-             # Assuming a simple conversion for now.
-             print("Warning: Converting list of strings to basic 'user' messages. Verify format.")
-             return [{"role": "user", "content": m} for m in messages]
+            return [json.loads(m.prompt) for m in messages]
         else:
-            # Add more specific checks or raise error for unsupported formats
-            raise ValueError(f"Unsupported messages format: {type(messages)}. Expected List[JsonChatStr], List[dict], or List[str].")
-
+            raise ValueError("Messages must be a list of JsonChatStr objects")
 
     @staticmethod
     def parse_logprobs(
@@ -242,16 +225,9 @@ class CuratorAPIModel(TemplateLM):
              return None # Or raise error
 
         # Curator returns a dictionary with a 'response' key containing a list of outputs
-        response_data = self.llm(formatted_messages)
+        response = self.llm(formatted_messages)["response"]
 
-        # Extract the actual response content for the single prompt
-        if response_data and "response" in response_data and isinstance(response_data["response"], list) and len(response_data["response"]) > 0:
-             # Return the first response dictionary (or just the text?)
-             return response_data["response"][0] # Returning the dict like {'response': 'text'}
-        else:
-             print(f"Warning: Unexpected response structure from curator in model_call: {response_data}")
-             return None
-
+        return response
 
     def _loglikelihood_tokens(self, requests, **kwargs) -> List[Tuple[float, bool]]:
         raise NotImplementedError("Log likelihood tokens not implemented for curator.")
@@ -288,12 +264,9 @@ class CuratorAPIModel(TemplateLM):
         formatted_messages = self.create_message(contexts)
 
         # Make the call to curator
-        start_time = time.time()
-        response_data = self.llm(formatted_messages)["response"]
-        end_time = time.time()
-        print(f"Curator call took {end_time - start_time:.2f} seconds for {len(requests)} requests.")
+        response = self.llm(formatted_messages)["response"]
 
-        return response_data
+        return response
 
     def loglikelihood_rolling(self, requests, disable_tqdm: bool = False) -> List[float]:
         raise NotImplementedError("Log likelihood rolling not implemented for curator.")

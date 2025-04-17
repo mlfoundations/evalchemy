@@ -3,10 +3,36 @@ import argparse
 import hashlib
 import os
 import re
+import socket
 import subprocess
 import time
 
 from huggingface_hub import HfApi
+
+clusters = [
+    {
+        "name": "capella",
+        "hostname_pattern": r"c\\d",
+        "eval_sbatch_filename": "simple_zih.sbatch",
+        "gpus_per_node": 4,
+    },
+    {
+        "name": "vista",
+        "hostname_pattern": r".*?.vista.tacc.utexas.edu",
+        "eval_sbatch_filename": "simple_tacc.sbatch",
+        "gpus_per_node": 1,
+    },
+]
+
+
+def detect_hpc() -> dict:
+    """Automatically detect the HPC based on hostname"""
+    hostname = socket.gethostname()
+    for cluster in clusters:
+        if re.compile(cluster["hostname_pattern"]).match(hostname):
+            print(f"Automatically detected HPC: {cluster['name']}")
+            return cluster
+    raise ValueError(f"HPC not recognized for hostname {hostname}")
 
 
 def generate_evaluation_dataset_hash(tasks, system_instruction=None):
@@ -112,8 +138,18 @@ def main():
     logs_dir = "logs"
     os.makedirs(logs_dir, exist_ok=True)
 
+    # Determine sbatch filename based on HPC
+    cluster = detect_hpc()
+    eval_sbatch_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), cluster["eval_sbatch_filename"])
+
+    # Determine number of nodes
+    if args.num_shards % cluster["gpus_per_node"] != 0:
+        raise ValueError("Number of shards must be a multiple of the number of GPUs per node")
+    num_nodes = int(args.num_shards / cluster["gpus_per_node"])
+
     # Create sbatch
     args_dict = vars(args)
+    args_dict["num_nodes"] = num_nodes
     args_dict["time_limit"] = f"{args.max_job_duration:02d}:00:00"
     args_dict["job_name"] = f"{output_dataset_name}"
     args_dict["input_dataset"] = input_dataset
@@ -121,7 +157,7 @@ def main():
     args_dict["logs_dir"] = logs_dir
     args_dict["output_dataset_name"] = output_dataset_name
     args_dict["tasks_str"] = args.tasks
-    with open("eval/distributed/simple_tacc.sbatch", "r") as f:
+    with open(eval_sbatch_path, "r") as f:
         sbatch_content = f.read()
     curly_brace_pattern = r"(?<!\$)\{([^{}]*)\}"
     sbatch_content = re.sub(curly_brace_pattern, lambda m: str(args_dict[m.group(1)]), sbatch_content)

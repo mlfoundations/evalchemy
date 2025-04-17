@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --nodes={num_shards}
+#SBATCH --nodes={num_nodes}
 #SBATCH --ntasks-per-node 1
 #SBATCH --time={time_limit}   
 #SBATCH --cpus-per-task=72

@@ -141,15 +141,13 @@ def main():
     # Determine sbatch filename based on HPC
     cluster = detect_hpc()
     eval_sbatch_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), cluster["eval_sbatch_filename"])
-    gpus_per_node = cluster["gpus_per_node"]
 
-    # Determine number of nodes based on the number of shards
-    num_shards = args.num_shards
-    if num_shards % gpus_per_node != 0:
+    # Determine number of nodes
+    if args.num_shards % cluster["gpus_per_node"] != 0:
         raise ValueError(
-            f"Number of shards ({num_shards}) must be a multiple of the number of GPUs per node ({gpus_per_node})"
+            f"Number of shards ({args.num_shards}) must be a multiple of the number of GPUs per node ({cluster['gpus_per_node']})"
         )
-    num_nodes = int(num_shards / gpus_per_node)
+    num_nodes = int(args.num_shards / cluster["gpus_per_node"])
 
     # Create sbatch
     args_dict = vars(args)

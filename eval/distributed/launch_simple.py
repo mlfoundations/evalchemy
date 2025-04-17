@@ -144,7 +144,9 @@ def main():
 
     # Determine number of nodes
     if args.num_shards % cluster["gpus_per_node"] != 0:
-        raise ValueError("Number of shards must be a multiple of the number of GPUs per node")
+        raise ValueError(
+            f"Number of shards {args.num_shards} must be a multiple of the number of GPUs per node {cluster['gpus_per_node']}"
+        )
     num_nodes = int(args.num_shards / cluster["gpus_per_node"])
 
     # Create sbatch

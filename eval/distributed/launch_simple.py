@@ -12,7 +12,7 @@ from huggingface_hub import HfApi
 clusters = [
     {
         "name": "capella",
-        "hostname_pattern": r"c\\d",
+        "hostname_pattern": r"c\d",
         "eval_sbatch_filename": "simple_zih.sbatch",
         "gpus_per_node": 4,
     },

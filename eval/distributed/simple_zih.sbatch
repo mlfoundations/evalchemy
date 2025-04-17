@@ -4,7 +4,7 @@
 #SBATCH --gres=gpu:4
 #SBATCH --time={time_limit}
 #SBATCH --mem=512G
-#SBATCH --cpus-per-task=32
+#SBATCH --cpus-per-task=8
 #SBATCH --account=p_finetuning
 
 # CUDA

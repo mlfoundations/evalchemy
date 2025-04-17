@@ -7,20 +7,18 @@
 #SBATCH --cpus-per-task=32
 #SBATCH --account=p_finetuning
 
-# MODULES
+# CUDA
 module load release/24.04  GCCcore/12.3.0
 module load CUDA/12.1.1
 module load NCCL/2.18.3-CUDA-12.1.1
+export PATH=/usr/local/cuda-12/bin:$PATH
+export LD_LIBRARY_PATH=/usr/local/cuda-12/lib64:$LD_LIBRARY_PATH
 
 # ENVIRONMENT VARIABLES - EVALCHEMY, HF_HUB_CACHE, and EVALCHEMY_ACTIVATE_ENV
 source /work/10159/rmarten/vista/dcft/dcft_private/hpc/dotenv/zih.env
 
 # CONDA
 $EVALCHEMY_ACTIVATE_ENV
-
-# CUDA PATHS
-export PATH=/usr/local/cuda-12/bin:$PATH
-export LD_LIBRARY_PATH=/usr/local/cuda-12/lib64:$LD_LIBRARY_PATH
 
 # DOWNLOAD MODEL AND DATASET
 MODEL_NAME={model_name}

@@ -8,7 +8,7 @@
 #SBATCH --account=p_finetuning
 #SBATCH --job-name={job_name}
 #SBATCH --output={logs_dir}/%x_%j.out
-#SBATCH --exclude=c77,c31
+#SBATCH --exclude=c77
 
 # CUDA
 module load release/24.04  GCCcore/12.3.0

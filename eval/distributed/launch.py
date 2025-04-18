@@ -307,8 +307,6 @@ def launch_sbatch(
             sbatch_script = "eval/distributed/process_shards_capella.sbatch"
             print_info("Detected Capella environment, using process_shards_capella.sbatch")
     elif "leonardo" in hostname:
-        sbatch_script = "eval/distributed/process_shards_leonardo.sbatch"
-        print_info("Detected Leonardo environment, using process_shards_leonardo.sbatch")
         if tp4:
             sbatch_script = "eval/distributed/process_shards_leonardo_tp.sbatch"
             print_info("Detected Leonardo environment with TP4, using process_shards_leonardo_tp.sbatch")
@@ -316,8 +314,12 @@ def launch_sbatch(
             sbatch_script = "eval/distributed/process_shards_leonardo.sbatch"
             print_info("Detected Leonardo environment, using process_shards_leonardo.sbatch")
     elif "tacc" in hostname:
-        sbatch_script = "eval/distributed/process_shards_tacc.sbatch"
-        print_info("Detected TACC environment, using process_shards_tacc.sbatch")
+        if tp4:
+            sbatch_script = "eval/distributed/process_shards_tacc_tp.sbatch"
+            print_info("Detected TACC environment with TP4, using process_shards_tacc_tp.sbatch")
+        else:
+            sbatch_script = "eval/distributed/process_shards_tacc.sbatch"
+            print_info("Detected TACC environment, using process_shards_tacc.sbatch")
     else:
         raise ValueError(f"Unknown hostname: {hostname}, can't determine which sbatch script to use")
 

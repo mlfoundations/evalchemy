@@ -6,7 +6,7 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --account=EUHPC_E03_068
 #SBATCH --partition=boost_usr_prod
-#SBATCH --qos=boost_usr_bprod
+#SBATCH --qos=boost_qos_bprod
 
 # MODULES
 module load cuda/12.1

@@ -1,9 +1,9 @@
 #!/bin/bash
-#SBATCH --nodes=128        
-#SBATCH --ntasks=1           
+#SBATCH --nodes=128
+#SBATCH --ntasks-per-node=4
 #SBATCH --gres=gpu:4
-#SBATCH --time=04:00:00        
-#SBATCH --cpus-per-task=32
+#SBATCH --time=04:00:00
+#SBATCH --cpus-per-task=8
 #SBATCH --account=EUHPC_E03_068
 #SBATCH --partition=boost_usr_prod
 #SBATCH --qos=boost_usr_bprod

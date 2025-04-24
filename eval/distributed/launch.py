@@ -150,6 +150,10 @@ def check_conda_env(watchdog=False):
         python_path = "/work/08134/negin/anaconda3/envs/evalchemy/bin/python3.10"
         activate_cmd = "source /work/08134/negin/anaconda3/bin/activate evalchemy"
         print_info(f"Detected TACC environment, checking python path: {python_path}")
+    elif "jureca" in hostname:
+        python_path = "/work/08134/negin/anaconda3/envs/evalchemy/bin/python3.10"
+        activate_cmd = "source /work/08134/negin/anaconda3/bin/activate evalchemy"
+        print_info(f"Detected JURECA environment, checking python path: {python_path}")
     else:
         raise ValueError(f"Unknown hostname: {hostname}, can't determine which HF_HUB_CACHE to use")
 

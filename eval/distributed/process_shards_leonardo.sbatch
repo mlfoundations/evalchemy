@@ -1,12 +1,12 @@
 #!/bin/bash
-#SBATCH --array=0-1
-#SBATCH --nodes=1            
+#SBATCH --nodes=128        
 #SBATCH --ntasks=1           
-#SBATCH --gres=gpu:1           
-#SBATCH --time=01:00:00        
-#SBATCH --cpus-per-task=8 
+#SBATCH --gres=gpu:4
+#SBATCH --time=04:00:00        
+#SBATCH --cpus-per-task=32
 #SBATCH --account=EUHPC_E03_068
 #SBATCH --partition=boost_usr_prod
+#SBATCH --qos=boost_usr_bprod
 
 # MODULES
 module load cuda/12.1
@@ -30,5 +30,5 @@ export INPUT_DATASET="$HF_HUB_CACHE/datasets--mlfoundations-dev--evalset_2870"
 export OUTPUT_DATASET="$EVALCHEMY/results/${MODEL_NAME##*--}_${INPUT_DATASET##*--}"
 
 # RUN SHARDED INFERENCE
-srun echo -e "GLOBAL_SIZE: ${GLOBAL_SIZE}\nRANK: ${RANK}\nMODEL: ${MODEL_NAME}\nINPUT_DATASET: ${INPUT_DATASET}\nOUTPUT_DATASET: ${OUTPUT_DATASET}"
-srun python $EVALCHEMY/eval/distributed/process_shard.py --global_size ${GLOBAL_SIZE} --rank ${RANK} --input_dataset ${INPUT_DATASET} --model_name ${MODEL_NAME} --output_dataset ${OUTPUT_DATASET}
+srun --output={logs_dir}/%x_%j_%t.out bash -c 'echo -e "GLOBAL_SIZE: ${SLURM_STEP_NUM_TASKS}\nRANK: ${SLURM_PROCID}\nMODEL: '$MODEL_NAME'\nINPUT_DATASET: '$INPUT_DATASET'\nOUTPUT_DATASET: '$OUTPUT_DATASET'"'
+srun --output={logs_dir}/%x_%j_%t.out bash -c 'CUDA_VISIBLE_DEVICES=${SLURM_LOCALID} python $EVALCHEMY/eval/distributed/process_shard.py --global_size ${SLURM_STEP_NUM_TASKS} --rank ${SLURM_PROCID} --input_dataset '${INPUT_DATASET}' --model_name '${MODEL_NAME}' --output_dataset '${OUTPUT_DATASET}''

@@ -338,10 +338,10 @@ def launch_sbatch(
     sbatch_content = re.sub(r"(^#!.*\n)", r"\1#SBATCH --output=" + logs_dir + r"/%A_%a.out\n", sbatch_content)
 
     # Update job duration if specified
-    # if max_job_duration:
-    #     formatted_duration = f"{max_job_duration:02d}:00:00"
-    #     sbatch_content = re.sub(r"#SBATCH --time=.*", f"#SBATCH --time={formatted_duration}", sbatch_content)
-    #     print_info(f"Setting job duration to {formatted_duration}")
+    if max_job_duration:
+        formatted_duration = f"{max_job_duration:02d}:00:00"
+        sbatch_content = re.sub(r"#SBATCH --time=.*", f"#SBATCH --time={formatted_duration}", sbatch_content)
+        print_info(f"Setting job duration to {formatted_duration}")
 
     with open(temp_sbatch_file, "w") as f:
         f.write(sbatch_content)
@@ -668,12 +668,12 @@ def main():
     parser.add_argument("--model_name", type=str, required=True, help="Model name/path to evaluate")
     parser.add_argument("--num_shards", type=int, default=512, help="Number of shards for distributed evaluation")
     parser.add_argument("--watchdog", action="store_true", help="Monitor job progress and compute scores when done")
-    # parser.add_argument(
-    #     "--max-job-duration",
-    #     type=int,
-    #     default=None,
-    #     help="Maximum job duration in hours (default: use sbatch script default)",
-    # )
+    parser.add_argument(
+        "--max-job-duration",
+        type=int,
+        default=None,
+        help="Maximum job duration in hours (default: use sbatch script default)",
+    )
     parser.add_argument("--no_sanity", action="store_true", help="Skip environment sanity checks")
     parser.add_argument("--system_instruction", type=str, default=None, help="System instruction for the model")
     parser.add_argument("--tp4", action="store_true", help="Use Tensor Parallelism with 4 GPUs")

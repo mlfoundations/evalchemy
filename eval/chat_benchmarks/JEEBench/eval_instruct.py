@@ -1,4 +1,5 @@
 import logging
+import os
 from typing import Any, Dict, List, Optional
 
 import numpy as np
@@ -20,6 +21,12 @@ PROMPT_LIBRARY = {
     "Integer": "In this problem, the final answer will be a non-negative integer. Give a detailed solution and end the solution with the final answer.",
     "Numeric": "In this problem, the final will be a numeric value. Give the numerical answer correct upto the 2nd decimal digit. Give a detailed solution and end the solution with the final answer.",
 }
+
+HF_HUB_CACHE = os.environ.get("HF_HUB_CACHE")
+if not HF_HUB_CACHE:
+    print(
+        "WARNING: HF_HUB_CACHE environment variable is not set, using default cache directory ~/.cache/huggingface/hub for JEEBench benchmark"
+    )
 
 
 def format_message(question, prompt_library):
@@ -217,7 +224,7 @@ class JEEBenchBenchmark(BaseBenchmark):
         Load JEEBench questions from source.
         """
         self.logger.info("Loading JEEBench questions from source...")
-        dataset = load_dataset("daman1209arora/jeebench", split="test")
+        dataset = load_dataset("daman1209arora/jeebench", split="test", cache_dir=HF_HUB_CACHE)
         self.logger.info(f"{len(dataset)} examples retrieved.")
         return dataset
 

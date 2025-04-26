@@ -15,6 +15,7 @@ from eval.task import BaseBenchmark
 
 from .codeelo_utils import codeelo_run, post_process_code, rating_to_difficulty
 
+
 def has_code(response):
     pattern = r"```(?:[a-zA-Z]*)\n(.*?)```"
     # Use re.DOTALL to match multiline content inside backticks
@@ -27,6 +28,13 @@ def calc_stats(values):
     mean = np.mean(values)
     stderr = np.std(values, ddof=1) / np.sqrt(len(values))
     return mean, stderr
+
+
+HF_HUB_CACHE = os.environ.get("HF_HUB_CACHE")
+if not HF_HUB_CACHE:
+    print(
+        "WARNING: HF_HUB_CACHE environment variable is not set, using default cache directory ~/.cache/huggingface/hub for CodeElo benchmark"
+    )
 
 
 class CodeEloBenchmark(BaseBenchmark):
@@ -76,7 +84,7 @@ class CodeEloBenchmark(BaseBenchmark):
 
         # TODO - figure out how to support these?
         if self.filter_interaction_questions:
-            examples = [x for x in examples if not x['interaction']]
+            examples = [x for x in examples if not x["interaction"]]
 
         all_outputs = []
 
@@ -89,14 +97,16 @@ class CodeEloBenchmark(BaseBenchmark):
                 outs = tc[1]
                 testtype = "stdin"
 
-                test_cases.append({
-                    "input": ins,
-                    "output": outs,
-                    "testtype": testtype,
-                })
+                test_cases.append(
+                    {
+                        "input": ins,
+                        "output": outs,
+                        "testtype": testtype,
+                    }
+                )
 
             title = problem["title"]
-            html_output = '<html><body>'
+            html_output = "<html><body>"
             html_output += f"<h1>{title}</h1>"
             html_output += f'<div>Time limit per test: {problem["time_limit_ms"]} ms</div>'
             html_output += f"<h2>Description</h2>"
@@ -110,13 +120,13 @@ class CodeEloBenchmark(BaseBenchmark):
             html_output += f"<div>{test_cases[0]['input']}</div>"
             html_output += f"<h3>Output</h3>"
             html_output += f"<div>{test_cases[0]['output']}</div>"
-            if problem['interaction']:
+            if problem["interaction"]:
                 html_output += f"<h2>Interaction</h2>"
                 html_output += f"<div>{problem['interaction']}</div>"
-            if problem['note']:
+            if problem["note"]:
                 html_output += f"<h2>Note</h2>"
                 html_output += f"<div>{problem['note']}</div>"
-            html_output += '</body></html>'
+            html_output += "</body></html>"
             return html_output
 
         instruction = """"You are a coding expert. Given a competition-level coding problem, you need to write a Python program to solve it. You may start by outlining your thought process. In the end, please provide the complete code in a code block enclosed with ``` ```. The code should take stdin as input and print the output."""
@@ -126,7 +136,7 @@ class CodeEloBenchmark(BaseBenchmark):
             seed = [s + i for s in self.seed]
 
             for idx, example in enumerate(examples):
-                prompt_text = f'{instruction}\n\n{make_html_problem(example)}'
+                prompt_text = f"{instruction}\n\n{make_html_problem(example)}"
                 messages = [{"role": "user", "content": prompt_text}]
 
                 templated_messages = self._prepare_messages(messages, model)
@@ -213,7 +223,7 @@ class CodeEloBenchmark(BaseBenchmark):
                 curr_res = self.check_correctness(
                     problem=problem_to_check,
                     completion=post_process_code(last_code),
-                    timeout=problem_to_check['time_limit_ms'] / 1000,
+                    timeout=problem_to_check["time_limit_ms"] / 1000,
                     is_extracted=False,
                 )
 
@@ -374,6 +384,6 @@ class CodeEloBenchmark(BaseBenchmark):
     def load_questions(self) -> Dataset:
         """Load CodeElo questions from source."""
         self.logger.info("Loading CodeElo questions from source and converting to dataset...")
-        ds = load_dataset('Qwen/CodeElo')['test'].to_list()
-        ds = [{**x, 'difficulty': rating_to_difficulty(x['rating'])} for x in ds]
+        ds = load_dataset("Qwen/CodeElo", cache_dir=HF_HUB_CACHE)["test"].to_list()
+        ds = [{**x, "difficulty": rating_to_difficulty(x["rating"])} for x in ds]
         return ds

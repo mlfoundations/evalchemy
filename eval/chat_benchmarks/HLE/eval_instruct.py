@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 from typing import Any, Dict, List, Optional
 
 import numpy as np
@@ -19,6 +20,12 @@ from .testing_utils import get_multiple_choice_answer
 SYSTEM_EXACT_ANSWER = "Your response should be in the following format:\nExplanation: {your explanation for your final answer}\nExact Answer: {your succinct, final answer}\nConfidence: {your confidence score between 0% and 100% for your answer}"
 
 SYSTEM_MC = "Your response should be in the following format:\nExplanation: {your explanation for your answer choice}\nAnswer: {your chosen answer}\nConfidence: {your confidence score between 0% and 100% for your answer}"
+
+HF_HUB_CACHE = os.environ.get("HF_HUB_CACHE")
+if not HF_HUB_CACHE:
+    print(
+        "WARNING: HF_HUB_CACHE environment variable is not set, using default cache directory ~/.cache/huggingface/hub for HLE benchmark"
+    )
 
 
 def format_message(question):
@@ -236,7 +243,7 @@ class HLESubsetBenchmark(BaseBenchmark):
         Keep only the multiplechoice and no images.
         """
         self.logger.info("Loading HLE questions from source, filtering for multiplechoice and no images...")
-        dataset = load_dataset("cais/hle", split="test")
+        dataset = load_dataset("cais/hle", split="test", cache_dir=HF_HUB_CACHE)
         dataset = dataset.filter(lambda x: x["answer_type"] == "multipleChoice")
         dataset = dataset.filter(lambda x: x["image"] == "")
         self.logger.info(f"{len(dataset)} examples remaining after filtering for multiplechoice and no images.")

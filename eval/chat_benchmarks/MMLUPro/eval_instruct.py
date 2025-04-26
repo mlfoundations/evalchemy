@@ -1,4 +1,5 @@
 import logging
+import os
 import random
 from typing import Any, Dict, List, Optional
 
@@ -9,7 +10,14 @@ from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
 
 from eval.task import BaseBenchmark
+
 from .testing_utils import get_multiple_choice_answer
+
+HF_HUB_CACHE = os.environ.get("HF_HUB_CACHE")
+if not HF_HUB_CACHE:
+    print(
+        "WARNING: HF_HUB_CACHE environment variable is not set, using default cache directory ~/.cache/huggingface/hub for MMLUPro benchmark"
+    )
 
 
 class MMLUProBenchmark(BaseBenchmark):
@@ -67,10 +75,7 @@ class MMLUProBenchmark(BaseBenchmark):
 
             for idx, example in enumerate(examples):
                 messages = [
-                    {
-                        "role": "user",
-                        "content": example["prompt"]
-                    },
+                    {"role": "user", "content": example["prompt"]},
                 ]
 
                 templated_messages = self._prepare_messages(messages, model)
@@ -150,8 +155,8 @@ class MMLUProBenchmark(BaseBenchmark):
 
     def load_questions(self) -> List[Dict[str, Any]]:
         """Load MMLUPro (500 subset) questions from the dataset."""
-        dataset = load_dataset(self.dataset_name)
-        questions = [row for row in dataset['test']]
+        dataset = load_dataset(self.dataset_name, cache_dir=HF_HUB_CACHE)
+        questions = [row for row in dataset["test"]]
         if self.debug:
             questions = questions[:2]
         self.logger.info(f"Loaded {len(questions)} questions from {self.dataset_name}")

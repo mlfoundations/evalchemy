@@ -1,4 +1,5 @@
 import logging
+import os
 import random
 from typing import Any, Dict, List, Optional
 
@@ -16,6 +17,12 @@ PROMPT = """Return your final response within \\boxed{{}} and only include the l
 Problem: {problem}
 Options: {options}
 Answer:"""
+
+HF_HUB_CACHE = os.environ.get("HF_HUB_CACHE")
+if not HF_HUB_CACHE:
+    print(
+        "WARNING: HF_HUB_CACHE environment variable is not set, using default cache directory ~/.cache/huggingface/hub for GPQADiamond benchmark"
+    )
 
 
 class GPQADiamondBenchmark(BaseBenchmark):
@@ -162,7 +169,7 @@ class GPQADiamondBenchmark(BaseBenchmark):
 
     def load_questions(self) -> List[Dict[str, Any]]:
         """Load GPQADiamond questions from the dataset."""
-        dataset = load_dataset(self.dataset_name, "gpqa_diamond")
+        dataset = load_dataset(self.dataset_name, "gpqa_diamond", cache_dir=HF_HUB_CACHE)
         questions = [row for row in dataset["train"]]
         if self.debug:
             questions = questions[:2]

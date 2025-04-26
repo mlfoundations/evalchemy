@@ -1,20 +1,29 @@
-from sqlalchemy import create_engine, Engine
-from sqlalchemy.orm import sessionmaker, Session
+import logging
+from typing import Any, Dict, Generator, Optional, Tuple
+
+from datasets import Dataset as HFDataset
+from datasets import DatasetDict, load_dataset
+from huggingface_hub import HfApi, whoami
+from sqlalchemy import Engine, create_engine
+from sqlalchemy.orm import Session, sessionmaker
 
 from database.config import DATABASE_URL
 from database.models import Base, Dataset, Model
 
-from typing import Dict, Any, Optional, Tuple, Generator
-from datasets import load_dataset, DatasetDict, Dataset as HFDataset
-from huggingface_hub import whoami, HfApi
-import logging
-
 logger = logging.getLogger(__name__)
-from datetime import datetime, timezone
-from uuid import UUID
+import os
 import uuid
 from contextlib import contextmanager
+from datetime import datetime, timezone
+from uuid import UUID
+
 import openai
+
+HF_HUB_CACHE = os.environ.get("HF_HUB_CACHE")
+if not HF_HUB_CACHE:
+    print(
+        "WARNING: HF_HUB_CACHE environment variable is not set, using default cache directory ~/.cache/huggingface/hub for database utils"
+    )
 
 
 def get_full_openai_model_name(alias):
@@ -84,7 +93,7 @@ def check_dataset_exists(name: str) -> bool:
     Check if dataset exists based on name.
     Returns True or False.
     """
-    dataset = load_dataset(name)
+    dataset = load_dataset(name, cache_dir=HF_HUB_CACHE)
     if isinstance(dataset, DatasetDict):
         fingerprint = dataset["train"]._fingerprint
     else:
@@ -113,9 +122,9 @@ def get_or_add_dataset_by_name(name: str, subset: str = None) -> Dict[str, Any]:
         RuntimeError: If dataset cannot be loaded or database operations fail
     """
     if subset is not None:
-        dataset = load_dataset(name, subset)
+        dataset = load_dataset(name, subset, cache_dir=HF_HUB_CACHE)
     else:
-        dataset = load_dataset(name)
+        dataset = load_dataset(name, cache_dir=HF_HUB_CACHE)
     if isinstance(dataset, DatasetDict):
         fingerprint = dataset["train"]._fingerprint
     else:
@@ -165,9 +174,9 @@ def get_dataset_from_db(id: UUID, subset: str = None) -> Dict[str, Any]:
             raise RuntimeError(f"Dataset with id {id} not found in database")
 
         if subset is not None:
-            dataset = load_dataset(dataset_db_obj.name, subset)["train"]
+            dataset = load_dataset(dataset_db_obj.name, subset, cache_dir=HF_HUB_CACHE)["train"]
         else:
-            dataset = load_dataset(dataset_db_obj.name)["train"]
+            dataset = load_dataset(dataset_db_obj.name, cache_dir=HF_HUB_CACHE)["train"]
         if dataset._fingerprint == dataset_db_obj.data_generation_hash:
             return dataset_db_obj.to_dict()
         else:

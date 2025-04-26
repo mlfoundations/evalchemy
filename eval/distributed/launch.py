@@ -732,7 +732,8 @@ def main():
     logs_dir = os.path.join("logs", output_dataset_repo_name)
     os.makedirs(logs_dir, exist_ok=True)
     print_info(f"Logs directory: {logs_dir}")
-    output_dataset_dir = os.path.join("results", output_dataset_repo_name)
+    results_dir = os.environ.get("EVALCHEMY_RESULTS_DIR", "results")
+    output_dataset_dir = os.path.join(results_dir, output_dataset_repo_name)
     os.makedirs(output_dataset_dir, exist_ok=True)
     print_info(f"Output dataset directory: {output_dataset_dir}")
 

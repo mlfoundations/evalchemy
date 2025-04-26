@@ -104,7 +104,7 @@ export OUTPUT_DATASET="$EVALCHEMY/results/${MODEL_NAME_SHORT}_${INPUT_DATASET##*
 srun echo -e "GLOBAL_SIZE: ${GLOBAL_SIZE}\nRANK: ${RANK}\nMODEL: ${MODEL_NAME}\nINPUT_DATASET: ${INPUT_DATASET}\nOUTPUT_DATASET: ${OUTPUT_DATASET}"
 
 # Test the sbatch script
-sbatch eval/distributed/process_shards_leonardo.sbatch
+sbatch eval/distributed/process_shards_jureca.sbatch
 # Clean up logs when done
 rm *.out
 ```

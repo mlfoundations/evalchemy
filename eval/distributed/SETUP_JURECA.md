@@ -119,3 +119,8 @@ NOTE: No node sharing so use the simple launch instead
 ```
 python eval/distributed/launch_simple.py --model_name open-thoughts/OpenThinker-7B --tasks AIME24 --num_shards 16
 ```
+
+## Test the upload
+```
+huggingface-cli upload mlfoundations-dev/OpenThinker-7B_eval_2870 $EVALCHEMY_RESULTS_DIR/OpenThinker-7B_eval_2870 --repo-type=dataset --commit-message="upload inferences" 
+```

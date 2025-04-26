@@ -39,7 +39,7 @@ srun bash -c 'nvidia-smi'
 # Test the inference pipeline manually
 # Run through commands similar to those in eval/distributed/process_shards_jureca.sbatch
 mkdir -p results
-export GLOBAL_SIZE=16
+export GLOBAL_SIZE=32
 export RANK=0
 export MODEL_NAME_SHORT=$(echo "$MODEL_NAME" | sed -n 's/.*models--[^-]*--\([^\/]*\).*/\1/p')
 export INPUT_DATASET="$HF_HUB_CACHE/datasets--mlfoundations-dev--evalset_2870"

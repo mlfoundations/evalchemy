@@ -1,6 +1,60 @@
 
 # Initial env setup
+Stored already in `jureca.env`
 ```
+export DCFT=/p/project1/laionize/dcft
+export DCFT_DATA=/p/data1/mmlaion/dcft
+export DCFT_GROUP=laionize
+export HF_HUB_CACHE=$DCFT_DATA/hub
+export DCFT_CONDA=$DCFT_DATA/mamba
+export EVALCHEMY=$DCFT/evalchemy
+export EVALCHEMY_ENV=$DCFT_DATA/evalchemy_env
+export EVALCHEMY_ACTIVATE_ENV="source $DCFT_CONDA/bin/activate $EVALCHEMY_ENV"
+```
+And in `common.sh`
+```
+if [[ "$PRIMARY_GROUP_SET" != "true" ]]; then
+  export PRIMARY_GROUP_SET=true
+  exec newgrp $DCFT_GROUP
+fi
+umask 007
+```
+And previously setup
+```
+cd /p/project1/laionize
+mkdir dcft
+chmod g+s dcft
+chmod g+rwX dcft
+newgrp laionize
+umask 007
+
+git clone https://USER:TOKEN@github.com/mlfoundations/evalchemy.git
+cd evalchemy
+git remote set-url origin https://USER:TOKEN@github.com/mlfoundations/evalchemy.git
+cd ..
+
+git clone https://USER:TOKEN@github.com/mlfoundations/dcft_private.git
+cd dcft_private 
+git remote set-url origin https://USER:TOKEN@github.com/mlfoundations/dcft_private.git
+
+cd /p/data1/mmlaion/dcft
+chmod g+s dcft
+chmod g+rwX dcft
+mkdir hub
+chgrp -R mmlaion hub
+chmod g+s hub
+chmod g+rwX hub
+mkdir checkpoints
+chgrp -R mmlaion checkpoints
+chmod g+s checkpoints
+chmod g+rwX checkpoints
+```
+
+Setup commands
+```
+cd $DCFT_DATA
+mkdir -p evalchemy_results
+
 # Install Mamba (following Jenia's guide: https://iffmd.fz-juelich.de/e-hu5RBHRXG6DTgD9NVjig#Creating-env)
 SHELL_NAME=bash
 VERSION=23.3.1-0
@@ -8,14 +62,17 @@ VERSION=23.3.1-0
 # NOTE: download the exact python version and --clone off base
 curl -L -O "https://github.com/conda-forge/miniforge/releases/download/${VERSION}/Mambaforge-${VERSION}-$(uname)-$(uname -m).sh" 
 chmod +x Mambaforge-${VERSION}-$(uname)-$(uname -m).sh
-./Mambaforge-${VERSION}-$(uname)-$(uname -m).sh -b -p $DCFT_MAMBA
+./Mambaforge-${VERSION}-$(uname)-$(uname -m).sh -b -p $DCFT_CONDA
+chgrp -R mmlaion mamba
 rm ./Mambaforge-${VERSION}-$(uname)-$(uname -m).sh
 eval "$(${DCFT_CONDA}/bin/conda shell.${SHELL_NAME} hook)"
 ${DCFT_CONDA}/bin/mamba create -y --prefix ${EVALCHEMY_ENV} --clone base
 source ${DCFT_CONDA}/bin/activate ${EVALCHEMY_ENV}
 
+
 # Fix path resolution issue in the installation
-sed -i 's|"fschat @ file:eval/chat_benchmarks/MTBench"|"fschat @ file:///leonardo_work/EUHPC_E03_068/DCFT_shared/evalchemy/eval/chat_benchmarks/MTBench"|g' /leonardo_work/EUHPC_E03_068/DCFT_shared/evalchemy/pyproject.toml
+cd  $EVALCHEMY
+sed -i 's|"fschat @ file:eval/chat_benchmarks/MTBench"|"fschat @ file:///p/project1/laionize/dcft/evalchemy/eval/chat_benchmarks/MTBench"|g' /p/project1/laionize/dcft/evalchemy/pyproject.toml
 pip install -e .
 pip install -e eval/chat_benchmarks/alpaca_eval
 git reset --hard HEAD

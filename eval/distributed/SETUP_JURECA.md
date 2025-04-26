@@ -102,9 +102,16 @@ export MODEL_NAME_SHORT=$(echo "$MODEL_NAME" | sed -n 's/.*models--[^-]*--\([^\/
 export INPUT_DATASET="$HF_HUB_CACHE/datasets--mlfoundations-dev--evalset_2870"
 export OUTPUT_DATASET="$EVALCHEMY/results/${MODEL_NAME_SHORT}_${INPUT_DATASET##*--}"
 srun echo -e "GLOBAL_SIZE: ${GLOBAL_SIZE}\nRANK: ${RANK}\nMODEL: ${MODEL_NAME}\nINPUT_DATASET: ${INPUT_DATASET}\nOUTPUT_DATASET: ${OUTPUT_DATASET}"
+```
 
 # Test the sbatch script
+```
 sbatch eval/distributed/process_shards_jureca.sbatch
 # Clean up logs when done
 rm *.out
+```
+
+# Test the launch
+```
+python eval/distributed/launch.py --model_name open-thoughts/OpenThinker-7B --tasks AIME24 --num_shards 16 
 ```

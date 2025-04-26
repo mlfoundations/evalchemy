@@ -7,6 +7,7 @@ import socket
 import subprocess
 import time
 
+from datasets import load_dataset
 from huggingface_hub import HfApi, snapshot_download
 
 clusters = [
@@ -173,6 +174,7 @@ def main():
         HF_HUB_CACHE = os.environ["HF_HUB_CACHE"]
         dataset_path = snapshot_download(repo_id=input_dataset, cache_dir=HF_HUB_CACHE, repo_type="dataset")
         model_path = snapshot_download(repo_id=args.model_name, cache_dir=HF_HUB_CACHE)
+        load_dataset(input_dataset, split="train", cache_dir=HF_HUB_CACHE)
         input_dataset = dataset_path
         args_dict["model_name"] = model_path
 

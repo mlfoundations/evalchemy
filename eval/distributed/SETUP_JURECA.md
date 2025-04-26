@@ -115,3 +115,7 @@ rm *.out
 ```
 python eval/distributed/launch.py --model_name open-thoughts/OpenThinker-7B --tasks AIME24 --num_shards 16 
 ```
+NOTE: No node sharing so use the simple launch instead
+```
+python eval/distributed/launch_simple.py --model_name open-thoughts/OpenThinker-7B --tasks AIME24 --num_shards 16
+```

@@ -1,3 +1,5 @@
+
+# Initial env setup
 ```
 # Install Mamba (following Jenia's guide: https://iffmd.fz-juelich.de/e-hu5RBHRXG6DTgD9NVjig#Creating-env)
 SHELL_NAME=bash
@@ -19,3 +21,33 @@ pip install -e eval/chat_benchmarks/alpaca_eval
 git reset --hard HEAD
 
 python -m eval.eval --model upload_to_hf --tasks AIME24 --model_args repo_id=mlfoundations-dev/evalset_2870
+```
+
+# Test processing shards
+```
+# Download necessary datasets and models on the login node
+# Note that HF_HUB_CACHE needs to be set as it is above
+huggingface-cli download mlfoundations-dev/evalset_2870 --repo-type dataset
+huggingface-cli download open-thoughts/OpenThinker-7B
+
+# Request an interactive node for testing
+salloc --nodes=1 --ntasks-per-node=1 --gres=gpu:1 --cpus-per-task=12 -p dc-hwai -A westai0007
+
+# Verify GPU is available
+srun bash -c 'nvidia-smi'
+
+# Test the inference pipeline manually
+# Run through commands similar to those in eval/distributed/process_shards_jureca.sbatch
+mkdir -p results
+export GLOBAL_SIZE=16
+export RANK=0
+export MODEL_NAME_SHORT=$(echo "$MODEL_NAME" | sed -n 's/.*models--[^-]*--\([^\/]*\).*/\1/p')
+export INPUT_DATASET="$HF_HUB_CACHE/datasets--mlfoundations-dev--evalset_2870"
+export OUTPUT_DATASET="$EVALCHEMY/results/${MODEL_NAME_SHORT}_${INPUT_DATASET##*--}"
+srun echo -e "GLOBAL_SIZE: ${GLOBAL_SIZE}\nRANK: ${RANK}\nMODEL: ${MODEL_NAME}\nINPUT_DATASET: ${INPUT_DATASET}\nOUTPUT_DATASET: ${OUTPUT_DATASET}"
+
+# Test the sbatch script
+sbatch eval/distributed/process_shards_leonardo.sbatch
+# Clean up logs when done
+rm *.out
+```

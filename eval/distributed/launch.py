@@ -96,6 +96,9 @@ def check_required_env_vars():
     elif "tacc" in hostname:
         hf_hub_cache = "/work/08134/negin/ls6/shared_env/hub"
         print_info(f"Detected TACC environment, using HF_HUB_CACHE: {hf_hub_cache}")
+    elif "jureca" in hostname:
+        hf_hub_cache = "/p/data1/mmlaion/dcft/hub"
+        print_info(f"Detected Jureca environment, using HF_HUB_CACHE: {hf_hub_cache}")
     else:
         raise ValueError(f"Unknown hostname: {hostname}, can't determine which HF_HUB_CACHE to use")
     current_hub_cache = os.environ.get("HF_HUB_CACHE")

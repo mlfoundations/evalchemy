@@ -7,7 +7,7 @@ import socket
 import subprocess
 import time
 
-from huggingface_hub import HfApi
+from huggingface_hub import HfApi, snapshot_download
 
 clusters = [
     {

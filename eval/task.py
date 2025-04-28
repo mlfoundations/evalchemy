@@ -19,9 +19,19 @@ from lm_eval.api.model import LM
 class BaseBenchmark(ABC):
     """Abstract base class for implementing LLM evaluation benchmarks."""
 
-    def __init__(self, logger: Optional[logging.Logger] = None, system_instruction: Optional[str] = None):
+    def __init__(
+            self,
+            logger: Optional[logging.Logger] = None,
+            system_instruction: Optional[str] = None,
+            max_new_tokens: Optional[int] = None,
+            repetition_penalty: Optional[float] = None,
+            temperature: Optional[float] = None,
+        ):
         self.logger = logger or logging.getLogger(self.__class__.__name__)
         self.system_instruction = system_instruction
+        self.max_new_tokens = max_new_tokens
+        self.repetition_penalty = repetition_penalty
+        self.temperature = temperature
 
     def _normalize_model_args(self, model: LM, instances: List[Instance]) -> List[Instance]:
         for instance in instances:
@@ -235,7 +245,7 @@ class TaskManager:
 
             # Only pass kwargs that the benchmark's __init__ accepts
             for param_name, param in init_params.items():
-                if param_name in self.benchmark_kwargs:
+                if param_name in self.benchmark_kwargs and self.benchmark_kwargs[param_name] is not None:
                     valid_kwargs[param_name] = self.benchmark_kwargs[param_name]
                     self.logger.debug(f"Passing {param_name} to {name} benchmark")
 

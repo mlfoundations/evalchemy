@@ -82,7 +82,28 @@ def setup_custom_parser():
     )
 
     parser.add_argument(
-        "--config", type=str, help="Path to config yaml. Overwrites --batch_size, --tasks, and --annotator_model"
+        "--max_new_tokens",
+        type=int,
+        default=None,
+        help="Maximum number of tokens to generate. If not set, the model's default max_new_tokens will be used.",
+    )
+
+    parser.add_argument(
+        "--repetition_penalty",
+        type=float,
+        default=None,
+        help="Repetition penalty for model. If not set, the model's default repetition_penalty will be used.",
+    )
+
+    parser.add_argument(
+        "--temperature",
+        type=float,
+        default=None,
+        help="Temperature for model. If not set, the model's default temperature will be used.",
+    )
+
+    parser.add_argument(
+        "--config", type=str, help="Path to config yaml. Overwrites --batch_size, --tasks, --annotator_model, --max_new_tokens, --repetition_penalty and --temperature."
     )
     parser.add_argument(
         "--debug",
@@ -283,12 +304,16 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
         args = parse_eval_args(parser)
 
     if args.config is not None:
-        # This overwrites `--tasks` and `--batch_size`
+        # This overwrites `--tasks`, `--batch_size`, `--annotator_model`, `--max_new_tokens`,
+        # `--repetition_penalty` and `--temperature`.
         with open(args.config, "r") as file:
             tasks_yaml = yaml.safe_load(file)
         args.tasks = ",".join([t["task_name"] for t in tasks_yaml["tasks"]])
         batch_sizes_list = [int(t["batch_size"]) if t["batch_size"] != "auto" else "auto" for t in tasks_yaml["tasks"]]
         args.annotator_model = tasks_yaml.get("annotator_model", args.annotator_model)
+        args.max_new_tokens = tasks_yaml.get("max_new_tokens", args.max_new_tokens)
+        args.repetition_penalty = tasks_yaml.get("repetition_penalty", args.repetition_penalty)
+        args.temperature = tasks_yaml.get("temperature", args.temperature)
     else:
         batch_sizes_list = [
             int(args.batch_size) if args.batch_size != "auto" else args.batch_size
@@ -331,6 +356,9 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
         seed=args.seed,
         task_list=task_list,
         system_instruction=args.system_instruction,
+        max_new_tokens=args.max_new_tokens,
+        repetition_penalty=args.repetition_penalty,
+        temperature=args.temperature,
     )
     pretrain_task_manager = PretrainTaskManager(args.verbosity, include_path=args.include_path)
 

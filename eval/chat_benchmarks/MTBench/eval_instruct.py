@@ -7,6 +7,7 @@ import time
 import logging
 import numpy as np
 import pandas as pd
+import re
 import shortuuid
 import torch.distributed as dist
 from tqdm import tqdm
@@ -73,6 +74,9 @@ class MTBenchBenchmark(BaseBenchmark):
         annotator_model: str = "gpt-4o-mini-2024-07-18",
         logger: Optional[logging.Logger] = None,
         system_instruction: Optional[str] = None,
+        max_new_tokens: Optional[int] = None,
+        repetition_penalty: Optional[float] = None,
+        temperature: Optional[float] = None,
     ):
         """
         Initialize MTBench benchmark.
@@ -83,8 +87,11 @@ class MTBenchBenchmark(BaseBenchmark):
             debug: If True, run in debug mode on 2 samples
             logger: Optional logger instance
             system_instruction: Optional system instruction for the model
+            max_new_tokens: Optional maximum number of tokens to generate
+            repetition_penalty: Optional repetition penalty for the model
+            temperature: Optional temperature for the model
         """
-        super().__init__(logger=logger, system_instruction=system_instruction)
+        super().__init__(logger=logger, system_instruction=system_instruction, max_new_tokens=max_new_tokens, repetition_penalty=repetition_penalty, temperature=temperature)
         self.base_path = Path(base_path)
         if annotator_model == "auto":
             annotator_model = "gpt-4"
@@ -114,6 +121,9 @@ class MTBenchBenchmark(BaseBenchmark):
         max_turns = max(len(q["turns"]) for q in questions)
         answer_file = self.answer_dir / f"{model_id}.jsonl"
 
+        repetition_penalty = self.repetition_penalty if self.repetition_penalty else 1.0
+        max_new_tokens = self.max_new_tokens if self.max_new_tokens else 1024
+
         # Process each turn
         for turn_num in range(max_turns):
             self.logger.info(f"Processing Turn {turn_num + 1}")
@@ -123,8 +133,7 @@ class MTBenchBenchmark(BaseBenchmark):
             self.logger.info("Generating responses for MTBench...")
             for q_idx, question in enumerate(questions):
                 if turn_num < len(question["turns"]):
-                    temperature = temperature_config.get(question["category"], 0.7)
-
+                    temperature = self.temperature if self.temperature else temperature_config.get(question["category"], 0.7)
                     # Add user message to conversation
                     all_convs[q_idx].append({"role": "user", "content": question["turns"][turn_num]})
 
@@ -137,9 +146,10 @@ class MTBenchBenchmark(BaseBenchmark):
                             (
                                 prompt,
                                 {
-                                    "max_gen_toks": self.config.max_new_token,
+                                    "max_gen_toks": max_new_tokens,
                                     "do_sample": temperature >= 1e-4,
                                     "temperature": temperature,
+                                    "repetition_penalty": repetition_penalty,
                                 },
                             ),
                             q_idx,
@@ -152,6 +162,7 @@ class MTBenchBenchmark(BaseBenchmark):
 
                 # Process outputs
                 for q_idx, output in enumerate(outputs):
+                    output = self.extract_answer(output)
                     all_convs[q_idx].append({"role": "assistant", "content": output})
                     all_choices[q_idx]["turns"].append(output)
 
@@ -341,3 +352,12 @@ class MTBenchBenchmark(BaseBenchmark):
         except Exception as e:
             self.logger.error(f"Error running benchmark: {str(e)}")
             return {"error": str(e)}
+
+    def extract_answer(self, output: str) -> str:
+        """Extract the answer from the model's output. Required for think models."""
+        match = re.search(r"</think>\s*(.*)", output, re.DOTALL)
+        if match:
+            output = match.group(1).strip()
+        else:
+            output = output
+        return output

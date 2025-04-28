@@ -14,13 +14,15 @@ class IFEvalBenchmark(BaseBenchmark):
     def __init__(
         self,
         data_dir: str = "eval/chat_benchmarks/IFEval/data",
-        max_tokens: int = 512,
         num_examples: int = 3,
         start_idx: int = 10,
         end_idx: int = 510,
         debug: bool = False,
         logger: Optional[logging.Logger] = None,
         system_instruction: Optional[str] = None,
+        max_new_tokens: Optional[int] = None,
+        repetition_penalty: Optional[float] = None,
+        temperature: Optional[float] = None,
     ):
         """
         Initialize Instruction Following Benchmark
@@ -34,10 +36,12 @@ class IFEvalBenchmark(BaseBenchmark):
         debug_size: If set, only evaluate this many examples
         logger: Optional logger instance
         system_instruction: Optional system instruction for the model
+        max_new_tokens: Optional maximum number of tokens to generate
+        repetition_penalty: Optional repetition penalty for the model
+        temperature: Optional temperature for the model
         """
-        super().__init__(logger=logger, system_instruction=system_instruction)
+        super().__init__(logger=logger, system_instruction=system_instruction, max_new_tokens=max_new_tokens, repetition_penalty=repetition_penalty, temperature=temperature)
         self.data_dir = data_dir
-        self.max_tokens = max_tokens
         self.num_examples = num_examples
         self.start_idx = start_idx
         self.end_idx = end_idx
@@ -92,6 +96,11 @@ class IFEvalBenchmark(BaseBenchmark):
             self.logger.info(f"Process {len(examples)} examples")
 
             all_instances = []
+
+            max_new_tokens = self.max_new_tokens if self.max_new_tokens else 512
+            temperature = self.temperature if self.temperature else 0.7
+            repetition_penalty = self.repetition_penalty if self.repetition_penalty else 1.0
+
             for idx, example in enumerate(examples):
                 try:
                     inputs = self._prepare_messages([{"role": "user", "content": example["prompt"]}], model)
@@ -102,8 +111,10 @@ class IFEvalBenchmark(BaseBenchmark):
                             (
                                 inputs,
                                 {
-                                    "max_gen_toks": self.max_tokens,
+                                    "max_gen_toks": max_new_tokens,
                                     "do_sample": False,
+                                    "temperature": temperature,
+                                    "repetition_penalty": repetition_penalty,
                                 },
                             ),
                             idx,
@@ -197,7 +208,7 @@ class IFEvalBenchmark(BaseBenchmark):
 
         try:
             generation_results = self.generate_responses(model)
-            evaluation_results = self.evaluate_responses(generaiton_results)
+            evaluation_results = self.evaluate_responses(generation_results)
 
             evaluation_results.update(
                 {"benchmark_version": "ifeval", "max_tokens": self.max_tokens, "num_shot": self.num_examples}

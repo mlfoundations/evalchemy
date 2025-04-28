@@ -29,6 +29,9 @@ class AIME25Benchmark(BaseBenchmark):
         seed: List[int] = [0, 1234, 1234, 1234],
         logger: Optional[logging.Logger] = None,
         system_instruction: Optional[str] = None,
+        max_new_tokens: Optional[int] = None,
+        repetition_penalty: Optional[float] = None,
+        temperature: Optional[float] = None,
     ):
         """
         Initialize AIME25 benchmark.
@@ -38,11 +41,14 @@ class AIME25Benchmark(BaseBenchmark):
             debug: If set, only evaluate on 2 examples
             seed: Random seed for reproducibility. Default is [0, 1234, 1234, 1234] for lm-eval-harness.
             logger: Optional logger instance
+            system_instruction: Optional system instruction for the model
+            max_new_tokens: Optional maximum number of tokens to generate
+            repetition_penalty: Optional repetition penalty for the model
+            temperature: Optional temperature for the model
         """
-        super().__init__(logger=logger, system_instruction=system_instruction)
+        super().__init__(logger=logger, system_instruction=system_instruction, max_new_tokens=max_new_tokens, repetition_penalty=repetition_penalty, temperature=temperature)
         self.data_file = data_file
         self.debug = debug
-        self.max_new_tokens = 32768  # set higher to avoid truncation for reasoning models
         self.seed = seed
         self.n_repeat = 10
 
@@ -60,6 +66,10 @@ class AIME25Benchmark(BaseBenchmark):
         examples = self.load_questions()
         # Prepare instances for model
         all_outputs = []
+
+        max_new_tokens = self.max_new_tokens if self.max_new_tokens else 32768 # set default higher to avoid truncation for reasoning models
+        temperature = self.temperature if self.temperature else 0.7
+        repetition_penalty = self.repetition_penalty if self.repetition_penalty else 1.0
 
         for i in range(self.n_repeat):
             all_instances = []
@@ -79,9 +89,10 @@ class AIME25Benchmark(BaseBenchmark):
                         templated_messages,
                         {
                             "do_sample": False,
-                            "max_new_tokens": self.max_new_tokens,
-                            "temperature": 0.7,
+                            "max_gen_toks": max_new_tokens,
+                            "temperature": temperature,
                             "seed": seed,
+                            "repetition_penalty": repetition_penalty,
                         },
                     ),
                     idx,

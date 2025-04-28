@@ -70,7 +70,6 @@ class BigCodeBenchBenchmark(BaseBenchmark):
         self,
         language: str = "python",
         data_dir: str = BIGCODEBENCH_PATH,
-        max_tokens: int = 1280,
         num_workers: int = 32,
         timeout: float = 120,
         debug: bool = False,
@@ -80,6 +79,9 @@ class BigCodeBenchBenchmark(BaseBenchmark):
         safe_mode: bool = False,
         check_ground_truth: bool = False,
         system_instruction: Optional[str] = None,
+        max_new_tokens: Optional[int] = None,
+        repetition_penalty: Optional[float] = None,
+        temperature: Optional[float] = None,
     ):
         """
         Initialize BigCodeBench benchmark.
@@ -93,12 +95,14 @@ class BigCodeBenchBenchmark(BaseBenchmark):
             debug: If True, only evaluate first 2 examples
             logger: Optional logger instance
             system_instruction: Optional system instruction for the model
+            max_new_tokens: Optional maximum number of tokens to generate
+            repetition_penalty: Optional repetition penalty for the model
+            temperature: Optional temperature for the model
         """
-        super().__init__(logger=logger, system_instruction=system_instruction)
+        super().__init__(logger=logger, system_instruction=system_instruction, max_new_tokens=max_new_tokens, repetition_penalty=repetition_penalty, temperature=temperature)
         self.language = language
         os.makedirs(data_dir, exist_ok=True)
         self.data_dir = data_dir
-        self.max_tokens = max_tokens
         self.num_workers = num_workers
         self.timeout = timeout
         self.debug = debug
@@ -122,6 +126,11 @@ class BigCodeBenchBenchmark(BaseBenchmark):
         results = {}
         temp_dir_obj = tempfile.TemporaryDirectory()
         temp_dir = temp_dir_obj.name
+
+        max_new_tokens = self.max_new_tokens if self.max_new_tokens else 1280
+        temperature = self.temperature if self.temperature else 0.7
+        repetition_penalty = self.repetition_penalty if self.repetition_penalty else 1.0
+
         for prompt_type in self.prompt_types:
             all_instances = []
             try:
@@ -166,10 +175,11 @@ class BigCodeBenchBenchmark(BaseBenchmark):
                             (
                                 inputs,
                                 {
-                                    "max_gen_toks": self.max_tokens,
+                                    "max_gen_toks": max_new_tokens,
                                     # "do_sample": False,
                                     # "top_p": 1.0,
-                                    "temperature": 0,
+                                    "temperature": temperature,
+                                    "repetition_penalty": repetition_penalty,
                                 },
                             ),
                             example["task_id"],

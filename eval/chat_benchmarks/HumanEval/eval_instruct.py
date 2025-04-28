@@ -22,12 +22,14 @@ class HumanEvalBenchmark(BaseBenchmark):
         self,
         languages: List[str] = ["python", "sh"],
         data_dir: str = "eval/chat_benchmarks/HumanEval/data",
-        max_tokens: int = 1024,
         num_workers: int = 8,
         timeout: float = 3.0,
         debug: bool = False,
         logger: Optional[logging.Logger] = None,
         system_instruction: Optional[str] = None,
+        max_new_tokens: Optional[int] = None,
+        repetition_penalty: Optional[float] = None,
+        temperature: Optional[float] = None,
     ):
         """
         Initialize HumanEval benchmark.
@@ -35,17 +37,18 @@ class HumanEvalBenchmark(BaseBenchmark):
         Args:
             languages: List of programming languages to evaluate
             data_dir: Directory containing HumanEval datasets
-            max_tokens: Maximum number of tokens for generation
             num_workers: Number of workers for parallel evaluation
             timeout: Timeout for code execution
             debug: If True, only evaluate first 2 examples
             logger: Optional logger instance
             system_instruction: Optional system instruction for the model
+            max_new_tokens: Optional maximum number of tokens to generate
+            repetition_penalty: Optional repetition penalty for the model
+            temperature: Optional temperature for the model
         """
-        super().__init__(logger=logger, system_instruction=system_instruction)
+        super().__init__(logger=logger, system_instruction=system_instruction, max_new_tokens=max_new_tokens, repetition_penalty=repetition_penalty, temperature=temperature)
         self.languages = languages
         self.data_dir = data_dir
-        self.max_tokens = max_tokens
         self.num_workers = num_workers
         self.timeout = timeout
         self.debug = debug
@@ -76,6 +79,10 @@ Please continue to complete the function. You are not allowed to modify the give
         temp_dir_obj = tempfile.TemporaryDirectory()
         temp_dir = temp_dir_obj.name
 
+        max_new_tokens = self.max_new_tokens if self.max_new_tokens else 1024
+        temperature = self.temperature if self.temperature else 0.7
+        repetition_penalty = self.repetition_penalty if self.repetition_penalty else 1.0
+
         for lang in self.languages:
             try:
                 problem_file = os.path.join(self.data_dir, f"humaneval-{lang}.jsonl")
@@ -104,8 +111,10 @@ Please continue to complete the function. You are not allowed to modify the give
                             (
                                 inputs,
                                 {
-                                    "max_gen_toks": self.max_tokens,
+                                    "max_gen_toks": max_new_tokens,
                                     "do_sample": False,
+                                    "temperature": temperature,
+                                    "repetition_penalty": repetition_penalty,
                                 },
                             ),
                             idx,

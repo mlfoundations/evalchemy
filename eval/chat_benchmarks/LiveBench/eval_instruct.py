@@ -38,10 +38,8 @@ class LiveBenchBenchmark(BaseBenchmark):
 
     def __init__(
         self,
-        max_new_token: int = 4096,
         dataset_name: str = "live_bench",
         question_source: str = "huggingface",
-        temperature: float = 0.0,
         do_sample: bool = True,
         debug: bool = False,
         num_choices: int = 1,
@@ -50,6 +48,9 @@ class LiveBenchBenchmark(BaseBenchmark):
         seed: List[int] = [0, 1234, 1234, 1234],
         logger: Optional[logging.Logger] = None,
         system_instruction: Optional[str] = None,
+        max_new_tokens: Optional[int] = None,
+        repetition_penalty: Optional[float] = None,
+        temperature: Optional[float] = None,
     ):
         """
         Initialize LiveBench benchmark.
@@ -58,8 +59,11 @@ class LiveBenchBenchmark(BaseBenchmark):
             dataset_name: Name of the dataset
             logger: Optional logger instance
             system_instruction: Optional system instruction for the model
+            max_new_tokens: Optional maximum number of tokens to generate
+            repetition_penalty: Optional repetition penalty for the model
+            temperature: Optional temperature for the model
         """
-        super().__init__(logger=logger, system_instruction=system_instruction)
+        super().__init__(logger=logger, system_instruction=system_instruction, max_new_tokens=max_new_tokens, repetition_penalty=repetition_penalty, temperature=temperature)
         self.dataset_name = dataset_name
         self.question_source = question_source
         self.do_sample = do_sample
@@ -68,12 +72,9 @@ class LiveBenchBenchmark(BaseBenchmark):
         self.remove_existing_file = remove_existing_file
         self.num_workers = 1
         if self.debug:
-            self.max_tokens = 128
+            self.max_new_tokens = 128
             self.release_date = "2024-06-24"
             self.num_workers = 1
-        else:
-            self.max_tokens = max_new_token
-        self.temperature = temperature
         self.num_choices = num_choices
         self.all_release_dates = ["2024-07-26", "2024-06-24", "2024-08-31", "2024-11-25"]
         self.seed = seed
@@ -159,6 +160,10 @@ class LiveBenchBenchmark(BaseBenchmark):
         model_name = self._get_model_name(model)
         questions = self.get_question_list(model_name, self.all_release_dates)
 
+        max_new_tokens = self.max_new_tokens if self.max_new_tokens else 4096
+        temperature = self.temperature if self.temperature else 0.0
+        repetition_penalty = self.repetition_penalty if self.repetition_penalty else 1.0
+
         # Generate answers
         all_choices = {}
         for idx, (_, answer_file) in enumerate(questions):
@@ -190,10 +195,11 @@ class LiveBenchBenchmark(BaseBenchmark):
                                 (
                                     templated_messages,
                                     {
-                                        "max_new_tokens": self.max_tokens,
-                                        "do_sample": self.temperature >= 1e-4,
-                                        "temperature": self.temperature,
+                                        "max_gen_toks": max_new_tokens,
+                                        "do_sample": temperature >= 1e-4,
+                                        "temperature": temperature,
                                         "seed": self.seed,
+                                        "repetition_penalty": repetition_penalty,
                                     },
                                 ),
                                 idx,

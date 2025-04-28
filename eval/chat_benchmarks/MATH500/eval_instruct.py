@@ -29,6 +29,9 @@ class MATH500Benchmark(BaseBenchmark):
         seed: List[int] = [0, 1234, 1234, 1234],
         logger: Optional[logging.Logger] = None,
         system_instruction: Optional[str] = None,
+        max_new_tokens: Optional[int] = None,
+        repetition_penalty: Optional[float] = None,
+        temperature: Optional[float] = None,
     ):
         """
         Initialize MATH500 benchmark.
@@ -39,12 +42,14 @@ class MATH500Benchmark(BaseBenchmark):
             seed: Random seed for reproducibility. Default is [0, 1234, 1234, 1234] for lm-eval-harness.
             logger: Optional logger instance
             system_instruction: Optional system instruction for the model
+            max_new_tokens: Optional maximum number of tokens to generate
+            repetition_penalty: Optional repetition penalty for the model
+            temperature: Optional temperature for the model
         """
-        super().__init__(logger=logger, system_instruction=system_instruction)
+        super().__init__(logger=logger, system_instruction=system_instruction, max_new_tokens=max_new_tokens, repetition_penalty=repetition_penalty, temperature=temperature)
         self.data_file = data_file
         self.debug = debug
         self.seed = seed
-        self.max_new_tokens = 32768  # set higher to avoid truncation for reasoning models
 
     def generate_responses(self, model: LM) -> Dict[str, Any]:
         """
@@ -58,6 +63,10 @@ class MATH500Benchmark(BaseBenchmark):
             or None for non-primary ranks
         """
         examples = self.load_questions()
+
+        max_new_tokens = self.max_new_tokens if self.max_new_tokens else 32768
+        temperature = self.temperature if self.temperature else 0.7
+        repetition_penalty = self.repetition_penalty if self.repetition_penalty else 1.0
 
         # Prepare instances for model
         all_instances = []
@@ -82,9 +91,10 @@ class MATH500Benchmark(BaseBenchmark):
                         templated_messages,
                         {
                             "do_sample": False,
-                            "max_new_tokens": self.max_new_tokens,
-                            "temperature": 0.7,
+                            "max_gen_toks": max_new_tokens,
+                            "temperature": temperature,
                             "seed": self.seed,
+                            "repetition_penalty": repetition_penalty,
                         },
                     ),
                     idx,

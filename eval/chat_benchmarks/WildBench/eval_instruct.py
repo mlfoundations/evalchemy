@@ -80,6 +80,9 @@ class WildBenchBenchmark(BaseBenchmark):
         debug: bool = False,
         logger: Optional[logging.Logger] = None,
         system_instruction: Optional[str] = None,
+        max_new_tokens: Optional[int] = None,
+        temperature: Optional[float] = None,
+        repetition_penalty: Optional[float] = None,
     ):
         """
         Initialize WildBench benchmark.
@@ -88,8 +91,12 @@ class WildBenchBenchmark(BaseBenchmark):
             config: WildBench configuration
             debug: If True, run in debug mode on 2 samples
             logger: Optional logger instance
+            system_instruction: Optional system instruction for the model
+            max_new_tokens: Optional maximum number of tokens to generate
+            temperature: Optional temperature for the model
+            repetition_penalty: Optional repetition penalty for the model
         """
-        super().__init__(logger=logger, system_instruction=system_instruction)
+        super().__init__(logger=logger, system_instruction=system_instruction, max_new_tokens=max_new_tokens, temperature=temperature, repetition_penalty=repetition_penalty)
         if annotator_model == "auto":
             annotator_model = "gpt-4-1106-preview"
         if config:
@@ -174,6 +181,10 @@ class WildBenchBenchmark(BaseBenchmark):
                 [{"role": c["role"], "content": c["content"]} for c in chat] for chat in extracted_chats
             ]
 
+            max_new_tokens = self.max_new_tokens if self.max_new_tokens else 1024
+            temperature = self.temperature if self.temperature else 0.0
+            repetition_penalty = self.repetition_penalty if self.repetition_penalty else 1.0
+
             # Prepare model inputs
             model_inputs = [self._prepare_messages(chat, model) for chat in simplified_extracted_chats]
 
@@ -190,9 +201,10 @@ class WildBenchBenchmark(BaseBenchmark):
                     (
                         inputs,
                         {
-                            "max_gen_toks": self.config.max_tokens,
+                            "max_gen_toks": max_new_tokens,
                             "do_sample": self.config.do_sample,
-                            "temperature": self.config.temperature,
+                            "temperature": temperature,
+                            "repetition_penalty": repetition_penalty,
                         },
                     ),
                     idx,

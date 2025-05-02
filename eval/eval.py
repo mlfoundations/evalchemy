@@ -462,7 +462,14 @@ def initialize_model(
     else:
         lm = model
 
-    lm.model_identifier = sanitize_model_name(f"model_{model}_model_args_{model_args}")
+    # For model names that are too long, truncate them to avoid issues with storage
+    if len(f"model_{model}_model_args_{model_args}") > 150:
+        model_name = f"model_{model}_model_args_{model_args}"[:100]
+    else:
+        model_name = f"model_{model}_model_args_{model_args}"
+
+    lm.model_identifier = sanitize_model_name(model_name)
+    
     return lm
 
 

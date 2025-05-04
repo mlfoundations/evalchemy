@@ -15,27 +15,27 @@
 set -e
 
 # CUDA
-module load CUDA/12.6.0
-module load imkl/2023.2.0
+# module load CUDA/12.6.0
+# module load imkl/2023.2.0
 
 # ENVIRONMENT VARIABLES - EVALCHEMY, HF_HUB_CACHE, and EVALCHEMY_ACTIVATE_ENV
-export DCFT=/rwthfs/rz/cluster/hpcwork/rwth1775/dcft
-source $DCFT/dcft_private/hpc/dotenv/claix.env
-source $DCFT/dcft_private/database/access.env
+# export DCFT=/rwthfs/rz/cluster/hpcwork/rwth1775/dcft
+# source $DCFT/dcft_private/hpc/dotenv/claix.env
+# source $DCFT/dcft_private/database/access.env
 
 # CONDA
-echo "Loading conda: $EVALCHEMY_ACTIVATE_ENV"
-$EVALCHEMY_ACTIVATE_ENV
+# echo "Loading conda: $EVALCHEMY_ACTIVATE_ENV"
+# $EVALCHEMY_ACTIVATE_ENV
 
 # DOWNLOAD MODEL AND DATASET
 MODEL_NAME={model_name}
 INPUT_DATASET={input_dataset}
 OUTPUT_DATASET={output_dataset}
-srun --nodes=1 --ntasks=1 huggingface-cli download $MODEL_NAME --cache-dir $HF_HUB_CACHE
-srun --nodes=1 --ntasks=1 huggingface-cli download $INPUT_DATASET --cache-dir $HF_HUB_CACHE --repo-type dataset
+# srun --nodes=1 --ntasks=1 huggingface-cli download $MODEL_NAME --cache-dir $HF_HUB_CACHE
+# srun --nodes=1 --ntasks=1 huggingface-cli download $INPUT_DATASET --cache-dir $HF_HUB_CACHE --repo-type dataset
 
 # RUN SHARDED INFERENCE
-srun --nodes={num_nodes} --ntasks=$((${num_nodes}*4)) --ntasks-per-node=4 --cpus-per-task=24 --output={logs_dir}/%x_%j_%N_%t.out bash -c 'echo -e "GLOBAL_SIZE: ${SLURM_STEP_NUM_TASKS}\nRANK: ${SLURM_PROCID}\nMODEL: '$MODEL_NAME'\nINPUT_DATASET: '$INPUT_DATASET'\nOUTPUT_DATASET: '$OUTPUT_DATASET'"'
+srun --nodes={num_nodes} --ntasks=$({num_nodes}*4) --ntasks-per-node=4 --cpus-per-task=24 --output={logs_dir}/%x_%j_%N_%t.out bash -c 'echo -e "GLOBAL_SIZE: ${SLURM_STEP_NUM_TASKS}\nRANK: ${SLURM_PROCID}\nMODEL: '$MODEL_NAME'\nINPUT_DATASET: '$INPUT_DATASET'\nOUTPUT_DATASET: '$OUTPUT_DATASET'"'
 # srun --nodes={num_nodes} --ntasks-per-node=4 --cpus-per-task=24 --output={logs_dir}/%x_%j_%N_%t.out bash -c 'CUDA_VISIBLE_DEVICES=${SLURM_LOCALID} python $EVALCHEMY/eval/distributed/process_shard.py --global_size ${SLURM_STEP_NUM_TASKS} --rank ${SLURM_PROCID} --input_dataset '${INPUT_DATASET}' --model_name '${MODEL_NAME}' --output_dataset '${OUTPUT_DATASET}' --upload'
 
 # COMPUTE SCORES

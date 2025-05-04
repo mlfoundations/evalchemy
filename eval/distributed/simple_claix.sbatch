@@ -7,7 +7,7 @@
 #SBATCH --account=rwth1775
 #SBATCH --partition=c23g
 #SBATCH --job-name={job_name}
-#SBATCH --output={logs_dir}/%x_%j.out
+#SBATCH --output={logs_dir}/%x_%j_%N_%t.out
 #SBATCH --mail-type=END,TIME_LIMIT,FAIL
 #SBATCH --mail-user=dcft-slurm-notifs-aaaap7wt363mcsgryaejj2o6dm@dogs-and-ml.slack.com
 
@@ -36,7 +36,7 @@ srun --nodes=1 --ntasks=1 huggingface-cli download $INPUT_DATASET --cache-dir $H
 
 # RUN SHARDED INFERENCE
 srun --nodes={num_nodes} --ntasks-per-node=4 --cpus-per-task=24 --output={logs_dir}/%x_%j_%t.out bash -c 'echo -e "GLOBAL_SIZE: ${SLURM_STEP_NUM_TASKS}\nRANK: ${SLURM_PROCID}\nMODEL: '$MODEL_NAME'\nINPUT_DATASET: '$INPUT_DATASET'\nOUTPUT_DATASET: '$OUTPUT_DATASET'"'
-srun --nodes={num_nodes} --ntasks-per-node=4 --cpus-per-task=24 --output={logs_dir}/%x_%j_%t.out bash -c 'CUDA_VISIBLE_DEVICES=${SLURM_LOCALID} python $EVALCHEMY/eval/distributed/process_shard.py --global_size ${SLURM_STEP_NUM_TASKS} --rank ${SLURM_PROCID} --input_dataset '${INPUT_DATASET}' --model_name '${MODEL_NAME}' --output_dataset '${OUTPUT_DATASET}' --upload'
+# srun --nodes={num_nodes} --ntasks-per-node=4 --cpus-per-task=24 --output={logs_dir}/%x_%j_%t.out bash -c 'CUDA_VISIBLE_DEVICES=${SLURM_LOCALID} python $EVALCHEMY/eval/distributed/process_shard.py --global_size ${SLURM_STEP_NUM_TASKS} --rank ${SLURM_PROCID} --input_dataset '${INPUT_DATASET}' --model_name '${MODEL_NAME}' --output_dataset '${OUTPUT_DATASET}' --upload'
 
 # COMPUTE SCORES
-srun --nodes=1 --ntasks=1 --mem=0 --cpus-per-task=96 python -m eval.eval --model precomputed_hf --model_args "repo_id={output_dataset}",model="{model_name}" --tasks {tasks_str} --output_path logs --use_database
+# srun --nodes=1 --ntasks=1 --mem=0 --cpus-per-task=96 python -m eval.eval --model precomputed_hf --model_args "repo_id={output_dataset}",model="{model_name}" --tasks {tasks_str} --output_path logs --use_database

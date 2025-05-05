@@ -18,7 +18,7 @@ set -e
 module load cuda/12.4 nccl/12.4
 
 # ENVIRONMENT VARIABLES - EVALCHEMY, HF_HUB_CACHE, and EVALCHEMY_ACTIVATE_ENV
-source /work/10159/rmarten/vista/dcft/dcft_private/hpc/dotenv/tacc.env
+source /scratch/08002/gsmyrnis/dcft_shared/dcft_private/hpc/dotenv/tacc.env
 
 # CONDA
 $EVALCHEMY_ACTIVATE_ENV

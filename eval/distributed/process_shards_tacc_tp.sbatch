@@ -13,15 +13,11 @@
 # MODULES
 module load cuda/12.4 nccl/12.4
 
-# MAIN DIRECTORIES
-export DCFT="/work/08134/negin/ls6/shared_env/"
-export EVALCHEMY="$DCFT/evalchemy"
-export HF_HUB_CACHE="$SCRATCH/hf_home"
+# ENVIRONMENT VARIABLES - EVALCHEMY, HF_HUB_CACHE, and EVALCHEMY_ACTIVATE_ENV
+source /scratch/08002/gsmyrnis/dcft_shared/dcft_private/hpc/dotenv/tacc.env
 
 # CONDA
-export PATH="/work/08134/negin/anaconda3/condabin/:$PATH"
-source /work/08134/negin/anaconda3/etc/profile.d/conda.sh
-conda activate evalchemy
+$EVALCHEMY_ACTIVATE_ENV
 
 # LAUNCH RAY CLUSTER
 nodes=$(scontrol show hostnames "$SLURM_JOB_NODELIST")

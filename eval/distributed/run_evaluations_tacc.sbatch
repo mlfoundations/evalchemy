@@ -10,10 +10,11 @@
 # MODULES
 module load cuda/12.4 nccl/12.4
 
+# ENVIRONMENT VARIABLES - EVALCHEMY, HF_HUB_CACHE, and EVALCHEMY_ACTIVATE_ENV
+source /scratch/08002/gsmyrnis/dcft_shared/dcft_private/hpc/dotenv/tacc.env
+
 # CONDA
-export PATH="/work/08134/negin/anaconda3/condabin/:$PATH"
-source /work/08134/negin/anaconda3/etc/profile.d/conda.sh
-conda activate evalchemy
+$EVALCHEMY_ACTIVATE_ENV
 
 # EVAL SCORING COMMAND
 export EVAL_COMMAND="python -m eval.eval --model precomputed_hf --model_args "repo_id=mlfoundations-dev/Qwen2.5-7B-Instruct_1744582706_eval_288a",model="Qwen/Qwen2.5-7B-Instruct" --tasks AIME24,AMC23,MATH500,AIME25,GPQADiamond,MMLUPro,LiveCodeBench,CodeElo --output_path logs --use_database"

@@ -36,8 +36,8 @@ srun --nodes=1 --ntasks=1 huggingface-cli download $MODEL_NAME --cache-dir $HF_H
 srun --nodes=1 --ntasks=1 huggingface-cli download $INPUT_DATASET --cache-dir $HF_HUB_CACHE --repo-type dataset
 
 # RUN SHARDED INFERENCE
-srun --nodes={num_nodes} --ntasks=$GLOBAL_SIZE --ntasks-per-node=4 --cpus-per-task=24 --output={logs_dir}/%x/%j_%t.out bash -c 'echo -e "GLOBAL_SIZE: ${SLURM_STEP_NUM_TASKS}\nRANK: ${SLURM_PROCID}\nMODEL: '$MODEL_NAME'\nINPUT_DATASET: '$INPUT_DATASET'\nOUTPUT_DATASET: '$OUTPUT_DATASET'"'
-srun --nodes={num_nodes} --ntasks=$GLOBAL_SIZE --ntasks-per-node=4 --cpus-per-task=24 --output={logs_dir}/%x/%j_%t.out bash -c 'CUDA_VISIBLE_DEVICES=${SLURM_LOCALID} python $EVALCHEMY/eval/distributed/process_shard.py --global_size ${SLURM_STEP_NUM_TASKS} --rank ${SLURM_PROCID} --input_dataset '${INPUT_DATASET}' --model_name '${MODEL_NAME}' --output_dataset '${OUTPUT_DATASET}' --upload'
+srun --nodes={num_nodes} --wait-all-nodes=1 --ntasks=$GLOBAL_SIZE --ntasks-per-node=4 --cpus-per-task=24 --output={logs_dir}/%x/%j_%t.out bash -c 'echo -e "GLOBAL_SIZE: ${SLURM_STEP_NUM_TASKS}\nRANK: ${SLURM_PROCID}\nMODEL: '$MODEL_NAME'\nINPUT_DATASET: '$INPUT_DATASET'\nOUTPUT_DATASET: '$OUTPUT_DATASET'"'
+srun --nodes={num_nodes} --wait-all-nodes=1 --ntasks=$GLOBAL_SIZE --ntasks-per-node=4 --cpus-per-task=24 --output={logs_dir}/%x/%j_%t.out bash -c 'CUDA_VISIBLE_DEVICES=${SLURM_LOCALID} python $EVALCHEMY/eval/distributed/process_shard.py --global_size ${SLURM_STEP_NUM_TASKS} --rank ${SLURM_PROCID} --input_dataset '${INPUT_DATASET}' --model_name '${MODEL_NAME}' --output_dataset '${OUTPUT_DATASET}' --upload'
 
 # COMPUTE SCORES
 srun --nodes=1 --ntasks=1 --mem=0 --cpus-per-task=96 python -m eval.eval --model precomputed_hf --model_args "repo_id={output_dataset}",model="{model_name}" --tasks {tasks_str} --output_path logs --use_database

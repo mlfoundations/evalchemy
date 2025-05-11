@@ -111,7 +111,7 @@ class HMMTBenchmark(BaseBenchmark):
 
         for example, outputs in zip(examples, zip(*all_outputs)):
             example["model_outputs"] = list(outputs)
-            example["model_answers"] = [self.extract_answer(o) for o in outputs]
+            example["model_answers"] = outputs #[self.extract_answer(o) for o in outputs]
             example['label']=[]
         return {"examples": examples}
 

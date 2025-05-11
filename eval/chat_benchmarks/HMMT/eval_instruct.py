@@ -169,23 +169,5 @@ class HMMTBenchmark(BaseBenchmark):
         """Load HMMT questions from the data file."""
         dataset = load_dataset(self.dataset_name, split='train')
         questions = [dict(example) for example in dataset] 
-        questions = questions[:5]
         return questions
 
-
-    def extract_answer(self, output: str) -> str:
-        """Extract the final answer from a model-generated solution, which is expected to be in the format of \boxed{answer}.
-
-        Uses the same logic as hendrycks_math.
-
-        Args:
-            output (str): Model-generated solution text
-
-        Returns:
-            str: Extracted final answer. Returns empty string if no answer found in \boxed.
-        """
-        try:
-            answer = remove_boxed(last_boxed_only_string(output))
-            return answer
-        except:
-            return ""

@@ -14,7 +14,7 @@ from matharena.parser import extract_answer, parse_answer, check_answers, Warnin
 from matharena.possible_issues import check_number_proximity_any_order, check_all_numbers, check_output_length
 
 # Modified version of hendrycks_math with additional instruction to mark the solution with \\boxed
-PROMPT = """Problem: {problem}\nMark your solution with \\boxed\nAnswer:"""
+PROMPT = """Problem: {problem}\nPlease reason step by step, and put your final answer within \\boxed{{}}.\nAnswer:"""
 
 
 class HMMTBenchmark(BaseBenchmark):
@@ -48,7 +48,7 @@ class HMMTBenchmark(BaseBenchmark):
         self.debug = debug
         self.max_new_tokens = 32768  # set higher to avoid truncation for reasoning models
         self.seed = seed
-        self.n_repeat = 1
+        self.n_repeat = 10
 
     def generate_responses(self, model: LM) -> Dict[str, Any]:
         """
@@ -111,7 +111,9 @@ class HMMTBenchmark(BaseBenchmark):
 
         for example, outputs in zip(examples, zip(*all_outputs)):
             example["model_outputs"] = list(outputs)
-            example["model_answers"] = outputs #[self.extract_answer(o) for o in outputs]
+            list_answer = "," in str(example["answer"])
+            example["model_answers"] = [extract_answer(o, False, True, list_answer)[0] for o in outputs]
+            #example["model_answers"] = outputs #[self.extract_answer(o) for o in outputs]
             example['label']=[]
         return {"examples": examples}
 
@@ -133,7 +135,7 @@ class HMMTBenchmark(BaseBenchmark):
                 gold_answer, _ = parse_answer(str(example["answer"]))
                 list_answer = "," in str(example["answer"])
                 model_answer = example["model_answers"][i]
-                model_answer, _ = extract_answer(model_answer, False, True, list_answer)
+                #model_answer, _ = extract_answer(model_answer, False, True, list_answer)
                 is_correct = check_answers(model_answer, gold_answer)
                 example['label'].append(is_correct)
                 solved += is_correct

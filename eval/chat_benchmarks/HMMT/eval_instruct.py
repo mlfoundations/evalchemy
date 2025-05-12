@@ -113,7 +113,6 @@ class HMMTBenchmark(BaseBenchmark):
             example["model_outputs"] = list(outputs)
             list_answer = "," in str(example["answer"])
             example["model_answers"] = [extract_answer(o, False, True, list_answer)[0] for o in outputs]
-            #example["model_answers"] = outputs #[self.extract_answer(o) for o in outputs]
             example['label']=[]
         return {"examples": examples}
 
@@ -133,9 +132,7 @@ class HMMTBenchmark(BaseBenchmark):
             solved = 0
             for example in examples:
                 gold_answer, _ = parse_answer(str(example["answer"]))
-                list_answer = "," in str(example["answer"])
                 model_answer = example["model_answers"][i]
-                #model_answer, _ = extract_answer(model_answer, False, True, list_answer)
                 is_correct = check_answers(model_answer, gold_answer)
                 example['label'].append(is_correct)
                 solved += is_correct

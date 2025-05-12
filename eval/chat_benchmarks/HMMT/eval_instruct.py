@@ -113,7 +113,7 @@ class HMMTBenchmark(BaseBenchmark):
             example["model_outputs"] = list(outputs)
             list_answer = "," in str(example["answer"])
             example["model_answers"] = [extract_answer(o, False, True, list_answer)[0] for o in outputs]
-            example['label']=[]
+            example["label"] = []
         return {"examples": examples}
 
     def evaluate_responses(self, results: Dict[str, Any]) -> Dict[str, float]:
@@ -134,7 +134,7 @@ class HMMTBenchmark(BaseBenchmark):
                 gold_answer, _ = parse_answer(str(example["answer"]))
                 model_answer = example["model_answers"][i]
                 is_correct = check_answers(model_answer, gold_answer)
-                example['label'].append(is_correct)
+                example["label"].append(is_correct)
                 solved += is_correct
             all_results.append(
                 {
@@ -166,7 +166,6 @@ class HMMTBenchmark(BaseBenchmark):
 
     def load_questions(self) -> List[Dict[str, str]]:
         """Load HMMT questions from the data file."""
-        dataset = load_dataset(self.dataset_name, split='train')
-        questions = [dict(example) for example in dataset] 
+        dataset = load_dataset(self.dataset_name, split="train")
+        questions = [dict(example) for example in dataset]
         return questions
-

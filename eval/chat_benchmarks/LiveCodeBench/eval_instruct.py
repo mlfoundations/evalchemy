@@ -15,6 +15,12 @@ from eval.task import BaseBenchmark
 
 from .livecodebench_utils import lcb_run, map_to_example, post_process_code, translate_private_test_cases
 
+HF_HUB_CACHE = os.environ.get("HF_HUB_CACHE")
+if not HF_HUB_CACHE:
+    print(
+        "WARNING: HF_HUB_CACHE environment variable is not set, using default cache directory ~/.cache/huggingface/hub for LiveCodeBench benchmark"
+    )
+
 
 def has_code(response):
     pattern = r"```(?:[a-zA-Z]*)\n(.*?)```"
@@ -340,7 +346,11 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
         self.logger.info("Loading LiveCodeBench questions from source and converting to dataset...")
         cpu_count = os.cpu_count()
         ds = load_dataset(
-            "livecodebench/code_generation_lite", version_tag="release_v2", split="test", trust_remote_code=True
+            "livecodebench/code_generation_lite",
+            version_tag="release_v2",
+            split="test",
+            trust_remote_code=True,
+            cache_dir=HF_HUB_CACHE,
         )
         # Avoids "pyarrow.lib.ArrowInvalid: offset overflow while concatenating arrays" when mapping
         processed_shards = []

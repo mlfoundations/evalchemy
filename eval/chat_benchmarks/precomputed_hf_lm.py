@@ -53,6 +53,11 @@ class PrecomputedHFLM(TemplateLM):
         self.api = HfApi(token=self.token)
         self.tokenized_requests = False
         self.logger = logging.getLogger("PrecomputedHFLM")
+        self.HF_HUB_CACHE = os.environ.get("HF_HUB_CACHE")
+        if not self.HF_HUB_CACHE:
+            self.logger.warning(
+                "WARNING: HF_HUB_CACHE environment variable is not set, using default cache directory ~/.cache/huggingface/hub for precomputed_hf"
+            )
 
         # Load the dataset
         self.load_dataset()
@@ -83,6 +88,7 @@ class PrecomputedHFLM(TemplateLM):
                 revision=self.revision,
                 token=self.token,
                 subfolder=self.subfolder,
+                cache_dir=self.HF_HUB_CACHE,
             )
 
             self.logger.info(f"Loaded dataset with {len(self.dataset)} examples")

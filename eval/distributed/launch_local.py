@@ -276,11 +276,15 @@ def launch_local(
     output_dataset_dir,
     num_shards,
     logs_dir,
+    tp4,
 ):
     """Launch local job processing using the local shell script."""
     print_header("Launching Local Processing Job")
 
-    local_script = "eval/distributed/process_shards_local.sh"
+    if not tp4:
+        local_script = "eval/distributed/process_shards_local.sh"
+    else:
+        local_script = "eval/distributed/process_shards_local_tp.sh"
     print_info("Using process_shards_local.sh for local processing")
 
     # Create a temporary script file with the correct parameters
@@ -410,7 +414,7 @@ def launch_sbatch(
         print_info("Detected TACC environment, using process_shards_tacc.sbatch")
     else:
         print_warning(f"Unknown hostname: {hostname}, defaulting to local processing")
-        return launch_local(model_path, dataset_path, output_dataset_dir, num_shards, logs_dir)
+        return launch_local(model_path, dataset_path, output_dataset_dir, num_shards, logs_dir, tp4)
 
     # Create a temporary sbatch script with the correct parameters
     temp_sbatch_file = os.path.join(logs_dir, "job.sbatch")
@@ -964,6 +968,7 @@ def main():
             output_dataset_dir,
             local_num_shards,
             logs_dir,
+            args.tp4,
         )
     else:  # slurm mode
         # Launch sbatch job with the dataset repo but save to output repo

@@ -3,10 +3,66 @@ import argparse
 import hashlib
 import os
 import re
+import socket
 import subprocess
 import time
 
-from huggingface_hub import HfApi
+from datasets import load_dataset
+from huggingface_hub import HfApi, snapshot_download
+
+clusters = [
+    {
+        "name": "capella",
+        "hostname_pattern": r"c\d",
+        "eval_sbatch_filename": "simple_zih.sbatch",
+        "gpus_per_node": 4,
+        "internet": True,
+    },
+    {
+        "name": "vista",
+        "hostname_pattern": r".*?.vista.tacc.utexas.edu",
+        "eval_sbatch_filename": "simple_tacc.sbatch",
+        "gpus_per_node": 1,
+        "internet": True,
+    },
+    {
+        "name": "alpha",
+        "hostname_pattern": r".*?.alpha.hpc.tu-dresden.de",
+        "eval_sbatch_filename": "simple_alpha.sbatch",
+        "gpus_per_node": 8,
+        "internet": True,
+    },
+    {
+        "name": "jureca",
+        "hostname_pattern": r"jr.*?.jureca",
+        "eval_sbatch_filename": "simple_jureca.sbatch",
+        "gpus_per_node": 4,
+        "internet": False,
+    },
+    {
+        "name": "claix",
+        "hostname_pattern": r".*?.hpc.itc.rwth-aachen.de",
+        "eval_sbatch_filename": "simple_claix.sbatch",
+        "gpus_per_node": 4,
+        "internet": True,
+    },
+    {
+        "name": "leonardo",
+        "hostname_pattern": r".*leonardo.*",
+        "eval_sbatch_filename": "simple_leonardo.sbatch",
+        "gpus_per_node": 4,
+    },
+]
+
+
+def detect_hpc() -> dict:
+    """Automatically detect the HPC based on hostname"""
+    hostname = socket.gethostname()
+    for cluster in clusters:
+        if re.compile(cluster["hostname_pattern"]).match(hostname):
+            print(f"Automatically detected HPC: {cluster['name']}")
+            return cluster
+    raise ValueError(f"HPC not recognized for hostname {hostname}")
 
 
 def generate_evaluation_dataset_hash(tasks, system_instruction=None):
@@ -55,19 +111,20 @@ def create_evaluation_dataset(tasks, eval_dataset_hash, system_instruction=None)
     return cached_dataset_id
 
 
-def launch_sbatch(sbatch_content, new_sbatch_file):
+def launch_sbatch(sbatch_content, new_sbatch_file, dependency=None):
     # Write the sbatch file
     with open(new_sbatch_file, "w") as f:
         f.write(sbatch_content)
     print(f"Created sbatch file: {new_sbatch_file}")
 
-    # Launch the sbatch job
-    stdout = execute_command(f"sbatch {new_sbatch_file}")
-    job_id_match = re.search(r"Submitted batch job (\d+)", stdout)
-    if job_id_match:
-        job_id = job_id_match.group(1)
+    if dependency is not None:
+        sbatch_cmd = f"sbatch --dependency={dependency} {new_sbatch_file}"
     else:
-        raise Exception("Could not determine job ID from sbatch output.")
+        sbatch_cmd = f"sbatch {new_sbatch_file}"
+
+    # Launch the sbatch job
+    job_id = subprocess.check_output(sbatch_cmd, shell=True).decode("utf-8").strip()
+    print(f"Job {job_id} submitted with dependency {dependency}.")
     return job_id
 
 
@@ -76,7 +133,7 @@ def main():
     parser.add_argument(
         "--tasks",
         type=str,
-        default="AIME24,AMC23,MATH500,MMLUPro,JEEBench,GPQADiamond,LiveCodeBench,CodeElo",
+        default="AIME24,AMC23,MATH500,MMLUPro,JEEBench,GPQADiamond,LiveCodeBench,CodeElo,CodeForces",
         help="Comma-separated list of tasks to evaluate",
     )
     parser.add_argument("--model_name", type=str, required=True, help="Model name/path to evaluate")
@@ -89,6 +146,9 @@ def main():
     )
     parser.add_argument("--system_instruction", type=str, default=None, help="System instruction for the model")
     parser.add_argument("--timestamp", action="store_true", help="Add a timestamp to the output evaluation dataset")
+    parser.add_argument(
+        "--dependency", type=str, default=None, help="Dependency for the sbatch job. (e.g. afterok:123456)"
+    )
     args = parser.parse_args()
 
     # Generate evaluation dataset hash
@@ -112,8 +172,34 @@ def main():
     logs_dir = "logs"
     os.makedirs(logs_dir, exist_ok=True)
 
-    # Create sbatch
+    # Determine sbatch filename based on HPC
+    cluster = detect_hpc()
+    eval_sbatch_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), cluster["eval_sbatch_filename"])
+
+    # Determine number of nodes
+    if args.num_shards % cluster["gpus_per_node"] != 0:
+        raise ValueError(
+            f"Number of shards ({args.num_shards}) must be a multiple of the number of GPUs per node ({cluster['gpus_per_node']})"
+        )
+    num_nodes = int(args.num_shards / cluster["gpus_per_node"])
+
+    # Args
     args_dict = vars(args)
+
+    if not cluster["internet"]:
+        output_dataset = os.path.join(os.environ["EVALCHEMY_RESULTS_DIR"], output_dataset.split("/")[-1])
+        print(
+            f"Downloading model and dataset due to offline mode, will only save shards to {output_dataset} and won't upload or score"
+        )
+        HF_HUB_CACHE = os.environ["HF_HUB_CACHE"]
+        dataset_path = snapshot_download(repo_id=input_dataset, cache_dir=HF_HUB_CACHE, repo_type="dataset")
+        load_dataset(input_dataset, split="train", cache_dir=HF_HUB_CACHE)
+        model_path = snapshot_download(repo_id=args.model_name, cache_dir=HF_HUB_CACHE)
+        input_dataset = dataset_path
+        args_dict["model_name"] = model_path
+
+    # Create sbatch
+    args_dict["num_nodes"] = num_nodes
     args_dict["time_limit"] = f"{args.max_job_duration:02d}:00:00"
     args_dict["job_name"] = f"{output_dataset_name}"
     args_dict["input_dataset"] = input_dataset
@@ -121,16 +207,18 @@ def main():
     args_dict["logs_dir"] = logs_dir
     args_dict["output_dataset_name"] = output_dataset_name
     args_dict["tasks_str"] = args.tasks
-    with open("eval/distributed/simple_tacc.sbatch", "r") as f:
+    with open(eval_sbatch_path, "r") as f:
         sbatch_content = f.read()
     curly_brace_pattern = r"(?<!\$)\{([^{}]*)\}"
     sbatch_content = re.sub(curly_brace_pattern, lambda m: str(args_dict[m.group(1)]), sbatch_content)
 
     # Launch sbatch
-    new_sbatch_file = os.path.join(logs_dir, f"{output_dataset_name}.sbatch")
-    job_id = launch_sbatch(sbatch_content, new_sbatch_file)
+    job_logs_dir = os.path.join(logs_dir, f"{output_dataset_name}")
+    os.makedirs(job_logs_dir, exist_ok=True)
+    new_sbatch_file = os.path.join(job_logs_dir, f"{output_dataset_name}.sbatch")
+    job_id = launch_sbatch(sbatch_content, new_sbatch_file, dependency=args.dependency)
     print(f"Launched sbatch job with ID: {job_id}")
-    print(f"Logs: {args_dict['logs_dir']}/{args_dict['job_name']}_{job_id}*.out")
+    print(f"Logs: {job_logs_dir}/{job_id}*.out")
 
 
 if __name__ == "__main__":

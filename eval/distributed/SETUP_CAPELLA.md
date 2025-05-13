@@ -16,8 +16,8 @@ Follow these steps to set up the environment on Capella:
 ```bash
 # Allocate a workspace
 # Guide: https://doc.zih.tu-dresden.de/quickstart/getting_started/?h=workspaces#allocate-a-workspace
-ws_allocate -F horse -r 7 -m ryanmarten2000@gmail.com -n DCFT_Shared -d 100
-echo "export DCFT=/data/horse/ws/ryma833h-DCFT_Shared" >> ~/.bashrc
+ws_allocate -F cat -r 7 -m ryanmarten2000@gmail.com -n dcft -d 100
+echo "export DCFT=/data/cat/ws/ryma833h-dcft" >> ~/.bashrc
 
 # Set up shared access for project members
 # Check your group membership
@@ -29,11 +29,13 @@ ls -ld $DCFT # Should show p_finetuning ownership
 chmod -R u+rwX,g+rwX,o-rwx $DCFT
 # Set default ACLs for new files to maintain these permissions
 setfacl -R -d -m u::rwX,g::rwX,o::- $DCFT
+chmod g+s $DCFT
+umask 007
 
 # Set up conda in the shared workspace
 mkdir -p $DCFT/miniconda3
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O $DCFT/miniconda3/miniconda.sh
-bash $DCFT/miniconda3/miniconda.sh -b -u -p $WORK/miniconda3
+bash $DCFT/miniconda3/miniconda.sh -b -u -p $DCFT/miniconda3
 rm $DCFT/miniconda3/miniconda.sh
 source $DCFT/miniconda3/bin/activate
 conda init  # Adds conda initialization to ~/.bashrc

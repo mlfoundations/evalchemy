@@ -15,6 +15,13 @@ from eval.task import BaseBenchmark
 
 from .codeforces_utils import codeforces_run, post_process_code, rating_to_difficulty
 
+HF_HUB_CACHE = os.environ.get("HF_HUB_CACHE")
+if not HF_HUB_CACHE:
+    print(
+        "WARNING: HF_HUB_CACHE environment variable is not set, using default cache directory ~/.cache/huggingface/hub for CodeForces benchmark"
+    )
+
+
 def has_code(response):
     pattern = r"```(?:[a-zA-Z]*)\n(.*?)```"
     # Use re.DOTALL to match multiline content inside backticks
@@ -76,17 +83,16 @@ class CodeForcesBenchmark(BaseBenchmark):
 
         # TODO - figure out how to support these?
         if self.filter_interaction_questions:
-            examples = [x for x in examples if not x['interaction_format']]
+            examples = [x for x in examples if not x["interaction_format"]]
 
         all_outputs = []
 
         # Taken from the original code / paper
         def make_html_problem(problem):
-            test_cases = problem['examples']
-
+            test_cases = problem["examples"]
 
             title = problem["title"]
-            html_output = '<html><body>'
+            html_output = "<html><body>"
             html_output += f"<h1>{title}</h1>"
             html_output += f'<div>Time limit per test: {problem["time_limit"]} s</div>'
             html_output += f"<h2>Description</h2>"
@@ -103,16 +109,16 @@ class CodeForcesBenchmark(BaseBenchmark):
                     html_output += f"<div>{tc['input']}</div>"
                     html_output += f"<h3>Output</h3>"
                     html_output += f"<div>{tc['output']}</div>"
-            if problem['interaction_format']:
+            if problem["interaction_format"]:
                 html_output += f"<h2>Interaction</h2>"
                 html_output += f"<div>{problem['interaction_format']}</div>"
-            if problem['note']:
+            if problem["note"]:
                 html_output += f"<h2>Note</h2>"
                 html_output += f"<div>{problem['note']}</div>"
-            if problem['editorial']:
+            if problem["editorial"]:
                 html_output += f"<h2>Editorial</h2>"
                 html_output += f"<div>{problem['editorial']}</div>"
-            html_output += '</body></html>'
+            html_output += "</body></html>"
             return html_output
 
         instruction = """You are a coding expert. Given a competition-level coding problem, you need to write a Python program to solve it. You may start by outlining your thought process. In the end, please provide the complete code in a code block enclosed with ``` ```. The code should take stdin as input and print the output. Your program should be a Python function generated from the given prompt. Simply call the function after the definition."""
@@ -122,7 +128,7 @@ class CodeForcesBenchmark(BaseBenchmark):
             seed = [s + i for s in self.seed]
 
             for idx, example in enumerate(examples):
-                prompt_text = f'{instruction}\n\n{make_html_problem(example)}'
+                prompt_text = f"{instruction}\n\n{make_html_problem(example)}"
                 messages = [{"role": "user", "content": prompt_text}]
 
                 templated_messages = self._prepare_messages(messages, model)
@@ -209,7 +215,7 @@ class CodeForcesBenchmark(BaseBenchmark):
                 curr_res = self.check_correctness(
                     problem=problem_to_check,
                     completion=post_process_code(last_code),
-                    timeout=problem_to_check['time_limit'],
+                    timeout=problem_to_check["time_limit"],
                     is_extracted=False,
                 )
 
@@ -370,6 +376,6 @@ class CodeForcesBenchmark(BaseBenchmark):
     def load_questions(self) -> Dataset:
         """Load CodeForces questions from source."""
         self.logger.info("Loading CodeForces questions from source and converting to dataset...")
-        ds = load_dataset('open-r1/codeforces')['test'].to_list()
-        ds = [{**x, 'difficulty': rating_to_difficulty(x['rating'])} for x in ds]
+        ds = load_dataset("open-r1/codeforces", cache_dir=HF_HUB_CACHE)["test"].to_list()
+        ds = [{**x, "difficulty": rating_to_difficulty(x["rating"])} for x in ds]
         return ds

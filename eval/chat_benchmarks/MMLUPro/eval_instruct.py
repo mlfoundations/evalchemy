@@ -1,158 +1,200 @@
-import logging
+import re
 import random
+import time
+import logging
+from collections import defaultdict
 from typing import Any, Dict, List, Optional
 
-import lm_eval.models
-import numpy as np
 from datasets import load_dataset
+from transformers import AutoTokenizer
 from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
-
 from eval.task import BaseBenchmark
-from .testing_utils import get_multiple_choice_answer
 
+
+# --- Extraction helpers from https://github.com/TIGER-AI-Lab/MMLU-Pro/blob/main/evaluate_from_local.py ---
+
+def extract_answer(text: str) -> Optional[str]:
+    pattern = r"answer is \(?([A-J])\)?"
+    match = re.search(pattern, text, re.IGNORECASE)
+    if match:
+        return match.group(1)
+    else:
+        return extract_again(text)
+
+
+def extract_again(text: str) -> Optional[str]:
+    match = re.search(r"Answer:\s*([A-J])", text, re.IGNORECASE)
+    if match:
+        return match.group(1)
+    else:
+        return extract_final(text)
+
+
+def extract_final(text: str) -> Optional[str]:
+    pattern = r"\b[A-J]\b(?!.*\b[A-J]\b)"
+    match = re.search(pattern, text, re.DOTALL)
+    return match.group(0) if match else None
+
+
+# --- Prompt construction from Script 1 ---
+
+choices = [chr(ord('A') + i) for i in range(16)]
+
+
+def select_by_category(df: List[Dict[str, Any]] , subject: str) -> List[Dict[str, Any]]:
+    return [ex for ex in df if ex['category'] == subject]
+
+
+def format_cot_example(example: Dict[str, Any], including_answer: bool = True) -> str:
+    prompt = "Question:\n" + example['question'] + "\n"
+    prompt += "Options:\n"
+    for i, opt in enumerate(example['options']):
+        prompt += f"{choices[i]}. {opt}\n"
+    if including_answer:
+        cot = example['cot_content'].replace("A: Let's think step by step.", "Answer: Let's think step by step.")
+        prompt += cot + "\n\n"
+    else:
+        prompt += "Answer: Let's think step by step."
+    return prompt
+
+
+def generate_cot_prompt(val_df: List[Dict[str, Any]], curr: Dict[str, Any], k: int) -> str:
+    # Load base template
+    with open("./eval/chat_benchmarks/MMLUPro/initial_prompt.txt") as f:
+        base = f.read()
+    subject = curr['category']
+    support = select_by_category(val_df, subject)[:k]
+    prompt = base.replace("{$}", subject) + "\n"
+    for ex in support:
+        prompt += format_cot_example(ex, including_answer=True)
+    prompt += format_cot_example(curr, including_answer=False)
+    return prompt
+
+
+def preprocess(df: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    out = []
+    for ex in df:
+        opts = [o for o in ex['options'] if o != 'N/A']
+        ex['options'] = opts
+        out.append(ex)
+    return out
+
+
+# --- MMLUPro Benchmark with CoT prompting ---
 
 class MMLUProBenchmark(BaseBenchmark):
     """
-    MMLUPro (500 subset) Benchmark for evaluating multiple choice reasoning of LLMs.
-    https://huggingface.co/datasets/mlfoundations-dev/mmlu_pro_eval_500subset
+    MMLU-Pro CoT Benchmark: harness-style but with dynamic few-shot CoT prompts
+    and multi-stage regex answer extraction, reporting both overall and per-area accuracy.
     """
-
     def __init__(
         self,
+        ntrain: int = 5,
+        max_model_length: int = 4096,
+        max_new_tokens: int = 2048,
         debug: bool = False,
-        seed: List[int] = [0, 1234, 1234, 1234],
         logger: Optional[logging.Logger] = None,
         system_instruction: Optional[str] = None,
+        seed: List[int] = [0, 1234, 1234, 1234],
     ):
-        """
-        Initialize MMLUPro (500 subset) benchmark.
-
-        Args:
-            debug: If set, only evaluate on 2 examples
-            seed: Random seed for reproducibility. Default is [0, 1234, 1234, 1234] for lm-eval-harness.
-            logger: Optional logger instance
-        """
         super().__init__(logger=logger, system_instruction=system_instruction)
-        self.dataset_name = "mlfoundations-dev/mmlu_pro_eval_500subset"
+        self.dataset_name = "TIGER-Lab/MMLU-Pro"
+        self.ntrain = ntrain
+        self.max_model_length = max_model_length
+        self.max_new_tokens = max_new_tokens
         self.debug = debug
         self.seed = seed
-        self.max_new_tokens = 32768
-        self.n_repeat = 1
+
+        ds = load_dataset(self.dataset_name)
+        self.test_examples = preprocess(ds['test'])
+        self.val_examples = preprocess(ds['validation'])
+
+        # prepare tokenizer for dynamic prompt length checks
+        # model name will be set later in generate_responses
+        self.tokenizer: Optional[AutoTokenizer] = None
 
     def generate_responses(self, model: LM) -> Dict[str, Any]:
-        """
-        Generate solution completions using the provided model.
+        # initialize tokenizer on first use
+        if self.tokenizer is None:
+            from transformers import AutoTokenizer
+            model_name = getattr(model, 'pretrained', getattr(model, 'model_args', {}).get('model'))
+            self.tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-7B-Instruct", trust_remote_code=True)
 
-        Args:
-            model: Language model
+        instances = []
+        for idx, ex in enumerate(self.test_examples):
+            if self.debug and idx >= 2:
+                break
 
-        Returns:
-            Dictionary containing generated responses and examples
-        """
-        examples = self.load_questions()
+            # dynamically choose k so prompt fits
+            k = self.ntrain
+            while k > 0:
+                prompt = generate_cot_prompt(self.val_examples, ex, k)
+                toks = self.tokenizer(prompt, return_tensors='pt')
+                length = toks['input_ids'].shape[1]
+                if length < self.max_model_length - self.max_new_tokens:
+                    break
+                k -= 1
 
-        if isinstance(model, lm_eval.models.huggingface.HFLM):
-            model_name = model.pretrained
-        elif isinstance(model, lm_eval.models.openai_completions.OpenAIChatCompletion):
-            model_name = str(f"openai/{model.model}")
-        else:
-            model_name = model.model_args["model"]
+            # wrap prompt for harness
+            messages = [{"role": "user", "content": prompt}]
+            templated = self._prepare_messages(messages, model)
+            params = {"temperature": 0.0, "max_new_tokens": self.max_new_tokens, "seed": self.seed}
+            inst = Instance(
+                "generate_until",
+                ex,
+                (templated, params),
+                idx
+            )
+            instances.append(inst)
 
-        all_outputs = []
+        outputs = self.compute(model, instances)
+        examples = []
+        for ex, out in zip(self.test_examples, outputs):
+            # unwrap different output types
+            if isinstance(out, str):
+                text = out
+            elif hasattr(out, 'outputs') and out.outputs:
+                text = out.outputs[0].text
+            elif hasattr(out, 'text'):
+                text = out.text
+            else:
+                text = str(out)
 
-        for i in range(self.n_repeat):
-            all_instances = []
-            seed = [s + i for s in self.seed]
-
-            for idx, example in enumerate(examples):
-                messages = [
-                    {
-                        "role": "user",
-                        "content": example["prompt"]
-                    },
-                ]
-
-                templated_messages = self._prepare_messages(messages, model)
-
-                instance = Instance(
-                    "generate_until",
-                    example,
-                    (
-                        templated_messages,
-                        {
-                            "do_sample": True,
-                            "temperature": 0.7,
-                            "max_new_tokens": self.max_new_tokens,
-                            "seed": seed,
-                        },
-                    ),
-                    idx,
-                )
-                instance.repeat_idx = i
-                all_instances.append(instance)
-
-            # Generate model responses
-            self.logger.info("Generating responses for MMLUPro...")
-            outputs = self.compute(model, all_instances)
-            all_outputs.append(outputs)
-
-        # Return None early for non-primary ranks
-        if model.rank != 0:
-            return None
-
-        for example, outputs in zip(examples, zip(*all_outputs)):
-            example["model_outputs"] = list(outputs)
-            example["model_answers"] = [get_multiple_choice_answer(o) for o in outputs]
+            pred = extract_answer(text)
+            ex_copy = ex.copy()
+            ex_copy['model_outputs'] = text
+            ex_copy['pred'] = pred
+            examples.append(ex_copy)
 
         return {"examples": examples}
 
+
     def evaluate_responses(self, results: Dict[str, Any]) -> Dict[str, float]:
-        """Evaluate the generated solution completions."""
         if results is None:
             return None
 
-        examples = results["examples"]
-        num_questions = len(examples)
+        examples = results['examples']
+        area_stats = defaultdict(lambda: {'corr': 0, 'total': 0})
+        total_corr = 0
+        total = 0
 
-        # Calculate accuracy for each repetition
-        all_results = []
-        for i in range(self.n_repeat):
-            solved = sum([example["answer"] == example["model_answers"][i] for example in examples])
+        for ex in examples:
+            cat = ex['category']
+            correct = (ex['pred'] == ex['answer'])
+            area_stats[cat]['total'] += 1
+            area_stats[cat]['corr'] += int(correct)
+            total += 1
+            total_corr += int(correct)
 
-            all_results.append(
-                {
-                    "repetition": i + 1,
-                    "num_total": num_questions,
-                    "num_solved": solved,
-                    "accuracy": solved / num_questions,
-                }
-            )
+        out = {
+            'overall_accuracy': total_corr / total if total else 0.0,
+            'total_examples': total,
+        }
+        # per-area accuracy
+        for cat, vals in area_stats.items():
+            out[f'accuracy_{cat}'] = vals['corr'] / vals['total']
+            out[f'count_{cat}'] = vals['total']
 
-        # Calculate overall statistics
-        solved_avg = np.mean([result["num_solved"] for result in all_results])
-        accuracy_avg = np.mean([result["accuracy"] for result in all_results])
-        accuracy_std = np.std([result["accuracy"] for result in all_results])
-        accuracy_std_err = np.std([result["accuracy"] for result in all_results]) / np.sqrt(self.n_repeat)
+        return out
 
-        results.update(
-            {
-                "num_total": num_questions,
-                "solved_avg": solved_avg,
-                "run_stats": all_results,
-                "accuracy_avg": accuracy_avg,
-                "accuracy_std_err": accuracy_std_err,
-                "num_repeat": self.n_repeat,
-            }
-        )
-
-        return results
-
-    def load_questions(self) -> List[Dict[str, Any]]:
-        """Load MMLUPro (500 subset) questions from the dataset."""
-        dataset = load_dataset(self.dataset_name)
-        questions = [row for row in dataset['test']]
-        if self.debug:
-            questions = questions[:2]
-        self.logger.info(f"Loaded {len(questions)} questions from {self.dataset_name}")
-        return questions

@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+requests
+sqlalchemy
+asyncpg
+aiohttp
+python-json-logger
+psycopg2-binary
+antlr4-python3-runtime==4.11

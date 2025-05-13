@@ -14,8 +14,8 @@ module load CUDA/12.1.1
 module load NCCL/2.18.3-CUDA-12.1.1
 
 # CONDA
-export DCFT=/data/horse/ws/ryma833h-DCFT_Shared
-export EVALCHEMY=/data/horse/ws/ryma833h-DCFT_Shared/evalchemy/
+export DCFT=/data/cat/ws/ryma833h-dcft
+export EVALCHEMY=$DCFT/evalchemy/
 export PATH="$DCFT/miniconda3/condabin:$PATH"
 source $DCFT/miniconda3/etc/profile.d/conda.sh
 conda activate evalchemy

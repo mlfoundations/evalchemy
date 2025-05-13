@@ -6,25 +6,19 @@ import re
 
 
 def get_multiple_choice_answer(pred: str):
-    """
-    Extract the multiple choice answer from the prediction string.
-    HLE multiple-choice questions involve one of five or more answer choices.
-    Model is prompted to output answer after the "Answer:" string.
-    """
+    # Try to pull out “Answer: X”, “Answer: {X}” or “Answer: \boxed{X}”
+    m = re.search(
+        r"(?:Exact\s+)?Answer:\s*(?:\\boxed)?\{?([A-Z])\}?",
+        pred, 
+        re.IGNORECASE
+    )
+    if m:
+        return m.group(1).upper()
 
-    tmp = re.findall(r"Answer:\s*([A-Z])", pred)
+    # Fallback: isolate any single capital letter
+    candidates = re.findall(r"(?<![A-Z])([A-Z])(?![A-Z])", pred.upper())
+    if candidates:
+        return candidates[-1]
 
-    if tmp:
-        pred = tmp
-    else:
-        pred = [pred.strip().strip(".")]
-
-    if len(pred) == 0:
-        pred = ""
-    else:
-        pred = pred[-1]
-
-    # Remove the period at the end, again!
-    pred = pred.rstrip(".").rstrip("/")
-
-    return pred
+    # Final fallback: return the whole trimmed string
+    return pred.strip().rstrip(".").rstrip("/")

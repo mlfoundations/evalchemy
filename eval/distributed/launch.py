@@ -96,6 +96,9 @@ def check_required_env_vars():
     elif "tacc" in hostname:
         hf_hub_cache = "/work/08134/negin/ls6/shared_env/hub"
         print_info(f"Detected TACC environment, using HF_HUB_CACHE: {hf_hub_cache}")
+    elif "jureca" in hostname:
+        hf_hub_cache = "/p/data1/mmlaion/dcft/hub"
+        print_info(f"Detected Jureca environment, using HF_HUB_CACHE: {hf_hub_cache}")
     else:
         raise ValueError(f"Unknown hostname: {hostname}, can't determine which HF_HUB_CACHE to use")
     current_hub_cache = os.environ.get("HF_HUB_CACHE")
@@ -150,6 +153,10 @@ def check_conda_env(watchdog=False):
         python_path = "/work/08134/negin/anaconda3/envs/evalchemy/bin/python3.10"
         activate_cmd = "source /work/08134/negin/anaconda3/bin/activate evalchemy"
         print_info(f"Detected TACC environment, checking python path: {python_path}")
+    elif "jureca" in hostname:
+        python_path = "/p/data1/mmlaion/dcft/evalchemy_env/bin/python3.10"
+        activate_cmd = "source /p/data1/mmlaion/dcft/mamba/bin/activate /p/data1/mmlaion/dcft/evalchemy_env"
+        print_info(f"Detected JURECA environment, checking python path: {python_path}")
     else:
         raise ValueError(f"Unknown hostname: {hostname}, can't determine which HF_HUB_CACHE to use")
 
@@ -307,8 +314,6 @@ def launch_sbatch(
             sbatch_script = "eval/distributed/process_shards_capella.sbatch"
             print_info("Detected Capella environment, using process_shards_capella.sbatch")
     elif "leonardo" in hostname:
-        sbatch_script = "eval/distributed/process_shards_leonardo.sbatch"
-        print_info("Detected Leonardo environment, using process_shards_leonardo.sbatch")
         if tp4:
             sbatch_script = "eval/distributed/process_shards_leonardo_tp.sbatch"
             print_info("Detected Leonardo environment with TP4, using process_shards_leonardo_tp.sbatch")
@@ -316,8 +321,19 @@ def launch_sbatch(
             sbatch_script = "eval/distributed/process_shards_leonardo.sbatch"
             print_info("Detected Leonardo environment, using process_shards_leonardo.sbatch")
     elif "tacc" in hostname:
-        sbatch_script = "eval/distributed/process_shards_tacc.sbatch"
-        print_info("Detected TACC environment, using process_shards_tacc.sbatch")
+        if tp4:
+            sbatch_script = "eval/distributed/process_shards_tacc_tp.sbatch"
+            print_info("Detected TACC environment with TP4, using process_shards_tacc_tp.sbatch")
+        else:
+            sbatch_script = "eval/distributed/process_shards_tacc.sbatch"
+            print_info("Detected TACC environment, using process_shards_tacc.sbatch")
+    elif "jureca" in hostname:
+        if tp4:
+            sbatch_script = "eval/distributed/process_shards_jureca_tp.sbatch"
+            print_info("Detected JURECA environment with TP4, using process_shards_jureca_tp.sbatch")
+        else:
+            sbatch_script = "eval/distributed/process_shards_jureca.sbatch"
+            print_info("Detected JURECA environment, using process_shards_jureca.sbatch")
     else:
         raise ValueError(f"Unknown hostname: {hostname}, can't determine which sbatch script to use")
 
@@ -719,7 +735,8 @@ def main():
     logs_dir = os.path.join("logs", output_dataset_repo_name)
     os.makedirs(logs_dir, exist_ok=True)
     print_info(f"Logs directory: {logs_dir}")
-    output_dataset_dir = os.path.join("results", output_dataset_repo_name)
+    results_dir = os.environ.get("EVALCHEMY_RESULTS_DIR", "results")
+    output_dataset_dir = os.path.join(results_dir, output_dataset_repo_name)
     os.makedirs(output_dataset_dir, exist_ok=True)
     print_info(f"Output dataset directory: {output_dataset_dir}")
 

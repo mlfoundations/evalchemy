@@ -13,7 +13,7 @@ from typing import Any, Dict, Optional, Tuple
 import torch
 from huggingface_hub import model_info
 from lm_eval.loggers.evaluation_tracker import GeneralConfigTracker
-from lm_eval.utils import handle_non_serializable, hash_string, simple_parse_args_string
+from lm_eval.utils import setup_logging, handle_non_serializable, hash_string, simple_parse_args_string
 
 from database.models import Dataset, EvalResult, EvalSetting, Model
 from database.utils import create_db_engine, create_tables, get_model_from_db, get_or_add_model_by_name, sessionmaker

@@ -29,6 +29,7 @@ from eval.constants import LIST_OPENAI_MODELS
 from eval.eval_tracker import DCEvaluationTracker
 from eval.task import TaskManager as InstructTaskManager
 
+eval_logger = logging.getLogger(__name__)
 
 def setup_custom_parser():
     """
@@ -128,7 +129,6 @@ def evaluate(
             Dictionary mapping task names to their evaluation results.
             Each result dictionary contains metrics specific to that task.
     """
-    eval_logger = logging.getLogger(__name__)
     eval_logger.setLevel(getattr(logging, f"{verbosity}"))
 
     # Split tasks between benchmark and pretrain
@@ -296,7 +296,6 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
         ]
     
     # Initialize logging
-    eval_logger = logging.getLogger(__name__)
     eval_logger.setLevel(getattr(logging, f"{args.verbosity}"))
 
     # Initialize evaluation tracker

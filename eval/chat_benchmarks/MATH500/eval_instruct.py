@@ -61,12 +61,6 @@ class MATH500Benchmark(BaseBenchmark):
 
         # Prepare instances for model
         all_instances = []
-        if isinstance(model, lm_eval.models.huggingface.HFLM):
-            model_name = model.pretrained
-        elif isinstance(model, lm_eval.models.openai_completions.OpenAIChatCompletion):
-            model_name = str(f"openai/{model.model}")
-        else:
-            model_name = model.model_args["model"]
         for idx, example in enumerate(examples):
             messages = [
                 {"role": "user", "content": PROMPT.format(problem=example["problem"])},

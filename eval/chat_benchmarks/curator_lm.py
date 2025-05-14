@@ -85,9 +85,14 @@ class CuratorAPIModel(TemplateLM):
         self.additional_llm_args = {} # For args passed directly to curator.LLM constructor
 
         # Model-specific adjustments
-        is_thinking_model = "thinking" in self.model_name
+        is_thinking_model = "thinking" in self.model_name or "gemini-2.5-pro" in self.model_name
 
         if "gemini" in self.model_name:
+            if self.is_batch_request:
+                self.additional_llm_args["backend"] = "gemini"
+                self.gen_kwargs.pop("max_completion_tokens", None)
+                self.gen_kwargs.pop("stop", None)
+
             if is_thinking_model:
                 max_requests_per_minute = max_requests_per_minute or 200
                 max_tokens_per_minute = max_tokens_per_minute or 400_000
@@ -122,7 +127,7 @@ class CuratorAPIModel(TemplateLM):
             max_requests_per_minute = 2_500 # Override rate limits
             max_tokens_per_minute = 1_000_000_000
             self.gen_kwargs["temperature"] = 0 # Override temperature
-        elif "o1" in self.model_name or "o3" in self.model_name:
+        elif "o1" in self.model_name or "o3" in self.model_name or "o4" in self.model_name:
              # o1/o3 don't support these
             print(f"Warning: Model {self.model_name} does not support top_p, stop, or temperature. Ignoring them.")
             self.gen_kwargs.pop("top_p", None)
@@ -263,8 +268,12 @@ class CuratorAPIModel(TemplateLM):
         # Format messages for curator
         formatted_messages = self.create_message(contexts)
 
+        response = self.llm(formatted_messages)
         # Make the call to curator
-        response = self.llm(formatted_messages)["response"]
+        try:
+            response = response["response"]
+        except Exception as e:
+            response = response.dataset["response"]
 
         return response
 

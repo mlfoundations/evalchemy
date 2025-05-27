@@ -77,9 +77,8 @@ class GPQADiamondBenchmark(BaseBenchmark):
             model_name = model.model_args["model"]
 
         all_outputs = []
-
+        all_instances = []
         for i in range(self.n_repeat):
-            all_instances = []
             seed = [s + i for s in self.seed]
 
             for idx, example in enumerate(examples):
@@ -111,10 +110,13 @@ class GPQADiamondBenchmark(BaseBenchmark):
                 instance.repeat_idx = i
                 all_instances.append(instance)
 
-            # Generate model responses
-            self.logger.info("Generating responses for GPQADiamond...")
-            outputs = self.compute(model, all_instances)
-            all_outputs.append(outputs)
+        # Generate model responses
+        self.logger.info("Generating responses for GPQADiamond...")
+        all_outputs = self.compute(model, all_instances)
+
+        all_outputs = [
+            all_outputs[i: i + len(examples)] for i in range(0, len(examples) * self.n_repeat, len(examples))
+        ]
 
         # Return None early for non-primary ranks
         if model.rank != 0:

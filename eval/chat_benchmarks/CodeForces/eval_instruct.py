@@ -123,8 +123,8 @@ class CodeForcesBenchmark(BaseBenchmark):
 
         instruction = """You are a coding expert. Given a competition-level coding problem, you need to write a Python program to solve it. You may start by outlining your thought process. In the end, please provide the complete code in a code block enclosed with ``` ```. The code should take stdin as input and print the output. Your program should be a Python function generated from the given prompt. Simply call the function after the definition."""
 
+        all_instances = []
         for i in range(self.n_repeat):
-            all_instances = []
             seed = [s + i for s in self.seed]
 
             for idx, example in enumerate(examples):
@@ -150,10 +150,13 @@ class CodeForcesBenchmark(BaseBenchmark):
                 instance.repeat_idx = i
                 all_instances.append(instance)
 
-            # Generate model responses
-            self.logger.info("Generating responses for CodeForces...")
-            outputs = self.compute(model, all_instances)
-            all_outputs.append(outputs)
+        # Generate model responses
+        self.logger.info("Generating responses for CodeForces...")
+        all_outputs = self.compute(model, all_instances)
+
+        all_outputs = [
+            all_outputs[i: i + len(examples)] for i in range(0, len(examples) * self.n_repeat, len(examples))
+        ]
 
         # Return None early for non-primary ranks
         if model.rank != 0:

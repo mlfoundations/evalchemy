@@ -119,9 +119,8 @@ class JEEBenchBenchmark(BaseBenchmark):
 
         # Prepare instances for model
         all_outputs = []
-
+        all_instances = []
         for i in range(self.n_repeat):
-            all_instances = []
             seed = [s + i for s in self.seed]
 
             for idx, example in enumerate(examples):
@@ -155,10 +154,13 @@ class JEEBenchBenchmark(BaseBenchmark):
 
                 all_instances.append(instance)
 
-            # Generate model responses
-            self.logger.info("Generating responses for JEEBench...")
-            outputs = self.compute(model, all_instances)
-            all_outputs.append(outputs)
+        # Generate model responses
+        self.logger.info("Generating responses for JEEBench...")
+        all_outputs = self.compute(model, all_instances)
+
+        all_outputs = [
+            all_outputs[i: i + len(examples)] for i in range(0, len(examples) * self.n_repeat, len(examples))
+        ]
         # Return None early for non-primary ranks
         if model.rank != 0:
             return None

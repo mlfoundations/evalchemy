@@ -18,17 +18,19 @@ from typing import Callable, Dict, Optional
 
 import scipy.stats as stats
 
+
 def rating_to_difficulty(rating):
     if not rating:
-        return 'Easy'
+        return "Easy"
     if rating < 1000:
-        return 'Easy'
+        return "Easy"
     if rating < 1300:
-        return 'Medium'
+        return "Medium"
     if rating <= 3500:
-        return 'Hard'
+        return "Hard"
 
-    return 'Easy'
+    return "Easy"
+
 
 def reliability_guard(maximum_memory_bytes: Optional[int] = None):
     """
@@ -155,8 +157,8 @@ def run_test_std(completion, test_input, test_output):
         sys.stdin = io.StringIO(test_input)
         try:
             exec(f'__name__ = "__main__"\n{completion}' if '__name__ == "__main__"' in completion else completion, {})
-            out = output.getvalue().strip().replace('\n',' ').replace('\r', '')
-            expected = test_output.strip().replace('\n', ' ').replace('\r', '')
+            out = output.getvalue().strip().replace("\n", " ").replace("\r", "")
+            expected = test_output.strip().replace("\n", " ").replace("\r", "")
 
             return out == expected, output.getvalue().strip()
         finally:
@@ -245,7 +247,6 @@ def run_tests_for_one_example(test_cases, completion, result_list, is_extracted)
         result_list.append((passed, output_error, output_value, time_elapsed))
         if not passed:
             return
-
 
 
 def codeforces_run(problem, completion, timeout, is_extracted):

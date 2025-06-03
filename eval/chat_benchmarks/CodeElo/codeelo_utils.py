@@ -18,15 +18,17 @@ from typing import Callable, Dict, Optional
 
 import scipy.stats as stats
 
+
 def rating_to_difficulty(rating):
     if rating < 1000:
-        return 'Easy'
+        return "Easy"
     if rating < 1300:
-        return 'Medium'
+        return "Medium"
     if rating <= 3500:
-        return 'Hard'
+        return "Hard"
 
-    return 'Easy'
+    return "Easy"
+
 
 def reliability_guard(maximum_memory_bytes: Optional[int] = None):
     """
@@ -250,11 +252,13 @@ def codeelo_run(problem, completion, timeout, is_extracted):
         outs = tc[1]
         testtype = "stdin"
 
-        test_cases.append({
-            "input": ins,
-            "output": outs,
-            "testtype": testtype,
-        })
+        test_cases.append(
+            {
+                "input": ins,
+                "output": outs,
+                "testtype": testtype,
+            }
+        )
 
     manager = multiprocessing.Manager()
     result = manager.list()

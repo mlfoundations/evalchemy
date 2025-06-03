@@ -62,9 +62,7 @@ class CodeForcesBenchmark(BaseBenchmark):
         """
         super().__init__(logger=logger, system_instruction=system_instruction)
         self.debug = debug
-        self.max_new_tokens = (
-            max_tokens if max_tokens is not None else 32768
-        )
+        self.max_new_tokens = max_tokens if max_tokens is not None else 32768
         self.seed = seed
         self.n_repeat = 3
         self.filter_interaction_questions = True

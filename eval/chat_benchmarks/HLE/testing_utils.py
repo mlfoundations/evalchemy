@@ -7,11 +7,7 @@ import re
 
 def get_multiple_choice_answer(pred: str):
     # Try to pull out “Answer: X”, “Answer: {X}” or “Answer: \boxed{X}”
-    m = re.search(
-        r"(?:Exact\s+)?Answer:\s*(?:\\boxed)?\{?([A-Z])\}?",
-        pred, 
-        re.IGNORECASE
-    )
+    m = re.search(r"(?:Exact\s+)?Answer:\s*(?:\\boxed)?\{?([A-Z])\}?", pred, re.IGNORECASE)
     if m:
         return m.group(1).upper()
 

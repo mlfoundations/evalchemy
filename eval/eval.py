@@ -32,7 +32,9 @@ from eval.eval_tracker import DCEvaluationTracker
 from eval.task import TaskManager as InstructTaskManager
 
 
-_BIT_CAP = 15_000 
+_BIT_CAP = 15_000
+
+
 def handle_non_serializable_extended(o):
     """
     Delegates to the stock helper, but for gigantic SymPy Integer /
@@ -40,11 +42,12 @@ def handle_non_serializable_extended(o):
     """
     try:
         from sympy import Integer, Rational
+
         if isinstance(o, Integer):
             if o.p.bit_length() > _BIT_CAP:
                 digits = int(o.p.bit_length() * math.log10(2)) + 1
                 return f"<Integer ~{digits} digits>"
-            return str(int(o)) # safe: fits under the guard
+            return str(int(o))  # safe: fits under the guard
 
         if isinstance(o, Rational):
             num_bits = o.p.bit_length()
@@ -59,6 +62,7 @@ def handle_non_serializable_extended(o):
 
     # Everything else: NumPy ints, sets, etc.
     return _orig_handle(o)
+
 
 def setup_custom_parser():
     """
@@ -118,7 +122,9 @@ def setup_custom_parser():
     )
 
     parser.add_argument(
-        "--config", type=str, help="Path to config yaml. Overwrites --batch_size, --tasks, --annotator_model, and --max_tokens"
+        "--config",
+        type=str,
+        help="Path to config yaml. Overwrites --batch_size, --tasks, --annotator_model, and --max_tokens",
     )
     parser.add_argument(
         "--debug",

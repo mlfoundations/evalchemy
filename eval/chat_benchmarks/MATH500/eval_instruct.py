@@ -45,7 +45,9 @@ class MATH500Benchmark(BaseBenchmark):
         self.data_file = data_file
         self.debug = debug
         self.seed = seed
-        self.max_new_tokens = max_tokens if max_tokens is not None else 32768  # set higher to avoid truncation for reasoning models
+        self.max_new_tokens = (
+            max_tokens if max_tokens is not None else 32768
+        )  # set higher to avoid truncation for reasoning models
 
     def generate_responses(self, model: LM) -> Dict[str, Any]:
         """

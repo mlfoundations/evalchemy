@@ -47,7 +47,7 @@ class AMC23Benchmark(BaseBenchmark):
         self.data_file = data_file
         self.debug = debug
         self.seed = seed
-        self.max_new_tokens = max_tokens if max_tokens is not None else 32768  
+        self.max_new_tokens = max_tokens if max_tokens is not None else 32768
         self.n_repeat = 10
 
     def generate_responses(self, model: LM) -> Dict[str, Any]:

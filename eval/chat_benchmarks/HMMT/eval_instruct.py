@@ -47,7 +47,9 @@ class HMMTBenchmark(BaseBenchmark):
         super().__init__(logger=logger, system_instruction=system_instruction)
         self.dataset_name = dataset_name
         self.debug = debug
-        self.max_new_tokens = max_tokens if max_tokens is not None else 32768  # set higher to avoid truncation for reasoning models
+        self.max_new_tokens = (
+            max_tokens if max_tokens is not None else 32768
+        )  # set higher to avoid truncation for reasoning models
         self.seed = seed
         self.n_repeat = 10
 

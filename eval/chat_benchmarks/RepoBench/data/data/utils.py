@@ -30,7 +30,6 @@ def construct_prompt(data: dict, language: str = "python", tokenizer=None, max_t
 
     # if we assign the tokenizer and the max_token_nums, we will truncate the cross-file prompt to meet the constraint
     if tokenizer is not None and max_token_nums is not None:
-
         cross_file_prompt_token_nums = len(tokenizer.encode(cross_file_prompt))
         in_file_prompt_token_nums = len(tokenizer.encode(in_file_prompt))
 

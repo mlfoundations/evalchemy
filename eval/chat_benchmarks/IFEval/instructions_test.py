@@ -24,7 +24,6 @@ from .instructions import *
 
 # pylint:disable=g-complex-comprehension
 class InstructionsTest(parameterized.TestCase):
-
     @parameterized.named_parameters(
         [
             {

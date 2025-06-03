@@ -150,7 +150,6 @@ def main(
     batch_size: int = 1,
     res_dir: str = "./results",
 ):
-
     # Load the dataset
     dataset = load_dataset(dataset_name, ignore_verifications=True)
 

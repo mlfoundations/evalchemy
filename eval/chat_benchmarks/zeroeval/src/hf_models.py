@@ -85,7 +85,6 @@ class ModelManager:
 
 
 class DecoderOnlyModelManager(ModelManager):
-
     def __init__(
         self,
         model_path,
@@ -214,7 +213,6 @@ class DecoderOnlyModelManager(ModelManager):
         print("model device:", self.model.device)
 
     def _adapt_with_prefix(self, input_data, pure_input_data, n=3, args=None):
-
         if self.adapt_ckpt == "fixed":
             decoded_outputs = [["The answer is: "] for _ in range(len(input_data))]
         # print(input_data_clean)
@@ -248,7 +246,6 @@ class DecoderOnlyModelManager(ModelManager):
         return prefixes, input_data_with_prefixes
 
     def infer_generate(self, input_data, args={}, device=None, remarks=None, pure_input_data=None):
-
         if self.adapt_mode in ["prefix", "retrieve+prefix"]:
             prefixes, input_data = self._adapt_with_prefix(input_data, pure_input_data, args=args)
 
@@ -366,7 +363,6 @@ def completion_with_backoff(**kwargs):
 
 
 class OpenAIModelManager(ModelManager):
-
     def __init__(self, model_name):
         super().__init__(model_name, model_name)
 

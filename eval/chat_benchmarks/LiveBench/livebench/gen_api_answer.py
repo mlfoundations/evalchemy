@@ -125,7 +125,6 @@ def run_questions(
         if len(questions) > 0:
             reorg_answer_file(answer_file)
     else:
-
         with concurrent.futures.ThreadPoolExecutor(max_workers=parallel) as executor:
             futures = []
             for question in questions:

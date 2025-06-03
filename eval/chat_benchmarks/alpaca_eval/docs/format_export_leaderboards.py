@@ -41,9 +41,9 @@ for leaderboard_file in PRECOMPUTED_LEADERBOARDS.values():
 
         file_outputs = RESULTS_DIR / informal_name / "model_outputs.json"
         if file_outputs.is_file():
-            df.loc[idx, "samples"] = (
-                f"https://github.com/tatsu-lab/alpaca_eval/blob/main/results/{informal_name}/model_outputs.json"
-            )
+            df.loc[
+                idx, "samples"
+            ] = f"https://github.com/tatsu-lab/alpaca_eval/blob/main/results/{informal_name}/model_outputs.json"
 
     # if "length_controlled_winrate" never nan then we can use it as the main metric
     if "length_controlled_winrate" in cols_to_keep and df["length_controlled_winrate"].notna().all():

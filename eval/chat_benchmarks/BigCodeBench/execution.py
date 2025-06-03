@@ -60,9 +60,7 @@ def check_correctness(
     def unsafe_execute(tmp_dir):
         random_id = random.randint(1, 100000)
         if "python" in language_type.lower():
-
             with create_tempdir():
-
                 # These system calls are needed when cleaning up tempdir.
                 import os
                 import shutil

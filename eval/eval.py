@@ -536,7 +536,9 @@ def add_results_metadata(results: Dict, batch_sizes_list: List[int], args: argpa
         "model": (
             args.model
             if isinstance(args.model, str)
-            else args.model.config._name_or_path if hasattr(args.model, "config") else type(args.model).__name__
+            else args.model.config._name_or_path
+            if hasattr(args.model, "config")
+            else type(args.model).__name__
         ),
         "model_args": args.model_args,
         "tasks": args.tasks,

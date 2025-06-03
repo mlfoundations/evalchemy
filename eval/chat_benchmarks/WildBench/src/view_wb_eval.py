@@ -26,7 +26,6 @@ print(list(set(task_group_new.values())))
 task_mapping = {}
 wb_data = load_dataset("allenai/WildBench", "v2", split="test")
 for item in wb_data:
-
     tags = [item["primary_tag"]] + item["secondary_tags"]
     task_mapping[item["id"]] = []
     for tag in tags:

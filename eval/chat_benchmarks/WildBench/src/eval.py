@@ -310,7 +310,6 @@ def shorten(text, K=-1):
 
 
 def placeholder_generation(args, candidates, references, histories, last_queries, checklists):
-
     with open(args.eval_template) as f:
         eval_template = f.read()
         print(f"Loaded the eval_template from {args.eval_template}")

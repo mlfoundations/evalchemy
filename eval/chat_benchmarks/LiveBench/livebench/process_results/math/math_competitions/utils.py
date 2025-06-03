@@ -46,7 +46,6 @@ def mathcontest_process_results(ground_truth: str, llm_answer: str, question_tex
 
 
 def extract_answer(statement, letter):
-
     pattern = r"\\textbf{\(([A-E])\)\s?}(.*?)(?:\\qquad|\$)"
     matches = re.findall(pattern, statement)
     answers = {match[0]: match[1].strip() for match in matches}

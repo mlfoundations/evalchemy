@@ -53,7 +53,6 @@ def chat_completion_openai(model: "Model", conv, temperature, max_tokens, api_di
             if message["role"] == "system":
                 message["role"] = "developer"
     try:
-
         response = client.chat.completions.create(
             model=model.api_name,
             messages=messages,

@@ -11,7 +11,6 @@ from livebench.common import (
 model_answer, model_judgment = load_answers_judgments()
 
 for dir_name, dataset in [("model_answer", model_answer), ("model_judgment", model_judgment)]:
-
     categories, tasks = get_categories_tasks(LIVE_BENCH_DATA_SUPER_PATH)
 
     for category_name, task_names in tqdm(tasks.items()):
@@ -19,7 +18,6 @@ for dir_name, dataset in [("model_answer", model_answer), ("model_judgment", mod
         for task_name in task_names:
             rows_task = [r for r in rows if r["task"] == task_name]
             if dir_name == "model_judgment":
-
                 task_path = f"data/{LIVE_BENCH_DATA_SUPER_PATH}/{category_name}/{task_name}/{dir_name}"
                 file_path = f"{task_path}/ground_truth_judgment.jsonl"
 

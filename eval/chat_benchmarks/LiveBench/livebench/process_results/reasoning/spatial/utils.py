@@ -3,7 +3,6 @@ from livebench.process_results.util import last_boxed_only_string, remove_boxed
 
 
 def spatial_process_results(ground_truth: str, llm_answer: str, debug=False) -> int:
-
     word_to_number = {
         "zero": "0",
         "one": "1",

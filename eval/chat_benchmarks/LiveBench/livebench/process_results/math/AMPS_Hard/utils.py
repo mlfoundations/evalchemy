@@ -158,7 +158,6 @@ def is_equiv(x1: str, x2: str) -> bool:
     x1 and x2 are normalized latex string
     """
     try:
-
         parsed_x1s = parse(x1)
         parsed_x2s = parse(x2)
 
@@ -168,7 +167,6 @@ def is_equiv(x1: str, x2: str) -> bool:
         errors = []
         for parsed_x1 in parsed_x1s:
             for parsed_x2 in parsed_x2s:
-
                 try:
                     diff = parsed_x1 - parsed_x2
                 except Exception as e:

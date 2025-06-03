@@ -196,7 +196,6 @@ def gen_results(run_name_folders):
 
 
 if __name__ == "__main__":
-
     data_name = sys.argv[1] if len(sys.argv) > 1 else "math-l5"
     if len(sys.argv) > 1:
         data_name = sys.argv[1]

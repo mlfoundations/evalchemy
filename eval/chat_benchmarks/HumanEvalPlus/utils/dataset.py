@@ -4,7 +4,6 @@ import json
 
 
 class HumanEvalPlusDataset:
-
     def __init__(self, root, sample_num=1, language="python", issft=False):
         """
         root: the path to the HumanEvalPlus dataset

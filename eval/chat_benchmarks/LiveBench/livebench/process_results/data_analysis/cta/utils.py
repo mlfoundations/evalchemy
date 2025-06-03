@@ -9,7 +9,6 @@ def clean_text(text):
 
 
 def cta_process_results(ground_truth: str, llm_answer: str, debug=False) -> int:
-
     parsed_answer = llm_answer
 
     if "\\boxed{" in parsed_answer:

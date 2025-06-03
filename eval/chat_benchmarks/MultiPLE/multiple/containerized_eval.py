@@ -87,7 +87,6 @@ def eval_string_script(language: str, program: str, tmpdir):
         suffix=file_ext,
         delete=True,
     ) as f:
-
         f.write(program.encode("utf-8"))
         f.flush()
         result = eval_script(Path(f.name))

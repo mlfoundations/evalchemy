@@ -8,7 +8,6 @@ def eval(
     path="results/deepseek-coder-1.3b-base-python",
     language="python",  # to calculate codebleu, we need to specify the language
 ):
-
     total_data_points = 0
     total_em_model, total_es_model, total_cb_model = 0, 0, 0
 
@@ -22,7 +21,6 @@ def eval(
             continue
 
         with open(filepath, "r") as f:
-
             data = []
             for line in f:
                 entry = json.loads(line.strip())

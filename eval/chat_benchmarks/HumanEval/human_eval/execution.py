@@ -38,7 +38,6 @@ def check_correctness(
         random_id = random.randint(1, 100000)
         if "python" in language_type.lower():
             with create_tempdir():
-
                 # These system calls are needed when cleaning up tempdir.
                 import os
                 import shutil
@@ -493,7 +492,6 @@ def check_correctness(
 
             # 0 means success
             if returned_val_compilation == 0:
-
                 # Execution pipeline
                 cargo_test: str = "cargo test --bin " + file_prefix + " --message-format json >> " + log_path
                 returned_val_execution = os.system(cargo_test)

@@ -4,7 +4,6 @@ from livebench.process_results.util import last_boxed_only_string, remove_boxed
 
 
 def web_of_lies_process_results(ground_truth: str, llm_answer: str, debug=False) -> int:
-
     score = 0
     parsed_answer = None
     # pull out words in bold

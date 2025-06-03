@@ -21,7 +21,6 @@ from instruction_following_eval import instructions_util
 
 
 class InstructionsUtilTest(parameterized.TestCase):
-
     TEST_WORD_COUNT_CASE_1 = ("word1, word2, word3, word4.", 4)
 
     TEST_WORD_COUNT_CASE_2 = (

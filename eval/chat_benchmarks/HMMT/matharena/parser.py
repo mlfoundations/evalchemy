@@ -366,7 +366,6 @@ class ParsePrimitive(ParseObject):
                     break
 
             for _ in range(5):
-
                 init_str = latex_str
                 latex_str = re.sub(r"\{(\d+)\}", r"(\1)", latex_str)
                 latex_str = re.sub(r"\\*(?:dfrac|tfrac|frac)\{([^{}]*)\}\{([^{}]*)\}", r"(\1)/(\2)", latex_str)

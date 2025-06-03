@@ -86,7 +86,6 @@ language_settings = {
 
 
 def get_function_name(question: str, lang: str):
-
     if question.startswith("<?php"):
         question = question[5:]
 

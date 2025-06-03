@@ -22,7 +22,6 @@ from instruction_following_eval import instructions
 
 # pylint:disable=g-complex-comprehension
 class InstructionsTest(parameterized.TestCase):
-
     @parameterized.named_parameters(
         [
             {

@@ -116,7 +116,6 @@ def run_test(sample, test=None, debug=False, timeout=6):
             print(f"loading test code = {datetime.now().time()}")
 
         if which_type == CODE_TYPE.call_based:
-
             sol += test
             if debug:
                 print(f"sol = {sol}")
@@ -594,7 +593,6 @@ def run_test(sample, test=None, debug=False, timeout=6):
 
 
 def custom_compare_(output, ground_truth):
-
     if isinstance(output, list):
         output_1 = "\n".join(output)
         if stripped_string_compare(output_1, ground_truth):
@@ -616,7 +614,6 @@ def stripped_string_compare(s1, s2):
 
 
 def call_method(method, inputs):
-
     if isinstance(inputs, list):
         inputs = "\n".join(inputs)
 

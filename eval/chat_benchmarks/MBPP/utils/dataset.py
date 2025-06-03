@@ -4,7 +4,6 @@ import json
 
 
 class MBPPDataset:
-
     def __init__(self, root, samplenum=1):
         """
         root: 数据文件的根目录

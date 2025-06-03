@@ -15,7 +15,6 @@ def jsonl_to_csv(input_filename, output_filename, task):
         open(input_filename, "r", encoding="utf-8") as jsonl_file,
         open(output_filename, "w", encoding="utf-8", newline="") as csv_file,
     ):
-
         # Define the CSV writer and write the header
         csv_writer = csv.writer(csv_file)
         header = ["question_id", "citation", "prompt"]

@@ -48,7 +48,6 @@ class APIQuery:
         openai_responses=False,
         **kwargs,
     ):
-
         # if "think" in model and api == "google":
         #     logger.info("Google Think model does not allow chat.")
         #     is_chat = False # think model cannot handle chat

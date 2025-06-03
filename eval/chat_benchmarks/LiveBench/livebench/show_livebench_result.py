@@ -13,7 +13,6 @@ from livebench.model.api_models import get_model
 
 
 def display_result_single(args):
-
     if args.livebench_release_option not in LIVE_BENCH_RELEASES:
         raise ValueError(f"Bad release {args.livebench_release_option}.")
     print(f"Using release {args.livebench_release_option}")

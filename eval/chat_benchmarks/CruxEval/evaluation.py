@@ -72,7 +72,6 @@ def evaluate_generations(
     sample_jsonl = stream_jsonl_all(input_file)
 
     with ThreadPoolExecutor(max_workers=n_workers) as executor:
-
         futures = []
         completion_id = Counter()
         n_samples = 0

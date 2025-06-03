@@ -240,7 +240,6 @@ if __name__ == "__main__":
     todo_inputs = model_inputs[num_skipped:]
 
     if args.engine == "vllm":
-
         sampling_params = SamplingParams(
             top_p=args.top_p,
             temperature=args.temperature,

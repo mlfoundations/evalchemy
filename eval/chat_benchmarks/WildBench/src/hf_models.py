@@ -85,7 +85,6 @@ class ModelManager:
 
 
 class DecoderOnlyModelManager(ModelManager):
-
     def __init__(self, model_path, model_name, cache_dir=None, bf16=False, int8=False, bnb4=False, gptq=False):
         super().__init__(model_path, model_name)
         self.cache_dir = cache_dir
@@ -192,7 +191,6 @@ class DecoderOnlyModelManager(ModelManager):
         print("model device:", self.model.device)
 
     def infer_generate(self, input_data, args={}, device=None, remarks=None, pure_input_data=None):
-
         if not device:
             device = self.model.device
         if type(args) is dict:

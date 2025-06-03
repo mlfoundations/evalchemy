@@ -9,7 +9,7 @@ import logging
 from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
 from multiple.evaluation import evaluate_functional_correctness
-from utils import extract_generation_code
+from .utils import extract_generation_code
 from eval.task import BaseBenchmark
 import traceback
 

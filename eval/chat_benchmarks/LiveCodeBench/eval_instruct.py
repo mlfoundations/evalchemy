@@ -66,7 +66,7 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
         """
         super().__init__(logger=logger, system_instruction=system_instruction)
         self.debug = debug
-        self.max_new_tokens = max_tokens
+        self.max_new_tokens = max_tokens or 32768
         self.seed = seed
         self.n_repeat = 6
 

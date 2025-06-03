@@ -45,7 +45,7 @@ class MBPPBenchmark(BaseBenchmark):
         """
         super().__init__(logger=logger, system_instruction=system_instruction)
         self.data_dir = data_dir
-        self.max_tokens = max_tokens
+        self.max_tokens = max_tokens or 512
         self.num_examples = num_examples
         self.start_idx = start_idx
         self.end_idx = end_idx

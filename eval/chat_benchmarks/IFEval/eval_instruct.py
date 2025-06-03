@@ -18,7 +18,7 @@ class IFEvalBenchmark(BaseBenchmark):
         start_idx: int = 10,
         end_idx: int = 510,
         debug: bool = False,
-        max_tokens: Optional[int] = 512,
+        max_tokens: int = 512,
         logger: Optional[logging.Logger] = None,
         system_instruction: Optional[str] = None,
     ):
@@ -37,7 +37,7 @@ class IFEvalBenchmark(BaseBenchmark):
         """
         super().__init__(logger=logger, system_instruction=system_instruction)
         self.data_dir = data_dir
-        self.max_tokens = max_tokens if max_tokens is not None else 512
+        self.max_tokens = max_tokens
         self.num_examples = num_examples
         self.start_idx = start_idx
         self.end_idx = end_idx

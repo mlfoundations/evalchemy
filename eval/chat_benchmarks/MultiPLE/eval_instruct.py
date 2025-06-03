@@ -115,7 +115,7 @@ class MultipleBenchmark(BaseBenchmark):
         super().__init__(logger)
         self.languages = languages
         self.data_dir = data_dir
-        self.max_tokens = max_tokens or 1024
+        self.max_tokens = max_tokens
         self.num_workers = num_workers
         self.timeout = timeout
         self.debug = debug

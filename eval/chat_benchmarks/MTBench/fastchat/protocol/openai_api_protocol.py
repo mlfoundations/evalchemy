@@ -66,7 +66,7 @@ class ChatCompletionRequest(BaseModel):
     top_p: Optional[float] = 1.0
     top_k: Optional[int] = -1
     n: Optional[int] = 1
-    max_tokens: Optional[int] = None
+    max_tokens: int = 1024
     stop: Optional[Union[str, List[str]]] = None
     stream: Optional[bool] = False
     presence_penalty: Optional[float] = 0.0
@@ -154,7 +154,7 @@ class CompletionRequest(BaseModel):
     suffix: Optional[str] = None
     temperature: Optional[float] = 0.7
     n: Optional[int] = 1
-    max_tokens: Optional[int] = 16
+    max_tokens: int = 16
     stop: Optional[Union[str, List[str]]] = None
     stream: Optional[bool] = False
     top_p: Optional[float] = 1.0

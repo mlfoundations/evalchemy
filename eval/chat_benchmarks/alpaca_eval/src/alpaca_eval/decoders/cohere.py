@@ -73,7 +73,7 @@ def cohere_completions(
 def _cohere_completion_helper(
     prompt: str,
     cohere_api_keys: Optional[Sequence[str]] = (constants.COHERE_API_KEY,),
-    max_tokens: Optional[int] = 1000,
+    max_tokens: int = 1000,
     temperature: Optional[float] = 0.7,
     max_tries=5,
     **kwargs,

@@ -47,7 +47,7 @@ class LiveCodeBenchV5Benchmark(BaseBenchmark):
         self,
         debug: bool = False,
         seed: List[int] = [0, 1234, 1234, 1234],
-        max_tokens: Optional[int] = None,
+        max_tokens: int = 32768,
         logger: Optional[logging.Logger] = None,
         system_instruction: Optional[str] = None,
     ):
@@ -62,9 +62,7 @@ class LiveCodeBenchV5Benchmark(BaseBenchmark):
         """
         super().__init__(logger=logger, system_instruction=system_instruction)
         self.debug = debug
-        self.max_new_tokens = (
-            max_tokens if max_tokens is not None else 32768
-        )  # set higher to avoid truncation for reasoning models
+        self.max_new_tokens = max_tokens
         self.seed = seed
         self.n_repeat = 3
 

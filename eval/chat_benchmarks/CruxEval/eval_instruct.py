@@ -132,7 +132,7 @@ class CruxEvalBenchmark(BaseBenchmark):
     def __init__(
         self,
         data_dir: str = CruxEval_PATH,
-        max_tokens: Optional[int] = 2048,
+        max_tokens: int = 2048,
         num_workers: int = 32,
         timeout: float = 120,
         debug: bool = False,
@@ -155,7 +155,7 @@ class CruxEvalBenchmark(BaseBenchmark):
         self.language = "python"
         os.makedirs(data_dir, exist_ok=True)
         self.data_dir = data_dir
-        self.max_tokens = max_tokens if max_tokens is not None else 2048
+        self.max_tokens = max_tokens
         self.num_workers = num_workers
         self.timeout = timeout
         self.debug = debug

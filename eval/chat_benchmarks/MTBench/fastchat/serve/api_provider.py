@@ -957,7 +957,7 @@ def cohere_api_stream_iter(
     messages: list,
     temperature: Optional[float] = None,  # The SDK or API handles None for all parameters following
     top_p: Optional[float] = None,
-    max_new_tokens: Optional[int] = None,
+    max_new_tokens: int = 1024,
     api_key: Optional[str] = None,  # default is env var CO_API_KEY
     api_base: Optional[str] = None,
 ):
@@ -1084,7 +1084,7 @@ def reka_api_stream_iter(
     messages: list,
     temperature: Optional[float] = None,  # The SDK or API handles None for all parameters following
     top_p: Optional[float] = None,
-    max_new_tokens: Optional[int] = None,
+    max_new_tokens: int = 1024,
     api_key: Optional[str] = None,  # default is env var CO_API_KEY
     api_base: Optional[str] = None,
 ):

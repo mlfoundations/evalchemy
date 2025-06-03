@@ -25,7 +25,7 @@ class MBPPPlusBenchmark(BaseBenchmark):
         num_workers: int = 8,
         timeout: float = 3.0,
         debug: bool = False,
-        max_tokens: Optional[int] = 1024,
+        max_tokens: int = 1024,
         logger: Optional[logging.Logger] = None,
         system_instruction: Optional[str] = None,
     ):
@@ -43,7 +43,7 @@ class MBPPPlusBenchmark(BaseBenchmark):
         """
         super().__init__(logger=logger, system_instruction=system_instruction)
         self.data_dir = data_dir
-        self.max_tokens = max_tokens if max_tokens is not None else 1024
+        self.max_tokens = max_tokens
         self.num_workers = num_workers
         self.timeout = timeout
         self.debug = debug

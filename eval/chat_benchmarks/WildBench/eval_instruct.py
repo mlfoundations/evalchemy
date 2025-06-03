@@ -76,7 +76,7 @@ class WildBenchBenchmark(BaseBenchmark):
         config: Optional[WildBenchConfig] = None,
         annotator_model: str = "gpt-4o-mini-2024-07-18",
         debug: bool = False,
-        max_tokens: Optional[int] = 1024,
+        max_tokens: int = 1024,
         logger: Optional[logging.Logger] = None,
         system_instruction: Optional[str] = None,
     ):
@@ -96,7 +96,7 @@ class WildBenchBenchmark(BaseBenchmark):
             config.model = annotator_model
         self.config = config or WildBenchConfig(model=annotator_model)
         self.debug = debug
-        self.max_new_tokens = max_tokens if max_tokens is not None else 1024
+        self.max_new_tokens = max_tokens
 
         # Task category mapping
         self.task_group_mapping = {

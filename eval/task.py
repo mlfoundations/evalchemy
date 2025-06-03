@@ -234,13 +234,20 @@ class TaskManager:
             valid_kwargs = {}
 
             # Only pass kwargs that the benchmark's __init__ accepts
+            # Filter out None values to let benchmarks use their default values
             for param_name, param in init_params.items():
                 if param_name in self.benchmark_kwargs:
-                    valid_kwargs[param_name] = self.benchmark_kwargs[param_name]
-                    self.logger.debug(f"Passing {param_name} to {name} benchmark")
+                    value = self.benchmark_kwargs[param_name]
+                    # Only pass the argument if it's not None, so benchmarks can use defaults
+                    if value is not None:
+                        valid_kwargs[param_name] = value
+                        self.logger.debug(f"Passing {param_name}={value} to {name} benchmark")
 
-            # Ensure system_instruction is passed if available
-            if "system_instruction" in self.benchmark_kwargs:
+            # Ensure system_instruction is passed if available and not None
+            if (
+                "system_instruction" in self.benchmark_kwargs
+                and self.benchmark_kwargs["system_instruction"] is not None
+            ):
                 valid_kwargs["system_instruction"] = self.benchmark_kwargs["system_instruction"]
 
             instance = benchmark_class(**valid_kwargs)

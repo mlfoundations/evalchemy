@@ -35,7 +35,7 @@ class GPQADiamondBenchmark(BaseBenchmark):
         self,
         debug: bool = False,
         seed: List[int] = [0, 1234, 1234, 1234],
-        max_tokens: Optional[int] = 32768,
+        max_tokens: int = 32768,
         logger: Optional[logging.Logger] = None,
         system_instruction: Optional[str] = None,
     ):
@@ -51,7 +51,7 @@ class GPQADiamondBenchmark(BaseBenchmark):
         self.dataset_name = "Idavidrein/gpqa"
         self.debug = debug
         self.seed = seed
-        self.max_new_tokens = max_tokens if max_tokens is not None else 32768
+        self.max_new_tokens = max_tokens
         self.n_repeat = 3
 
     def generate_responses(self, model: LM) -> Dict[str, Any]:

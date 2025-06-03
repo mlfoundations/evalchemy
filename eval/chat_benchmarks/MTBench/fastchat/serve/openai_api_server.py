@@ -266,7 +266,7 @@ async def get_gen_params(
     top_k: Optional[int],
     presence_penalty: Optional[float],
     frequency_penalty: Optional[float],
-    max_tokens: Optional[int],
+    max_tokens: int,
     echo: Optional[bool],
     logprobs: Optional[int] = None,
     stop: Optional[Union[str, List[str]]],

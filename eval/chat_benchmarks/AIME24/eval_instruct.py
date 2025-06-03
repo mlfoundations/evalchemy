@@ -27,7 +27,7 @@ class AIME24Benchmark(BaseBenchmark):
         data_file: str = "eval/chat_benchmarks/AIME24/data/aime24.json",
         debug: bool = False,
         seed: List[int] = [0, 1234, 1234, 1234],
-        max_tokens: Optional[int] = 32768,
+        max_tokens: int = 32768,
         logger: Optional[logging.Logger] = None,
         system_instruction: Optional[str] = None,
     ):
@@ -44,9 +44,7 @@ class AIME24Benchmark(BaseBenchmark):
         super().__init__(logger=logger, system_instruction=system_instruction)
         self.data_file = data_file
         self.debug = debug
-        self.max_new_tokens = (
-            max_tokens if max_tokens is not None else 32768
-        )  # set higher to avoid truncation for reasoning models
+        self.max_new_tokens = max_tokens
         self.seed = seed
         self.n_repeat = 10
 

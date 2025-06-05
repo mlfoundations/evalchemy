@@ -428,9 +428,9 @@ If you find Evalchemy useful, please consider citing us!
 
 ```
 @software{Evalchemy: Automatic evals for LLMs,
-  author = {Guha, Etash and Raoof, Negin and Mercat, Jean and Marten, Ryan and Frankel, Eric and Keh, Sedrick and Grover, Sachin and Smyrnis, George and Vu, Trung and Saad-Falcon, Jon and Choi, Caroline and Arora, Kushal and Merrill, Mike and Deng, Yichuan and Suvarna, Ashima and Bansal, Hritik and Nezhurina, Marianna and Choi, Yejin and Heckel, Reinhard and Oh, Seewong and Hashimoto, Tatsunori and Jitsev, Jenia and Shankar, Vaishaal and Dimakis, Alex and Sathiamoorthy, Mahesh and Schmidt, Ludwig},
-  month = nov,
+  author = {Raoof, Negin and Guha, Etash Kumar and Marten, Ryan and Mercat, Jean and Frankel, Eric and Keh, Sedrick and Bansal, Hritik and Smyrnis, Georgios and Nezhurina, Marianna and Vu, Trung and Sprague, Zayne Rea and Merrill, Mike A and Chen, Liangyu and Choi, Caroline and Khan, Zaid and Grover, Sachin and Feuer, Benjamin and Suvarna, Ashima and Su, Shiye and Zhao, Wanjia and Sharma, Kartik and Ji, Charlie Cheng-Jie and Arora, Kushal and Li, Jeffrey and Gokaslan, Aaron and Pratt, Sarah M and Muennighoff, Niklas and Saad-Falcon, Jon and Yang, John and Aali, Asad and Pimpalgaonkar, Shreyas and Albalak, Alon and Dave, Achal and Pouransari, Hadi and Durrett, Greg and Oh, Sewoong and Hashimoto, Tatsunori and Shankar, Vaishaal and Choi, Yejin and Bansal, Mohit and Hegde, Chinmay and Heckel, Reinhard and Jitsev, Jenia and Sathiamoorthy, Maheswaran and Dimakis, Alex and Schmidt, Ludwig}
+  month = June,
   title = {{Evalchemy}},
-  year = {2024}
+  year = {2025}
 }
 ```

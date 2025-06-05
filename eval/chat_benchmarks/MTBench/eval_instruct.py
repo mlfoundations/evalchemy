@@ -87,13 +87,13 @@ class MTBenchBenchmark(BaseBenchmark):
         """
         super().__init__(logger=logger, system_instruction=system_instruction)
         self.base_path = Path(base_path)
-        if annotator_model == "auto":
-            annotator_model = "gpt-4"
-        if config:
-            print(f"Warning: Overwriting config.judge_model = {annotator_model} ")
-            config.judge_model = annotator_model
-        self.config = config or MTBenchConfig(judge_model=annotator_model)
-        self.config.max_new_token = max_tokens or 1024
+        if getattr(self, "config", None) is None:
+            self.config = MTBenchConfig(
+                judge_model=annotator_model,
+            )
+        else:
+            self.config = config
+        self.config.max_new_token = max_tokens if max_tokens is not None else 1024
         self.debug = debug
 
         # Setup paths
@@ -116,7 +116,6 @@ class MTBenchBenchmark(BaseBenchmark):
         max_turns = max(len(q["turns"]) for q in questions)
         answer_file = self.answer_dir / f"{model_id}.jsonl"
 
-        self.config.max_new_token = self.max_new_token
         # Process each turn
         for turn_num in range(max_turns):
             self.logger.info(f"Processing Turn {turn_num + 1}")

@@ -31,7 +31,7 @@ class AlpacaBenchmark(BaseBenchmark):
         dataset_name: str = "tatsu-lab/alpaca_eval",
         subset: str = "alpaca_eval",
         split: str = "eval",
-        max_tokens: int = 1024,
+        max_tokens: Optional[int] = 1024,
         temperature: float = 0.5,
         do_sample: bool = True,
         debug: bool = False,
@@ -57,7 +57,7 @@ class AlpacaBenchmark(BaseBenchmark):
         self.dataset_name = dataset_name
         self.subset = subset
         self.split = split
-        self.max_tokens = max_tokens
+        self.max_tokens = max_tokens if max_tokens is not None else 1024
         self.temperature = temperature
         self.do_sample = do_sample
         self.debug = debug

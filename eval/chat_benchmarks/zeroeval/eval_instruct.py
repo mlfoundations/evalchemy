@@ -33,7 +33,7 @@ class ZeroEvalBenchmark(BaseBenchmark):
         self,
         tasks: List[str] = ["zebra-grid", "numersense-v2", "crux", "math-l5"],
         config: Optional[ZeroEvalConfig] = None,
-        max_tokens: int = 4096,
+        max_tokens: Optional[int] = 4096,
         debug: bool = False,
         logger: Optional[logging.Logger] = None,
         system_instruction: Optional[str] = None,
@@ -41,7 +41,7 @@ class ZeroEvalBenchmark(BaseBenchmark):
         super().__init__(logger, system_instruction=system_instruction)
         self.tasks = tasks
         self.config = config or ZeroEvalConfig()
-        self.max_new_tokens = int(max_tokens)
+        self.max_new_tokens = int(max_tokens) if max_tokens is not None else 4096
         self.debug = debug
 
     def load_dataset(self, data_name: str) -> Tuple[List[str], List[str], List[Dict[str, Any]], Dict[str, Any]]:

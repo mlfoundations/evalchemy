@@ -116,7 +116,6 @@ class MTBenchBenchmark(BaseBenchmark):
         max_turns = max(len(q["turns"]) for q in questions)
         answer_file = self.answer_dir / f"{model_id}.jsonl"
 
-        self.config.max_new_token = self.max_new_token
         # Process each turn
         for turn_num in range(max_turns):
             self.logger.info(f"Processing Turn {turn_num + 1}")

@@ -73,9 +73,9 @@ class AMC23Benchmark(BaseBenchmark):
             model_name = model.model_args["model"]
 
         all_outputs = []
+        all_instances = []
         for i in range(self.n_repeat):
             seed = [s + i for s in self.seed]
-            all_instances = []
             for idx, example in enumerate(examples):
                 messages = [
                     {"role": "user", "content": PROMPT.format(problem=example["question"])},
@@ -108,11 +108,13 @@ class AMC23Benchmark(BaseBenchmark):
 
                 all_instances.append(instance)
 
-            # Generate model responses
-            self.logger.info("Generating responses for AMC23...")
-            outputs = self.compute(model, all_instances)
-            all_outputs.append(outputs)
+        # Generate model responses
+        self.logger.info("Generating responses for AMC23...")
+        all_outputs = self.compute(model, all_instances)
 
+        all_outputs = [
+            all_outputs[i: i + len(examples)] for i in range(0, len(examples) * self.n_repeat, len(examples))
+        ]
         # Return None early for non-primary ranks
         if model.rank != 0:
             return None

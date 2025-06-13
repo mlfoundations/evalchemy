@@ -1,7 +1,7 @@
 import copy
+import json
 import logging
 import os
-import re
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any, Dict, List, Optional
@@ -13,20 +13,39 @@ from lm_eval.api.model import LM
 
 from eval.task import BaseBenchmark
 
-from .livecodebench_utils import lcb_run, map_to_example, post_process_code, translate_private_test_cases
+from .livecodebench_utils import (
+    check_correctness,
+    extract_code,
+    format_prompt,
+    translate_private_test_cases,
+)
 
 HF_HUB_CACHE = os.environ.get("HF_HUB_CACHE")
 if not HF_HUB_CACHE:
     print(
         "WARNING: HF_HUB_CACHE environment variable is not set, using default cache directory ~/.cache/huggingface/hub for LiveCodeBench benchmark"
     )
+# generic question formatting from
+# https://github.com/LiveCodeBench/LiveCodeBench/blob/main/lcb_runner/prompts/code_generation.py#L13
+DEFAULT_SYSTEM_INSTRUCTION = (
+    "You are an expert Python programmer. "
+    "You will be given a question (problem specification) and "
+    "will generate a correct Python program that matches the "
+    "specification and passes all tests."
+)
 
+FORMATTING_MESSAGE_WITH_STARTER_CODE = (
+    "You will use the following starter code to write the solution "
+    "to the problem and enclose your code within delimiters."
+)
 
-def has_code(response):
-    pattern = r"```(?:[a-zA-Z]*)\n(.*?)```"
-    # Use re.DOTALL to match multiline content inside backticks
-    matches = re.findall(pattern, response, re.DOTALL)
-    return matches
+FORMATTING_WITHOUT_STARTER_CODE = (
+    "Read the inputs from stdin solve the problem and write the answer "
+    "to stdout (do not directly test on the sample inputs). "
+    "Enclose your code within delimiters as follows. Ensure that when "
+    "the python program runs, it reads the inputs, runs the algorithm and "
+    "writes output to STDOUT."
+)
 
 
 # Calculate mean and standard error for all metrics
@@ -64,6 +83,11 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
             logger: Optional logger instance
             system_instruction: Optional system instruction for the model
         """
+        system_instruction = (
+            DEFAULT_SYSTEM_INSTRUCTION
+            if system_instruction is None
+            else system_instruction
+        )
         super().__init__(logger=logger, system_instruction=system_instruction)
         self.debug = debug
         self.max_new_tokens = max_tokens
@@ -92,17 +116,7 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
             seed = [s + i for s in self.seed]
 
             for idx, example in enumerate(examples):
-                if example["is_stdin"]:
-                    prompt_text = (
-                        "Generate an executable Python function generated from the given prompt. The function should take stdin as input and print the output. Simply call the function after the definition."
-                        + example["prompt"]
-                    )
-                else:
-                    prompt_text = (
-                        "Generate an executable Python function generated from the given prompt. Return the function body without invoking it at the final solution."
-                        + example["prompt"]
-                    )
-                messages = [{"role": "user", "content": prompt_text}]
+                messages = [{"role": "user", "content": example["prompt"]}]
 
                 templated_messages = self._prepare_messages(messages, model)
 
@@ -136,29 +150,10 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
 
         for example, outputs in zip(examples, zip(*all_outputs)):
             example["model_outputs"] = list(outputs)
-            example["model_answers"] = [has_code(o) for o in outputs]
+            example["model_answers"] = [[extract_code(o)] for o in outputs]
             examples_list.append(example)
 
         return {"examples": examples_list}
-
-    @staticmethod
-    def check_correctness(problem: Dict, completion: str, timeout: float, is_extracted: bool = False) -> Dict:
-        """
-        Evaluates the functional correctness of a completion by running the test
-        suite provided in the problem.
-
-        :param completion_id: an optional completion ID so we can match
-            the results later even if execution finishes asynchronously.
-        """
-        result_list = lcb_run(problem, completion, timeout, is_extracted)
-        details = [r[0] for r in result_list]
-        all_passed = all(details)
-
-        result = ""
-        if result_list and all_passed:
-            result = "passed"
-
-        return result == "passed"
 
     def evaluate_single_example(self, example):
         """Helper function to evaluate a single example"""
@@ -184,12 +179,25 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
                 # Add debugging
                 self.logger.debug(f"Evaluating {example['difficulty']} problem...")
 
-                # Add timeout handling
-                curr_res = self.check_correctness(
-                    problem=problem_to_check,
-                    completion=post_process_code(last_code),
-                    timeout=6,
-                    is_extracted=not problem_to_check["is_stdin"],
+                # extracts tests
+                test_cases = (
+                    problem_to_check["public_test_cases"]
+                    + problem_to_check["private_test_cases"]
+                )
+                tests = {
+                    "input_output": json.dumps(
+                        {
+                            "inputs": [t["input"] for t in test_cases],
+                            "outputs": [t["output"] for t in test_cases],
+                            "fn_name": problem_to_check["metadata"].get(
+                                "func_name", None
+                            ),
+                        }
+                    ),
+                }
+                # check correctness on all tests for a given code
+                curr_res = check_correctness(
+                    tests, last_code, timeout=6, debug=self.debug
                 )
 
                 # Log the result
@@ -199,7 +207,9 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
                 response_entry["reason"] = "" if curr_res else "Code is incorrect."
 
             except Exception as e:
-                self.logger.error(f"Error evaluating {example['difficulty']} example: {str(e)}")
+                self.logger.error(
+                    f"Error evaluating {example['difficulty']} example: {str(e)}"
+                )
                 response_entry["correctness"] = False
                 response_entry["reason"] = f"Evaluation error: {str(e)}"
 
@@ -221,12 +231,16 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
             return None
 
         self.logger.info(f"Evaluating {len(responses['examples'])} examples...")
-        self.logger.warning(f"Expect some output leaks from the code / test execution into stdout")
+        self.logger.warning(
+            "Expect some output leaks from the code / test execution into stdout"
+        )
 
         # First, organize completions by repeat index
         examples_by_repeat = defaultdict(list)
         for example in responses["examples"]:
-            for i, (output, answers) in enumerate(zip(example["model_outputs"], example["model_answers"])):
+            for i, (output, answers) in enumerate(
+                zip(example["model_outputs"], example["model_answers"])
+            ):
                 # Create a copy of the original example and update with the specific completion
                 example_copy = example.copy()  # Make a shallow copy of the example
                 example_copy["model_answer"] = answers
@@ -291,7 +305,8 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
             # Add per-difficulty accuracies
             for difficulty in per_difficulty_correct.keys():
                 metrics[f"accuracy_{difficulty}"] = (
-                    per_difficulty_correct[difficulty] / per_difficulty_total[difficulty]
+                    per_difficulty_correct[difficulty]
+                    / per_difficulty_total[difficulty]
                 )
 
             all_metrics.append(metrics)
@@ -331,7 +346,9 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
 
         # Include raw results and examples in final metrics
         final_metrics["raw_metrics"] = all_metrics
-        final_metrics["examples"] = [result for result, _ in results]  # Include last run's examples
+        final_metrics["examples"] = [
+            result for result, _ in results
+        ]  # Include last run's examples
 
         # Add compatibility with precomputed_hf_lm.py
         solved_avg = np.mean([result["num_solved"] for result in run_stats])
@@ -348,7 +365,9 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
 
     def load_questions(self) -> Dataset:
         """Load LiveCodeBench questions from source."""
-        self.logger.info("Loading LiveCodeBench questions from source and converting to dataset...")
+        self.logger.info(
+            "Loading LiveCodeBench questions from source and converting to dataset..."
+        )
         cpu_count = os.cpu_count()
         ds = load_dataset(
             "livecodebench/code_generation_lite",
@@ -363,10 +382,25 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
         for i in range(num_shards):
             shard = ds.shard(num_shards=num_shards, index=i)
             shard = shard.map(
-                lambda example: {"private_test_cases": translate_private_test_cases(example["private_test_cases"])},
+                lambda example: {
+                    "prompt": format_prompt(
+                        example,
+                        FORMATTING_MESSAGE_WITH_STARTER_CODE,
+                        FORMATTING_WITHOUT_STARTER_CODE,
+                    ),
+                    "metadata": {
+                        "func_name": json.loads(example["metadata"]).get(
+                            "func_name", None
+                        )
+                    },
+                    "public_test_cases": json.loads(example["public_test_cases"]),
+                    "private_test_cases": translate_private_test_cases(
+                        example["private_test_cases"]
+                    ),
+                },
                 num_proc=cpu_count,
             )
-            shard = shard.map(map_to_example, remove_columns=ds.column_names)
             processed_shards.append(shard)
         ds = concatenate_datasets(processed_shards)
+        ds = ds.sort("question_id")
         return ds

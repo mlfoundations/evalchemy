@@ -28,7 +28,7 @@ class AIME24Benchmark(BaseBenchmark):
         self.debug = debug
         self.max_new_tokens = max_tokens
         self.seed = seed
-        self.n_repeat = 3
+        self.n_repeat = 1
 
     def generate_responses(self, model: LM) -> Dict[str, Any]:
         examples = self.load_questions()

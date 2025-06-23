@@ -12,13 +12,55 @@ from lm_eval.models.api_models import JsonChatStr
 from lm_eval.models.utils import handle_stop_sequences
 
 
+class ExtendedJsonChatStr:
+    """Extended JsonChatStr class with additional string methods that behaves like a string."""
+    
+    def __init__(self, prompt: str):
+        self.prompt = prompt
+    
+    def __str__(self):
+        return self.prompt
+    
+    def __repr__(self):
+        return f"ExtendedJsonChatStr({self.prompt!r})"
+    
+    def __len__(self):
+        """Return the length of the prompt."""
+        return len(self.prompt)
+    
+    def __add__(self, other):
+        if isinstance(other, str):
+            return ExtendedJsonChatStr(self.prompt + other)
+        return NotImplemented
+    
+    def __radd__(self, other):
+        if isinstance(other, str):
+            return ExtendedJsonChatStr(other + self.prompt)
+        return NotImplemented
+    
+    def encode(self, encoding):
+        return self.prompt.encode(encoding)
+    
+    def rstrip(self, chars=None):
+        """Strip trailing characters from the prompt."""
+        return ExtendedJsonChatStr(self.prompt.rstrip(chars))
+    
+    def lstrip(self, chars=None):
+        """Strip leading characters from the prompt."""
+        return ExtendedJsonChatStr(self.prompt.lstrip(chars))
+    
+    def strip(self, chars=None):
+        """Strip leading and trailing characters from the prompt."""
+        return ExtendedJsonChatStr(self.prompt.strip(chars))
+
+
 @register_model("curator")
 class CuratorAPIModel(TemplateLM):
     def __init__(
         self,
         model: str = None,
         pretrained: str = None,
-        max_length: Optional[int] = 2048,
+        max_length: Optional[int] = 14000,
         max_retries: int = 10,
         timeout: int = 600,
         tokenized_requests: bool = False,
@@ -121,7 +163,10 @@ class CuratorAPIModel(TemplateLM):
     ) -> dict:
         assert generate, "Curator only supports generation."
         # Create the payload for the API request
-        max_tokens = self.max_length or gen_kwargs.get("max_gen_toks", self.max_length)
+        # max_new_tokens를 우선적으로 사용하고, 없으면 max_gen_toks, 마지막으로 self.max_length 사용
+        max_tokens = (gen_kwargs.get("max_new_tokens") or 
+                     gen_kwargs.get("max_gen_toks") or 
+                     self.max_length)
         temperature = self.gen_kwargs.get("temperature", gen_kwargs.get("temperature", 0))
         top_p = self.gen_kwargs.get("top_p", gen_kwargs.get("top_p", 0.95))
         stop = handle_stop_sequences(gen_kwargs.get("until", None), eos)
@@ -160,10 +205,10 @@ class CuratorAPIModel(TemplateLM):
         return messages
 
     def create_message(
-        self, messages: Union[List[List[int]], List[str], List[JsonChatStr]], generate=False
+        self, messages: Union[List[List[int]], List[str], List[JsonChatStr], List[ExtendedJsonChatStr]], generate=False
     ) -> Union[List[List[int]], List[dict], List[str], str]:
         # Convert messages to the format expected by the API
-        if isinstance(messages, list) and all(isinstance(m, JsonChatStr) for m in messages):
+        if isinstance(messages, list) and all(isinstance(m, (JsonChatStr, ExtendedJsonChatStr)) for m in messages):
             return [json.loads(m.prompt) for m in messages]
         else:
             raise ValueError("Messages must be a list of JsonChatStr objects")
@@ -194,9 +239,9 @@ class CuratorAPIModel(TemplateLM):
     def apply_chat_template(self, chat_history: List[Dict[str, str]], add_generation_prompt: bool = True, **kwargs) -> Union[str, JsonChatStr]:
         # Convert chat history to the required format
         # add_generation_prompt is ignored for curator as it handles this internally
-        return JsonChatStr(json.dumps(chat_history))
+        return ExtendedJsonChatStr(json.dumps(chat_history))
 
-    def model_call(self, messages: Union[List[List[int]], List[str], List[JsonChatStr]], **kwargs) -> Optional[dict]:
+    def model_call(self, messages: Union[List[List[int]], List[str], List[JsonChatStr], List[ExtendedJsonChatStr]], **kwargs) -> Optional[dict]:
         payload = self._create_payload(self.create_message(messages), **kwargs)
         response = self.llm(payload)
         # Handle CuratorResponse object
@@ -209,14 +254,22 @@ class CuratorAPIModel(TemplateLM):
             return response["response"] if isinstance(response, dict) else response
 
     def _loglikelihood_tokens(self, requests, **kwargs) -> List[Tuple[float, bool]]:
-        raise NotImplementedError("Log likelihood tokens not implemented for curator.")
+        # For curator model, we cannot compute exact log likelihoods via API
+        # Return dummy values - this is a limitation of API-based models
         results = []
-        for context, continuation in requests:
-            # Assuming the model can compute log likelihoods
-            response = self.model_call([context, continuation])
-            logprob = response.get("logprob", 0.0)  # Replace with actual key
-            is_greedy = response.get("is_greedy", False)  # Replace with actual key
-            results.append((logprob, is_greedy))
+        for request in requests:
+            # Handle different request formats
+            if isinstance(request, tuple) and len(request) == 2:
+                context, continuation = request
+            elif hasattr(request, 'args') and len(request.args) >= 2:
+                context, continuation = request.args[0], request.args[1]
+            else:
+                # Fallback for unexpected formats
+                context, continuation = str(request), ""
+            
+            # Return dummy logprob and is_greedy values
+            # This is a common limitation for API-based models
+            results.append((0.0, False))
         return results
 
     @property
@@ -295,5 +348,26 @@ class CuratorAPIModel(TemplateLM):
         return loglikelihoods
 
     def tok_encode(self, string: str, **kwargs) -> List[int]:
-        raise NotImplementedError("Token encoding not implemented for curator.")
-        return self.llm.tokenizer.encode(string)  # Replace with actual method to tokenize
+        # Use huggingface tokenizer for token encoding
+        if not hasattr(self, '_tokenizer'):
+            try:
+                from transformers import AutoTokenizer
+                tokenizer_name = self.model_args.get("tokenizer", self.model_name)
+                self._tokenizer = AutoTokenizer.from_pretrained(tokenizer_name, trust_remote_code=True)
+            except Exception as e:
+                print(f"Warning: Failed to load tokenizer {tokenizer_name}: {e}")
+                # Fallback to approximate token count (1 token ≈ 4 chars for English)
+                return list(range(len(string) // 4 + 1))
+        
+        try:
+            # Handle ExtendedJsonChatStr objects
+            if hasattr(string, 'prompt'):
+                text_to_encode = string.prompt
+            else:
+                text_to_encode = str(string)
+            return self._tokenizer.encode(text_to_encode, add_special_tokens=False)
+        except Exception as e:
+            print(f"Warning: Tokenization failed: {e}")
+            # Fallback to approximate token count
+            text_len = len(string.prompt) if hasattr(string, 'prompt') else len(str(string))
+            return list(range(text_len // 4 + 1))

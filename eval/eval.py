@@ -596,7 +596,7 @@ def handle_evaluation_output(
             rather than returning values.
     """
     if args.log_samples:
-        samples = results.pop("samples")
+        samples = results.pop("samples", {})
 
     dumped = json.dumps(
         results,
@@ -630,9 +630,10 @@ def handle_evaluation_output(
             is_external=args.is_external_model,
         )
 
-    if args.log_samples:
+    if args.log_samples and samples and "configs" in results:
         for task_name, config in results["configs"].items():
-            evaluation_tracker.save_results_samples(task_name=task_name, samples=samples[task_name])
+            if task_name in samples:
+                evaluation_tracker.save_results_samples(task_name=task_name, samples=samples[task_name])
 
     eval_logger.info(
         f"Eval arugments: {args.model} ({args.model_args}), gen_kwargs: ({args.gen_kwargs}), "

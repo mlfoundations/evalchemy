@@ -170,6 +170,12 @@ class CuratorAPIModel(TemplateLM):
         max_tokens = (gen_kwargs.get("max_new_tokens") or 
                      gen_kwargs.get("max_gen_toks") or 
                      self.max_length)
+        
+        # qwen3-8b 모델의 최대 컨텍스트 길이는 16384이므로 안전한 범위로 제한
+        if "qwen3" in self.model_name.lower():
+            max_tokens = min(max_tokens, 8192)  # 입력을 위한 여유 공간 확보
+        elif max_tokens > 16000:
+            max_tokens = 8192  # 일반적으로 안전한 값으로 제한
         temperature = self.gen_kwargs.get("temperature", gen_kwargs.get("temperature", 0))
         top_p = self.gen_kwargs.get("top_p", gen_kwargs.get("top_p", 0.95))
         stop = handle_stop_sequences(gen_kwargs.get("until", None), eos)

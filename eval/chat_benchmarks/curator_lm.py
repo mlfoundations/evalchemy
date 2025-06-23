@@ -163,6 +163,9 @@ class CuratorAPIModel(TemplateLM):
     ) -> dict:
         assert generate, "Curator only supports generation."
         # Create the payload for the API request
+        if gen_kwargs is None:
+            gen_kwargs = {}
+        
         # max_new_tokens를 우선적으로 사용하고, 없으면 max_gen_toks, 마지막으로 self.max_length 사용
         max_tokens = (gen_kwargs.get("max_new_tokens") or 
                      gen_kwargs.get("max_gen_toks") or 
@@ -230,7 +233,28 @@ class CuratorAPIModel(TemplateLM):
     @staticmethod
     def parse_generations(outputs: Union[Any, List[Any]], **kwargs) -> List[str]:
         # Parse the generated outputs from the API
-        return [output["response"] for output in outputs]
+        results = []
+        for output in outputs:
+            if hasattr(output, 'dataset') and hasattr(output.dataset, '__iter__'):
+                # Handle CuratorResponse object
+                try:
+                    # Extract the first response from the dataset
+                    dataset_rows = list(output.dataset)
+                    if dataset_rows and 'response' in dataset_rows[0]:
+                        results.append(dataset_rows[0]['response'])
+                    else:
+                        results.append("")
+                except Exception as e:
+                    print(f"Error parsing CuratorResponse: {e}")
+                    results.append("")
+            elif isinstance(output, dict) and "response" in output:
+                results.append(output["response"])
+            elif isinstance(output, str):
+                results.append(output)
+            else:
+                # Fallback: convert to string
+                results.append(str(output))
+        return results
 
     @property
     def tokenizer_name(self) -> str:
@@ -241,17 +265,11 @@ class CuratorAPIModel(TemplateLM):
         # add_generation_prompt is ignored for curator as it handles this internally
         return ExtendedJsonChatStr(json.dumps(chat_history))
 
-    def model_call(self, messages: Union[List[List[int]], List[str], List[JsonChatStr], List[ExtendedJsonChatStr]], **kwargs) -> Optional[dict]:
+    def model_call(self, messages: Union[List[List[int]], List[str], List[JsonChatStr], List[ExtendedJsonChatStr]], **kwargs) -> Any:
         payload = self._create_payload(self.create_message(messages), **kwargs)
         response = self.llm(payload)
-        # Handle CuratorResponse object
-        if hasattr(response, 'response'):
-            return response.response
-        elif hasattr(response, 'responses'):
-            return response.responses
-        else:
-            # Fallback: try dict access
-            return response["response"] if isinstance(response, dict) else response
+        # Return the raw CuratorResponse object so parse_generations can handle it properly
+        return response
 
     def _loglikelihood_tokens(self, requests, **kwargs) -> List[Tuple[float, bool]]:
         # For curator model, we cannot compute exact log likelihoods via API
@@ -316,21 +334,30 @@ class CuratorAPIModel(TemplateLM):
             payload = self._create_payload(contexts_dataset, generate=True, gen_kwargs=group_gen_kwargs)
             response = self.llm(payload)
             
-            # Handle CuratorResponse object
-            if hasattr(response, 'response'):
-                group_responses = response.response
-            elif hasattr(response, 'responses'):
-                group_responses = response.responses
+            # Handle CuratorResponse object - extract responses from dataset
+            if hasattr(response, 'dataset') and hasattr(response.dataset, '__iter__'):
+                try:
+                    dataset_rows = list(response.dataset)
+                    group_responses = []
+                    for row in dataset_rows:
+                        if isinstance(row, dict) and 'response' in row:
+                            group_responses.append(row['response'])
+                        else:
+                            group_responses.append(str(row))
+                    
+                    # If we don't have enough responses, pad with empty strings
+                    while len(group_responses) < len(group_contexts):
+                        group_responses.append("")
+                        
+                except Exception as e:
+                    print(f"Error extracting responses from CuratorResponse: {e}")
+                    group_responses = [""] * len(group_contexts)
             elif isinstance(response, dict) and "response" in response:
-                group_responses = response["response"]
+                group_responses = [response["response"]] * len(group_contexts)
+            elif isinstance(response, str):
+                group_responses = [response] * len(group_contexts)
             else:
-                group_responses = response
-            
-            # If response is a single string, convert to list
-            if isinstance(group_responses, str):
-                group_responses = [group_responses] * len(group_contexts)
-            elif not isinstance(group_responses, list):
-                group_responses = [str(group_responses)] * len(group_contexts)
+                group_responses = [str(response)] * len(group_contexts)
             
             # Place responses back in their original positions
             for (original_idx, _, _), group_response in zip(group_requests, group_responses):

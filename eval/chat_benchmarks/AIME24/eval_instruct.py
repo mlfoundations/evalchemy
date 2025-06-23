@@ -16,7 +16,7 @@ PROMPT = """Problem: {problem}\nMark your solution with \\boxed\nAnswer:"""
 class AIME24Benchmark(BaseBenchmark):
     def __init__(
         self,
-        data_file: str = "eval/chat_benchmarks/AIME24/data/aime24_single.json",
+        data_file: str = "eval/chat_benchmarks/AIME24/data/aime24.json",
         debug: bool = False,
         seed: List[int] = [0, 1234, 1234, 1234],
         max_tokens: int = 32768,

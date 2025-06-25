@@ -52,8 +52,7 @@ class AMC23Benchmark(BaseBenchmark):
         self.debug = debug
         self.seed = seed
         self.max_new_tokens = max_tokens
-        self.n_repeat = 2
-
+        self.n_repeat = 10
     def generate_responses(self, model: LM) -> Dict[str, Any]:
         """
         Generate solution completions using the provided model.

@@ -12,7 +12,11 @@ from eval.task import BaseBenchmark
 
 # Modified version of hendrycks_math with additional instruction to mark the solution with \\boxed
 # https://github.com/mlfoundations/evalchemy/blob/e70a45e41cb2ada273d6bb98e75dba303ec31f8b/eval/chat_benchmarks/AMC23/eval_instruct.py#L15
-PROMPT = """Problem: {problem}\nMark your solution with \\boxed\nAnswer:"""
+PROMPT = """Problem: {problem}
+
+Please solve this step-by-step and provide your final answer in the format \\boxed{{answer}} or clearly state "The answer is X" at the end.
+
+Answer:"""
 
 
 class AMC23Benchmark(BaseBenchmark):
@@ -49,7 +53,6 @@ class AMC23Benchmark(BaseBenchmark):
         self.seed = seed
         self.max_new_tokens = max_tokens
         self.n_repeat = 10
-
     def generate_responses(self, model: LM) -> Dict[str, Any]:
         """
         Generate solution completions using the provided model.
@@ -186,4 +189,32 @@ class AMC23Benchmark(BaseBenchmark):
             answer = remove_boxed(last_boxed_only_string(output))
             return answer
         except:
+            # If \boxed{} format is not found, try to extract answer from other patterns
+            import re
+            
+            # Try to find patterns like "Therefore, the answer is X" or "The answer is X"
+            answer_patterns = [
+                r"(?:Therefore|Thus|So),?\s+(?:the\s+)?answer\s+is\s+([^.\n]+)",
+                r"(?:The\s+)?answer\s+is\s+([^.\n]+)",
+                r"Final\s+answer:\s*([^.\n]+)",
+                r"Answer:\s*([^.\n]+)",
+                r"Solution:\s*([^.\n]+)",
+                r"Result:\s*([^.\n]+)",
+                # Look for numbers at the end of the text
+                r"(?:^|\n)\s*([+-]?\d+(?:\.\d+)?)\s*$",
+                # Look for fractions at the end
+                r"(?:^|\n)\s*([+-]?\d+/\d+)\s*$",
+                # Look for mathematical expressions at the end
+                r"(?:^|\n)\s*([+-]?\d+(?:\.\d+)?(?:\s*[+\-*/]\s*\d+(?:\.\d+)?)*)\s*$"
+            ]
+            
+            for pattern in answer_patterns:
+                matches = re.findall(pattern, output, re.IGNORECASE | re.MULTILINE)
+                if matches:
+                    # Clean up the answer
+                    answer = matches[-1].strip()
+                    # Remove common trailing punctuation
+                    answer = re.sub(r'[.,;!?]+$', '', answer)
+                    return answer
+            
             return ""

@@ -60,7 +60,7 @@ class CuratorAPIModel(TemplateLM):
         self,
         model: str = None,
         pretrained: str = None,
-        max_length: Optional[int] = 14000,
+        max_length: Optional[int] = 30000,
         max_retries: int = 10,
         timeout: int = 600,
         tokenized_requests: bool = False,
@@ -173,9 +173,9 @@ class CuratorAPIModel(TemplateLM):
         
         # qwen3-8b 모델의 최대 컨텍스트 길이는 16384이므로 안전한 범위로 제한
         if "qwen3" in self.model_name.lower():
-            max_tokens = min(max_tokens, 8192)  # 입력을 위한 여유 공간 확보
+            max_tokens = min(max_tokens, 4096)  # 수학 문제 해결에 충분하면서도 안전한 범위
         elif max_tokens > 16000:
-            max_tokens = 8192  # 일반적으로 안전한 값으로 제한
+            max_tokens = 4096  # 일반적으로 안전한 값으로 제한
         temperature = self.gen_kwargs.get("temperature", gen_kwargs.get("temperature", 0))
         top_p = self.gen_kwargs.get("top_p", gen_kwargs.get("top_p", 0.95))
         stop = handle_stop_sequences(gen_kwargs.get("until", None), eos)

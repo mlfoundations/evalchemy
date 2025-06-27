@@ -96,7 +96,12 @@ def has_test_type(tests, type):  ## helper to select specific type of problems
     """
     Check if any test in the test list has 'testtype' set to 'type'.
     """
-    test_list = json.loads(tests)
+    # tests가 이미 파싱된 객체인지 문자열인지 확인
+    if isinstance(tests, str):
+        test_list = json.loads(tests)
+    else:
+        test_list = tests
+        
     for test in test_list:
         if test.get("testtype") == type:
             return True
@@ -111,15 +116,21 @@ def translate_private_test_cases(encoded_data):
 
 
 def map_to_example(row):
-    return {
-        "prompt": row["question_content"],
-        "test": row["private_test_cases"],
-        "entry_point": row["starter_code"],
-        "task_id": row["question_id"],
-        "is_stdin": has_test_type(row["public_test_cases"], "stdin"),
-        "public_test_cases": row["public_test_cases"],
-        "difficulty": row["difficulty"],
-    }
+    try:
+        return {
+            "prompt": row["question_content"],
+            "test": row["private_test_cases"],
+            "entry_point": row["starter_code"],
+            "task_id": row["question_id"],
+            "is_stdin": has_test_type(row["public_test_cases"], "stdin"),
+            "public_test_cases": row["public_test_cases"],
+            "difficulty": row["difficulty"],
+        }
+    except Exception as e:
+        print(f"Error in map_to_example: {e}")
+        print(f"Row type: {type(row)}")
+        print(f"Row content: {row}")
+        raise
 
 
 def post_process_code(code):

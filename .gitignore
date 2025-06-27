@@ -226,3 +226,5 @@ eval/chat_benchmarks/MixEval/mix_eval/data/model_responses
 eval/chat_benchmarks/MixEval/mix_eval/eval_scripts
 eval/chat_benchmarks/MixEval/results
 results/
+/livecodebench___code_generation_lite
+livecodebench___code_generation_lite_release_latest-version_tag=release_v5_0.0.0_4c038560f391c4c05fdf7fd7ae61ae0e6dbd8672f8fe5b95597b78a8dc40a417.lock

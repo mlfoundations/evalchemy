@@ -81,7 +81,9 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
             Dictionary containing generated responses and temporary directory,
             or None for non-primary ranks
         """
-        examples = self.load_questions()
+        examples_dataset = self.load_questions()
+        # Convert the dataset object to a list
+        examples = list(examples_dataset)
         if self.debug:
             examples = examples[:10]
 
@@ -92,6 +94,11 @@ class LiveCodeBenchBenchmark(BaseBenchmark):
             seed = [s + i for s in self.seed]
 
             for idx, example in enumerate(examples):
+                # Type check for debugging purposes
+                if not isinstance(example, dict):
+                    self.logger.error(f"Example at index {idx} is not a dict. Type: {type(example)}, Value: {example}")
+                    continue
+                    
                 if example["is_stdin"]:
                     prompt_text = (
                         "Generate an executable Python function generated from the given prompt. The function should take stdin as input and print the output. Simply call the function after the definition."

@@ -65,12 +65,6 @@ class AMC23Benchmark(BaseBenchmark):
 
         # Prepare instances for model
         all_instances = []
-        if isinstance(model, lm_eval.models.huggingface.HFLM):
-            model_name = model.pretrained
-        elif isinstance(model, lm_eval.models.openai_completions.OpenAIChatCompletion):
-            model_name = str(f"openai/{model.model}")
-        else:
-            model_name = model.model_args["model"]
 
         all_outputs = []
         for i in range(self.n_repeat):

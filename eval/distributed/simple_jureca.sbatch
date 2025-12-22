@@ -4,7 +4,7 @@
 #SBATCH --gres=gpu:4
 #SBATCH --time={time_limit}
 #SBATCH --cpus-per-task=12
-#SBATCH --account=westai0007
+#SBATCH --account=westai0066
 #SBATCH --partition=dc-hwai
 #SBATCH --job-name={job_name}
 #SBATCH --output={logs_dir}/%x_%j.out

@@ -165,7 +165,7 @@ def main():
     else:
         suffix = f"_eval_{evaluation_dataset_hash}"
     output_dataset_name = args.model_name.split("/")[-1] + suffix
-    output_dataset = f"mlfoundations-dev/{output_dataset_name}"
+    output_dataset = f"DCAgent2/{output_dataset_name}"
     print(f"Output dataset: {output_dataset}")
 
     # Create output log dir

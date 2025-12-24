@@ -74,7 +74,6 @@ dependencies = [
     "reka-api",
     "together",
     "dashscope",
-    "fschat @ file:eval/chat_benchmarks/MTBench",  # Use relative path that pip will resolve during installation
     
     # Cloud & Storage
     "gcsfs",

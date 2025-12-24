@@ -112,6 +112,11 @@ class AIWBenchmark(BaseBenchmark):
         """Load AIW questions from the data file."""
         with open(self.data_file, "r") as f:
             questions = json.load(f)
+            
+        if self.debug:
+            questions = questions[:2]
+            self.logger.info(f"Debug mode enabled. Using only {len(questions)} questions.")
+ 
         self.logger.info(f"Loaded {len(questions)} questions from {self.data_file}")
         return questions
 

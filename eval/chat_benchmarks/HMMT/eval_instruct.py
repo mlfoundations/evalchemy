@@ -168,5 +168,10 @@ class HMMTBenchmark(BaseBenchmark):
     def load_questions(self) -> List[Dict[str, str]]:
         """Load HMMT questions from the data file."""
         dataset = load_dataset(self.dataset_name, split="train")
+
+        if self.debug:
+            questions = questions[:2]
+            self.logger.info(f"Debug mode enabled. Using only {len(questions)} questions.")
+ 
         questions = [dict(example) for example in dataset]
         return questions

@@ -189,13 +189,13 @@ def check_dataset_exists(repo_id):
         return False
 
 
-def create_evaluation_dataset(tasks, system_instruction=None):
+def create_evaluation_dataset(tasks, namespace, system_instruction=None):
     """Create or use cached evaluation dataset."""
     print_header("Preparing Evaluation Dataset")
 
     # Generate a cached dataset name based on tasks
     eval_dataset_hash = generate_evaluation_dataset_hash(tasks, system_instruction)
-    cached_dataset_id = f"mlfoundations-dev/evalset_{eval_dataset_hash}"
+    cached_dataset_id = f"{namespace}/evalset_{eval_dataset_hash}"
 
     # Check if the cached dataset exists
     if check_dataset_exists(cached_dataset_id):
@@ -693,6 +693,13 @@ def main():
     parser.add_argument("--tp4", action="store_true", help="Use Tensor Parallelism with 4 GPUs")
     parser.add_argument("--timestamp", action="store_true", help="Add a timestamp to the output evaluation dataset")
     parser.add_argument("--on_login", action="store_true", help="Run on login node instead of sbatch job")
+    parser.add_argument(
+        "--hf_namespace",
+        type=str,
+        default=os.environ.get("EVALCHEMY_HF_NAMESPACE", "mlfoundations-dev"),
+        help="Hugging Face namespace (user or org) for cached datasets and uploads. "
+        "Set via CLI or EVALCHEMY_HF_NAMESPACE env var.",
+    )
 
     args = parser.parse_args()
 
@@ -721,10 +728,10 @@ def main():
         suffix = f"_eval_{evaluation_dataset_hash}"
     remaining_characters = 96 - len(suffix)
     model_name_short = args.model_name.split("/")[-1][:remaining_characters]
-    output_dataset = f"mlfoundations-dev/{model_name_short}{suffix}"
+    output_dataset = f"{args.hf_namespace}/{model_name_short}{suffix}"
 
     # Create or get cached evaluation dataset
-    input_dataset = create_evaluation_dataset(tasks, args.system_instruction)
+    input_dataset = create_evaluation_dataset(tasks, args.hf_namespace, args.system_instruction)
     if not input_dataset:
         sys.exit(1)
 

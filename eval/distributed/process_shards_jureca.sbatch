@@ -5,7 +5,7 @@
 #SBATCH --gres=gpu:1           
 #SBATCH --time=01:00:00        
 #SBATCH --cpus-per-task=12
-#SBATCH --account=westai0007
+#SBATCH --account=westai0066
 #SBATCH --partition=dc-hwai
 
 # ENVIRONMENT VARIABLES

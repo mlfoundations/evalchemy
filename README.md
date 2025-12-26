@@ -26,6 +26,22 @@ Evalchemy is developed by the [DataComp community](https://datacomp.ai) and [Bes
         --model_args 'tokenized_requests=False' \
         --output_path logs
 ```
+
+Here are other examples of `model_name`:
+- `"claude-3-7-sonnet-latest-thinking"`
+- `"deepseek-reasoner"`
+- `"gemini/gemini-1.5-flash"`
+- `"claude-3-7-sonnet-latest"`
+- `"gpt-4o-mini-2024-07-18"`
+- `"o1-preview-2024-09-12"`
+- `"gpt-4o-2024-08-06"`
+
+You can also change the `model_args` to fit your needs. For example, `"claude-3-7-sonnet-latest-thinking"` might need more tokens and more time for its thinking process and can be used in batch mode to speed up evaluation and reduce costs by setting `model_args` like this:
+
+```
+--model_args 'tokenized_requests=False,timeout=2000,max_length=64000,batch=True'
+```
+
 #### [2025.01.29] New Reasoning Benchmarks
 
 - AIME24, AMC23, MATH500, LiveCodeBench, GPQADiamond, HumanEvalPlus, MBPPPlus, BigCodeBench, MultiPL-E, and CRUXEval have been added to our growing list of [available benchmarks](https://github.com/mlfoundations/evalchemy?tab=readme-ov-file#built-in-benchmarks). This is part of the effort in the [Open Thoughts](https://github.com/open-thoughts/open-thoughts) project. See the [our blog post](https://www.open-thoughts.ai/blog/measure) on using Evalchemy for measuring reasoning models. 

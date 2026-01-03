@@ -155,6 +155,7 @@ dependencies = [
 
     # LM Eval
     "lm-eval[vllm] @ git+https://github.com/EtashGuha/lm-evaluation-harness@etashg/tokenize_fix",
+    "vllm<=0.8.3", #pin VLLM version for compatibility
 ]
 
 [project.urls]

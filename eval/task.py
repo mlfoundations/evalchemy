@@ -53,7 +53,26 @@ class BaseBenchmark(ABC):
                     if "4o" in model.model:
                         instance.args[1]["max_tokens"] = min(max_new_tokens, 16384)
                 elif isinstance(model, lm_eval_models.vllm_causallms.VLLM):
-                    instance.args[1]["max_gen_toks"] = max_new_tokens
+                    # Get prompt from instance.args[0] (the templated string)
+                    prompt = instance.args[0]
+                    prompt_length = len(model.tokenizer.encode(prompt))
+
+                    # Get max model length from vLLM engine
+                    max_model_len = model.model.llm_engine.model_config.max_model_len
+
+                    # Calculate max allowed generation tokens (16 token safety buffer)
+                    max_allowed = max_model_len - prompt_length - 16
+
+                    # Cap to available space
+                    capped_max_new_tokens = min(max_new_tokens, max(1, max_allowed))
+
+                    if capped_max_new_tokens < max_new_tokens:
+                        self.logger.warning(
+                            f"max_new_tokens ({max_new_tokens}) capped to {capped_max_new_tokens} "
+                            f"(prompt: {prompt_length} tokens, model max: {max_model_len})"
+                        )
+
+                    instance.args[1]["max_gen_toks"] = capped_max_new_tokens
                 else:  # Huggingface
                     instance.args[1]["max_new_tokens"] = max_new_tokens
         return instances

@@ -15,8 +15,8 @@ import torch.distributed as dist
 from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
 
-# Safety buffer for vLLM max_gen_toks calculation
-VLLM_SAFETY_BUFFER_TOKENS = 16
+# Safety buffer for max_gen_toks calculation
+SAFETY_BUFFER_TOKENS = 16
 
 
 class BaseBenchmark(ABC):
@@ -49,20 +49,18 @@ class BaseBenchmark(ABC):
                     _ = instance.args[1].pop("seed") if "seed" in instance.args[1] else None
             if "max_new_tokens" in instance.args[1]:
                 max_new_tokens = instance.args[1].pop("max_new_tokens")
-                if isinstance(model, lm_eval_models.openai_completions.OpenAIChatCompletion) or isinstance(
-                    model, lm_eval_models.openai_completions.OpenAICompletionsAPI
-                ):
-                    instance.args[1]["max_tokens"] = max_new_tokens
-                    if "4o" in model.model:
-                        instance.args[1]["max_tokens"] = min(max_new_tokens, 16384)
-                elif isinstance(model, lm_eval_models.vllm_causallms.VLLM):
+                
+                max_model_len = None
+                if isinstance(model, lm_eval_models.vllm_causallms.VLLM):
+                    max_model_len = model.model.llm_engine.model_config.max_model_len
+                elif isinstance(model, lm_eval_models.huggingface.HFLM):
+                    max_model_len = model.model.config.max_position_embeddings
+
+                if max_model_len is not None:
                     try:
                         # Get prompt from instance.args[0] (the templated string)
                         prompt = instance.args[0]
                         prompt_length = len(model.tokenizer.encode(prompt))
-
-                        # Get max model length from vLLM engine
-                        max_model_len = model.model.llm_engine.model_config.max_model_len
 
                         # Check if prompt itself exceeds model capacity
                         if prompt_length > max_model_len:
@@ -72,7 +70,7 @@ class BaseBenchmark(ABC):
                             )
 
                         # Calculate max allowed generation tokens (16 token safety buffer)
-                        max_allowed = max_model_len - prompt_length - VLLM_SAFETY_BUFFER_TOKENS
+                        max_allowed = max_model_len - prompt_length - SAFETY_BUFFER_TOKENS
                         capped_max_new_tokens = min(max_new_tokens, max(1, max_allowed))
 
                         if capped_max_new_tokens < max_new_tokens:
@@ -81,14 +79,23 @@ class BaseBenchmark(ABC):
                                 f"(prompt: {prompt_length} tokens, model max: {max_model_len})"
                             )
 
-                        instance.args[1]["max_gen_toks"] = capped_max_new_tokens
+                        max_new_tokens = capped_max_new_tokens
                     except Exception as e:
                         self.logger.warning(
-                            f"Failed to calculate max_gen_toks for vLLM, using original value: {e}"
+                            f"Failed to calculate max_new_tokens, using original value: {e}"
                         )
-                        instance.args[1]["max_gen_toks"] = max_new_tokens
+                        
+                if isinstance(model, lm_eval_models.openai_completions.OpenAIChatCompletion) or isinstance(
+                    model, lm_eval_models.openai_completions.OpenAICompletionsAPI
+                ):
+                    instance.args[1]["max_tokens"] = max_new_tokens
+                    if "4o" in model.model:
+                        instance.args[1]["max_tokens"] = min(max_new_tokens, 16384)
+                elif isinstance(model, lm_eval_models.vllm_causallms.VLLM):
+                    instance.args[1]["max_gen_toks"] = int(max_new_tokens)
                 else:  # Huggingface
-                    instance.args[1]["max_new_tokens"] = max_new_tokens
+                    instance.args[1]["max_new_tokens"] = int(max_new_tokens)
+
         return instances
 
     def _prepare_messages(

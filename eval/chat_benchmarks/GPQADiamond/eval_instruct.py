@@ -65,8 +65,9 @@ class GPQADiamondBenchmark(BaseBenchmark):
             Dictionary containing generated responses and examples
         """
         examples = self.load_questions()
+        rnd = random.Random(42)
         for example in examples:
-            multiple_choice_string, correct_answer = self.generate_multiple_choice_answers(example)
+            multiple_choice_string, correct_answer = self.generate_multiple_choice_answers(example, rnd)
             example["multiple_choice_string"] = multiple_choice_string
             example["answer"] = correct_answer
 
@@ -177,7 +178,7 @@ class GPQADiamondBenchmark(BaseBenchmark):
         self.logger.info(f"Loaded {len(questions)} questions from {self.dataset_name}")
         return questions
 
-    def generate_multiple_choice_answers(self, data: Dict[str, Any]) -> tuple[str, str]:
+    def generate_multiple_choice_answers(self, data: Dict[str, Any], rnd: random.Random) -> tuple[str, str]:
         """Generate multiple choice string and correct answer letter."""
         answers = [
             data["Correct Answer"],
@@ -185,7 +186,6 @@ class GPQADiamondBenchmark(BaseBenchmark):
             data["Incorrect Answer 2"],
             data["Incorrect Answer 3"],
         ]
-        rnd = random.Random(42)
         rnd.shuffle(answers)
 
         options = ["A", "B", "C", "D"]

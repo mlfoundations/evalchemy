@@ -1,3 +1,4 @@
+import hashlib
 import logging
 import os
 import random
@@ -185,7 +186,7 @@ class GPQADiamondBenchmark(BaseBenchmark):
             data["Incorrect Answer 2"],
             data["Incorrect Answer 3"],
         ]
-        rnd = random.Random(42)
+        rnd = random.Random(42 + int(hashlib.md5(data["Question"].encode()).hexdigest(), 16))
         rnd.shuffle(answers)
 
         options = ["A", "B", "C", "D"]

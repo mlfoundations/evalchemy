@@ -1,0 +1,63 @@
+{
+  "results": {
+    "IFEval": {
+      "prompt-level": 0.328,
+      "instruction-level": 0.45513654096228867,
+      "num_examples": 500,
+      "completion_rate": 1.0
+    }
+  },
+  "config": {
+    "model": "hf",
+    "model_args": "trust_remote_code=True,pretrained=ali-elganzory/1.7b-Comma0.1-300BT-DPO-Tulu3-decontaminated",
+    "tasks": "IFEval",
+    "batch_sizes": [
+      "auto"
+    ],
+    "device": null,
+    "use_cache": null,
+    "limit": null,
+    "annotator_model": "auto",
+    "max_tokens": "default",
+    "gen_kwargs": null,
+    "random_seed": 0,
+    "numpy_seed": 1234,
+    "torch_seed": 1234,
+    "fewshot_seed": 1234,
+    "model_num_parameters": 1714377728,
+    "model_dtype": "torch.bfloat16",
+    "model_revision": "main",
+    "model_sha": ""
+  },
+  "git_hash": "1b061c1878df07b0f2fd3c65a5e8a1711d7d1b5f",
+  "date": 1769962217.0227635,
+  "pretty_env_info": "'NoneType' object has no attribute 'splitlines'",
+  "transformers_version": "4.57.6",
+  "upper_git_hash": null,
+  "tokenizer_pad_token": [
+    "<|endoftext|>",
+    "0"
+  ],
+  "tokenizer_eos_token": [
+    "<|endoftext|>",
+    "0"
+  ],
+  "tokenizer_bos_token": [
+    "<|endoftext|>",
+    "0"
+  ],
+  "eot_token_id": 0,
+  "max_length": 4096,
+  "task_hashes": {},
+  "model_source": "hf",
+  "model_name": "ali-elganzory/1.7b-Comma0.1-300BT-DPO-Tulu3-decontaminated",
+  "model_name_sanitized": "ali-elganzory__1.7b-Comma0.1-300BT-DPO-Tulu3-decontaminated",
+  "system_instruction": null,
+  "system_instruction_sha": null,
+  "fewshot_as_multiturn": false,
+  "chat_template": null,
+  "chat_template_sha": null,
+  "start_time": 883279.060134397,
+  "end_time": 883346.599074487,
+  "total_evaluation_time_seconds": "67.53894008998759"
+}

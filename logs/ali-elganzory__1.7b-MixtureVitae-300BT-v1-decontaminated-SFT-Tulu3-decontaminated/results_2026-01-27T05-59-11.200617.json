@@ -1,0 +1,3499 @@
+{
+  "results": {
+    "LiveCodeBench": {
+      "accuracy_avg": 0.021526418786692758,
+      "accuracy_std_err": 0.0,
+      "accuracy_easy_avg": 0.05494505494505495,
+      "accuracy_easy_std_err": 3.103167691559091e-18,
+      "accuracy_medium_avg": 0.004854368932038834,
+      "accuracy_medium_std_err": 3.878959614448864e-19,
+      "accuracy_hard_avg": 0.0,
+      "accuracy_hard_std_err": 0.0,
+      "raw_metrics": [
+        {
+          "total_correct": 11,
+          "total_finish": 511,
+          "accuracy": 0.021526418786692758,
+          "per_difficulty_correct": {
+            "easy": 10,
+            "medium": 1,
+            "hard": 0
+          },
+          "per_difficulty_total": {
+            "easy": 182,
+            "medium": 206,
+            "hard": 123
+          },
+          "accuracy_easy": 0.054945054945054944,
+          "accuracy_medium": 0.0048543689320388345,
+          "accuracy_hard": 0.0
+        },
+        {
+          "total_correct": 11,
+          "total_finish": 511,
+          "accuracy": 0.021526418786692758,
+          "per_difficulty_correct": {
+            "easy": 10,
+            "medium": 1,
+            "hard": 0
+          },
+          "per_difficulty_total": {
+            "easy": 182,
+            "medium": 206,
+            "hard": 123
+          },
+          "accuracy_easy": 0.054945054945054944,
+          "accuracy_medium": 0.0048543689320388345,
+          "accuracy_hard": 0.0
+        },
+        {
+          "total_correct": 11,
+          "total_finish": 511,
+          "accuracy": 0.021526418786692758,
+          "per_difficulty_correct": {
+            "easy": 10,
+            "medium": 1,
+            "hard": 0
+          },
+          "per_difficulty_total": {
+            "easy": 182,
+            "medium": 206,
+            "hard": 123
+          },
+          "accuracy_easy": 0.054945054945054944,
+          "accuracy_medium": 0.0048543689320388345,
+          "accuracy_hard": 0.0
+        },
+        {
+          "total_correct": 11,
+          "total_finish": 511,
+          "accuracy": 0.021526418786692758,
+          "per_difficulty_correct": {
+            "easy": 10,
+            "medium": 1,
+            "hard": 0
+          },
+          "per_difficulty_total": {
+            "easy": 182,
+            "medium": 206,
+            "hard": 123
+          },
+          "accuracy_easy": 0.054945054945054944,
+          "accuracy_medium": 0.0048543689320388345,
+          "accuracy_hard": 0.0
+        },
+        {
+          "total_correct": 11,
+          "total_finish": 511,
+          "accuracy": 0.021526418786692758,
+          "per_difficulty_correct": {
+            "easy": 10,
+            "medium": 1,
+            "hard": 0
+          },
+          "per_difficulty_total": {
+            "easy": 182,
+            "medium": 206,
+            "hard": 123
+          },
+          "accuracy_easy": 0.054945054945054944,
+          "accuracy_medium": 0.0048543689320388345,
+          "accuracy_hard": 0.0
+        },
+        {
+          "total_correct": 11,
+          "total_finish": 511,
+          "accuracy": 0.021526418786692758,
+          "per_difficulty_correct": {
+            "easy": 10,
+            "medium": 1,
+            "hard": 0
+          },
+          "per_difficulty_total": {
+            "easy": 182,
+            "medium": 206,
+            "hard": 123
+          },
+          "accuracy_easy": 0.054945054945054944,
+          "accuracy_medium": 0.0048543689320388345,
+          "accuracy_hard": 0.0
+        }
+      ],
+      "examples": [
+        {
+          "content": [
+            "def can_make_abc(s):\n    if s == 'abc':\n        return 'YES'\n    elif s == 'cba':\n        return 'YES'\n    else:\n        return 'NO'\n\nt = int(input())\nfor _ in range(t):\n    s = input()\n    print(can_make_abc(s))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def max_product(t, test_cases):\n    for case in test_cases:\n        n, a = case\n        max_product = 0\n        for i in range(n):\n            a[i] += 1\n            product = 1\n            for num in a:\n                product *= num\n            max_product = max(max_product, product)\n            a[i] -= 1\n        print(max_product)\n\nt = int(input())\ntest_cases = []\nfor _ in range(t):\n    n = int(input())\n    a = list(map(int, input().split()))\n    test_cases.append((n, a))\n\nmax_product(t, test_cases)\n"
+          ],
+          "difficulty": "easy",
+          "correctness": true,
+          "reason": ""
+        },
+        {
+          "content": [
+            "def min_operations(t, test_cases):\n    results = []\n    for n, k, s in test_cases:\n        operations = 0\n        i = 0\n        while i < n:\n            if s[i] == 'B':\n                operations += 1\n                i += k\n            else:\n                i += 1\n        results.append(operations)\n    return results\n\nt = int(input())\ntest_cases = []\nfor _ in range(t):\n    n, k = map(int, input().split())\n    s = input()\n    test_cases.append((n, k, s))\n\nresults = min_operations(t, test_cases)\nfor result in results:\n    print(result)\n"
+          ],
+          "difficulty": "easy",
+          "correctness": true,
+          "reason": ""
+        },
+        {
+          "content": [
+            "def can_form_palindrome(s, k):\n    from collections import Counter\n    count = Counter(s)\n    odd_count = sum(1 for v in count.values() if v % 2 != 0)\n    if odd_count <= k:\n        return \"YES\"\n    else:\n        return \"NO\"\n\nt = int(input())\nfor _ in range(t):\n    n, k = map(int, input().split())\n    s = input().strip()\n    print(can_form_palindrome(s, k))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def min_operations(n, k, a):\n    count = 0\n    for i in range(n):\n        if a[i] % k != 0:\n            count += 1\n            a[i] += 1\n    return count\n\nt = int(input())\nfor _ in range(t):\n    n, k = map(int, input().split())\n    a = list(map(int, input().split()))\n    print(min_operations(n, k, a))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def determine_winner(n):\n    if n % 3 == 0:\n        return \"First\"\n    elif n % 3 == 1:\n        return \"Second\"\n    else:\n        return \"First\"\n\nt = int(input())\nfor _ in range(t):\n    n = int(input())\n    print(determine_winner(n))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "import sys\ninput = sys.stdin.read\ndata = input().split()\n\nt = int(data[0])\nindex = 1\n\nfor _ in range(t):\n    n = int(data[index])\n    index += 1\n    a = list(map(int, data[index:index+n]))\n    index += n\n    \n    a.sort()\n    \n    max_diff = 0\n    for k in range(1, n+1):\n        if n % k != 0:\n            continue\n        \n        total = 0\n        for i in range(0, n, k):\n            total += a[i]\n        \n        max_diff = max(max_diff, total - total)\n    \n    print(max_diff)\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def max_alternating_sum(arr):\n    max_sum = float('-inf')\n    current_sum = 0\n    for i in range(len(arr)):\n        if i == 0 or arr[i] % 2 != arr[i-1] % 2:\n            current_sum += arr[i]\n            max_sum = max(max_sum, current_sum)\n        else:\n            current_sum = arr[i]\n    return max_sum\n\nt = int(input())\nfor _ in range(t):\n    n = int(input())\n    arr = list(map(int, input().split()))\n    print(max_alternating_sum(arr))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def count_pairs(a):\n    count = 0\n    for i in range(len(a)):\n        for j in range(i+1, len(a)):\n            if a[i]**a[j] == a[j]**a[i]:\n                count += 1\n    return count\n\nt = int(input())\nfor _ in range(t):\n    n = int(input())\n    a = list(map(int, input().split()))\n    print(count_pairs(a))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def can_rearrange(N, M, strings):\n    from itertools import permutations\n    \n    for perm in permutations(strings):\n        valid = True\n        for i in range(N-1):\n            if perm[i] == perm[i+1]:\n                continue\n            for j in range(M):\n                if perm[i][j] != perm[i+1][j]:\n                    valid = False\n                    break\n            if not valid:\n                break\n        if valid:\n            return \"Yes\"\n    return \"No\"\n\nN, M = map(int, input().split())\nstrings = [input().strip() for _ in range(N)]\nprint(can_rearrange(N, M, strings))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def process_queries(N, Q, queries):\n    from collections import defaultdict\n\n    # Initialize the graph\n    graph = defaultdict(set)\n\n    # Initialize the count of isolated vertices\n    isolated_count = N\n\n    # Process each query\n    for query in queries:\n        if query[0] == 1:\n            u, v = query[1], query[2]\n            if not graph[u]:\n                graph[u].add(v)\n                isolated_count -= 1\n            else:\n                graph[u].add(v)\n                isolated_count -= 1\n                isolated_count += 1\n        elif query[0] == 2:\n            v = query[1]\n            for u in graph[v]:\n                graph[u].remove(v)\n                isolated_count += 1\n            graph[v].clear()\n            isolated_count += 1\n\n    return isolated_count\n\n# Read input\nN, Q = map(int, input().split())\nqueries = [tuple(map(int, input().split())) for _ in range(Q)]\n\n# Process queries and print the result\nprint(process_queries(N, Q, queries))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def are_similar_strings(N, S, T):\n    for i in range(N):\n        if S[i] != T[i]:\n            if S[i] == '1' and T[i] == 'l' or S[i] == 'l' and T[i] == '1':\n                continue\n            elif S[i] == '0' and T[i] == 'o' or S[i] == 'o' and T[i] == '0':\n                continue\n            else:\n                return \"No\"\n    return \"Yes\"\n\nN = int(input())\nS = input()\nT = input()\n\nprint(are_similar_strings(N, S, T))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": true,
+          "reason": ""
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def can_complete_moves(N, M, H, K, S, x_list, y_list):\n    x, y = 0, 0\n    health = H\n    for move in S:\n        if move == 'R':\n            x += 1\n        elif move == 'L':\n            x -= 1\n        elif move == 'U':\n            y += 1\n        elif move == 'D':\n            y -= 1\n        health -= 1\n        if health < 0:\n            return \"No\"\n        if (x, y) in [(x_i, y_i) for x_i, y_i in zip(x_list, y_list)]:\n            if health < K:\n                health = K\n    return \"Yes\"\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "import sys\nfrom collections import defaultdict\n\ndef find_stars(N, edges):\n    graph = defaultdict(list)\n    for u, v in edges:\n        graph[u].append(v)\n        graph[v].append(u)\n\n    visited = [False] * (N + 1)\n    stars = []\n    for i in range(1, N + 1):\n        if not visited[i]:\n            stack = [i]\n            visited[i] = True\n            while stack:\n                node = stack.pop()\n                for neighbor in graph[node]:\n                    if not visited[neighbor]:\n                        visited[neighbor] = True\n                        stack.append(neighbor)\n\n            if len(stack) > 1:\n                stars.append(len(stack) - 1)\n\n    return sorted(stars)\n\ndef main():\n    N = int(sys.stdin.readline())\n    edges = [tuple(map(int, sys.stdin.readline().split())) for _ in range(N - 1)]\n    stars = find_stars(N, edges)\n    print(\" \".join(map(str, stars)))\n\nif __name__ == \"__main__\":\n    main()\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "import math\n\ndef is_infected(N, D, X, Y):\n    infected = [False] * N\n    infected[0] = True\n    queue = [0]\n    while queue:\n        i = queue.pop(0)\n        for j in range(N):\n            if not infected[j]:\n                if math.sqrt((X[i] - X[j])**2 + (Y[i] - Y[j])**2) <= D:\n                    infected[j] = True\n                    queue.append(j)\n    return [str(infected[i]) for i in range(N)]\n\nN, D = map(int, input().split())\nX = [int(input()) for _ in range(N)]\nY = [int(input()) for _ in range(N)]\n\nprint('\\n'.join(is_infected(N, D, X, Y)))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def solve():\n    import sys\n    input = sys.stdin.read().split()\n    W, H = int(input[0]), int(input[1])\n    N = int(input[2])\n    strawberries = [(int(input[3 + 2 * i]), int(input[4 + 2 * i])) for i in range(N)]\n    A = int(input[2 + N])\n    a = [int(input[3 + N + 2 * i]) for i in range(A)]\n    B = int(input[2 + N + A])\n    b = [int(input[3 + N + A + 2 * i]) for i in range(B)]\n    \n    min_strawberries = float('inf')\n    max_strawberries = 0\n    \n    for i in range(A + 1):\n        for j in range(B + 1):\n            strawberries_in_piece = 0\n            for p, q in strawberries:\n                if p == a[i] or q == b[j]:\n                    continue\n                strawberries_in_piece += 1\n            min_strawberries = min(min_strawberries, strawberries_in_piece)\n            max_strawberries = max(max_strawberries, strawberries_in_piece)\n    \n    print(min_strawberries, max_strawberries)\n\nsolve()\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def sleep_log(N, A, Q, queries):\n    # Precompute the sleep intervals\n    sleep_intervals = []\n    for i in range(1, N//2 + 1):\n        sleep_intervals.append((A[2*i], A[2*i+1]))\n    \n    # Answer the queries\n    for l, r in queries:\n        total_sleep = 0\n        for start, end in sleep_intervals:\n            if start <= r and end >= l:\n                total_sleep += end - start\n        print(total_sleep)\n\n# Read input\nimport sys\ninput = sys.stdin.read().split()\n\nN = int(input[0])\nA = list(map(int, input[1:N+1]))\nQ = int(input[N+1])\nqueries = [(int(input[N+2 + 2*i]), int(input[N+3 + 2*i])) for i in range(Q)]\n\n# Call the function\nsleep_log(N, A, Q, queries)\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def main():\n    import sys\n    input = sys.stdin.read().split()\n    A = list(map(int, input))\n    result = sum(A[i] * (2**i) for i in range(64))\n    print(result)\n\nif __name__ == \"__main__\":\n    main()\n",
+            "echo \"1 0 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\" | python3 your_script.py\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def f(A, K):\n    B = sorted(A, reverse=True)\n    return sum(B[:K])\n\ndef apply_updates(N, K, Q, updates):\n    A = [0] * N\n    results = []\n    for X, Y in updates:\n        A[X-1] = Y\n        results.append(f(A, K))\n    return results\n\ndef main():\n    import sys\n    input = sys.stdin.read().split()\n    N = int(input[0])\n    K = int(input[1])\n    Q = int(input[2])\n    updates = [(int(input[3 + 2 * i]), int(input[4 + 2 * i])) for i in range(Q)]\n    results = apply_updates(N, K, Q, updates)\n    for result in results:\n        print(result)\n\nif __name__ == \"__main__\":\n    main()\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def main():\n    import sys\n    input = sys.stdin.read().split()\n    N = int(input[0])\n    A = list(map(int, input[1:]))\n    B = [sum(A[i:i+7]) for i in range(0, len(A), 7)]\n    print(' '.join(map(str, B)))\n\nif __name__ == \"__main__\":\n    main()\n"
+          ],
+          "difficulty": "easy",
+          "correctness": true,
+          "reason": ""
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def can_create_sheet(H_A, W_A, A, H_B, W_B, B, H_X, W_X, X):\n    # Check if all black squares of A and B can be covered by a single cut-out sheet X\n    for i in range(H_X):\n        for j in range(W_X):\n            if A[i][j] == '#' and B[i][j] == '#':\n                if X[i][j] != '#':\n                    return \"No\"\n    \n    # Check if the cut-out sheet matches sheet X\n    for i in range(H_X):\n        for j in range(W_X):\n            if A[i][j] != X[i][j]:\n                return \"No\"\n            if B[i][j] != X[i][j]:\n                return \"No\"\n    \n    return \"Yes\"\n\n# Read input\nH_A, W_A = map(int, input().split())\nA = [input().strip() for _ in range(H_A)]\nH_B, W_B = map(int, input().split())\nB = [input().strip() for _ in range(H_B)]\nH_X, W_X = map(int, input().split())\nX = [input().strip() for _ in range(H_X)]\n\n# Call the function and print the result\nprint(can_create_sheet(H_A, W_A, A, H_B, W_B, B, H_X, W_X, X))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def solve():\n    import sys\n    input = sys.stdin.read().split()\n    N = int(input[0])\n    S = input[1]\n    \n    stack = []\n    for char in S:\n        if char == '(':\n            stack.append(char)\n        elif char == ')':\n            if stack:\n                stack.pop()\n    \n    print(''.join(stack))\n\nsolve()\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def main():\n    import sys\n    input = sys.stdin.read().split()\n    N = int(input[0])\n    A = [int(input[i*2+1]) for i in range(N)]\n    B = [int(input[i*2+2]) for i in range(N)]\n    \n    people = [(A[i] / (A[i] + B[i]), i+1) for i in range(N)]\n    people.sort(reverse=True)\n    \n    for p in people:\n        print(p[1])\n\nif __name__ == \"__main__\":\n    main()\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def mex(a, b, c):\n    if a == 0:\n        if b == 0:\n            if c == 0:\n                return 1\n            elif c == 1:\n                return 2\n            else:\n                return 3\n        elif b == 1:\n            if c == 0:\n                return 2\n            elif c == 1:\n                return 3\n            else:\n                return 0\n        else:\n            if c == 0:\n                return 2\n            elif c == 1:\n                return 3\n            else:\n                return 0\n    elif a == 1:\n        if b == 0:\n            if c == 0:\n                return 2\n            elif c == 1:\n                return 3\n            else:\n                return 0\n        elif b == 1:\n            if c == 0:\n                return 3\n            elif c == 1:\n                return 0\n            else:\n                return 2\n        else:\n            if c == 0:\n                return 3\n            elif c == 1:\n                return 0\n            else:\n                return 2\n    else:\n        if b == 0:\n            if c == 0:\n                return 3\n            elif c == 1:\n                return 0\n            else:\n                return 2\n        elif b == 1:\n            if c == 0:\n                return 0\n            elif c == 1:\n                return 2\n            else:\n                return 3\n        else:\n            if c == 0:\n                return 2\n            elif c == 1:\n                return 3\n            else:\n                return 0\n\ndef solve(N, A, S):\n    count = [0, 0, 0]\n    for i in range(N):\n        if S[i] == 'M':\n            count[0] += 1\n        elif S[i] == 'E':\n            count[1] += 1\n        else:\n            count[2] += 1\n    \n    result = 0\n    for i in range(N):\n        for j in range(i+1, N):\n            for k in range(j+1, N):\n                if S[i] + S[j] + S[k] == 'MEX':\n                    result += mex(A[i], A[j], A[k])\n    return result\n\nN = int(input())\nA = list(map(int, input().split()))\nS = input()\nprint(solve(N, A, S))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "import sys\nfrom collections import defaultdict, deque\n\ndef bfs(graph, start, end):\n    queue = deque([start])\n    visited = [False] * (len(graph) + 1)\n    visited[start] = True\n    while queue:\n        node = queue.popleft()\n        if node == end:\n            return len(queue)\n        for neighbor in graph[node]:\n            if not visited[neighbor]:\n                visited[neighbor] = True\n                queue.append(neighbor)\n    return -1\n\ndef main():\n    input = sys.stdin.read().split()\n    N1, N2, M = map(int, input[:3])\n    graph = defaultdict(list)\n    for i in range(M):\n        a, b = map(int, input[3*i:3*i+2])\n        graph[a].append(b)\n        graph[b].append(a)\n    \n    max_d = 0\n    for u in range(1, N1 + 1):\n        for v in range(N1 + 1, N1 + N2 + 1):\n            d = bfs(graph, u, v)\n            if d != -1:\n                max_d = max(max_d, d)\n    \n    print(max_d)\n\nif __name__ == \"__main__\":\n    main()\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def nand_sum(N, S):\n    A = [int(c) for c in S]\n    f = [0] * (N + 1)\n    for i in range(1, N + 1):\n        f[i] = A[i - 1]\n        for j in range(i, N + 1):\n            f[j] = f[j - 1] & A[j - 1]\n    return sum(f[1:])\n\nN = int(input())\nS = input()\nprint(nand_sum(N, S))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_tak_codes(N, M, grid):\n    tak_codes = []\n    for i in range(N - 8):\n        for j in range(M - 8):\n            is_tak_code = True\n            for x in range(3):\n                for y in range(3):\n                    if grid[i + x][j + y] != '#':\n                        is_tak_code = False\n                        break\n                if not is_tak_code:\n                    break\n            if is_tak_code:\n                for x in range(3):\n                    for y in range(3):\n                        if grid[i + x + 3][j + y + 3] != '#':\n                            is_tak_code = False\n                            break\n                    if not is_tak_code:\n                        break\n                if is_tak_code:\n                    tak_codes.append((i + 1, j + 1))\n    return tak_codes\n\ndef main():\n    import sys\n    input = sys.stdin.read().split()\n    N = int(input[0])\n    M = int(input[1])\n    grid = input[2:]\n    tak_codes = find_tak_codes(N, M, grid)\n    for i, j in sorted(tak_codes):\n        print(i, j)\n\nif __name__ == \"__main__\":\n    main()\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "MOD = 998244353\n\ndef count_parenthesis_strings(S):\n    n = len(S)\n    dp = [[0] * (n + 1) for _ in range(n + 1)]\n    dp[0][0] = 1\n    \n    for i in range(1, n + 1):\n        for j in range(i + 1):\n            if S[i - 1] == '(':\n                dp[i][j] = dp[i - 1][j - 1]\n            elif S[i - 1] == ')':\n                if j > 0:\n                    dp[i][j] = dp[i - 1][j - 1]\n            else:\n                if j > 0:\n                    dp[i][j] = (dp[i - 1][j - 1] + dp[i - 1][j]) % MOD\n    \n    return dp[n][n]\n\nS = input().strip()\nprint(count_parenthesis_strings(S))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "import sys\n\ndef main():\n    N = int(sys.stdin.readline())\n    cuboids = []\n    for _ in range(N):\n        x1, y1, z1, x2, y2, z2 = map(int, sys.stdin.readline().split())\n        cuboids.append((x1, y1, z1, x2, y2, z2))\n    \n    result = [0]*N\n    for i in range(N):\n        for j in range(N):\n            if i != j:\n                x1, y1, z1, x2, y2, z2 = cuboids[i]\n                x3, y3, z3, x4, y4, z4 = cuboids[j]\n                if (x1 == x3 and y1 == y3 and z1 == z3 and x2 == x4 and y2 == y4 and z2 == z4) or \\\n                   (x1 == x3 and y1 == y4 and z1 == z3 and x2 == x4 and y2 == y3 and z2 == z4) or \\\n                   (x1 == x3 and y1 == y4 and z1 == z4 and x2 == x4 and y2 == y3 and z2 == z3) or \\\n                   (x1 == x4 and y1 == y3 and z1 == z3 and x2 == x3 and y2 == y4 and z2 == z4) or \\\n                   (x1 == x4 and y1 == y3 and z1 == z4 and x2 == x3 and y2 == y4 and z2 == z3):\n                    result[i] += 1\n                    result[j] += 1\n    for r in result:\n        print(r)\n\nif __name__ == \"__main__\":\n    main()\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def process_operations(N, S, Q, operations):\n    S = list(S)\n    for t, x, c in operations:\n        if t == 1:\n            S[x - 1] = c\n        elif t == 2:\n            S = [char.lower() for char in S]\n        elif t == 3:\n            S = [char.upper() for char in S]\n    return ''.join(S)\n\ndef main():\n    import sys\n    input = sys.stdin.read().split()\n    N = int(input[0])\n    S = input[1]\n    Q = int(input[2])\n    operations = [(int(input[3 + 2 * i]), int(input[4 + 2 * i]), input[5 + 2 * i]) for i in range(Q)]\n    print(process_operations(N, S, Q, operations))\n\nif __name__ == \"__main__\":\n    main()\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "import math\n\ndef main():\n    N, M = map(int, input().split())\n    wheels = []\n    for _ in range(N):\n        C, P, *S = map(int, input().split())\n        wheels.append((C, P, S))\n    \n    # Initialize the expected cost\n    E = 0\n    \n    # Iterate over the number of spins\n    for spins in range(1, 101):\n        # Calculate the expected cost for this number of spins\n        cost = 0\n        for i in range(N):\n            C, P, S = wheels[i]\n            # Calculate the probability of each outcome\n            prob = [S[j] / sum(S) for j in range(P)]\n            # Calculate the expected cost for this wheel\n            cost += C * sum(prob)\n        # Update the expected cost\n        E += cost\n    \n    # Print the final expected cost\n    print(E)\n\nif __name__ == \"__main__\":\n    main()\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "MOD = 998244353\n\ndef mod_inv(a, m):\n    return pow(a, m - 2, m)\n\ndef solve(N, matches):\n    E = [0] * N\n    for i in range(N - 1):\n        p, q = matches[i]\n        a, b = p, q\n        E[p - 1] = (E[p - 1] + a * mod_inv(a + b, MOD) * (N - i - 1)) % MOD\n        E[q - 1] = (E[q - 1] + b * mod_inv(a + b, MOD) * (N - i - 1)) % MOD\n    return E\n\ndef main():\n    import sys\n    input = sys.stdin.read().split()\n    N = int(input[0])\n    matches = [(int(input[2 * i + 1]), int(input[2 * i + 2])) for i in range(N - 1)]\n    E = solve(N, matches)\n    print(' '.join(map(str, E)))\n\nif __name__ == \"__main__\":\n    main()\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_middle_day(M, D):\n    total_days = sum(D)\n    middle_day = (total_days + 1) // 2\n    \n    day = 1\n    month = 1\n    \n    for i in range(M):\n        if day + D[i] >= middle_day:\n            day = middle_day - (day + D[i] - 1)\n            month += 1\n            break\n        day += D[i]\n    \n    return month, day\n\nM = int(input())\nD = list(map(int, input().split()))\n\nmonth, day = find_middle_day(M, D)\nprint(month, day)\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def max_satisfaction(N, cups):\n    max_satisfaction = 0\n    for i in range(N):\n        for j in range(i+1, N):\n            s1, s2 = cups[i]\n            s3, s4 = cups[j]\n            if s1 != s3:\n                max_satisfaction = max(max_satisfaction, s1 + s2 + s3 + s4)\n            else:\n                max_satisfaction = max(max_satisfaction, s1 + s2 + s4 // 2)\n    return max_satisfaction\n\n# Read input\nN = int(input())\ncups = []\nfor _ in range(N):\n    F, S = map(int, input().split())\n    cups.append((F, S))\n\n# Calculate and print the maximum satisfaction\nprint(max_satisfaction(N, cups))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def solve(H, W, grid):\n    marked = [[False]*W for _ in range(H)]\n    \n    # Step 1: Mark rows\n    for i in range(H):\n        for j in range(W-1):\n            if grid[i][j] == grid[i][j+1]:\n                marked[i][j] = True\n                marked[i][j+1] = True\n    \n    # Step 2: Mark columns\n    for j in range(W):\n        for i in range(H-1):\n            if grid[i][j] == grid[i+1][j]:\n                marked[i][j] = True\n                marked[i+1][j] = True\n    \n    # Step 3: Remove marked cookies\n    for i in range(H):\n        for j in range(W):\n            if marked[i][j]:\n                grid[i][j] = '.'\n                marked[i][j] = False\n    \n    # Count remaining cookies\n    remaining_cookies = sum(row.count('.') for row in grid)\n    return remaining_cookies\n\n# Read input\nH, W = map(int, input().split())\ngrid = [input().strip() for _ in range(H)]\n\n# Solve and print the result\nprint(solve(H, W, grid))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def solve(N, C, P):\n    visited = [False] * (N + 1)\n    order = []\n    \n    def dfs(book):\n        if visited[book]:\n            return\n        visited[book] = True\n        for i in range(C[book - 1]):\n            dfs(P[book - 1][i])\n        order.append(book)\n    \n    for i in range(1, N + 1):\n        if not visited[i]:\n            dfs(i)\n    \n    return order[1:]\n\nN = int(input())\nC = [int(input()) for _ in range(N)]\nP = [list(map(int, input().split())) for _ in range(N)]\n\nprint(' '.join(map(str, solve(N, C, P))))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def min_cost(N, D, P, F):\n    # Sort the fares in ascending order\n    F.sort()\n    \n    # Initialize the total cost\n    total_cost = 0\n    \n    # Iterate over the fares\n    for i in range(N):\n        # If the fare is less than or equal to the cost of one pass\n        if F[i] <= P:\n            # Use the pass and add the remaining fares to the total cost\n            total_cost += F[i] - P\n        else:\n            # Otherwise, add the fare to the total cost\n            total_cost += F[i]\n    \n    return total_cost\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_min_window_width(N, M, L):\n    L.sort()\n    total_width = 0\n    current_width = 0\n    for i in range(N):\n        total_width += L[i]\n        if total_width > current_width:\n            current_width = total_width\n        if i == M - 1:\n            return current_width\n    return current_width\n\nN, M = map(int, input().split())\nL = list(map(int, input().split()))\nprint(find_min_window_width(N, M, L))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def solve():\n    import sys\n    input = sys.stdin.read().split()\n    \n    N = int(input[0])\n    X = int(input[1])\n    Y = int(input[2])\n    \n    P = []\n    T = []\n    for i in range(N-1):\n        P.append(int(input[3+i*2]))\n        T.append(int(input[4+i*2]))\n    \n    Q = int(input[3+N-1])\n    queries = [int(input[4+N+i]) for i in range(Q)]\n    \n    def earliest_arrival(q):\n        time = q\n        for i in range(N-1):\n            if time % P[i] == 0:\n                time += T[i]\n            else:\n                time += P[i]\n        return time + Y\n    \n    for q in queries:\n        print(earliest_arrival(q))\n\nsolve()\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def solve(N, M, info):\n    # Initialize the coordinates of all people\n    coordinates = [[0, 0] for _ in range(N + 1)]\n    \n    # Process each piece of information\n    for A, B, X, Y in info:\n        # If the coordinates of A and B are already known, check if they match\n        if coordinates[A][0] == coordinates[A][1] == 0 and coordinates[B][0] == coordinates[B][1] == 0:\n            # If they match, update the coordinates of B\n            coordinates[B][0] += X\n            coordinates[B][1] += Y\n        else:\n            # If they don't match, it's undecidable\n            coordinates[B][0] = coordinates[A][0] + X\n            coordinates[B][1] = coordinates[A][1] + Y\n    \n    # Print the coordinates of each person\n    for i in range(1, N + 1):\n        if coordinates[i][0] == coordinates[i][1] == 0:\n            print(\"undecidable\")\n        else:\n            print(coordinates[i][0], coordinates[i][1])\n\n# Read input\nimport sys\ninput = sys.stdin.read().split()\nN = int(input[0])\nM = int(input[1])\ninfo = [(int(input[2 + 4 * i]), int(input[3 + 4 * i]), int(input[4 + 4 * i]), int(input[5 + 4 * i])) for i in range(M)]\n\n# Solve the problem\nsolve(N, M, info)\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_kth_321_like_number(k):\n    count = 0\n    num = 1\n    while count < k:\n        if is_321_like(num):\n            count += 1\n        num += 1\n    return num\n\ndef is_321_like(num):\n    num_str = str(num)\n    for i in range(len(num_str) - 1):\n        if int(num_str[i]) <= int(num_str[i + 1]):\n            return False\n    return True\n\nk = int(input())\nprint(find_kth_321_like_number(k))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def count_vertices(N, X, K):\n    if K == 0:\n        return 1 if X == 1 else 0\n    elif K == 1:\n        return N - 1\n    else:\n        return 0\n\ndef main():\n    import sys\n    input = sys.stdin.read().split()\n    T = int(input[0])\n    index = 1\n    results = []\n    for _ in range(T):\n        N = int(input[index])\n        X = int(input[index + 1])\n        K = int(input[index + 2])\n        index += 3\n        results.append(count_vertices(N, X, K))\n    for result in results:\n        print(result)\n\nif __name__ == \"__main__\":\n    main()\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def can_fill_grid(polyominoes):\n    rows = 4\n    cols = 4\n    grid = [['.' for _ in range(cols)] for _ in range(rows)]\n\n    def is_valid(x, y, polyomino):\n        for i in range(4):\n            for j in range(4):\n                if polyomino[i][j] == '#' and grid[x + i][y + j] != '.':\n                    return False\n        return True\n\n    def place_polyomino(x, y, polyomino):\n        for i in range(4):\n            for j in range(4):\n                if polyomino[i][j] == '#':\n                    grid[x + i][y + j] = '#'\n\n    def remove_polyomino(x, y, polyomino):\n        for i in range(4):\n            for j in range(4):\n                if polyomino[i][j] == '#':\n                    grid[x + i][y + j] = '.'\n\n    def rotate_polyomino(polyomino):\n        return [list(row) for row in zip(*polyomino[::-1])]\n\n    def flip_polyomino(polyomino):\n        return [row[::-1] for row in polyomino]\n\n    def translate_polyomino(polyomino, dx, dy):\n        return [row[dy:] + row[:dy] for row in polyomino]\n\n    def check_grid():\n        for i in range(rows):\n            for j in range(cols):\n                if grid[i][j] == '#':\n                    for k in range(4):\n                        for l in range(4):\n                            if not is_valid(i + k, j + l, polyominoes[i][j][k][l]):\n                                return False\n        return True\n\n    def backtrack(polyominoes, x, y):\n        if x == rows:\n            return check_grid()\n        if y == cols:\n            return backtrack(polyominoes, x + 1, 0)\n        if not polyominoes[x][y]:\n            return backtrack(polyominoes, x, y + 1)\n        for dx, dy in [(0, 0), (0, 1), (1, 0), (1, 1)]:\n            polyomino = translate_polyomino(polyominoes[x][y], dx, dy)\n            if is_valid(x, y, polyomino):\n                place_polyomino(x, y, polyomino)\n                if backtrack(polyominoes, x, y):\n                    return True\n                remove_polyomino(x, y, polyomino)\n        return False\n\n    return \"Yes\" if backtrack(polyominoes, 0, 0) else \"No\"\n\n# Read input\npolyominoes = []\nfor _ in range(16):\n    polyominoes.append(list(input().strip()))\n\n# Print output\nprint(can_fill_grid(polyominoes))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_rank(N, S):\n    wins = [0] * N\n    for i in range(N):\n        for j in range(N):\n            if S[i][j] == 'o':\n                wins[i] += 1\n    rank = sorted(range(N), key=lambda x: (-wins[x], x))\n    return rank\n\nN = int(input())\nS = [input().strip() for _ in range(N)]\nprint(*find_rank(N, S))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "MOD = 998244353\n\ndef mod_inverse(a, m):\n    m0, x0, x1 = m, 0, 1\n    if m == 1:\n        return 0\n    while a > 1:\n        q = a // m\n        m, a = a % m, m\n        x0, x1 = x1 - q * x0, x0\n    if x1 < 0:\n        x1 += m0\n    return x1\n\ndef solve(N, X, T):\n    total_time = sum(T)\n    favorable_times = 0\n    for i in range(N):\n        favorable_times += T[i] * (N - i)\n    \n    numerator = (favorable_times + X) % MOD\n    denominator = total_time\n    \n    inv_denominator = mod_inverse(denominator, MOD)\n    result = (numerator * inv_denominator) % MOD\n    \n    return result\n\nN, X = map(int, input().split())\nT = list(map(int, input().split()))\nprint(solve(N, X, T))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_possible_strings(N, T_prime, strings):\n    possible_indices = []\n    for i, S in enumerate(strings, start=1):\n        if T_prime == S or T_prime == S[:len(S)-1] or T_prime == S[1:] or T_prime == S[:len(S)] or T_prime == S[1:len(S)]:\n            possible_indices.append(i)\n    return len(possible_indices), possible_indices\n\nN, T_prime = input().split()\nstrings = [input() for _ in range(int(N))]\n\nK, indices = find_possible_strings(N, T_prime, strings)\nprint(K)\nprint(\" \".join(map(str, indices)))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "import sys\n\ndef count_pairs(N, T, S):\n    dp = [[0] * (len(T) + 1) for _ in range(N + 1)]\n    for i in range(1, N + 1):\n        for j in range(1, len(T) + 1):\n            if S[i - 1] == T[j - 1]:\n                dp[i][j] = dp[i - 1][j - 1] + 1\n            else:\n                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])\n    return dp[N][len(T)]\n\ndef main():\n    N, T = sys.stdin.readline().split()\n    N = int(N)\n    S = [sys.stdin.readline().strip() for _ in range(N)]\n    print(count_pairs(N, T, S))\n\nif __name__ == \"__main__\":\n    main()\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "import sys\nimport math\n\ndef mod_inverse(a, m):\n    m0, x0, x1 = m, 0, 1\n    if m == 1:\n        return 0\n    while a > 1:\n        q = a // m\n        m, a = a % m, m\n        x0, x1 = x1 - q * x0, x0\n    if x1 < 0:\n        x1 += m0\n    return x1\n\ndef main():\n    N = int(sys.stdin.readline())\n    A = list(map(int, sys.stdin.readline().split()))\n    \n    mod = 998244353\n    \n    # Calculate the expected value\n    expected_value = sum(A[i] * (i + 1) for i in range(N))\n    \n    # Calculate the modular inverse of the denominator\n    denominator = math.prod(range(1, N + 1))\n    inv_denominator = mod_inverse(denominator, mod)\n    \n    # Calculate the final result\n    result = (expected_value * inv_denominator) % mod\n    \n    print(result)\n\nif __name__ == \"__main__\":\n    main()\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_A(B):\n    if B == 1:\n        return 1\n    if B < 1:\n        return -1\n    A = 1\n    while True:\n        if A**A == B:\n            return A\n        elif A**A > B:\n            return -1\n        A += 1\n\nB = int(input())\nprint(find_A(B))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": true,
+          "reason": ""
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def is_good_pair(N, M, A, B):\n    # Create a list of 0s and 1s of length N\n    X = [0] * N\n    \n    # Check if there exists a sequence X that satisfies the condition\n    for i in range(M):\n        if A[i] == B[i]:\n            return \"No\"\n        else:\n            X[A[i] - 1] = 1\n            X[B[i] - 1] = 0\n    \n    return \"Yes\"\n\n# Read input\nN, M = map(int, input().split())\nA = list(map(int, input().split()))\nB = list(map(int, input().split()))\n\n# Print output\nprint(is_good_pair(N, M, A, B))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def count_double_occurrences(S, queries):\n    results = []\n    for l, r in queries:\n        count = 0\n        for i in range(l-1, r-1):\n            if S[i] == S[i+1]:\n                count += 1\n        results.append(count)\n    return results\n\ndef main():\n    import sys\n    input = sys.stdin.read().split()\n    N = int(input[0])\n    Q = int(input[1])\n    S = input[2]\n    queries = []\n    for i in range(3, 3+Q):\n        l = int(input[i])\n        r = int(input[i+1])\n        queries.append((l, r))\n    results = count_double_occurrences(S, queries)\n    for result in results:\n        print(result)\n\nif __name__ == \"__main__\":\n    main()\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "import sys\nimport heapq\n\ndef dijkstra(graph, start, K):\n    dist = [float('inf')] * (len(graph) + 1)\n    dist[start] = 0\n    pq = [(0, start)]\n    while pq:\n        d, u = heapq.heappop(pq)\n        if d > dist[u]:\n            continue\n        for v, w in graph[u]:\n            new_dist = (d + w) % K\n            if new_dist < dist[v]:\n                dist[v] = new_dist\n                heapq.heappush(pq, (new_dist, v))\n    return dist\n\ndef main():\n    N, M, K = map(int, sys.stdin.readline().split())\n    graph = [[] for _ in range(N + 1)]\n    for _ in range(M):\n        u, v, w = map(int, sys.stdin.readline().split())\n        graph[u].append((v, w))\n        graph[v].append((u, w))\n    \n    dist = dijkstra(graph, 1, K)\n    min_cost = min(dist[2:])\n    print(min_cost)\n\nif __name__ == \"__main__\":\n    main()\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_X(N, L, R, A):\n    X = []\n    for i in range(N):\n        X.append(L)\n    for i in range(N):\n        X[i] = max(L, min(R, A[i]))\n    return ' '.join(map(str, X))\n\nN, L, R = map(int, input().split())\nA = list(map(int, input().split()))\nprint(find_X(N, L, R, A))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": true,
+          "reason": ""
+        },
+        {
+          "content": [
+            "def min_abs_diff(D):\n    # Initialize the minimum absolute difference to a large number\n    min_diff = float('inf')\n    \n    # Iterate over all possible values of x and y\n    for x in range(int(D**0.5) + 1):\n        for y in range(int(D**0.5) + 1):\n            # Calculate the absolute difference\n            diff = abs(x**2 + y**2 - D)\n            # Update the minimum difference if the current difference is smaller\n            if diff < min_diff:\n                min_diff = diff\n    \n    # Return the minimum absolute difference\n    return min_diff\n\n# Read input from standard input\nD = int(input())\n\n# Print the result\nprint(min_abs_diff(D))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def mex_sequence(N, Q, A, queries):\n    A = list(A)\n    for i, x in queries:\n        A[i-1] = x\n        print(find_mex(A))\n\ndef find_mex(A):\n    mex = 0\n    while mex in A:\n        mex += 1\n    return mex\n\nN, Q = map(int, input().split())\nA = list(map(int, input().split()))\nqueries = [tuple(map(int, input().split())) for _ in range(Q)]\n\nmex_sequence(N, Q, A, queries)\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def next_day(M, D, y, m, d):\n    if d < D:\n        return y, m, d + 1\n    elif m < M:\n        return y, m + 1, 1\n    else:\n        return y + 1, 1, 1\n\nM, D = map(int, input().split())\ny, m, d = map(int, input().split())\n\ny, m, d = next_day(M, D, y, m, d)\n\nprint(y, m, d)\n"
+          ],
+          "difficulty": "easy",
+          "correctness": true,
+          "reason": ""
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def solve(N, A):\n    B = [0] * N\n    for i in range(N):\n        B[i] = sum(A[j] for j in range(N) if j != i and A[j] > A[i])\n    return B\n\n# Read input\nN = int(input())\nA = list(map(int, input().split()))\n\n# Solve the problem\nB = solve(N, A)\n\n# Print output\nprint(\" \".join(map(str, B)))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def min_operations(H, W, A, B):\n    def is_identical(A, B):\n        return all(a == b for a, b in zip(A, B))\n\n    def swap_rows(A, i):\n        A[i], A[i+1] = A[i+1], A[i]\n        return A\n\n    def swap_cols(A, i):\n        A[i], A[i+1] = A[i+1], A[i]\n        return A\n\n    def count_operations(A, B):\n        operations = 0\n        for i in range(H-1):\n            if A[i] != B[i]:\n                if A[i+1] != B[i]:\n                    return -1\n                A = swap_rows(A, i)\n                operations += 1\n        return operations\n\n    if is_identical(A, B):\n        return 0\n\n    min_ops = float('inf')\n    for i in range(H-1):\n        for j in range(W-1):\n            A = swap_rows(A, i)\n            A = swap_cols(A, j)\n            ops = count_operations(A, B)\n            if ops != -1:\n                min_ops = min(min_ops, ops)\n\n    return min_ops if min_ops != float('inf') else -1\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def check_segments(s1s2, t1t2):\n    # Define the coordinates of the vertices of the regular pentagon\n    vertices = ['A', 'B', 'C', 'D', 'E']\n    coordinates = {\n        'A': (0, 1),\n        'B': (1, 0),\n        'C': (0.5, -0.866),\n        'D': (-0.5, -0.866),\n        'E': (-1, 0)\n    }\n\n    # Calculate the distance between two points\n    def distance(p1, p2):\n        return ((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)**0.5\n\n    # Calculate the distance between S1 and S2\n    s1s2_distance = distance(coordinates[s1s2], coordinates[s1s2])\n\n    # Calculate the distance between T1 and T2\n    t1t2_distance = distance(coordinates[t1t2], coordinates[t1t2])\n\n    # Check if the distances are equal\n    if s1s2_distance == t1t2_distance:\n        return \"Yes\"\n    else:\n        return \"No\"\n\n# Read input\ns1s2 = input().strip()\nt1t2 = input().strip()\n\n# Print the result\nprint(check_segments(s1s2, t1t2))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def decide_item(B, G):\n    if B > G:\n        print(\"Bat\")\n    else:\n        print(\"Glove\")\n\n# Read input from stdin\nB, G = map(int, input().split())\n\n# Call the function with the input values\ndecide_item(B, G)\n"
+          ],
+          "difficulty": "easy",
+          "correctness": true,
+          "reason": ""
+        },
+        {
+          "content": [
+            "def count_christmas_trees(A, M, L, R):\n    count = 0\n    for i in range(A, R+1, M):\n        if L <= i <= R:\n            count += 1\n    return count\n\n# Read input\nA, M, L, R = map(int, input().split())\n\n# Calculate and print the number of Christmas trees\nprint(count_christmas_trees(A, M, L, R))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def min_weirdness(N, K, A):\n    A.sort()\n    total_weirdness = 0\n    for i in range(K):\n        total_weirdness += abs(A[i] - A[i+1])\n    return total_weirdness\n\nN, K = map(int, input().split())\nA = list(map(int, input().split()))\nprint(min_weirdness(N, K, A))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def max_sleighs(N, Q, R, queries):\n    # Sort the reindeer requirements in descending order\n    R.sort(reverse=True)\n    \n    # Initialize the answer list\n    answers = []\n    \n    # Process each query\n    for X in queries:\n        # Initialize the number of sleighs pulled\n        sleighs = 0\n        # Initialize the total reindeer used\n        total_reindeer = 0\n        \n        # Iterate through the reindeer requirements\n        for reindeer in R:\n            # If we can pull the current sleigh\n            if total_reindeer + reindeer <= X:\n                sleighs += 1\n                total_reindeer += reindeer\n            else:\n                break\n        \n        # Append the answer to the list\n        answers.append(sleighs)\n    \n    return answers\n\n# Read input\nN, Q = map(int, input().split())\nR = list(map(int, input().split()))\nqueries = [int(input()) for _ in range(Q)]\n\n# Get the answers\nanswers = max_sleighs(N, Q, R, queries)\n\n# Print the answers\nfor answer in answers:\n    print(answer)\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "MOD = 998244353\n\ndef solve(H, W, grid):\n    def dfs(i, j, visited):\n        if i < 0 or i >= H or j < 0 or j >= W or visited[i][j] or grid[i][j] == '.':\n            return\n        visited[i][j] = True\n        for di, dj in [(0, 1), (0, -1), (1, 0), (-1, 0)]:\n            dfs(i + di, j + dj, visited)\n\n    visited = [[False] * W for _ in range(H)]\n    components = 0\n    for i in range(H):\n        for j in range(W):\n            if grid[i][j] == '#' and not visited[i][j]:\n                components += 1\n                dfs(i, j, visited)\n\n    total_red_cells = sum(row.count('.') for row in grid)\n    total_green_components = sum(1 for i in range(H) for j in range(W) if grid[i][j] == '#' and not visited[i][j])\n    total_red_components = sum(1 for i in range(H) for j in range(W) if grid[i][j] == '.' and not visited[i][j])\n\n    numerator = (total_green_components * total_red_cells + total_red_components * total_green_components) % MOD\n    denominator = total_red_cells * total_green_components\n    inv_denominator = pow(denominator, MOD - 2, MOD)\n    result = (numerator * inv_denominator) % MOD\n    return result\n\nH, W = map(int, input().split())\ngrid = [input().strip() for _ in range(H)]\nprint(solve(H, W, grid))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def print_triples(N):\n    for x in range(N+1):\n        for y in range(N+1-x):\n            for z in range(N+1-x-y):\n                print(x, y, z)\n\n# Call the function with the input\nprint_triples(int(input()))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": true,
+          "reason": ""
+        },
+        {
+          "content": [
+            "def dragon_game(N, Q, queries):\n    # Initialize the positions of the dragon parts\n    positions = [(i, 0) for i in range(1, N+1)]\n    \n    # Process each query\n    for query in queries:\n        if query[0] == 1:\n            # Move the head\n            direction = query[1]\n            if direction == 'R':\n                positions[0] = (positions[0][0] + 1, positions[0][1])\n            elif direction == 'L':\n                positions[0] = (positions[0][0] - 1, positions[0][1])\n            elif direction == 'U':\n                positions[0] = (positions[0][0], positions[0][1] + 1)\n            elif direction == 'D':\n                positions[0] = (positions[0][0], positions[0][1] - 1)\n            \n            # Move the rest of the parts\n            for i in range(1, N):\n                positions[i] = positions[i-1]\n        elif query[0] == 2:\n            # Find the coordinates of part p\n            p = int(query[1]) - 1\n            print(positions[p][0], positions[p][1])\n\n# Read input\nN, Q = map(int, input().split())\nqueries = [input().split() for _ in range(Q)]\n\n# Call the function\ndragon_game(N, Q, queries)\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def solve(N):\n    grid = [[0]*N for _ in range(N)]\n    grid[N//2][N//2] = 'T'\n    for i in range(1, N*N):\n        grid[i//N][i%N] = str(i)\n    return grid\n\ndef print_grid(grid):\n    for row in grid:\n        print(' '.join(row))\n\nN = int(input())\ngrid = solve(N)\nprint_grid(grid)\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def nth_smallest_good_integer(n):\n    # Initialize the result\n    result = 0\n    \n    # Iterate over the digits\n    for i in range(1, 10):\n        # Calculate the number of good integers with the current digit\n        count = 5 ** (n - i)\n        # Add the count to the result\n        result += count\n        # If the result is greater than or equal to n, break the loop\n        if result >= n:\n            break\n    \n    # Convert the result to a string and return it\n    return str(result)\n\n# Call the function with the input\nprint(nth_smallest_good_integer(int(input())))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "import sys\n\ndef main():\n    N = int(input())\n    M = 0\n    while True:\n        M += 1\n        K = 0\n        A = []\n        for i in range(M):\n            K += 1\n            A.append(list(range(1, N+1)))\n            A[i] = A[i][:K]\n        print(M)\n        print(' '.join(map(str, A)))\n        sys.stdout.flush()\n        S = input().strip()\n        if S == '0' * M:\n            break\n    print(int(input()))\n\nif __name__ == \"__main__\":\n    main()\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def min_tour_length(N, M, X):\n    # Calculate the total number of bridges crossed if no bridge is closed\n    total_bridges = sum(1 for i in range(M-1))\n    \n    # Calculate the minimum tour length if each bridge is closed\n    min_length = float('inf')\n    for i in range(N):\n        # Calculate the tour length if bridge i is closed\n        current_length = 0\n        for j in range(M-1):\n            if (X[j] == i+1 and X[j+1] == (i+2)%N) or (X[j] == (i+2)%N and X[j+1] == i+1):\n                current_length += 1\n        min_length = min(min_length, current_length)\n    \n    return min_length\n\n# Read input\nimport sys\ninput = sys.stdin.read().split()\nN = int(input[0])\nM = int(input[1])\nX = list(map(int, input[2:]))\n\n# Calculate and print the minimum tour length\nprint(min_tour_length(N, M, X))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def check_intersection(N, chords):\n    # Sort the chords by their starting point\n    chords.sort(key=lambda x: x[0])\n\n    # Check for intersection\n    for i in range(N):\n        for j in range(i+1, N):\n            if chords[i][0] < chords[j][0] < chords[i][1] < chords[j][1]:\n                return \"Yes\"\n    return \"No\"\n\n# Read input\nN = int(input())\nchords = [tuple(map(int, input().split())) for _ in range(N)]\n\n# Check intersection and print result\nprint(check_intersection(N, chords))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def paint_grid(H, W, N):\n    grid = [['.' for _ in range(W)] for _ in range(H)]\n    direction = [0, 1]\n    for _ in range(N):\n        i, j = 0, 0\n        while True:\n            if grid[i][j] == '.':\n                grid[i][j] = '#'\n                direction[0] = (direction[0] + 1) % 4\n                direction[1] = (direction[1] + 1) % 2\n                i += 1\n                break\n            else:\n                grid[i][j] = '.'\n                direction[0] = (direction[0] - 1) % 4\n                direction[1] = (direction[1] - 1) % 2\n                i += 1\n                j += 1\n    for row in grid:\n        print(''.join(row))\n\npaint_grid(int(input()), int(input()), int(input()))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def min_passengers(N, A):\n    total = 0\n    for a in A:\n        total += a\n    return max(0, total)\n\n# Read input\nN = int(input())\nA = list(map(int, input().split()))\n\n# Calculate and print the result\nprint(min_passengers(N, A))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def process_queries(queries):\n    A = []\n    results = []\n    for query in queries:\n        if query[0] == 1:\n            A.append(query[1])\n        elif query[0] == 2:\n            results.append(A[-query[1]])\n    return results\n\n# Read input\nQ = int(input())\nqueries = [input().split() for _ in range(Q)]\n\n# Process queries\nresults = process_queries(queries)\n\n# Print results\nfor result in results:\n    print(result)\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_kth_smallest(N, M, K):\n    count = 0\n    num = 1\n    while count < K:\n        if num % N == 0 or num % M == 0:\n            count += 1\n        num += 1\n    return num\n\nN, M, K = map(int, input().split())\nprint(find_kth_smallest(N, M, K))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def process_queries(N, Q, S, queries):\n    S = list(S)\n    for query in queries:\n        if query[0] == 1:\n            L, R = query[1], query[2]\n            for i in range(L-1, R):\n                S[i] = '1' if S[i] == '0' else '0'\n        elif query[0] == 2:\n            L, R = query[1], query[2]\n            S_prime = ''.join(S[L-1:R])\n            if S_prime[0] != S_prime[1]:\n                print(\"Yes\")\n            else:\n                print(\"No\")\n\ndef main():\n    import sys\n    input = sys.stdin.read().split()\n    N = int(input[0])\n    Q = int(input[1])\n    S = input[2]\n    queries = []\n    for i in range(3, 3+Q):\n        queries.append(tuple(map(int, input[i].split())))\n    process_queries(N, Q, S, queries)\n\nif __name__ == \"__main__\":\n    main()\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def process_queries(N, P, Q, queries):\n    for A, B in queries:\n        A -= 1\n        B -= 1\n        if P[A] < P[B]:\n            print(A + 1)\n        else:\n            print(B + 1)\n\ndef main():\n    import sys\n    input = sys.stdin.read().split()\n    N = int(input[0])\n    P = list(map(int, input[1:N+1]))\n    Q = int(input[N+1])\n    queries = [(int(input[N+2 + 2*i]), int(input[N+3 + 2*i])) for i in range(Q)]\n    process_queries(N, P, Q, queries)\n\nif __name__ == \"__main__\":\n    main()\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def solve(N, S, Q, operations):\n    for c, d in operations:\n        S = S.replace(c, d)\n    return S\n\n# Read input\nN = int(input())\nS = input()\nQ = int(input())\noperations = [input().split() for _ in range(Q)]\n\n# Solve and print the result\nprint(solve(N, S, Q, operations))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "import math\n\ndef is_square(n):\n    return int(math.sqrt(n))**2 == n\n\ndef count_square_pairs(A):\n    N = len(A)\n    count = 0\n    for i in range(N):\n        for j in range(i+1, N):\n            if is_square(A[i]*A[j]):\n                count += 1\n    return count\n\ndef main():\n    import sys\n    input = sys.stdin.read().split()\n    N = int(input[0])\n    A = list(map(int, input[1:N+1]))\n    print(count_square_pairs(A))\n\nif __name__ == \"__main__\":\n    main()\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "import heapq\n\ndef solve(N, M, trains):\n    # Initialize the latest arrival times at each station\n    f = [-float('inf')] * (N + 1)\n    f[1] = 0\n    \n    # Priority queue to store the latest arrival times at each station\n    pq = [(0, 1)]\n    \n    # Process each train\n    for l, d, k, c, A, B in trains:\n        # Push the departure times of the trains into the priority queue\n        for i in range(k):\n            departure_time = l + i * d\n            arrival_time = departure_time + c\n            heapq.heappush(pq, (-arrival_time, B))\n    \n    # Process the priority queue\n    while pq:\n        current_time, current_station = heapq.heappop(pq)\n        current_time = -current_time\n        \n        # If the current time is less than the latest arrival time at the current station, skip\n        if current_time < f[current_station]:\n            continue\n        \n        # Update the latest arrival times at the next stations\n        for i in range(k):\n            departure_time = l + i * d\n            arrival_time = departure_time + c\n            if arrival_time <= current_time:\n                f[A[i]] = max(f[A[i]], current_time)\n                heapq.heappush(pq, (-arrival_time, A[i]))\n    \n    # Print the latest arrival times at each station\n    for i in range(2, N + 1):\n        if f[i] == -float('inf'):\n            print(\"Unreachable\")\n        else:\n            print(f[i])\n\n# Read input\nN, M = map(int, input().split())\ntrains = [tuple(map(int, input().split())) for _ in range(M)]\n\n# Solve the problem\nsolve(N, M, trains)\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def is_palindrome(n):\n    return str(n) == str(n)[::-1]\n\ndef max_palindromic_cube(N):\n    max_cube = 0\n    i = 1\n    while i**3 <= N:\n        if is_palindrome(i**3):\n            max_cube = i**3\n        i += 1\n    return max_cube\n\nN = int(input())\nprint(max_palindromic_cube(N))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": true,
+          "reason": ""
+        },
+        {
+          "content": [
+            "def main():\n    import sys\n    input = sys.stdin.read().split()\n    N, T = int(input[0]), int(input[1])\n    A = [0] * N\n    B = [0] * T\n    for i in range(T):\n        A[int(input[2 + 2 * i]) - 1] += int(input[3 + 2 * i])\n    \n    ans = []\n    for i in range(T):\n        ans.append(len(set(A)))\n    \n    for i in range(T):\n        print(ans[i])\n\nif __name__ == \"__main__\":\n    main()\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def solve_cubes(V1, V2, V3):\n    # Check if the given volumes are within the constraints\n    if not (0 <= V1 <= 3 * 7**3 and 0 <= V2 <= 3 * 7**3 and 0 <= V3 <= 3 * 7**3):\n        return \"No\"\n\n    # Try to find a solution\n    for a1 in range(-100, 101):\n        for b1 in range(-100, 101):\n            for c1 in range(-100, 101):\n                for a2 in range(-100, 101):\n                    for b2 in range(-100, 101):\n                        for c2 in range(-100, 101):\n                            for a3 in range(-100, 101):\n                                for b3 in range(-100, 101):\n                                    for c3 in range(-100, 101):\n                                        # Calculate the volumes\n                                        V1_calculated = calculate_volume(a1, b1, c1, a2, b2, c2, a3, b3, c3, V1)\n                                        V2_calculated = calculate_volume(a1, b1, c1, a2, b2, c2, a3, b3, c3, V2)\n                                        V3_calculated = calculate_volume(a1, b1, c1, a2, b2, c2, a3, b3, c3, V3)\n                                        # Check if the calculated volumes match the given volumes\n                                        if V1_calculated == V1 and V2_calculated == V2 and V3_calculated == V3:\n                                            return \"Yes\\n\" + f\"{a1} {b1} {c1} {a2} {b2} {c2} {a3} {b3} {c3}\"\n    return \"No\"\n\ndef calculate_volume(a1, b1, c1, a2, b2, c2, a3, b3, c3, V):\n    # Calculate the volume of the region contained in exactly one of C1, C2, C3\n    V1 = (a1 < a2 and a1 < a3 and b1 < b2 and b1 < b3 and c1 < c2 and c1 < c3) or \\\n        (a1 < a2 and a1 < a3 and b1 < b2 and b1 < b3 and c1 > c2 and c1 > c3) or \\\n        (a1 < a2 and a1 < a3 and b1 > b2 and b1 > b3 and c1 < c2 and c1 < c3) or \\\n        (a1 < a2 and a1 < a3 and b1 > b2 and b1 > b3 and c1 > c2 and c1 > c3) or \\\n        (a1 > a2 and a1 > a3 and b1 < b2 and b1 < b3 and c1 < c2 and c1 < c3) or \\\n        (a1 > a2 and a1 > a3 and b1 < b2 and b1 < b3 and c1 > c2 and c1 > c3) or \\\n        (a1 > a2 and a1 > a3 and b1 > b2 and b1 > b3 and c1 < c2 and c1 < c3) or \\\n        (a1 > a2 and a1 > a3 and b1 > b2 and b1 > b3 and c1 > c2 and c1 > c3)\n    # Calculate the volume of the region contained in exactly two of C1, C2, C3\n    V2 = (a1 < a2 and a1 < a3 and b1 < b2 and b1 < b3 and c1 < c2 and c1 < c3) and \\\n        (a1 < a2 and a1 < a3 and b1 < b2 and b1 < b3 and c1 > c2 and c1 > c3) and \\\n        (a1 < a2 and a1 < a3 and b1 > b2 and b1 > b3 and c1 < c2 and c1 < c3) and \\\n        (a1 < a2 and a1 < a3 and b1 > b2 and b1 > b3 and c1 > c2 and c1 > c3) and \\\n        (a1 > a2 and a1 > a3 and b1 < b2 and b1 < b3 and c1 < c2 and c1 < c3) and \\\n        (a1 > a2 and a1 > a3 and b1 < b2 and b1 < b3 and c1 > c2 and c1 > c3) and \\\n        (a1 > a2 and a1 > a3 and b1 > b2 and b1 > b3 and c1 < c2 and c1 < c3) and \\\n        (a1 > a2 and a1 > a3 and b1 > b2 and b1 > b3 and c1 > c2 and c1 > c3)\n    # Calculate the volume of the region contained in all of C1, C2, C3\n    V3 = (a1 < a2 and a1 < a3 and b1 < b2 and b1 < b3 and c1 < c2 and c1 < c3) and \\\n        (a1 < a2 and a1 < a3 and b1 < b2 and b1 < b3 and c1 > c2 and c1 > c3) and \\\n        (a1 < a2 and a1 < a3 and b1 > b2 and b1 > b3 and c1 < c2 and c1 < c3) and \\\n        (a1 < a2 and a1 < a3 and b1 > b2 and b1 > b3 and c1 > c2 and c1 > c3) and \\\n        (a1 > a2 and a1 > a3 and b1 < b2 and b1 < b3 and c1 < c2 and c1 < c3) and \\\n        (a1 > a2 and a1 > a3 and b1 < b2 and b1 < b3 and c1 > c2 and c1 > c3) and \\\n        (a1 > a2 and a1 > a3 and b1 > b2 and b1 > b3 and c1 < c2 and c1 < c3) and \\\n        (a1 > a2 and a1 > a3 and b1 > b2 and b1 > b3 and c1 > c2 and c1 > c3)\n    return V1 - V2 + V3\n\n# Read input\nV1, V2, V3 = map(int, input().split())\n\n# Solve the problem\nresult = solve_cubes(V1, V2, V3)\n\n# Print the result\nif result == \"Yes\":\n    print(\"Yes\")\n    print(result)\nelse:\n    print(\"No\")\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def solve():\n    import sys\n    input = sys.stdin.read().split()\n    \n    N = int(input[0])\n    A = list(map(int, input[1:N+1]))\n    M = int(input[N+1])\n    B = list(map(int, input[N+2:N+2+M]))\n    L = int(input[N+2+M])\n    C = list(map(int, input[N+2+M+1:N+2+M+1+L]))\n    Q = int(input[N+2+M+1+L])\n    X = list(map(int, input[N+2+M+1+L+1:N+2+M+1+L+1+Q]))\n    \n    for x in X:\n        found = False\n        for a in A:\n            for b in B:\n                for c in C:\n                    if a + b + c == x:\n                        found = True\n                        break\n                if found:\n                    break\n            if found:\n                break\n        print(\"Yes\" if found else \"No\")\n\nsolve()\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def process_queries(N, A, Q, queries):\n    A = list(A)\n    for query in queries:\n        if query[0] == 1:\n            x, y = query[1], query[2]\n            A.remove(x)\n            A.insert(A.index(x) + 1, y)\n        elif query[0] == 2:\n            x = query[1]\n            A.remove(x)\n    return A\n\ndef main():\n    import sys\n    input = sys.stdin.read().split()\n    N = int(input[0])\n    A = list(map(int, input[1:N+1]))\n    Q = int(input[N+1])\n    queries = []\n    for i in range(Q):\n        if input[N+2+i] == '1':\n            queries.append((1, int(input[N+3+i]), int(input[N+4+i])))\n        else:\n            queries.append((2, int(input[N+3+i])))\n    A = process_queries(N, A, Q, queries)\n    print(' '.join(map(str, A)))\n\nif __name__ == \"__main__\":\n    main()\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def min_cost_to_good_string(N, S, C):\n    # Initialize the minimum cost to a large number\n    min_cost = float('inf')\n    \n    # Iterate over each character in the string\n    for i in range(N):\n        # If the current character is 0, we need to flip it to 1\n        if S[i] == '0':\n            # Calculate the cost of flipping this character\n            cost = C[i]\n            # Update the minimum cost\n            min_cost = min(min_cost, cost)\n        # If the current character is 1, we need to flip it to 0\n        else:\n            # Calculate the cost of flipping this character\n            cost = C[i]\n            # Update the minimum cost\n            min_cost = min(min_cost, cost)\n    \n    return min_cost\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def piano_segment(W, B):\n    S = \"wbwbwwbwbwbwwbw\"\n    for i in range(len(S) - W - B + 1):\n        if S[i:i+W+B] == \"w\"*W + \"b\"*B:\n            return \"Yes\"\n    return \"No\"\n\nW, B = map(int, input().split())\nprint(piano_segment(W, B))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def solve():\n    import sys\n    input = sys.stdin.read().split()\n    H, W, M = map(int, input[:3])\n    T = [int(input[i]) for i in range(3, 3+M)]\n    A = [int(input[i]) for i in range(3+M, 3+M+M)]\n    X = [int(input[i]) for i in range(3+M+M, 3+M+M+M)]\n    \n    grid = [[0]*W for _ in range(H)]\n    for i in range(M):\n        if T[i] == 1:\n            for j in range(W):\n                grid[A[i]-1][j] = X[i]\n        else:\n            for j in range(H):\n                grid[j][A[i]-1] = X[i]\n    \n    color_count = {}\n    for row in grid:\n        for cell in row:\n            if cell in color_count:\n                color_count[cell] += 1\n            else:\n                color_count[cell] = 1\n    \n    print(len(color_count))\n    for color, count in sorted(color_count.items()):\n        print(color, count)\n\nsolve()\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def main():\n    import sys\n    input = sys.stdin.read().split()\n    N = int(input[0])\n    K = int(input[1])\n    A = list(map(int, input[2:2+N]))\n    \n    # Create a set for O(1) lookup\n    A_set = set(A)\n    \n    # Calculate the sum of numbers from 1 to K that are not in A\n    result = sum(i for i in range(1, K+1) if i not in A_set)\n    \n    print(result)\n\nif __name__ == \"__main__\":\n    main()\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def is_all_holidays(N, A, B, D):\n    # Calculate the total number of days in a week\n    total_days = A + B\n    \n    # Calculate the first day of the week\n    first_day = 1\n    \n    # Calculate the last day of the week\n    last_day = first_day + total_days - 1\n    \n    # Check if all D_i are within the first A days\n    for d in D:\n        if d > first_day + A - 1:\n            return \"No\"\n    \n    # Check if all D_i are within the last B days\n    for d in D:\n        if d > last_day - B + 1:\n            return \"No\"\n    \n    return \"Yes\"\n\n# Read input\nN, A, B = map(int, input().split())\nD = list(map(int, input().split()))\n\n# Print output\nprint(is_all_holidays(N, A, B, D))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def process_queries(N, Q, queries):\n    A = [0] * (N + 1)\n    S = set()\n    for x in queries:\n        if x in S:\n            S.remove(x)\n        else:\n            S.add(x)\n        for j in S:\n            A[j] += len(S)\n    return A[1:]\n\n# Read input\nN, Q = map(int, input().split())\nqueries = list(map(int, input().split()))\n\n# Process queries and print output\nprint(' '.join(map(str, process_queries(N, Q, queries))))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "import math\n\ndef find_farthest_point(points):\n    N = len(points)\n    farthest_points = [0] * N\n    for i in range(N):\n        max_distance = 0\n        farthest_id = -1\n        for j in range(N):\n            if i != j:\n                distance = math.sqrt((points[i][0] - points[j][0])**2 + (points[i][1] - points[j][1])**2)\n                if distance > max_distance or (distance == max_distance and j < farthest_id):\n                    max_distance = distance\n                    farthest_id = j\n        farthest_points[i] = farthest_id + 1\n    return farthest_points\n\ndef main():\n    N = int(input())\n    points = []\n    for _ in range(N):\n        X, Y = map(int, input().split())\n        points.append((X, Y))\n    farthest_points = find_farthest_point(points)\n    for point_id in farthest_points:\n        print(point_id)\n\nif __name__ == \"__main__\":\n    main()\n"
+          ],
+          "difficulty": "easy",
+          "correctness": true,
+          "reason": ""
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "import sys\nfrom collections import defaultdict\n\ndef main():\n    input = sys.stdin.read().split()\n    N = int(input[0])\n    edges = []\n    C = []\n    for i in range(1, 2*N, 2):\n        A = int(input[i])\n        B = int(input[i+1])\n        edges.append((A, B))\n        C.append(int(input[i+2]))\n    \n    # Build adjacency list\n    adj = defaultdict(list)\n    for A, B in edges:\n        adj[A].append(B)\n        adj[B].append(A)\n    \n    # Calculate f(v) for all vertices\n    f = [0] * (N + 1)\n    for v in range(1, N + 1):\n        f[v] = sum(C[i] * len(adj[i]) for i in range(1, N + 1))\n    \n    # Find the minimum value of f(v)\n    min_f = min(f[1:])\n    \n    print(min_f)\n\nif __name__ == \"__main__\":\n    main()\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def is_airport_code(S, T):\n    if len(T) != 3:\n        return \"No\"\n    \n    # Check if T can be derived from S by taking a subsequence of length 3\n    for i in range(len(S)):\n        for j in range(i+1, len(S)):\n            for k in range(j+1, len(S)):\n                if S[i] == T[0] and S[j] == T[1] and S[k] == T[2]:\n                    return \"Yes\"\n    \n    # Check if T can be derived from S by taking a subsequence of length 2 and appending X\n    for i in range(len(S)):\n        for j in range(i+1, len(S)):\n            if S[i] == T[0] and S[j] == T[1]:\n                return \"Yes\"\n    \n    return \"No\"\n\n# Read input\nS = input().strip()\nT = input().strip()\n\n# Print output\nprint(is_airport_code(S, T))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def generate_good_sequences(L, R):\n    i = 0\n    while L < R:\n        j = L\n        while j < R:\n            if (j & (j - 1)) == 0:\n                print(f\"{L} {j}\")\n                L = j + 1\n                break\n            j += 1\n        i += 1\n\nL, R = map(int, input().split())\ngenerate_good_sequences(L, R)\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def solve(A):\n    # Initialize the scores for Takahashi and Aoki\n    takahashi_score = 0\n    aoki_score = 0\n    \n    # Iterate over each cell in the grid\n    for i in range(3):\n        for j in range(3):\n            # If the cell is white, choose it\n            if A[i][j] == 0:\n                # Takahashi's turn\n                takahashi_score += A[i][j]\n                # Check for winning condition\n                if check_win(A, i, j, 'Takahashi'):\n                    return 'Takahashi'\n                # Aoki's turn\n                aoki_score += A[i][j]\n                # Check for winning condition\n                if check_win(A, i, j, 'Aoki'):\n                    return 'Aoki'\n    \n    # If no white cells are left, compare the scores\n    if takahashi_score > aoki_score:\n        return 'Takahashi'\n    else:\n        return 'Aoki'\n\ndef check_win(A, i, j, player):\n    # Check rows\n    for k in range(3):\n        if A[i][k] == player and A[i][k+1] == player and A[i][k+2] == player:\n            return True\n    # Check columns\n    for k in range(3):\n        if A[k][j] == player and A[k+1][j] == player and A[k+2][j] == player:\n            return True\n    # Check diagonals\n    if A[i][i] == player and A[i+1][i+1] == player and A[i+2][i+2] == player:\n        return True\n    if A[i][2-i] == player and A[i+1][1-i] == player and A[i+2][0-i] == player:\n        return True\n    return False\n\n# Read input\nA = []\nfor _ in range(3):\n    A.append(list(map(int, input().split())))\n\n# Solve the problem\nprint(solve(A))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "import sys\n\ndef dist(A, B):\n    x1, y1 = A\n    x2, y2 = B\n    return max(abs(x1 - x2), abs(y1 - y2))\n\ndef main():\n    N = int(sys.stdin.readline())\n    points = [tuple(map(int, sys.stdin.readline().split())) for _ in range(N)]\n    \n    total_dist = 0\n    for i in range(N):\n        for j in range(i+1, N):\n            total_dist += dist(points[i], points[j])\n    \n    print(total_dist)\n\nif __name__ == \"__main__\":\n    main()\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "import sys\nimport heapq\n\ndef main():\n    input = sys.stdin.read().split()\n    idx = 0\n    N = int(input[idx])\n    M = int(input[idx+1])\n    idx += 2\n    \n    edges = []\n    for _ in range(M):\n        K = int(input[idx])\n        C = int(input[idx+1])\n        idx += 2\n        S = [int(input[idx+i]) for i in range(K)]\n        idx += K\n        for i in range(K):\n            for j in range(i+1, K):\n                u, v = S[i], S[j]\n                edges.append((C, u, v))\n    \n    # Sort edges by weight\n    edges.sort()\n    \n    # Union-Find data structure\n    parent = list(range(N+1))\n    rank = [1]*(N+1)\n    \n    def find(x):\n        if parent[x] != x:\n            parent[x] = find(parent[x])\n        return parent[x]\n    \n    def union(x, y):\n        x_root = find(x)\n        y_root = find(y)\n        if x_root == y_root:\n            return False\n        if rank[x_root] < rank[y_root]:\n            parent[x_root] = y_root\n        else:\n            parent[y_root] = x_root\n            if rank[x_root] == rank[y_root]:\n                rank[x_root] += 1\n        return True\n    \n    total_weight = 0\n    for weight, u, v in edges:\n        if union(u, v):\n            total_weight += weight\n    \n    # Check if all nodes are connected\n    root = find(1)\n    for i in range(2, N+1):\n        if find(i) != root:\n            print(-1)\n            return\n    \n    print(total_weight)\n\nif __name__ == \"__main__\":\n    main()\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_min_diff(N, K, P):\n    P = sorted(P)\n    min_diff = float('inf')\n    for i in range(N - K + 1):\n        if P[i:i+K] == list(range(P[i], P[i] + K)):\n            min_diff = min(min_diff, i + K - i)\n    return min_diff\n\nN, K = map(int, input().split())\nP = list(map(int, input().split()))\nprint(find_min_diff(N, K, P))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def f(x, y):\n    return (x + y) % 100000000\n\ndef main():\n    import sys\n    input = sys.stdin.read().split()\n    N = int(input[0])\n    A = list(map(int, input[1:N+1]))\n    ans = 0\n    for i in range(N):\n        for j in range(i+1, N):\n            ans += f(A[i], A[j])\n    print(ans)\n\nif __name__ == \"__main__\":\n    main()\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def f(x, y):\n    i = 0\n    while i < len(x) and i < len(y) and x[i] == y[i]:\n        i += 1\n    return i\n\ndef main():\n    import sys\n    input = sys.stdin.read().split()\n    N = int(input[0])\n    S = input[1:]\n    ans = 0\n    for i in range(N):\n        for j in range(i+1, N):\n            ans += f(S[i], S[j])\n    print(ans)\n\nif __name__ == \"__main__\":\n    main()\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "MOD = 998244353\n\ndef f(x, y):\n    return int(str(x) + str(y))\n\ndef solve(N, A):\n    total = 0\n    for i in range(N):\n        for j in range(i+1, N):\n            total = (total + f(A[i], A[j])) % MOD\n    return total\n\nN = int(input())\nA = list(map(int, input().split()))\nprint(solve(N, A))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def solve():\n    import sys\n    input = sys.stdin.read().split()\n    N = int(input[0])\n    cards = [(int(input[2*i+1]), int(input[2*i+2])) for i in range(N)]\n    cards.sort(key=lambda x: (x[0], x[1]))\n    remaining_cards = [i+1 for i in range(N) if cards[i][0] > cards[i+1][0] and cards[i][1] < cards[i+1][1]]\n    print(len(remaining_cards))\n    print(\" \".join(map(str, remaining_cards)))\n\nsolve()\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "import sys\n\ndef ask(i, j):\n    print(f\"? {i} {j}\")\n    sys.stdout.flush()\n    return int(input())\n\ndef solve(N, L, R):\n    m = 0\n    while True:\n        i = 0\n        while True:\n            j = 0\n            while True:\n                l = 2**i * j\n                r = 2**i * (j+1) - 1\n                if l > R:\n                    break\n                if l >= 2**N:\n                    break\n                if ask(i, j) == -1:\n                    return -1\n                m += 1\n                if m > 2**N:\n                    return -1\n                if ask(i, j) == 0:\n                    return 0\n                j += 1\n            i += 1\n        return ask(i, 0)\n\nN, L, R = map(int, input().split())\nprint(f\"! {solve(N, L, R)}\")\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_bingo_turn(N, T, A):\n    grid = [[0] * N for _ in range(N)]\n    marked_rows = [set() for _ in range(N)]\n    marked_cols = [set() for _ in range(N)]\n    marked_diag1 = [set() for _ in range(N)]\n    marked_diag2 = [set() for _ in range(N)]\n\n    for i in range(N):\n        for j in range(N):\n            grid[i][j] = i * N + j + 1\n            marked_rows[i].add(grid[i][j])\n            marked_cols[j].add(grid[i][j])\n            if i == j:\n                marked_diag1[i].add(grid[i][j])\n            if i + j == N - 1:\n                marked_diag2[i].add(grid[i][j])\n\n    for turn in range(T):\n        A_i = A[turn]\n        i, j = divmod(A_i - 1, N)\n        if grid[i][j] == A_i:\n            marked_rows[i].remove(A_i)\n            marked_cols[j].remove(A_i)\n            if i == j:\n                marked_diag1[i].remove(A_i)\n            if i + j == N - 1:\n                marked_diag2[i].remove(A_i)\n\n    for i in range(N):\n        if len(marked_rows[i]) == N:\n            return turn + 1\n        if len(marked_cols[i]) == N:\n            return turn + 1\n        if len(marked_diag1[i]) == N:\n            return turn + 1\n        if len(marked_diag2[i]) == N:\n            return turn + 1\n\n    return -1\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def powerful_array(x):\n    powers = []\n    while x:\n        if x & 1:\n            powers.append(1 << (x & -x))\n        x >>= 1\n    return powers\n\ndef generate_big_nums(limit):\n    big_nums = []\n    i = 1\n    while len(big_nums) < limit:\n        big_nums.extend(powerful_array(i))\n        i += 1\n    return big_nums\n\ndef product_mod(queries):\n    big_nums = generate_big_nums(10**15)\n    answer = []\n    for from_i, to_i, mod_i in queries:\n        product = 1\n        for i in range(from_i, to_i + 1):\n            product *= big_nums[i]\n            product %= mod_i\n        answer.append(product)\n    return answer\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        }
+      ],
+      "num_total": 511,
+      "solved_avg": 11.0,
+      "run_stats": [
+        {
+          "repetition": 1,
+          "num_total": 511,
+          "num_solved": 11,
+          "accuracy": 0.021526418786692758
+        },
+        {
+          "repetition": 2,
+          "num_total": 511,
+          "num_solved": 11,
+          "accuracy": 0.021526418786692758
+        },
+        {
+          "repetition": 3,
+          "num_total": 511,
+          "num_solved": 11,
+          "accuracy": 0.021526418786692758
+        },
+        {
+          "repetition": 4,
+          "num_total": 511,
+          "num_solved": 11,
+          "accuracy": 0.021526418786692758
+        },
+        {
+          "repetition": 5,
+          "num_total": 511,
+          "num_solved": 11,
+          "accuracy": 0.021526418786692758
+        },
+        {
+          "repetition": 6,
+          "num_total": 511,
+          "num_solved": 11,
+          "accuracy": 0.021526418786692758
+        }
+      ],
+      "num_repeat": 6
+    }
+  },
+  "config": {
+    "model": "hf",
+    "model_args": "trust_remote_code=True,pretrained=ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-SFT-Tulu3-decontaminated",
+    "tasks": "LiveCodeBench",
+    "batch_sizes": [
+      "auto"
+    ],
+    "device": null,
+    "use_cache": null,
+    "limit": null,
+    "annotator_model": "auto",
+    "max_tokens": "default",
+    "gen_kwargs": null,
+    "random_seed": 0,
+    "numpy_seed": 1234,
+    "torch_seed": 1234,
+    "fewshot_seed": 1234,
+    "model_num_parameters": 1714377728,
+    "model_dtype": "torch.bfloat16",
+    "model_revision": "main",
+    "model_sha": ""
+  },
+  "git_hash": "1b061c1878df07b0f2fd3c65a5e8a1711d7d1b5f",
+  "date": 1769489951.174152,
+  "pretty_env_info": "'NoneType' object has no attribute 'splitlines'",
+  "transformers_version": "4.57.6",
+  "upper_git_hash": null,
+  "tokenizer_pad_token": [
+    "<|endoftext|>",
+    "0"
+  ],
+  "tokenizer_eos_token": [
+    "<|endoftext|>",
+    "0"
+  ],
+  "tokenizer_bos_token": [
+    "<|endoftext|>",
+    "0"
+  ],
+  "eot_token_id": 0,
+  "max_length": 4096,
+  "task_hashes": {},
+  "model_source": "hf",
+  "model_name": "ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-SFT-Tulu3-decontaminated",
+  "model_name_sanitized": "ali-elganzory__1.7b-MixtureVitae-300BT-v1-decontaminated-SFT-Tulu3-decontaminated",
+  "system_instruction": null,
+  "system_instruction_sha": null,
+  "fewshot_as_multiturn": false,
+  "chat_template": null,
+  "chat_template_sha": null,
+  "start_time": 972984.171806164,
+  "end_time": 992960.124260271,
+  "total_evaluation_time_seconds": "19975.952454107"
+}

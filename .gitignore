@@ -200,6 +200,7 @@ venv/
 tmp*
 out*
 log*
+!logs
 wandb*
 *_creds.sh
 plots*
@@ -226,3 +227,6 @@ eval/chat_benchmarks/MixEval/mix_eval/data/model_responses
 eval/chat_benchmarks/MixEval/mix_eval/eval_scripts
 eval/chat_benchmarks/MixEval/results
 results/
+
+# mv_exp
+mv_exp/eval_scripts/

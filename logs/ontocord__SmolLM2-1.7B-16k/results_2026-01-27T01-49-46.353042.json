@@ -1,0 +1,61 @@
+{
+  "results": {
+    "HumanEval": {
+      "python_pass@1": 0.23780487804878048,
+      "sh_pass@1": 0.02531645569620253
+    }
+  },
+  "config": {
+    "model": "hf",
+    "model_args": "trust_remote_code=True,pretrained=ontocord/SmolLM2-1.7B-16k",
+    "tasks": "HumanEval",
+    "batch_sizes": [
+      "auto"
+    ],
+    "device": null,
+    "use_cache": null,
+    "limit": null,
+    "annotator_model": "auto",
+    "max_tokens": "default",
+    "gen_kwargs": null,
+    "random_seed": 0,
+    "numpy_seed": 1234,
+    "torch_seed": 1234,
+    "fewshot_seed": 1234,
+    "model_num_parameters": 1711507456,
+    "model_dtype": "torch.bfloat16",
+    "model_revision": "main",
+    "model_sha": ""
+  },
+  "git_hash": "1b061c1878df07b0f2fd3c65a5e8a1711d7d1b5f",
+  "date": 1769474986.3335738,
+  "pretty_env_info": "'NoneType' object has no attribute 'splitlines'",
+  "transformers_version": "4.57.6",
+  "upper_git_hash": null,
+  "tokenizer_pad_token": [
+    "<end_of_turn>",
+    "49152"
+  ],
+  "tokenizer_eos_token": [
+    "<end_of_turn>",
+    "49152"
+  ],
+  "tokenizer_bos_token": [
+    "<|endoftext|>",
+    "0"
+  ],
+  "eot_token_id": 49152,
+  "max_length": 16384,
+  "task_hashes": {},
+  "model_source": "hf",
+  "model_name": "ontocord/SmolLM2-1.7B-16k",
+  "model_name_sanitized": "ontocord__SmolLM2-1.7B-16k",
+  "system_instruction": null,
+  "system_instruction_sha": null,
+  "fewshot_as_multiturn": false,
+  "chat_template": null,
+  "chat_template_sha": null,
+  "start_time": 976637.92811481,
+  "end_time": 977690.72610113,
+  "total_evaluation_time_seconds": "1052.797986319987"
+}

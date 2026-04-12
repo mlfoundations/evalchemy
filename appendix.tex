@@ -1,0 +1,92 @@
+\section{Appendix}
+\subsection{Benchmark Details}
+\begin{table}[ht]
+\centering
+\caption{Benchmark Abbreviations and Full Names}
+\label{tab:benchmark_mapping}
+\scriptsize
+\begin{tabular}{ll}
+\toprule
+\textbf{Abbreviation} & \textbf{Full Name} \\
+\midrule
+A24 & AIME24 \\
+A25 & AIME25 \\
+AMC & AMC23 \\
+M500 & MATH500 \\
+HE & HumanEval \\
+LCB & LiveCodeBench \\
+MBPP & MBPP \\
+GPQA & GPQADiamond \\
+JEE & JEEBench \\
+IFE & IFEval \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Model Mappings}
+\begin{table}[ht]
+\centering
+\caption{Model Names to Hugging Face ID Mappings}
+\label{tab:model_mapping}
+\scriptsize
+\begin{tabular}{lp{10cm}}
+\toprule
+\textbf{Model Name} & \textbf{Hugging Face ID} \\
+\midrule
+Baguettotron & \texttt{PleIAs/\allowbreak{}Baguettotron} \\
+Baguettotron + DPO & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}Baguettotron-\allowbreak{}DPO-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+Baguettotron + SFT & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}Baguettotron-\allowbreak{}SFT-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+Baguettotron 16k & \texttt{ontocord/\allowbreak{}Baguettotron-\allowbreak{}longsft\_16k} \\
+Comma0.1 & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}1.7b-\allowbreak{}Comma0.1-\allowbreak{}300BT-\allowbreak{}WithChatTemplate} \\
+Comma0.1 + DPO & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}1.7b-\allowbreak{}Comma0.1-\allowbreak{}300BT-\allowbreak{}DPO-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+Comma0.1 + SFT & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}1.7b-\allowbreak{}Comma0.1-\allowbreak{}300BT-\allowbreak{}SFT-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+Comma0.1-16k & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}1.7b-\allowbreak{}Comma0.1-\allowbreak{}300BT-\allowbreak{}longsft\_16k} \\
+Comma0.1-16k + DPO & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}1.7b-\allowbreak{}Comma0.1-\allowbreak{}300BT-\allowbreak{}longsft\_16k-\allowbreak{}DPO-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+Comma0.1-16k + SFT & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}1.7b-\allowbreak{}Comma0.1-\allowbreak{}300BT-\allowbreak{}longsft\_16k-\allowbreak{}SFT-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+FineWeb-Edu & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}open-\allowbreak{}sci-\allowbreak{}ref-\allowbreak{}v0.02-\allowbreak{}1.7b-\allowbreak{}fineweb-\allowbreak{}edu-\allowbreak{}1.4t-\allowbreak{}300B-\allowbreak{}4096} \\
+FineWeb-Edu + DPO & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}open-\allowbreak{}sci-\allowbreak{}ref-\allowbreak{}v0.02-\allowbreak{}1.7b-\allowbreak{}fineweb-\allowbreak{}edu-\allowbreak{}1.4t-\allowbreak{}300B-\allowbreak{}4096-\allowbreak{}DPO-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+FineWeb-Edu + SFT & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}open-\allowbreak{}sci-\allowbreak{}ref-\allowbreak{}v0.02-\allowbreak{}1.7b-\allowbreak{}fineweb-\allowbreak{}edu-\allowbreak{}1.4t-\allowbreak{}300B-\allowbreak{}4096-\allowbreak{}SFT-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+FineWeb-Edu-16k & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}open-\allowbreak{}sci-\allowbreak{}ref-\allowbreak{}v0.02-\allowbreak{}1.7b-\allowbreak{}fineweb-\allowbreak{}edu-\allowbreak{}1.4t-\allowbreak{}300B-\allowbreak{}4096-\allowbreak{}4096-\allowbreak{}longsft\_16k} \\
+FineWeb-Edu-16k + DPO & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}open-\allowbreak{}sci-\allowbreak{}ref-\allowbreak{}v0.02-\allowbreak{}1.7b-\allowbreak{}fineweb-\allowbreak{}edu-\allowbreak{}1.4t-\allowbreak{}300B-\allowbreak{}4096-\allowbreak{}longsft\_16k-\allowbreak{}DPO-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+FineWeb-Edu-16k + SFT & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}open-\allowbreak{}sci-\allowbreak{}ref-\allowbreak{}v0.02-\allowbreak{}1.7b-\allowbreak{}fineweb-\allowbreak{}edu-\allowbreak{}1.4t-\allowbreak{}300B-\allowbreak{}4096-\allowbreak{}longsft\_16k-\allowbreak{}SFT-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+MV & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}1.7b-\allowbreak{}MixtureVitae-\allowbreak{}300BT-\allowbreak{}v1-\allowbreak{}decontaminated} \\
+MV (0.4B) & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}0.4b-\allowbreak{}mixturevitae-\allowbreak{}v1-\allowbreak{}decontaminated-\allowbreak{}300B-\allowbreak{}4096} \\
+MV (0.4B) + DPO & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}0.4b-\allowbreak{}mixturevitae-\allowbreak{}v1-\allowbreak{}decontaminated-\allowbreak{}300B-\allowbreak{}4096-\allowbreak{}DPO-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+MV (0.4B) + SFT & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}0.4b-\allowbreak{}mixturevitae-\allowbreak{}v1-\allowbreak{}decontaminated-\allowbreak{}300B-\allowbreak{}4096-\allowbreak{}SFT-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+MV + DPO & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}1.7b-\allowbreak{}MixtureVitae-\allowbreak{}300BT-\allowbreak{}v1-\allowbreak{}decontaminated-\allowbreak{}DPO-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+MV + SFT & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}1.7b-\allowbreak{}MixtureVitae-\allowbreak{}300BT-\allowbreak{}v1-\allowbreak{}decontaminated-\allowbreak{}SFT-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+MV-16k & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}1.7b-\allowbreak{}MixtureVitae-\allowbreak{}300BT-\allowbreak{}v1-\allowbreak{}decontaminated-\allowbreak{}16k} \\
+MV-16k (0.4B) & \texttt{ontocord/\allowbreak{}0.4b-\allowbreak{}mixturevitae-\allowbreak{}v1-\allowbreak{}decontaminated-\allowbreak{}300B-\allowbreak{}4096-\allowbreak{}longsft\_16k} \\
+MV-16k + DPO & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}1.7b-\allowbreak{}MixtureVitae-\allowbreak{}300BT-\allowbreak{}v1-\allowbreak{}decontaminated-\allowbreak{}16k-\allowbreak{}DPO-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+MV-16k + SFT & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}1.7b-\allowbreak{}MixtureVitae-\allowbreak{}300BT-\allowbreak{}v1-\allowbreak{}decontaminated-\allowbreak{}16k-\allowbreak{}SFT-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+MV-noinstruct & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}1.7b-\allowbreak{}MixtureVitae-\allowbreak{}web\_curated-\allowbreak{}100BT} \\
+MV-noinstruct + DPO & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}1.7b-\allowbreak{}MixtureVitae-\allowbreak{}web\_curated-\allowbreak{}100BT-\allowbreak{}DPO-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+MV-noinstruct + SFT & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}1.7b-\allowbreak{}MixtureVitae-\allowbreak{}web\_curated-\allowbreak{}100BT-\allowbreak{}SFT-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+MV-noinstruct-16k & \texttt{ontocord/\allowbreak{}1.7b-\allowbreak{}MixtureVitae-\allowbreak{}web\_curated-\allowbreak{}100BT-\allowbreak{}longsft\_16k} \\
+MV-noweb & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}1.7b-\allowbreak{}MixtureVitae-\allowbreak{}curated\_instruct-\allowbreak{}100BT} \\
+MV-noweb + DPO & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}1.7b-\allowbreak{}MixtureVitae-\allowbreak{}curated\_instruct-\allowbreak{}100BT-\allowbreak{}DPO-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+MV-noweb + SFT & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}1.7b-\allowbreak{}MixtureVitae-\allowbreak{}curated\_instruct-\allowbreak{}100BT-\allowbreak{}SFT-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+MV-noweb-16k & \texttt{ontocord/\allowbreak{}1.7b-\allowbreak{}MixtureVitae-\allowbreak{}curated\_instruct-\allowbreak{}100BT-\allowbreak{}longsft\_16k} \\
+MV-noweb-16k + DPO & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}1.7b-\allowbreak{}MixtureVitae-\allowbreak{}curated\_instruct-\allowbreak{}100BT-\allowbreak{}longsft\_16k-\allowbreak{}DPO-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+MV-noweb-16k + SFT & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}1.7b-\allowbreak{}MixtureVitae-\allowbreak{}curated\_instruct-\allowbreak{}100BT-\allowbreak{}longsft\_16k-\allowbreak{}SFT-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+OpenSci-NM & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}open-\allowbreak{}sci-\allowbreak{}ref-\allowbreak{}v0.02-\allowbreak{}1.7b-\allowbreak{}nemotron-\allowbreak{}hq-\allowbreak{}300B-\allowbreak{}4096} \\
+OpenSci-NM + DPO & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}open-\allowbreak{}sci-\allowbreak{}ref-\allowbreak{}v0.02-\allowbreak{}1.7b-\allowbreak{}nemotron-\allowbreak{}hq-\allowbreak{}300B-\allowbreak{}4096-\allowbreak{}DPO-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+OpenSci-NM + SFT & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}open-\allowbreak{}sci-\allowbreak{}ref-\allowbreak{}v0.02-\allowbreak{}1.7b-\allowbreak{}nemotron-\allowbreak{}hq-\allowbreak{}300B-\allowbreak{}4096-\allowbreak{}SFT-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+OpenSci-NM-16k & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}open-\allowbreak{}sci-\allowbreak{}ref-\allowbreak{}v0.02-\allowbreak{}1.7b-\allowbreak{}nemotron-\allowbreak{}hq-\allowbreak{}300B-\allowbreak{}16384-\allowbreak{}rope\_theta-\allowbreak{}1M-\allowbreak{}long\_sft\_16k} \\
+OpenSci-NM-16k + DPO & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}open-\allowbreak{}sci-\allowbreak{}ref-\allowbreak{}v0.02-\allowbreak{}1.7b-\allowbreak{}nemotron-\allowbreak{}hq-\allowbreak{}300B-\allowbreak{}16k-\allowbreak{}DPO-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+OpenSci-NM-16k + SFT & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}open-\allowbreak{}sci-\allowbreak{}ref-\allowbreak{}v0.02-\allowbreak{}1.7b-\allowbreak{}nemotron-\allowbreak{}hq-\allowbreak{}300B-\allowbreak{}16k-\allowbreak{}SFT-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+Qwen2.5 & \texttt{Qwen/\allowbreak{}Qwen2.5-\allowbreak{}1.5B} \\
+Qwen2.5 + DPO & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}Qwen2.5-\allowbreak{}1.5B-\allowbreak{}DPO-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+Qwen2.5 + SFT & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}Qwen2.5-\allowbreak{}1.5B-\allowbreak{}SFT-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+Qwen3 & \texttt{Qwen/\allowbreak{}Qwen3-\allowbreak{}1.7B-\allowbreak{}Base} \\
+Qwen3 + DPO & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}Qwen3-\allowbreak{}1.7B-\allowbreak{}Base-\allowbreak{}DPO-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+Qwen3 + SFT & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}Qwen3-\allowbreak{}1.7B-\allowbreak{}Base-\allowbreak{}SFT-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+SmolLM2 & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}SmolLM2-\allowbreak{}1.7B-\allowbreak{}WithChatTemplate} \\
+SmolLM2 + DPO & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}SmolLM2-\allowbreak{}1.7B-\allowbreak{}DPO-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+SmolLM2 + SFT & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}SmolLM2-\allowbreak{}1.7B-\allowbreak{}SFT-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+SmolLM2-16k & \texttt{ontocord/\allowbreak{}SmolLM2-\allowbreak{}1.7B-\allowbreak{}16k} \\
+SmolLM2-16k + DPO & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}SmolLM2-\allowbreak{}1.7B-\allowbreak{}16k-\allowbreak{}DPO-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+SmolLM2-16k + SFT & \texttt{ali-\allowbreak{}elganzory/\allowbreak{}SmolLM2-\allowbreak{}1.7B-\allowbreak{}16k-\allowbreak{}SFT-\allowbreak{}Tulu3-\allowbreak{}decontaminated} \\
+\bottomrule
+\end{tabular}
+\end{table}

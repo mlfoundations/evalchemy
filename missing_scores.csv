@@ -1,0 +1,405 @@
+model_id_or_name,missing_benchmark
+ali-elganzory/1.7b-MixtureVitae-web_curated-100BT,LiveCodeBench
+ontocord/1.7b-MixtureVitae-web_curated-100BT-longsft_16k,AIME24
+ontocord/1.7b-MixtureVitae-web_curated-100BT-longsft_16k,AIME25
+ontocord/1.7b-MixtureVitae-web_curated-100BT-longsft_16k,AMC23
+ontocord/1.7b-MixtureVitae-web_curated-100BT-longsft_16k,MATH500
+ontocord/1.7b-MixtureVitae-web_curated-100BT-longsft_16k,HumanEval
+ontocord/1.7b-MixtureVitae-web_curated-100BT-longsft_16k,LiveCodeBench
+ontocord/1.7b-MixtureVitae-web_curated-100BT-longsft_16k,MBPP
+ontocord/1.7b-MixtureVitae-web_curated-100BT-longsft_16k,GPQADiamond
+ontocord/1.7b-MixtureVitae-web_curated-100BT-longsft_16k,JEEBench
+ontocord/1.7b-MixtureVitae-web_curated-100BT-longsft_16k,IFEval
+MV-noinstruct-16k + SFT,AIME24
+MV-noinstruct-16k + SFT,AIME25
+MV-noinstruct-16k + SFT,AMC23
+MV-noinstruct-16k + SFT,MATH500
+MV-noinstruct-16k + SFT,HumanEval
+MV-noinstruct-16k + SFT,LiveCodeBench
+MV-noinstruct-16k + SFT,MBPP
+MV-noinstruct-16k + SFT,GPQADiamond
+MV-noinstruct-16k + SFT,JEEBench
+MV-noinstruct-16k + SFT,IFEval
+MV-noinstruct-16k + DPO,AIME24
+MV-noinstruct-16k + DPO,AIME25
+MV-noinstruct-16k + DPO,AMC23
+MV-noinstruct-16k + DPO,MATH500
+MV-noinstruct-16k + DPO,HumanEval
+MV-noinstruct-16k + DPO,LiveCodeBench
+MV-noinstruct-16k + DPO,MBPP
+MV-noinstruct-16k + DPO,GPQADiamond
+MV-noinstruct-16k + DPO,JEEBench
+MV-noinstruct-16k + DPO,IFEval
+ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT,LiveCodeBench
+ontocord/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k,AIME24
+ontocord/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k,AIME25
+ontocord/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k,AMC23
+ontocord/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k,MATH500
+ontocord/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k,HumanEval
+ontocord/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k,LiveCodeBench
+ontocord/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k,MBPP
+ontocord/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k,GPQADiamond
+ontocord/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k,JEEBench
+ontocord/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k,IFEval
+ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k-SFT-Tulu3-decontaminated,AIME24
+ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k-SFT-Tulu3-decontaminated,AIME25
+ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k-SFT-Tulu3-decontaminated,AMC23
+ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k-SFT-Tulu3-decontaminated,MATH500
+ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k-SFT-Tulu3-decontaminated,HumanEval
+ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k-SFT-Tulu3-decontaminated,LiveCodeBench
+ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k-SFT-Tulu3-decontaminated,MBPP
+ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k-SFT-Tulu3-decontaminated,GPQADiamond
+ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k-SFT-Tulu3-decontaminated,JEEBench
+ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k-SFT-Tulu3-decontaminated,IFEval
+ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k-DPO-Tulu3-decontaminated,AIME24
+ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k-DPO-Tulu3-decontaminated,AIME25
+ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k-DPO-Tulu3-decontaminated,AMC23
+ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k-DPO-Tulu3-decontaminated,MATH500
+ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k-DPO-Tulu3-decontaminated,HumanEval
+ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k-DPO-Tulu3-decontaminated,LiveCodeBench
+ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k-DPO-Tulu3-decontaminated,MBPP
+ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k-DPO-Tulu3-decontaminated,GPQADiamond
+ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k-DPO-Tulu3-decontaminated,JEEBench
+ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k-DPO-Tulu3-decontaminated,IFEval
+ali-elganzory/1.7b-MixtureVitae-100BT,LiveCodeBench
+ontocord/1.7b-MixtureVitae-100BT-longsft_16k,AIME24
+ontocord/1.7b-MixtureVitae-100BT-longsft_16k,AIME25
+ontocord/1.7b-MixtureVitae-100BT-longsft_16k,AMC23
+ontocord/1.7b-MixtureVitae-100BT-longsft_16k,MATH500
+ontocord/1.7b-MixtureVitae-100BT-longsft_16k,HumanEval
+ontocord/1.7b-MixtureVitae-100BT-longsft_16k,LiveCodeBench
+ontocord/1.7b-MixtureVitae-100BT-longsft_16k,MBPP
+ontocord/1.7b-MixtureVitae-100BT-longsft_16k,GPQADiamond
+ontocord/1.7b-MixtureVitae-100BT-longsft_16k,JEEBench
+ontocord/1.7b-MixtureVitae-100BT-longsft_16k,IFEval
+ali-elganzory/1.7b-MixtureVitae-100BT-longsft_16k-SFT-Tulu3-decontaminated,AIME24
+ali-elganzory/1.7b-MixtureVitae-100BT-longsft_16k-SFT-Tulu3-decontaminated,AIME25
+ali-elganzory/1.7b-MixtureVitae-100BT-longsft_16k-SFT-Tulu3-decontaminated,AMC23
+ali-elganzory/1.7b-MixtureVitae-100BT-longsft_16k-SFT-Tulu3-decontaminated,MATH500
+ali-elganzory/1.7b-MixtureVitae-100BT-longsft_16k-SFT-Tulu3-decontaminated,HumanEval
+ali-elganzory/1.7b-MixtureVitae-100BT-longsft_16k-SFT-Tulu3-decontaminated,LiveCodeBench
+ali-elganzory/1.7b-MixtureVitae-100BT-longsft_16k-SFT-Tulu3-decontaminated,MBPP
+ali-elganzory/1.7b-MixtureVitae-100BT-longsft_16k-SFT-Tulu3-decontaminated,GPQADiamond
+ali-elganzory/1.7b-MixtureVitae-100BT-longsft_16k-SFT-Tulu3-decontaminated,JEEBench
+ali-elganzory/1.7b-MixtureVitae-100BT-longsft_16k-SFT-Tulu3-decontaminated,IFEval
+ali-elganzory/1.7b-MixtureVitae-100BT-longsft_16k-DPO-Tulu3-decontaminated,AIME24
+ali-elganzory/1.7b-MixtureVitae-100BT-longsft_16k-DPO-Tulu3-decontaminated,AIME25
+ali-elganzory/1.7b-MixtureVitae-100BT-longsft_16k-DPO-Tulu3-decontaminated,AMC23
+ali-elganzory/1.7b-MixtureVitae-100BT-longsft_16k-DPO-Tulu3-decontaminated,MATH500
+ali-elganzory/1.7b-MixtureVitae-100BT-longsft_16k-DPO-Tulu3-decontaminated,HumanEval
+ali-elganzory/1.7b-MixtureVitae-100BT-longsft_16k-DPO-Tulu3-decontaminated,LiveCodeBench
+ali-elganzory/1.7b-MixtureVitae-100BT-longsft_16k-DPO-Tulu3-decontaminated,MBPP
+ali-elganzory/1.7b-MixtureVitae-100BT-longsft_16k-DPO-Tulu3-decontaminated,GPQADiamond
+ali-elganzory/1.7b-MixtureVitae-100BT-longsft_16k-DPO-Tulu3-decontaminated,JEEBench
+ali-elganzory/1.7b-MixtureVitae-100BT-longsft_16k-DPO-Tulu3-decontaminated,IFEval
+ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated,LiveCodeBench
+ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-16k,AIME24
+ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-16k,AIME25
+ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-16k,AMC23
+ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-16k,LiveCodeBench
+ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-16k,JEEBench
+ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-16k-SFT-Tulu3-decontaminated,AIME24
+ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-16k-SFT-Tulu3-decontaminated,AMC23
+ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-16k-SFT-Tulu3-decontaminated,LiveCodeBench
+ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-16k-SFT-Tulu3-decontaminated,JEEBench
+ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-16k-DPO-Tulu3-decontaminated,AIME24
+ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-16k-DPO-Tulu3-decontaminated,AIME25
+ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-16k-DPO-Tulu3-decontaminated,JEEBench
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096,AIME24
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096,AIME25
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096,AMC23
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096,MATH500
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096,HumanEval
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096,LiveCodeBench
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096,MBPP
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096,GPQADiamond
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096,JEEBench
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096,IFEval
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096-SFT-Tulu3-decontaminated,AIME24
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096-SFT-Tulu3-decontaminated,AIME25
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096-SFT-Tulu3-decontaminated,AMC23
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096-SFT-Tulu3-decontaminated,MATH500
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096-SFT-Tulu3-decontaminated,HumanEval
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096-SFT-Tulu3-decontaminated,LiveCodeBench
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096-SFT-Tulu3-decontaminated,MBPP
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096-SFT-Tulu3-decontaminated,GPQADiamond
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096-SFT-Tulu3-decontaminated,JEEBench
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096-SFT-Tulu3-decontaminated,IFEval
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096-DPO-Tulu3-decontaminated,AIME24
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096-DPO-Tulu3-decontaminated,AIME25
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096-DPO-Tulu3-decontaminated,AMC23
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096-DPO-Tulu3-decontaminated,MATH500
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096-DPO-Tulu3-decontaminated,HumanEval
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096-DPO-Tulu3-decontaminated,LiveCodeBench
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096-DPO-Tulu3-decontaminated,MBPP
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096-DPO-Tulu3-decontaminated,GPQADiamond
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096-DPO-Tulu3-decontaminated,JEEBench
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-4096-DPO-Tulu3-decontaminated,IFEval
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16384-rope_theta-1M-long_sft_16k,AIME24
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16384-rope_theta-1M-long_sft_16k,AIME25
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16384-rope_theta-1M-long_sft_16k,AMC23
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16384-rope_theta-1M-long_sft_16k,MATH500
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16384-rope_theta-1M-long_sft_16k,HumanEval
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16384-rope_theta-1M-long_sft_16k,LiveCodeBench
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16384-rope_theta-1M-long_sft_16k,MBPP
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16384-rope_theta-1M-long_sft_16k,GPQADiamond
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16384-rope_theta-1M-long_sft_16k,JEEBench
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16384-rope_theta-1M-long_sft_16k,IFEval
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16k-SFT-Tulu3-decontaminated,AIME24
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16k-SFT-Tulu3-decontaminated,AIME25
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16k-SFT-Tulu3-decontaminated,AMC23
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16k-SFT-Tulu3-decontaminated,MATH500
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16k-SFT-Tulu3-decontaminated,HumanEval
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16k-SFT-Tulu3-decontaminated,LiveCodeBench
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16k-SFT-Tulu3-decontaminated,MBPP
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16k-SFT-Tulu3-decontaminated,GPQADiamond
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16k-SFT-Tulu3-decontaminated,JEEBench
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16k-SFT-Tulu3-decontaminated,IFEval
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16k-DPO-Tulu3-decontaminated,AIME24
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16k-DPO-Tulu3-decontaminated,AIME25
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16k-DPO-Tulu3-decontaminated,AMC23
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16k-DPO-Tulu3-decontaminated,MATH500
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16k-DPO-Tulu3-decontaminated,HumanEval
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16k-DPO-Tulu3-decontaminated,LiveCodeBench
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16k-DPO-Tulu3-decontaminated,MBPP
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16k-DPO-Tulu3-decontaminated,GPQADiamond
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16k-DPO-Tulu3-decontaminated,JEEBench
+ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16k-DPO-Tulu3-decontaminated,IFEval
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096,AIME24
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096,AIME25
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096,AMC23
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096,MATH500
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096,HumanEval
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096,LiveCodeBench
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096,MBPP
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096,GPQADiamond
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096,JEEBench
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096,IFEval
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-SFT-Tulu3-decontaminated,AIME24
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-SFT-Tulu3-decontaminated,AIME25
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-SFT-Tulu3-decontaminated,AMC23
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-SFT-Tulu3-decontaminated,MATH500
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-SFT-Tulu3-decontaminated,HumanEval
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-SFT-Tulu3-decontaminated,LiveCodeBench
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-SFT-Tulu3-decontaminated,MBPP
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-SFT-Tulu3-decontaminated,GPQADiamond
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-SFT-Tulu3-decontaminated,JEEBench
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-SFT-Tulu3-decontaminated,IFEval
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-DPO-Tulu3-decontaminated,AIME24
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-DPO-Tulu3-decontaminated,AIME25
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-DPO-Tulu3-decontaminated,AMC23
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-DPO-Tulu3-decontaminated,MATH500
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-DPO-Tulu3-decontaminated,HumanEval
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-DPO-Tulu3-decontaminated,LiveCodeBench
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-DPO-Tulu3-decontaminated,MBPP
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-DPO-Tulu3-decontaminated,GPQADiamond
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-DPO-Tulu3-decontaminated,JEEBench
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-DPO-Tulu3-decontaminated,IFEval
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-4096-longsft_16k,AIME24
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-4096-longsft_16k,AIME25
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-4096-longsft_16k,AMC23
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-4096-longsft_16k,MATH500
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-4096-longsft_16k,HumanEval
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-4096-longsft_16k,LiveCodeBench
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-4096-longsft_16k,MBPP
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-4096-longsft_16k,GPQADiamond
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-4096-longsft_16k,JEEBench
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-4096-longsft_16k,IFEval
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-longsft_16k-SFT-Tulu3-decontaminated,AIME24
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-longsft_16k-SFT-Tulu3-decontaminated,AIME25
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-longsft_16k-SFT-Tulu3-decontaminated,AMC23
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-longsft_16k-SFT-Tulu3-decontaminated,MATH500
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-longsft_16k-SFT-Tulu3-decontaminated,HumanEval
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-longsft_16k-SFT-Tulu3-decontaminated,LiveCodeBench
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-longsft_16k-SFT-Tulu3-decontaminated,MBPP
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-longsft_16k-SFT-Tulu3-decontaminated,GPQADiamond
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-longsft_16k-SFT-Tulu3-decontaminated,JEEBench
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-longsft_16k-SFT-Tulu3-decontaminated,IFEval
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-longsft_16k-DPO-Tulu3-decontaminated,AIME24
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-longsft_16k-DPO-Tulu3-decontaminated,AIME25
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-longsft_16k-DPO-Tulu3-decontaminated,AMC23
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-longsft_16k-DPO-Tulu3-decontaminated,MATH500
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-longsft_16k-DPO-Tulu3-decontaminated,HumanEval
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-longsft_16k-DPO-Tulu3-decontaminated,LiveCodeBench
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-longsft_16k-DPO-Tulu3-decontaminated,MBPP
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-longsft_16k-DPO-Tulu3-decontaminated,GPQADiamond
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-longsft_16k-DPO-Tulu3-decontaminated,JEEBench
+ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-longsft_16k-DPO-Tulu3-decontaminated,IFEval
+ali-elganzory/1.7b-Comma0.1-300BT-WithChatTemplate,LiveCodeBench
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k,AIME24
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k,AIME25
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k,AMC23
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k,MATH500
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k,HumanEval
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k,LiveCodeBench
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k,MBPP
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k,GPQADiamond
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k,JEEBench
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k,IFEval
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-SFT-Tulu3-decontaminated,AIME24
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-SFT-Tulu3-decontaminated,AIME25
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-SFT-Tulu3-decontaminated,AMC23
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-SFT-Tulu3-decontaminated,MATH500
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-SFT-Tulu3-decontaminated,HumanEval
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-SFT-Tulu3-decontaminated,LiveCodeBench
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-SFT-Tulu3-decontaminated,MBPP
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-SFT-Tulu3-decontaminated,GPQADiamond
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-SFT-Tulu3-decontaminated,JEEBench
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-SFT-Tulu3-decontaminated,IFEval
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-DPO-Tulu3-decontaminated,AIME24
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-DPO-Tulu3-decontaminated,AIME25
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-DPO-Tulu3-decontaminated,AMC23
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-DPO-Tulu3-decontaminated,MATH500
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-DPO-Tulu3-decontaminated,HumanEval
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-DPO-Tulu3-decontaminated,LiveCodeBench
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-DPO-Tulu3-decontaminated,MBPP
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-DPO-Tulu3-decontaminated,GPQADiamond
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-DPO-Tulu3-decontaminated,JEEBench
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-DPO-Tulu3-decontaminated,IFEval
+ali-elganzory/SmolLM2-1.7B-WithChatTemplate,LiveCodeBench
+ali-elganzory/SmolLM2-1.7B-WithChatTemplate,JEEBench
+ontocord/SmolLM2-1.7B-16k,LiveCodeBench
+ontocord/SmolLM2-1.7B-16k,JEEBench
+ali-elganzory/SmolLM2-1.7B-16k-SFT-Tulu3-decontaminated,LiveCodeBench
+ali-elganzory/SmolLM2-1.7B-16k-SFT-Tulu3-decontaminated,JEEBench
+ali-elganzory/SmolLM2-1.7B-16k-DPO-Tulu3-decontaminated,LiveCodeBench
+ali-elganzory/SmolLM2-1.7B-16k-DPO-Tulu3-decontaminated,JEEBench
+Qwen/Qwen2.5-1.5B,AIME24
+Qwen/Qwen2.5-1.5B,AIME25
+Qwen/Qwen2.5-1.5B,AMC23
+Qwen/Qwen2.5-1.5B,MATH500
+Qwen/Qwen2.5-1.5B,LiveCodeBench
+Qwen/Qwen2.5-1.5B,GPQADiamond
+Qwen/Qwen2.5-1.5B,JEEBench
+ali-elganzory/Qwen2.5-1.5B-SFT-Tulu3-decontaminated,LiveCodeBench
+ali-elganzory/Qwen2.5-1.5B-SFT-Tulu3-decontaminated,JEEBench
+Qwen/Qwen3-1.7B-Base,AIME25
+Qwen/Qwen3-1.7B-Base,LiveCodeBench
+Qwen/Qwen3-1.7B-Base,JEEBench
+ali-elganzory/Qwen3-1.7B-Base-SFT-Tulu3-decontaminated,JEEBench
+ali-elganzory/Qwen3-1.7B-Base-DPO-Tulu3-decontaminated,LiveCodeBench
+ali-elganzory/Qwen3-1.7B-Base-DPO-Tulu3-decontaminated,JEEBench
+ali-elganzory/1.7b-MixtureVitae-300BT-v1-WithChatTemplate,LiveCodeBench
+ali-elganzory/1.7b-MixtureVitae-300BT-v1-16k-WithChatTemplate,LiveCodeBench
+ali-elganzory/1.7b-MixtureVitae-300BT-v1-16k-WithChatTemplate,JEEBench
+ali-elganzory/1.7b-MixtureVitae-300BT-v1-16k-SFT-Tulu3,JEEBench
+PleIAs/Baguettotron,AIME24
+PleIAs/Baguettotron,AIME25
+PleIAs/Baguettotron,AMC23
+PleIAs/Baguettotron,MATH500
+PleIAs/Baguettotron,HumanEval
+PleIAs/Baguettotron,LiveCodeBench
+PleIAs/Baguettotron,MBPP
+PleIAs/Baguettotron,GPQADiamond
+PleIAs/Baguettotron,JEEBench
+PleIAs/Baguettotron,IFEval
+ali-elganzory/Baguettotron-SFT-Tulu3-decontaminated,AIME24
+ali-elganzory/Baguettotron-SFT-Tulu3-decontaminated,AIME25
+ali-elganzory/Baguettotron-SFT-Tulu3-decontaminated,AMC23
+ali-elganzory/Baguettotron-SFT-Tulu3-decontaminated,MATH500
+ali-elganzory/Baguettotron-SFT-Tulu3-decontaminated,HumanEval
+ali-elganzory/Baguettotron-SFT-Tulu3-decontaminated,LiveCodeBench
+ali-elganzory/Baguettotron-SFT-Tulu3-decontaminated,MBPP
+ali-elganzory/Baguettotron-SFT-Tulu3-decontaminated,GPQADiamond
+ali-elganzory/Baguettotron-SFT-Tulu3-decontaminated,JEEBench
+ali-elganzory/Baguettotron-SFT-Tulu3-decontaminated,IFEval
+ali-elganzory/Baguettotron-DPO-Tulu3-decontaminated,AIME24
+ali-elganzory/Baguettotron-DPO-Tulu3-decontaminated,AIME25
+ali-elganzory/Baguettotron-DPO-Tulu3-decontaminated,AMC23
+ali-elganzory/Baguettotron-DPO-Tulu3-decontaminated,MATH500
+ali-elganzory/Baguettotron-DPO-Tulu3-decontaminated,HumanEval
+ali-elganzory/Baguettotron-DPO-Tulu3-decontaminated,LiveCodeBench
+ali-elganzory/Baguettotron-DPO-Tulu3-decontaminated,MBPP
+ali-elganzory/Baguettotron-DPO-Tulu3-decontaminated,GPQADiamond
+ali-elganzory/Baguettotron-DPO-Tulu3-decontaminated,JEEBench
+ali-elganzory/Baguettotron-DPO-Tulu3-decontaminated,IFEval
+ontocord/Baguettotron-longsft_16k,AIME24
+ontocord/Baguettotron-longsft_16k,AIME25
+ontocord/Baguettotron-longsft_16k,AMC23
+ontocord/Baguettotron-longsft_16k,MATH500
+ontocord/Baguettotron-longsft_16k,HumanEval
+ontocord/Baguettotron-longsft_16k,LiveCodeBench
+ontocord/Baguettotron-longsft_16k,MBPP
+ontocord/Baguettotron-longsft_16k,GPQADiamond
+ontocord/Baguettotron-longsft_16k,JEEBench
+ontocord/Baguettotron-longsft_16k,IFEval
+Baguettotron 16k + SFT,AIME24
+Baguettotron 16k + SFT,AIME25
+Baguettotron 16k + SFT,AMC23
+Baguettotron 16k + SFT,MATH500
+Baguettotron 16k + SFT,HumanEval
+Baguettotron 16k + SFT,LiveCodeBench
+Baguettotron 16k + SFT,MBPP
+Baguettotron 16k + SFT,GPQADiamond
+Baguettotron 16k + SFT,JEEBench
+Baguettotron 16k + SFT,IFEval
+Baguettotron 16k + DPO,AIME24
+Baguettotron 16k + DPO,AIME25
+Baguettotron 16k + DPO,AMC23
+Baguettotron 16k + DPO,MATH500
+Baguettotron 16k + DPO,HumanEval
+Baguettotron 16k + DPO,LiveCodeBench
+Baguettotron 16k + DPO,MBPP
+Baguettotron 16k + DPO,GPQADiamond
+Baguettotron 16k + DPO,JEEBench
+Baguettotron 16k + DPO,IFEval
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096,AIME24
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096,AIME25
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096,AMC23
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096,MATH500
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096,HumanEval
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096,LiveCodeBench
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096,MBPP
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096,GPQADiamond
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096,JEEBench
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096,IFEval
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096-SFT-Tulu3-decontaminated,AIME24
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096-SFT-Tulu3-decontaminated,AIME25
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096-SFT-Tulu3-decontaminated,AMC23
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096-SFT-Tulu3-decontaminated,MATH500
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096-SFT-Tulu3-decontaminated,HumanEval
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096-SFT-Tulu3-decontaminated,LiveCodeBench
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096-SFT-Tulu3-decontaminated,MBPP
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096-SFT-Tulu3-decontaminated,GPQADiamond
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096-SFT-Tulu3-decontaminated,JEEBench
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096-SFT-Tulu3-decontaminated,IFEval
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096-DPO-Tulu3-decontaminated,AIME24
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096-DPO-Tulu3-decontaminated,AIME25
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096-DPO-Tulu3-decontaminated,AMC23
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096-DPO-Tulu3-decontaminated,MATH500
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096-DPO-Tulu3-decontaminated,HumanEval
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096-DPO-Tulu3-decontaminated,LiveCodeBench
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096-DPO-Tulu3-decontaminated,MBPP
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096-DPO-Tulu3-decontaminated,GPQADiamond
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096-DPO-Tulu3-decontaminated,JEEBench
+ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096-DPO-Tulu3-decontaminated,IFEval
+ontocord/0.4b-mixturevitae-v1-decontaminated-300B-4096-longsft_16k,AIME24
+ontocord/0.4b-mixturevitae-v1-decontaminated-300B-4096-longsft_16k,AIME25
+ontocord/0.4b-mixturevitae-v1-decontaminated-300B-4096-longsft_16k,AMC23
+ontocord/0.4b-mixturevitae-v1-decontaminated-300B-4096-longsft_16k,MATH500
+ontocord/0.4b-mixturevitae-v1-decontaminated-300B-4096-longsft_16k,HumanEval
+ontocord/0.4b-mixturevitae-v1-decontaminated-300B-4096-longsft_16k,LiveCodeBench
+ontocord/0.4b-mixturevitae-v1-decontaminated-300B-4096-longsft_16k,MBPP
+ontocord/0.4b-mixturevitae-v1-decontaminated-300B-4096-longsft_16k,GPQADiamond
+ontocord/0.4b-mixturevitae-v1-decontaminated-300B-4096-longsft_16k,JEEBench
+ontocord/0.4b-mixturevitae-v1-decontaminated-300B-4096-longsft_16k,IFEval
+MV-16k (0.4B) + SFT,AIME24
+MV-16k (0.4B) + SFT,AIME25
+MV-16k (0.4B) + SFT,AMC23
+MV-16k (0.4B) + SFT,MATH500
+MV-16k (0.4B) + SFT,HumanEval
+MV-16k (0.4B) + SFT,LiveCodeBench
+MV-16k (0.4B) + SFT,MBPP
+MV-16k (0.4B) + SFT,GPQADiamond
+MV-16k (0.4B) + SFT,JEEBench
+MV-16k (0.4B) + SFT,IFEval
+MV-16k (0.4B) + DPO,AIME24
+MV-16k (0.4B) + DPO,AIME25
+MV-16k (0.4B) + DPO,AMC23
+MV-16k (0.4B) + DPO,MATH500
+MV-16k (0.4B) + DPO,HumanEval
+MV-16k (0.4B) + DPO,LiveCodeBench
+MV-16k (0.4B) + DPO,MBPP
+MV-16k (0.4B) + DPO,GPQADiamond
+MV-16k (0.4B) + DPO,JEEBench
+MV-16k (0.4B) + DPO,IFEval

@@ -3,6 +3,10 @@
 Generate individual evaluation scripts for each model-task combination.
 """
 
+import subprocess
+
+import json
+
 import os
 from pathlib import Path
 
@@ -20,85 +24,91 @@ EXPERIMENT_PATH = "/e/project1/jureap59/ali/post-training/outputs/sft-olmo-3-102
 
 # Define the models (only uncommented/active models are used to generate scripts)
 MODELS = [
-    # "ali-elganzory/SmolLM2-1.7B-WithChatTemplate",
-    # "HuggingFaceTB/SmolLM2-1.7B-Instruct",
-    # "Qwen/Qwen2.5-1.5B",
-    # "Qwen/Qwen2.5-1.5B-Instruct",
-    # "Qwen/Qwen3-1.7B-Base",
-    # "Qwen/Qwen3-1.7B",
-    # "ali-elganzory/1.7b-MixtureVitae-300BT-v1-WithChatTemplate",
-    # "ali-elganzory/1.7b-MixtureVitae-300BT-v1-16k-WithChatTemplate",
-    # "ali-elganzory/open-sci-ref-v0.01-1.7b-nemotron-hq-300B-16384-WithChatTemplate",
-    # "ali-elganzory/1.7b-MixtureVitae-300BT-v1-SFT-Tulu3",
-    # "ali-elganzory/1.7b-MixtureVitae-300BT-v1-DPO-Tulu3",
-    # "ali-elganzory/1.7b-MixtureVitae-300BT-v1-16k-SFT-Tulu3",
-    # "ali-elganzory/1.7b-MixtureVitae-300BT-v1-16k-DPO-Tulu3",
-    # "ali-elganzory/open-sci-ref-v0.01-1.7b-nemotron-hq-300B-16384-SFT-Tulu3",
-    # "ali-elganzory/open-sci-ref-v0.01-1.7b-nemotron-hq-300B-16384-DPO-Tulu3",
-    # "ali-elganzory/SmolLM2-1.7B-SFT-Tulu3-decontaminated",
-    # "ali-elganzory/Qwen2.5-1.5B-SFT-Tulu3-decontaminated",
-    # "ali-elganzory/Qwen3-1.7B-Base-SFT-Tulu3-decontaminated",
-    # "HuggingFaceTB/SmolLM2-1.7B-Instruct-16k",
-    # "ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated",
-    # "ali-elganzory/1.7b-MixtureVitae-web_curated-100BT-SFT-Tulu3-decontaminated",
-    # "ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT-SFT-Tulu3-decontaminated",
-    ############################################################
-    ############################################################
-    # "ali-elganzory/SmolLM2-1.7B-DPO-Tulu3-decontaminated",
-    # "ali-elganzory/Qwen2.5-1.5B-DPO-Tulu3-decontaminated",
-    # "ali-elganzory/Qwen3-1.7B-Base-DPO-Tulu3-decontaminated",
-    # ###
-    # "ali-elganzory/1.7b-MixtureVitae-100BT-SFT-Tulu3-decontaminated",
-    # "ali-elganzory/1.7b-MixtureVitae-100BT-DPO-Tulu3-decontaminated",
-    # "ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT-SFT-Tulu3-decontaminated",
-    # "ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT-DPO-Tulu3-decontaminated",
-    # "ali-elganzory/1.7b-MixtureVitae-web_curated-100BT-SFT-Tulu3-decontaminated",
-    # "ali-elganzory/1.7b-MixtureVitae-web_curated-100BT-DPO-Tulu3-decontaminated",
-    # ###
-    # "ontocord/SmolLM2-1.7B-16k",
-    # "ali-elganzory/SmolLM2-1.7B-16k-SFT-Tulu3-decontaminated",
-    # "ali-elganzory/SmolLM2-1.7B-16k-DPO-Tulu3-decontaminated",
-    # ###
-    # "ali-elganzory/1.7b-MixtureVitae-100BT",
-    # "ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT",
-    # "ali-elganzory/1.7b-MixtureVitae-web_curated-100BT",
-    # ###
-    # "ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated",
-    # "ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-SFT-Tulu3-decontaminated",
-    # "ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-DPO-Tulu3-decontaminated",
-    # "ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-16k",
-    # "ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-16k-SFT-Tulu3-decontaminated",
-    # "ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-16k-DPO-Tulu3-decontaminated",
-    ############################################################
-    # "ali-elganzory/1.7b-Comma0.1-300BT-WithChatTemplate",
-    # "ali-elganzory/1.7b-Comma0.1-300BT-SFT-Tulu3-decontaminated",
-    # "ali-elganzory/1.7b-Comma0.1-300BT-DPO-Tulu3-decontaminated",
-    # ###
-    # "ali-elganzory/ablation-model-fineweb-edu-WithChatTemplate",
-    # "ali-elganzory/ablation-model-fineweb-edu-SFT-Tulu3-decontaminated",
-    # "ali-elganzory/ablation-model-fineweb-edu-DPO-Tulu3-decontaminated",
-    ############################################################
-    *[
-        f"{EXPERIMENT_PATH}/{model}"
-        for model in os.listdir(EXPERIMENT_PATH)
-        if os.path.isdir(f"{EXPERIMENT_PATH}/{model}")
-    ]
+    # Baselines
+    #
+    "ali-elganzory/open-sci-ref-v0.01-1.7b-nemotron-hq-300B-16384-WithChatTemplate",
+    "ali-elganzory/open-sci-ref-v0.01-1.7b-nemotron-hq-300B-16384-SFT-Tulu3",
+    "ali-elganzory/open-sci-ref-v0.01-1.7b-nemotron-hq-300B-16384-DPO-Tulu3",
+    #
+    "ali-elganzory/ablation-model-fineweb-edu-WithChatTemplate",
+    "ali-elganzory/ablation-model-fineweb-edu-SFT-Tulu3-decontaminated",
+    "ali-elganzory/ablation-model-fineweb-edu-DPO-Tulu3-decontaminated",
+    #
+    "ali-elganzory/1.7b-Comma0.1-300BT-WithChatTemplate",
+    "ali-elganzory/1.7b-Comma0.1-300BT-SFT-Tulu3-decontaminated",
+    "ali-elganzory/1.7b-Comma0.1-300BT-DPO-Tulu3-decontaminated",
+    #
+    "ali-elganzory/SmolLM2-1.7B-WithChatTemplate",
+    "ali-elganzory/SmolLM2-1.7B-SFT-Tulu3-decontaminated",
+    "ali-elganzory/SmolLM2-1.7B-DPO-Tulu3-decontaminated",
+    "HuggingFaceTB/SmolLM2-1.7B-Instruct",
+    #
+    "ontocord/SmolLM2-1.7B-16k",
+    "ali-elganzory/SmolLM2-1.7B-16k-SFT-Tulu3-decontaminated",
+    "ali-elganzory/SmolLM2-1.7B-16k-DPO-Tulu3-decontaminated",
+    "HuggingFaceTB/SmolLM2-1.7B-Instruct-16k",
+    #
+    "Qwen/Qwen2.5-1.5B",
+    "ali-elganzory/Qwen2.5-1.5B-SFT-Tulu3-decontaminated",
+    "ali-elganzory/Qwen2.5-1.5B-DPO-Tulu3-decontaminated",
+    "Qwen/Qwen2.5-1.5B-Instruct",
+    #
+    "Qwen/Qwen3-1.7B-Base",
+    "ali-elganzory/Qwen3-1.7B-Base-SFT-Tulu3-decontaminated",
+    "ali-elganzory/Qwen3-1.7B-Base-DPO-Tulu3-decontaminated",
+    "Qwen/Qwen3-1.7B",
+    #
+    # MixtureVitae
+    #
+    "ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated",
+    "ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-SFT-Tulu3-decontaminated",
+    "ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-DPO-Tulu3-decontaminated",
+    #
+    "ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-16k",
+    "ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-16k-SFT-Tulu3-decontaminated",
+    "ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-16k-DPO-Tulu3-decontaminated",
+    #
+    "ali-elganzory/1.7b-MixtureVitae-web_curated-100BT",
+    "ali-elganzory/1.7b-MixtureVitae-web_curated-100BT-SFT-Tulu3-decontaminated",
+    "ali-elganzory/1.7b-MixtureVitae-web_curated-100BT-DPO-Tulu3-decontaminated",
+    #
+    "ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT",
+    "ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT-SFT-Tulu3-decontaminated",
+    "ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT-DPO-Tulu3-decontaminated",
+    #
+    "ali-elganzory/1.7b-MixtureVitae-100BT",
+    "ali-elganzory/1.7b-MixtureVitae-100BT-SFT-Tulu3-decontaminated",
+    "ali-elganzory/1.7b-MixtureVitae-100BT-DPO-Tulu3-decontaminated",
+    #
+    ## Not decontaminated
+    #
+    "ali-elganzory/1.7b-MixtureVitae-300BT-v1-WithChatTemplate",
+    "ali-elganzory/1.7b-MixtureVitae-300BT-v1-SFT-Tulu3",
+    "ali-elganzory/1.7b-MixtureVitae-300BT-v1-DPO-Tulu3",
+    #
+    "ali-elganzory/1.7b-MixtureVitae-300BT-v1-16k-WithChatTemplate",
+    "ali-elganzory/1.7b-MixtureVitae-300BT-v1-16k-SFT-Tulu3",
+    "ali-elganzory/1.7b-MixtureVitae-300BT-v1-16k-DPO-Tulu3",
+    #
+    # *[
+    #     f"{EXPERIMENT_PATH}/{model}"
+    #     for model in os.listdir(EXPERIMENT_PATH)
+    #     if os.path.isdir(f"{EXPERIMENT_PATH}/{model}")
+    # ],
 ]
 
 # Define the tasks
 TASKS = [
-    # "IFEval",
-    # "HumanEval",
-    # "MBPP",
-    # "AIME24",
-    # "AIME25",
-    # "AMC23",
-    # "MATH500",
-    # "LiveCodeBench",
-    # "GPQADiamond",
-    # "JEEBench",
-    ####################
-    "alpaca_eval",
+    "IFEval",
+    "HumanEval",
+    "MBPP",
+    "AIME24",
+    "AIME25",
+    "AMC23",
+    "MATH500",
+    "LiveCodeBench",
+    "GPQADiamond",
+    "JEEBench",
 ]
 
 
@@ -187,10 +197,10 @@ echo "Network Interface: $NCCL_SOCKET_IFNAME"
 #SBATCH --error=slurm_logs/mv_exp/{model_short}/{task}_%j.%x.%N.err
 #SBATCH --time=00-12:00:00
 #SBATCH --partition=booster
-#SBATCH --account=jureap59
+#SBATCH --account=reformo
 #SBATCH --nodes={NUM_NODES}
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=32
+#SBATCH --cpus-per-task=72
 #SBATCH --gres=gpu:{GPUS_PER_NODE}
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=alielganzory@hotmail.com
@@ -206,7 +216,8 @@ export EVALCHEMY_DIR=$WORK_DIR/evalchemy
 export TMPDIR=$WORK_DIR/.tmp
 export TMP=$TMPDIR
 
-module load CUDA/13
+module load Stages/2025
+module load CUDA/12
 
 # Force Transformers and Hub into offline mode
 export TRANSFORMERS_OFFLINE=1
@@ -240,7 +251,7 @@ for MODEL in "${{MODEL_NAMES[@]}}"; do
             --tasks "$TASK" \\
             --model_args "trust_remote_code=True,pretrained=$MODEL" \\
             --batch_size auto \\
-            --result_dir outputs/
+            --output_path logs
     done
 done
 """
@@ -256,6 +267,48 @@ def get_safe_filename(model: str, task: str) -> str:
     return f"eval_{model_name}_{task}.sh"
 
 
+def remove_scripts(eval_scripts_dir: Path):
+    """Remove all scripts in the evaluation scripts directory."""
+    if eval_scripts_dir.exists():
+        for file in eval_scripts_dir.glob("*.sh"):
+            file.unlink()
+
+
+def remove_finished_scripts(eval_scripts_dir: Path, results_dir: Path):
+    """Remove all finished scripts in the evaluation scripts directory."""
+    all_scripts = [f.name for f in eval_scripts_dir.glob("*.sh")]
+    print(f"All scripts: {len(all_scripts)}")
+    finished_scripts = [
+        get_safe_filename(model, task)
+        for model, tasks in {
+            d.name.replace("__", "/"): [
+                list(json.load(open(f.path))["results"].keys())[0]
+                for f in os.scandir(d)
+                if f.is_file()
+                if list(json.load(open(f.path))["results"].values())[0] != {}
+            ]
+            for d in os.scandir(results_dir)
+        }.items()
+        for task in tasks
+    ]
+    print(f"Finished scripts: {len([f for f in all_scripts if f in finished_scripts])}")
+    running_scripts = subprocess.check_output(
+        ["squeue", "-u", "elganzory1", "-h", "-o", "%j"], text=True
+    )
+    running_scripts = [
+        s.strip() + ".sh" for s in running_scripts.split("\n") if s.strip()
+    ]
+    print(f"Running scripts: {len(running_scripts)}")
+    remaining_scripts = [
+        s for s in all_scripts if s not in finished_scripts and s not in running_scripts
+    ]
+    print(f"Remaining scripts: {len(remaining_scripts)}")
+
+    for script in eval_scripts_dir.glob("*.sh"):
+        if script.name not in remaining_scripts:
+            script.unlink()
+
+
 def main():
     # Get the directory where this script is located
     script_dir = Path(__file__).parent
@@ -269,6 +322,8 @@ def main():
     print(f"Tasks: {len(TASKS)}")
     print(f"Total scripts to generate: {len(MODELS) * len(TASKS)}")
     print()
+
+    remove_scripts(eval_scripts_dir)
 
     script_count = 0
 
@@ -292,6 +347,8 @@ def main():
 
     print()
     print(f"Successfully generated {script_count} scripts in {eval_scripts_dir}")
+
+    remove_finished_scripts(eval_scripts_dir, Path("logs"))
 
 
 if __name__ == "__main__":

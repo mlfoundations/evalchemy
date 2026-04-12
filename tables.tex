@@ -1,0 +1,174 @@
+\begin{table}[ht]
+\centering
+\caption{Ablation on MixtureVitae mixture composition on reasoning benchmarks.}
+\label{tab:evalchemy_table1}
+\scriptsize
+\begin{tabular}{lccccccccccc}
+\toprule
+\textbf{Model} & \textbf{A24} & \textbf{A25} & \textbf{AMC} & \textbf{M500} & \textbf{HE} & \textbf{LCB} & \textbf{MBPP} & \textbf{GPQA} & \textbf{JEE} & \textbf{IFE} & \textbf{Avg} \\
+\midrule
+MV-noinstruct & 0.0 & 0.0 & 0.0 & 0.4 & 0.6 & -- & 14.2 & 23.9 & 0.0 & 24.8 & 7.1 \\
+MV-noinstruct + SFT & 0.0 & 0.0 & 2.5 & 1.8 & 7.3 & 1.0 & 15.8 & 20.7 & 3.4 & 29.9 & 8.2 \\
+MV-noinstruct + DPO & 0.0 & 0.0 & 2.5 & 2.0 & 7.0 & 1.4 & 15.2 & 25.1 & 4.0 & 32.0 & 8.9 \\
+\midrule
+\addlinespace[0.3em]
+MV-noinstruct-16k & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+MV-noinstruct-16k + SFT & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+MV-noinstruct-16k + DPO & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+\midrule
+\addlinespace[0.3em]
+MV-noweb & 0.0 & 0.0 & \textbf{17.5} & \textbf{26.4} & 23.5 & -- & 34.6 & 23.7 & 2.6 & 26.5 & \textbf{17.2} \\
+MV-noweb + SFT & 0.0 & 0.0 & 7.5 & 10.0 & 23.6 & 2.4 & 36.8 & 22.4 & 3.7 & 35.0 & 14.1 \\
+MV-noweb + DPO & 0.0 & \textbf{3.3} & 10.0 & 12.2 & \textbf{25.1} & 1.8 & \textbf{38.0} & \textbf{25.2} & \textbf{4.3} & \textbf{36.2} & 15.6 \\
+\midrule
+\addlinespace[0.3em]
+MV-noweb-16k & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+MV-noweb-16k + SFT & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+MV-noweb-16k + DPO & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+\midrule
+\addlinespace[0.3em]
+MV & \textbf{3.3} & 0.0 & 0.0 & 12.2 & 0.6 & -- & 0.2 & 24.4 & 3.2 & 21.1 & 7.2 \\
+MV + SFT & 0.0 & 0.0 & 5.0 & 6.6 & 22.3 & 3.3 & 36.8 & 20.7 & 2.5 & 34.9 & 13.2 \\
+MV + DPO & 0.0 & 0.0 & 5.0 & 8.0 & 22.6 & \textbf{4.3} & 36.4 & 24.4 & 2.9 & 35.1 & 13.9 \\
+\midrule
+\addlinespace[0.3em]
+MV-16k & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+MV-16k + SFT & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+MV-16k + DPO & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\begin{table}[ht]
+\centering
+\caption{MixtureVitae against other baselines on reasoning benchmarks (1.5B-1.7B scale).}
+\label{tab:evalchemy_table2}
+\scriptsize
+\begin{tabular}{lccccccccccc}
+\toprule
+\textbf{Model} & \textbf{A24} & \textbf{A25} & \textbf{AMC} & \textbf{M500} & \textbf{HE} & \textbf{LCB} & \textbf{MBPP} & \textbf{GPQA} & \textbf{JEE} & \textbf{IFE} & \textbf{Avg} \\
+\midrule
+MV & 0.0 & \textbf{10.0} & 7.5 & 17.4 & 11.7 & -- & 18.6 & 23.9 & 4.1 & 25.6 & 13.2 \\
+MV + SFT & 0.0 & 0.0 & 7.5 & 28.6 & 27.9 & 2.1 & 41.2 & 26.1 & 4.2 & 42.4 & 18.0 \\
+MV + DPO & 0.0 & 0.0 & 15.0 & 27.4 & 27.9 & 1.8 & 40.8 & 24.6 & 3.1 & 42.9 & 18.4 \\
+\midrule
+\addlinespace[0.3em]
+MV-16k & -- & -- & -- & 46.0 & 31.9 & -- & 39.8 & 25.2 & -- & 46.9 & \textbf{38.0} \\
+MV-16k + SFT & -- & 0.0 & -- & 31.0 & 33.2 & -- & 40.6 & 23.4 & -- & 47.1 & 29.2 \\
+MV-16k + DPO & -- & -- & 15.0 & 33.6 & 33.2 & \textbf{14.9} & 40.0 & 25.2 & -- & 49.5 & 30.2 \\
+\midrule
+\addlinespace[0.3em]
+OpenSci-NM & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+OpenSci-NM + SFT & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+OpenSci-NM + DPO & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+\midrule
+\addlinespace[0.3em]
+OpenSci-NM-16k & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+OpenSci-NM-16k + SFT & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+OpenSci-NM-16k + DPO & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+\midrule
+\addlinespace[0.3em]
+FineWeb-Edu & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+FineWeb-Edu + SFT & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+FineWeb-Edu + DPO & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+\midrule
+\addlinespace[0.3em]
+FineWeb-Edu-16k & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+FineWeb-Edu-16k + SFT & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+FineWeb-Edu-16k + DPO & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+\midrule
+\addlinespace[0.3em]
+Comma0.1 & 0.0 & 0.0 & 0.0 & 0.0 & 4.3 & -- & 9.0 & 22.1 & 0.0 & 28.5 & 7.1 \\
+Comma0.1 + SFT & 0.0 & 0.0 & 0.0 & 0.6 & 8.6 & 1.8 & 22.8 & 25.8 & 4.3 & 36.8 & 10.1 \\
+Comma0.1 + DPO & 0.0 & 0.0 & 0.0 & 1.6 & 9.5 & 1.8 & 22.6 & 27.8 & 5.6 & 39.2 & 10.8 \\
+\midrule
+\addlinespace[0.3em]
+Comma0.1-16k & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+Comma0.1-16k + SFT & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+Comma0.1-16k + DPO & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+\midrule
+\addlinespace[0.3em]
+SmolLM2 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & -- & 1.8 & 22.7 & -- & 24.6 & 6.1 \\
+SmolLM2 + SFT & 0.0 & 0.0 & 2.5 & 6.0 & 19.4 & 4.9 & 37.6 & 24.9 & 5.5 & 44.5 & 14.5 \\
+SmolLM2 + DPO & 0.0 & 0.0 & 2.5 & 7.4 & 18.8 & 4.7 & 38.2 & 23.1 & 4.2 & 45.6 & 14.4 \\
+\midrule
+\addlinespace[0.3em]
+SmolLM2-16k & 0.0 & 0.0 & 0.0 & 12.2 & 13.2 & -- & 36.0 & 24.6 & -- & 44.3 & 16.3 \\
+SmolLM2-16k + SFT & 0.0 & 0.0 & 0.0 & 8.2 & 19.3 & -- & 36.2 & 25.8 & -- & 49.5 & 17.4 \\
+SmolLM2-16k + DPO & 0.0 & 0.0 & 2.5 & 8.2 & 20.9 & -- & 38.2 & 28.1 & -- & 51.4 & 18.7 \\
+\midrule
+\addlinespace[0.3em]
+Qwen2.5 & -- & -- & -- & -- & 13.8 & -- & 0.0 & -- & -- & 22.7 & 12.2 \\
+Qwen2.5 + SFT & 0.0 & 0.0 & 10.0 & 19.0 & 38.9 & -- & 44.6 & 26.6 & -- & 49.1 & 23.5 \\
+Qwen2.5 + DPO & \textbf{3.3} & 0.0 & 7.5 & 22.8 & 38.8 & 8.4 & 44.4 & 28.3 & \textbf{7.9} & 51.4 & 21.3 \\
+\midrule
+\addlinespace[0.3em]
+Qwen3 & 0.0 & -- & \textbf{22.5} & \textbf{46.4} & 33.0 & -- & 46.8 & 24.8 & -- & 30.1 & 29.1 \\
+Qwen3 + SFT & \textbf{3.3} & 0.0 & 12.5 & 29.6 & \textbf{48.7} & 2.9 & 55.0 & \textbf{30.1} & -- & 56.1 & 26.5 \\
+Qwen3 + DPO & \textbf{3.3} & 0.0 & 7.5 & 30.4 & 47.8 & -- & \textbf{56.0} & 28.1 & -- & \textbf{60.0} & 29.1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\begin{table}[ht]
+\centering
+\caption{The effect of decontamination on the model's performance on reasoning benchmarks.}
+\label{tab:evalchemy_table3}
+\scriptsize
+\begin{tabular}{llccccccccccc}
+\toprule
+\textbf{Base} & \textbf{Model} & \textbf{A24} & \textbf{A25} & \textbf{AMC} & \textbf{M500} & \textbf{HE} & \textbf{LCB} & \textbf{MBPP} & \textbf{GPQA} & \textbf{JEE} & \textbf{IFE} & \textbf{Avg} \\
+\midrule
+\multirow{6}{*}{Not Decontaminated} & MV & 0.0 & 0.0 & 15.0 & 14.6 & 26.6 & -- & 43.0 & 22.2 & \textbf{5.0} & 27.8 & 17.1 \\
+ & MV + SFT & \textbf{6.7} & 0.0 & 2.5 & 16.4 & 32.5 & 11.2 & 42.6 & 25.6 & 3.5 & 45.0 & 18.6 \\
+ & MV + DPO & 0.0 & 0.0 & 7.5 & 17.6 & 32.8 & 12.5 & 43.0 & \textbf{27.8} & 3.5 & 46.7 & 19.1 \\
+\cmidrule{2-13}
+ & MV-16k & 3.3 & 6.7 & \textbf{20.0} & 36.6 & 30.0 & -- & 41.8 & 22.6 & -- & 47.9 & 26.1 \\
+ & MV-16k + SFT & 0.0 & 0.0 & 5.0 & 18.0 & 29.7 & 10.6 & \textbf{43.2} & 27.3 & -- & 49.5 & 20.4 \\
+ & MV-16k + DPO & 0.0 & 0.0 & 0.0 & 18.0 & 30.0 & 11.0 & 41.8 & 25.2 & 3.8 & \textbf{50.7} & 18.1 \\
+\midrule
+\addlinespace[0.3em]
+\multirow{6}{*}{Decontaminated} & MV & 0.0 & \textbf{10.0} & 7.5 & 17.4 & 11.7 & -- & 18.6 & 23.9 & 4.1 & 25.6 & 13.2 \\
+ & MV + SFT & 0.0 & 0.0 & 7.5 & 28.6 & 27.9 & 2.1 & 41.2 & 26.1 & 4.2 & 42.4 & 18.0 \\
+ & MV + DPO & 0.0 & 0.0 & 15.0 & 27.4 & 27.9 & 1.8 & 40.8 & 24.6 & 3.1 & 42.9 & 18.4 \\
+\cmidrule{2-13}
+ & MV-16k & -- & -- & -- & \textbf{46.0} & 31.9 & -- & 39.8 & 25.2 & -- & 46.9 & \textbf{38.0} \\
+ & MV-16k + SFT & -- & 0.0 & -- & 31.0 & \textbf{33.2} & -- & 40.6 & 23.4 & -- & 47.1 & 29.2 \\
+ & MV-16k + DPO & -- & -- & 15.0 & 33.6 & \textbf{33.2} & \textbf{14.9} & 40.0 & 25.2 & -- & 49.5 & 30.2 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\begin{table}[ht]
+\centering
+\caption{Performance of 0.4B scale models on reasoning benchmarks.}
+\label{tab:evalchemy_table4}
+\scriptsize
+\begin{tabular}{lccccccccccc}
+\toprule
+\textbf{Model} & \textbf{A24} & \textbf{A25} & \textbf{AMC} & \textbf{M500} & \textbf{HE} & \textbf{LCB} & \textbf{MBPP} & \textbf{GPQA} & \textbf{JEE} & \textbf{IFE} & \textbf{Avg} \\
+\midrule
+Baguettotron & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+Baguettotron + SFT & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+Baguettotron + DPO & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+\midrule
+\addlinespace[0.3em]
+Baguettotron 16k & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+Baguettotron 16k + SFT & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+Baguettotron 16k + DPO & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+\midrule
+\addlinespace[0.3em]
+MV (0.4B) & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+MV (0.4B) + SFT & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+MV (0.4B) + DPO & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+\midrule
+\addlinespace[0.3em]
+MV-16k (0.4B) & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+MV-16k (0.4B) + SFT & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+MV-16k (0.4B) + DPO & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+\end{table}

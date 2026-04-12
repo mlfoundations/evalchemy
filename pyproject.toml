@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Evalchemy Evaluation Framework"
 authors = [{ name = "Your Name", email = "your.email@example.com" }]
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.12,<3.13"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -23,13 +23,13 @@ dependencies = [
     # Core ML and Deep Learning
     "torch",
     "torchvision",
-    "transformers",
+    "transformers<5.0.0",
     "accelerate",
     "peft",
     "trl",
     "bitsandbytes",
     "sentencepiece",
-    "sentence-transformers>=2.2.2",
+    "sentence-transformers<5.0.0",
     "optimum==1.12.0",
 
     # Machine Learning and Scientific Computing
@@ -75,15 +75,15 @@ dependencies = [
     # "fschat @ file:eval/chat_benchmarks/MTBench",  # Use relative path that pip will resolve during installation
 
     # Cloud & Storage
-    # "gcsfs",
-    # "google-cloud-aiplatform",
-    # "google-auth",
-    # "boto3",
-    # "botocore",
-    # "sagemaker",
-    # "fsspec",
-    # "hf-transfer",
-    # "huggingface_hub[cli]",
+    "gcsfs",
+    "google-cloud-aiplatform",
+    "google-auth",
+    "boto3",
+    "botocore",
+    "sagemaker",
+    "fsspec",
+    "hf-transfer",
+    "huggingface_hub[cli]",
 
     # Code Analysis & Development
     "black",
@@ -184,3 +184,8 @@ packages = ["evalchemy"]
 
 [tool.setuptools.package-dir]
 evalchemy = "evalchemy"
+
+[dependency-groups]
+dev = [
+    "jupyter>=1.1.1",
+]

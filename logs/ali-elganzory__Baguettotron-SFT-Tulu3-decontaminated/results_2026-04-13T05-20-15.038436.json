@@ -1,0 +1,4222 @@
+{
+  "results": {
+    "LiveCodeBench": {
+      "accuracy_avg": 0.0,
+      "accuracy_std_err": 0.0,
+      "accuracy_easy_avg": 0.0,
+      "accuracy_easy_std_err": 0.0,
+      "accuracy_medium_avg": 0.0,
+      "accuracy_medium_std_err": 0.0,
+      "accuracy_hard_avg": 0.0,
+      "accuracy_hard_std_err": 0.0,
+      "raw_metrics": [
+        {
+          "total_correct": 0,
+          "total_finish": 511,
+          "accuracy": 0.0,
+          "per_difficulty_correct": {
+            "easy": 0,
+            "medium": 0,
+            "hard": 0
+          },
+          "per_difficulty_total": {
+            "easy": 182,
+            "medium": 206,
+            "hard": 123
+          },
+          "accuracy_easy": 0.0,
+          "accuracy_medium": 0.0,
+          "accuracy_hard": 0.0
+        },
+        {
+          "total_correct": 0,
+          "total_finish": 511,
+          "accuracy": 0.0,
+          "per_difficulty_correct": {
+            "easy": 0,
+            "medium": 0,
+            "hard": 0
+          },
+          "per_difficulty_total": {
+            "easy": 182,
+            "medium": 206,
+            "hard": 123
+          },
+          "accuracy_easy": 0.0,
+          "accuracy_medium": 0.0,
+          "accuracy_hard": 0.0
+        },
+        {
+          "total_correct": 0,
+          "total_finish": 511,
+          "accuracy": 0.0,
+          "per_difficulty_correct": {
+            "easy": 0,
+            "medium": 0,
+            "hard": 0
+          },
+          "per_difficulty_total": {
+            "easy": 182,
+            "medium": 206,
+            "hard": 123
+          },
+          "accuracy_easy": 0.0,
+          "accuracy_medium": 0.0,
+          "accuracy_hard": 0.0
+        },
+        {
+          "total_correct": 0,
+          "total_finish": 511,
+          "accuracy": 0.0,
+          "per_difficulty_correct": {
+            "easy": 0,
+            "medium": 0,
+            "hard": 0
+          },
+          "per_difficulty_total": {
+            "easy": 182,
+            "medium": 206,
+            "hard": 123
+          },
+          "accuracy_easy": 0.0,
+          "accuracy_medium": 0.0,
+          "accuracy_hard": 0.0
+        },
+        {
+          "total_correct": 0,
+          "total_finish": 511,
+          "accuracy": 0.0,
+          "per_difficulty_correct": {
+            "easy": 0,
+            "medium": 0,
+            "hard": 0
+          },
+          "per_difficulty_total": {
+            "easy": 182,
+            "medium": 206,
+            "hard": 123
+          },
+          "accuracy_easy": 0.0,
+          "accuracy_medium": 0.0,
+          "accuracy_hard": 0.0
+        },
+        {
+          "total_correct": 0,
+          "total_finish": 511,
+          "accuracy": 0.0,
+          "per_difficulty_correct": {
+            "easy": 0,
+            "medium": 0,
+            "hard": 0
+          },
+          "per_difficulty_total": {
+            "easy": 182,
+            "medium": 206,
+            "hard": 123
+          },
+          "accuracy_easy": 0.0,
+          "accuracy_medium": 0.0,
+          "accuracy_hard": 0.0
+        }
+      ],
+      "examples": [
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def test_numbers(a1, a2, a3, a4, a5):\n    # Choose the index $i$ from 2 to 5\n    a1, a2, a3, a4, a5 = test_numbers(a1, a2, a3, a4, a5)\n\n    # Calculate the product of all the numbers in the array\n    product = a1 * a2 * a3 * a4 * a5\n\n    # Check if the product is divisible by $k$\n    if product % 2 == 0:\n        return True\n    else:\n        return False\n\n    # Determine the minimum number of operations needed to make the product divisible by $k$\n    min_operations = 0\n    for i in range(2, 5):\n        if product % 2 == 0:\n            min_operations += 1\n\n    return min_operations\n\nprint(test_numbers(15, 2, 5))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def count_passengers(details):\n    if details.length <= 100:\n        return 0\n    if details.length == 15:\n        return 1\n    if details.length == 15:\n        return 2\n    if details.length == 100:\n        return 1\n    if details.length == 15:\n        return 0\n    if details.length == 15:\n        return 1\n    if details.length == 100:\n        return 1\n    if details.length == 15:\n        return 0\n    return 1\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def max_strength(nums):\n    max_strength = nums.get(0, nums.length <= 13)\n    return nums.get(0, nums.length >= 13)\n\nnums = [3, -1, 5, 2, 5, -9]\n\n# Test the function\nmax_strength = max_strength(nums)\nprint(max_strength)\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def break_s(s):\n    s = s.split()\n    for i in range(s.length):\n        s[i] = s.split()\n        s[i] = dictionary[i]\n\n    return min(s[i] + 1)\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def minimize_leftover_money(prices, money):\n    leftover = 0\n    for price in prices:\n        if price <= 1:\n            leftover += price\n        else:\n            leftover -= price\n    return leftover\n\nprint(minimize_leftover_money(1, 3))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def find_good_integers(num1, num2, min_sum, max_sum):\n    num1 <= num2 <= 10^22\n    min_sum <= digit_sum(num1) <= max_sum\n    return num1, num2\n",
+            "def find_good_integers(num1, num2, min_sum, max_sum):\n    num1 <= num2 <= 10^22\n    min_sum <= digit_sum(num1) <= max_sum\n    return num1, num2\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def generate_distinct_difference(nums):\n    nums = [nums.length]\n    for num in nums:\n        nums[i] = nums[i + 1] - nums[i + 2]\n        nums[i] = nums[i + 1] + nums[i + 2]\n    return nums[i]\n\nnums = [3, 2, 3, 4, 2]\n\n# Generate the distinct difference array of nums\ndistinct_difference_array = generate_distinct_difference(nums)\n\nprint(distinct_difference_array)\n",
+            "[-2, -1, 0, 1, 3]\n",
+            "def generate_distinct_difference(nums):\n    nums = [nums.length]\n    for num in nums:\n        nums[i] = nums[i + 1] - nums[i + 2]\n        nums[i] = nums[i + 1] + nums[i + 2]\n    return nums[i]\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def color_nums(n):\n    nums = []\n    for i in range(n):\n        if nums[i] == nums[i + 1]:\n            nums[i] = nums[i + 1]\n    return nums\n\nprint(color_nums(n))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def semi_ordered_permutations(nums):\n    nums = [nums.length <= nums.length <= 50]\n    for i in nums:\n        if nums[i] == 1:\n            return nums[i]\n        else:\n            nums[i] = nums[i + 1]\n    return nums\n\n    return nums\n\nprint(semi_ordered_permutations(nums))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def semi_repetitive(s):\n    s = s.length()\n    semi_repetitive = None\n    for i in range(s.length):\n        s[i] = s.length()\n        if s[i] == '0':\n            semi_repetitive.append(s[i])\n        elif s[i] == '9':\n            semi_repetitive.append(s[i])\n        else:\n            semi_repetitive.append(s[i])\n    return semi_repetitive\n\nprint(semi_repetitive(s))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def game_turns(n, k):\n    game_turns = []\n    for i in range(n):\n        game_turns[i] = 1\n        game_turns[i+1] = game_turns[i+1] - 1\n        game_turns[i+2] = game_turns[i+1] + 1\n        game_turns[i+3] = game_turns[i+2] + 2\n        game_turns[i+4] = game_turns[i+3] + 3\n        game_turns[i+5] = game_turns[i+4] + 4\n    return game_turns\n\nprint(game_turns(5, 4))\n",
+            "def game_turns(n, k):\n    game_turns = []\n    for i in range(n):\n        game_turns[i] = 1\n        game_turns[i+1] = game_turns[i+1] - 1\n        game_turns[i+2] = game_turns[i+1] + 1\n        game_turns[i+3] = game_turns[i+2] + 2\n        game_turns[i+4] = game_turns[i+3] + 3\n        game_turns[i+5] = game_turns[i+4] + 4\n    return game_turns\n\nprint(game_turns(5, 4))\n",
+            "def game_turns(n, k):\n    game_turns = []\n    for i in range(n):\n        game_turns[i] = 1\n        game_turns[i+1] = game_turns[i+1] - 1\n        game_turns[i+2] = game_turns[i+1] + 1\n        game_turns[i+3] = game_turns[i+2] + 2\n        game_turns[i+4] = game_turns[i+3] + 3\n        game_turns[i+5] = game_turns[i+4] + 4\n    return game_turns\n",
+            "def game_turns(n, k):\n    game_turns = []\n    for i in range(n):\n        game_turns[i] = 1\n        game_turns[i+1] = game_turns[i+1] - 1\n        game_turns[i+2] = game_turns[i+1] + 1\n        game_turns[i+3] = game_turns[i+2] + 2\n        game_turns[i+4] = game_turns[i+3] + 3\n        game_turns[i+5] = game_turns[i+4] + 4\n    return game_turns\n",
+            "def game_turns(n, k):\n    game_turns = []\n    for i in range(n):\n        game_turns[i] = 1\n        game_turns[i+1] = game_turns[i+1] - 1\n        game_turns[i+2] = game_turns[i+1] + 1\n        game_turns[i+3] = game_turns[i+2] + 2\n        game_turns[i+4] = game_turns[i+3] + 3\n        game_turns[i+5] = game_turns[i+4] + 4\n    return game_turns\n",
+            "def game_turns(n, k):\n    game_turns = []\n    for i in range(n):\n        game_turns[i] = 1\n        game_turns[i+1] = game_turns[i+1] - 1\n        game_turns[i+2] = game_turns[i+1] + 1\n        game_turns[i+3] = game_turns[i+2] + 2\n        game_turns[i+4] = game_turns[i+3] + 3\n        game_turns[i+5] = game_turns[i+4] + 4\n    return game_turns\n",
+            "def game_turns(n, k):\n    game_turns = []\n    for i in range(n):\n        game_turns[i] = 1\n        game_turns[i+1] = game_turns[i+1] - 1\n        game_turns[i+2] = game_turns[i+1] + 1\n        game_turns[i+3] = game_turns[i+2] + 2\n        game_turns[i+4] = game_turns[i+3] + 3\n        game_turns[i+5] = game_turns[i+4] + 4\n    return game_turns\n",
+            "def game_turns(n, k):\n    game_turns = []\n    for i in range(n):\n        game_turns[i] = 1\n        game_turns[i+1] = game_turns[i+1] - 1\n        game_turns[i+2] = game_turns[i+1] + 1\n        game_turns[i+3] = game_turns[i+2] + 2\n        game_turns[i+4] = game_turns[i+3] + 3\n        game_turns[i+5] = game_turns[i+4] + 4\n    return game_turns\n",
+            "def game_turns(n, k):\n    game_turns = []\n    for i in range(n):\n        game_turns[i] = 1\n        game_turns[i+1] = game_turns[i+1] - 1\n        game_turns[i+2] = game_turns[i+1] + 1\n        game_turns[i+3] = game_turns[i+2] + 2\n        game_turns[i+4] = game_turns[i+3] + 3\n        game_turns[i+5] = game_turns[i+4] + 4\n    return game_turns\n",
+            "def game_turns(n, k):\n    game_turns = []\n    for i in range(n):\n        game_turns[i] = 1\n        game_turns[i+1] = game_turns[i+1] - 1\n        game_turns[i+2] = game_turns[i+1] + 1\n        game_turns[i+3] = game_turns[i+2] + 2\n        game_turns[i+4] = game_turns[i+3] + 3\n        game_turns[i+5] = game_turns[i+4] + 4\n    return game_turns\n",
+            "def game_turns(n, k):\n    game_turns = []\n    for i in range(n):\n        game_turns[i] = 1\n        game_turns[i+1] = game_turns[i+1] - 1\n        game_turns[i+2] = game_turns[i+1] + 1\n        game_turns[i+3] = game_turns[i+2] + 2\n        game_turns[i+4] = game_turns[i+3] + 3\n        game_turns[i+5] = game_turns[i+4] + 4\n    return game_turns\n",
+            "def game_turns(n, k):\n    game_turns = []\n    for i in range(n):\n        game_turns[i] = 1\n        game_turns[i+1] = game_turns[i+1] - 1\n        game_turns[i+2] = game_turns[i+1] + 1\n        game_turns[i+3] = game_turns[i+2] + 2\n        game_turns[i+4] = game_turns[i+3] + 3\n        game_turns[i+5] = game_turns[i+4] + 4\n    return game_turns\n",
+            "def game_turns(n, k):\n    game_turns = []\n    for i in range(n):\n        game_turns[i] = 1\n        game_turns[i+1] = game_turns[i+1] - 1\n        game_turns[i+2] = game_turns[i+1] + 1\n        game_turns[i+3] = game_turns[i+2] + 2\n        game_turns[i+4] = game_turns[i+3] + 3\n        game_turns[i+5] = game_turns[i+4] + 4\n    return game_turns\n",
+            "def game_turns(n, k):\n    game_turns = []\n    for i in range(n):\n        game_turns[i] = 1\n        game_turns[i+1] = game_turns[i+1] - 1\n        game_turns[i+2] = game_turns[i+1] + 1\n        game_turns[i+3] = game_turns[i+2] + 2\n        game_turns[i+4] = game_turns[i+3] + 3\n        game_turns[i+5] = game_turns[i+4] + 4\n    return game_turns\n",
+            "def game_turns(n, k):\n    game_turns = []\n    for i in range(n):\n        game_turns[i] = 1\n        game_turns[i+1] = game_turns[i+1] - 1\n        game_turns[i+2] = game_turns[i+1] + 1\n        game_turns[i+3] = game_turns[i+2] + 2\n        game_turns[i+4] = game_turns[i+3] + 3\n        game_turns[i+5] = game_turns[i+4] + 4\n    return game_turns\n",
+            "def game_turns(n, k):\n    game_turns = []\n    for i in range(n):\n        game_turns[i] = 1\n        game_turns[i+1] = game_turns[i+1] - 1\n        game_turns[i+2] = game_turns[i+1] + 1\n        game_turns[i+3] = game_turns[i+2] + 2\n        game_turns[i+4] = game_turns[i+3] + 3\n        game_turns[i+5] = game_turns[i+4] + 4\n    return game_turns\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def generate_array(n):\n    if n == derived.length:\n        return True\n    else:\n        return False\n\ndef derive_array(array):\n    if n == derived.length:\n        return True\n    else:\n        return False\n\ndef generate_array(array):\n    if n == derived.length:\n        return True\n    else:\n        return False\n\ndef generate_array(array):\n    if n == derived.length:\n        return True\n    else:\n        return False\n\ndef generate_array(array):\n    if n == derived.length:\n        return True\n    else:\n    return False\n\ndef generate_array(array):\n    if n == derived.length:\n        return True\n    else:\n    return False\n\nprint(generate_array(array))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def punishment_number(n):\n    return sum(i for i in range(n + 1))\n\n# Example 1\nn = 10\npunishment_number_1 = 1\n\n# Example 2\nn = 37\npunishment_number_2 = 1478\n\nprint(punishment_number_1)\nprint(punishment_number_2)\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def cost_min_paintings(cost, time):\n    cost_paintings = 0\n    for i in range(1, len(cost) + 1):\n        cost_paintings += cost[i]\n        cost_paintings.append(cost[i])\n    return cost_paintings\n\nprint(cost_min_paintings(cost, time))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def minimize_cost(nums, x):\n    nums = nums.lower()\n    x = x.lower()\n    for num in nums:\n        if num <= x:\n            nums[num] = nums[x]\n        else:\n            nums[num] = nums[x]\n    return nums[nums]\n\n# Example 1\nnums = [20, 1, 15]\nx = 5\nprint(min_cost(nums, x))\nprint(min_cost(nums, x))\nprint(min_cost(nums, x))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def max_achievable_num(num, t):\n    num = num\n    num_increment = 1\n    num_decrease = 1\n    num_increase = 1\n    return num\n\nnum = 4\nt = 2\n\nprint(max_achievable_num(num, t))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def make_equal_characters(s):\n    s = s.lower()\n    for i in range(len(s)):\n        if s[i] == '0' and s[i] == '1':\n            s[i] = '0'\n            s[i] = '1'\n    return s\n\nprint(make_equal_characters(s)\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def get_integer(num):\n    return num\n\nnum = \"123\"\nprint(get_integer(num))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def min_length(s):\n    s = 0\n    for i in range(1, len(s)):\n        if s[i] == s[i + 1]:\n            min_length(s) = min(s, s[i])\n    return min_length(s)\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def traverse_pairs(nums):\n    nums = [nums.length <= 10^5]\n    for i in range(1, nums.length):\n        nums[i] = nums[i - 1] + nums[i - 2]\n    return nums\n\nprint( traverse_pairs(nums))\n",
+            "def traverse_pairs(nums):\n    nums = [nums.length <= 10^5]\n    for i in range(1, nums.length):\n        nums[i] = nums[i - 1] + nums[i - 2]\n    return nums\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def convert_substring(s):\n    if s.length <= 3 * 10^5:\n        return \"b\"\n    else:\n        return \"a\"\n\n    for i in range(1, len(s) + 1):\n        if s[i] == s[i + 1]:\n            return \"a\"\n\n    return \"a\"\n\nprint(convert_substring(s))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_equal_subarrays(nums, k):\n    nums = nums.sort(len(nums), len(k))\n    equal_subarrays = []\n    for num in nums:\n        if num == k:\n            equal_subarrays.append(num)\n        else:\n            equal_subarrays.append(num)\n    return equal_subarrays\n\n# Example 1\nnums = [1, 3, 2, 3, 1, 3]\nk = 3\nprint(find_equal_subarrays(nums, k))\nprint(find_equal_subarrays(nums, k))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def get_requests(n, logs, x, queries):\n    total_requests = 0\n    for i in range(n, log_length):\n        total_requests += 1\n        for j in range(logs[i], queries[j]):\n            total_requests += 1\n        total_requests += 1\n    return total_requests\n\n# Example 1\nn = 3, logs = [[2,4],[2,1],[1,2],[3,1]], x = 5, queries = [10,11]\nprint(get_requests(3, 2, 5, 10))  # Output: [0,1]\n\n# Example 2\nn = 3, logs = [[2,4],[2,1],[1,2],[3,1]], x = 2, queries = [3,4]\nprint(get_requests(3, 2, 5, 10), queries = [3,4])  # Output: [0,1]\n\n# Example 3\nn = 3, logs = [[2,4],[2,1],[1,2],[3,1]], x = 2, queries = [3,4]\nprint(get_requests(3, 2, 5, 10), queries = [3,4])  # Output: [0,1]\n\nprint(get_requests(3, 2, 5, 10), queries = [3,4])  # Output: [0,1]\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def moveTo(nums):\n    # Initialize the move to move from the first move\n    moveTo = moveTo(nums)\n\n    # Move from the first move to the next move\n    # Move from the first move to the next move\n    # Move from the next move to the next move\n    # Move from the next move to the next move\n\n    # Return the sorted list of occupied positions\n    return [movie_list[i] for moves in moveTo(nums)]\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def make_num1_equal_num2(num1, num2):\n    num1 = num1\n    num2 = num2\n    return num1\n\nprint(make_num1_equal_num2(5, 7))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def find_max_sum(nums1, nums2):\n    nums1 = nums1[0]\n    nums2 = nums2[0]\n    for i in range(2, nums1[i], nums2[i]):\n        if nums1[i] >= x_i and nums2[i] >= y_i:\n            nums1[i] + nums2[i] += x_i + y_i\n        else:\n            nums1[i] + nums2[i] -= 1\n    return nums1[i] + nums2[i]\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def special_elements(nums):\n    nums = nums.lower()\n    for num in nums:\n        if num % nums == 0:\n            nums[nums] = nums[nums]\n        else:\n            nums[nums] = nums[nums]\n    return nums[nums]\n\nnums = [1, 2, 3, 4]\n\nprint(special_elements(nums))\n",
+            "import math\n\ndef special_elements(nums):\n    nums = nums.lower()\n    for num in nums:\n        if num % nums == 0:\n            nums[nums] = nums[nums]\n        else:\n            nums[nums] = nums[nums]\n    return nums\n\nnums = [1, 2, 3, 4]\n\nprint(special_elements(nums))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_pairs(words):\n    pairs = {}\n    for word in words:\n        if word.length <= 50:\n            words[word].length == 2:\n                pairs.append(word)\n            words[word].length += 1\n            words[word].length += 1\n            words[word].length += 1\n            words[word].length += 1\n    return pairs\n\nprint(find_pairs(words))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def special_permutations(nums):\n    nums = [nums.length]\n    for i in range(1, nums.length):\n        nums[i] % nums[i+1] == 0 or nums[i+1] % nums[i] == 0\n        nums[i] = nums[i+1]\n    return nums\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def sum_imbalance(nums):\n    subarrays = []\n    for num in nums:\n        if num <= 0:\n            subarrays.append(num)\n        else:\n            subarrays.append(num)\n        return sum_imbalance(subarrays)\n\nnums = [2, 3, 1, 4]\n\nprint(sum_imbalance(nums))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_max_jumps(nums, target):\n    nums = nums.sort(int)\n    target = target.sort(int)\n    jumps = 0\n    for num in nums:\n        jumps = nums[j] - nums[i] <= target\n        if target < jumps:\n            jumps.append(jumps)\n        else:\n            jumps.append(jumps)\n    return jumps\n\nprint(find_max_jumps(nums, target))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def generate_subarrays(nums):\n    subarrays = []\n    for num in nums:\n        if num <= nums.length:\n            subarrays.append(num)\n        else:\n            subarrays.append(num)\n    return subarrays\n\nnums = [1,3,1,2,2]\n\n# Example 1\nnums = [1,3,1,2,2]\n\n# Example 2\nnums = [5,5,5,5,5]\n\nprint(generate_subarrays(nums))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def fuel_transfer(mainTank, additionalTank, fuel_remaining):\n    mainTank = mainTank\n    additionalTank = additionalTank\n    fuel_remaining = mainTank - additionalTank\n    if fuel_remaining <= mainTank:\n        mainTank += 1\n        additionalTank -= 1\n    else:\n        mainTank += 1\n    return mainTank, additionalTank\n\nprint(fuel_transfer(5, 10, 50))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def find_longest_subarray(nums, threshold):\n    nums = nums.sort(len(nums), len(threshold))\n    for i in range(len(nums)):\n        nums[i] % 2 == 0\n        nums[i+1] % 2 == nums[i] % 2\n        nums[i] <= threshold\n    return nums\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def good_subarrays(nums):\n    good_subarrays = []\n    for num in nums:\n        if num in good_subarrays:\n            good_subarrays.append(num)\n        else:\n            return num\n    return 0\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def count_continuous_subarrays(nums):\n    nums = [nums.length]\n    for i in range(1, nums.length):\n        nums[i] = nums[i-1] + nums[i-2]\n        nums[i-1] <= nums[i-1] <= nums[i-2]\n        nums[i-1] - nums[i-2] <= 2\n        nums[i-1] <= nums[i-2] <= nums[i-3]\n    return nums\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def max_length_subarray(nums1, nums2):\n    nums3 = [nums1[0], nums2[1], nums2[2], nums2[3]]\n    return nums3\n\nnums1 = [2, 3, 1]\nnums2 = [1, 2, 1]\nnums3 = [2, 2, 1]\n\nprint(max_length_subarray(nums1, nums2))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def max_length(nums):\n    nums = [nums.length]\n    for i in range(1, nums.length):\n        nums[i] = nums[i-1] + 1\n    return nums\n\nnums = [2, 3, 4, 3, 4]\nprint(max_length(nums))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def is_prime_pair(n):\n    prime_numbers = []\n    for i in range(n):\n        if n % i == 0:\n            prime_numbers.append(i)\n    return prime_numbers\n\nprint(is_prime_pair(10))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def count_employees(hours, target):\n    if n == 0:\n        return 0\n    else:\n        return sum(hours[i] for i in range(n, n+1))\n\n    for i in range(1, n):\n        if target <= hours[i]:\n            return 0\n        if hours[i] <= target:\n            return 0\n        else:\n            return sum(hours[i] for i in range(n, n+1))\n\n    return 0\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def find_smallest_substring(a, b, c):\n    if a <= b:\n        return \"ab\"\n    else:\n        return \"ba\"\n    else:\n        return \"aaa\"\n\nprint(find_smallest_substring(a, b, c))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def make_all_elements_equal(nums, k):\n    nums = nums.lower()\n    for i in range(k):\n        nums[i] = nums[i-1] + 1\n    return nums\n\nprint(make_all_elements_equal(nums, k))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def is_semi_palindrome(s, k):\n    if len(s) <= 2:\n        return 1\n    else:\n        return 0\n    return len(s) // 2\n\nprint(is_semi_palindrome(s, k))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def express_n(n, x):\n    if n <= 300:\n        return 0\n    else:\n        return n\n\n    return (n % 10) % 10 + (x % 10) % 10 + (x % 10) % 10\n\nprint(express_n(4, 1))\nprint(express_n(4, 2))\nprint(express_n(4, 3))\nprint(express_n(4, 5))\nprint(express_n(4, 10))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def reverse_text(s):\n    return s[0]\n\nprint(reverse_text(s))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def vowels_sort(s):\n    vowels = []\n    for i in range(s.length):\n        if s[i] == 'a':\n            vowels.append(s[i])\n        elif s[i] == 'e':\n            vowels.append(s[i])\n            if s[i] == 'i':\n                vowels.append(s[i])\n            elif s[i] == 'o':\n                vowels.append(s[i])\n            elif s[i] == 'u':\n                vowels.append(s[i])\n            else:\n                vowels.append(s[i])\n    return vowels\n\nprint(vowels_sort(s))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def generate_array(nums, k):\n    nums = []\n    for i in range(0, nums.length - 1):\n        nums[i] = nums[i] + k\n    return nums\n\n# Example 1\nnums = [4, 6, 1, 2]\nk = 2\nresult = generate_array(nums, k)\nprint(result)\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def max_score(nums, x):\n    nums = nums.sort(len(nums) - 1)\n    score = nums[nums]\n    return max_score\n\nnums = [2, 3, 6, 1, 9, 2]\nx = 5\n\n# Function to find the maximum score\ndef max_score(nums, x):\n    nums = nums.sort(len(nums) - 1)\n    score = nums[nums]\n    return max_score\n\nprint(max_score(nums, x))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_interesting_subarrays(nums):\n    nums = [nums.length, nums.index]\n    mod = nums.mod\n    k = 1\n    for num in nums:\n        if num % mod == k:\n            count = nums[0]\n            count += 1\n    return count\n\nprint(find_interesting_subarrays(3))  # Output: 3\nprint(find_interesting_subarrays(1))  # Output: 2\nprint(find_interesting_subarrays(9))  # Output: 2\nprint(find_interesting_subarrays(10))  # Output: 2\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_pairs(nums, target):\n    nums = nums.sort(len(nums), len(target))\n    nums[i] = nums[i] + nums[j]\n    nums[i] + nums[j] < target\n    return nums[i] + nums[j]\n\nnums = [-1,1,2,3,1], target = 2\nprint(find_pairs(nums, target))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def max_groups(usage_limits):\n    max_groups = 0\n    for i in range(usage_limits):\n        max_group = 0\n        for group in range(i):\n            if group[i] <= usage_limits[i]:\n                max_group += 1\n            else:\n                max_groups += 1\n    return max_groups\n\n# Test the function\ninput_limit = usage_limits\noutput_group = max_groups\nprint(output_group)\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def equalize_array(nums):\n    nums = []\n    for i in range(0, nums.length):\n        nums[i] = nums[i]\n        nums[i] = nums[(i - 1 + nums[i]] % nums]\n        nums[i] = nums[(i + 1) % nums]\n    return nums\n\n# Example 1\nnums = [1,2,1,2]\nnums = equalize_array(nums)\nprint(equalize_array(nums))\nprint(equalize_array(nums))\nprint(equalize_array(nums))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def count_steps(low, high):\n    low = int(low)\n    high = int(high)\n    steps = 0\n    while low <= high:\n        if low < high:\n            steps += 1\n        else:\n            steps += 1\n    return steps\n\nprint(count_steps(low, high))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def sum_of_nums(nums1, nums2, x):\n    nums1 = nums1.length\n    nums2 = nums2.length\n    sum_of_nums = 0\n    for nums1 in nums1:\n        nums1[nums1] = nums1.length + nums2[nums1]\n        nums1[nums1] = nums1.length\n    return sum_of_nums\n\n# Example 1\nnums1 = [1,2,3]\nnums2 = [3,3,3]\nx = 4\nprint(sum_of_nums(nums1, nums2, x))\nprint(sum_of_nums(nums1, nums2, x))\nprint(sum_of_nums(nums1, nums2, x))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def max_sum(nums, m, k):\n    nums = nums.sort(len(nums) - 1, len(nums) - 1)\n    m = nums.sort(len(nums) - 1, len(nums) - 1)\n    k = nums.sort(len(nums) - 1, len(nums) - 1)\n    if nums[i] <= 10^9:\n        max_sum = nums[i]\n    else:\n        max_sum = 0\n    return max_sum\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def calculate_purchase_amount(purchase_amount):\n    if 0 <= purchase_amount <= 100:\n        return 0\n    else:\n        return purchase_amount\n\n    return max(0, purchase_amount - purchase_amount)\n\nprint(calculate_purchase_amount(purchase_amount))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def generate_acronym(words, s):\n    if len(words) <= 100:\n        return True\n    else:\n        return False\n\ns = \"abc\"\n\nprint(generate_acronym(words, s))\n",
+            "print(generate_acronym(words, s))\n",
+            "True\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def maximize_earnings(n, offers):\n    if n <= 0:\n        return 0\n    else:\n        return max(0, offers.length)\n\n    for i in range(0, n - 1):\n        for j in range(0, offers.length):\n            if offers.length == 3:\n                max_earnings = 0\n            elif offers.length > 10:\n                max_earnings = max(0, offers.length)\n            else:\n                max_earnings = max(0, offers.length)\n\n    return max_earnings\n\nn = 5\noffers = [[0, 0, 1],[0, 2, 2],[1, 3, 2]]\nprint(max_earnings)\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def is_symmetric(low, high):\n    # Check if the sum of the first n digits of low is equal to the sum of the last n digits of high\n    if len(low) <= len(high):\n        return True\n    # If low is not in the range, return False\n    return False\n\n    # Find the number of symmetric integers in the range [low, high]\n    return len(low) - len(high)\n\n    return number of symmetric integers\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def make_equal(s1, s2):\n    s1 = s1.length\n    s2 = s2.length\n    if s1 == s2:\n        return s1\n    else:\n        return s2\n\nprint(make_equal(s1, s2))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def is_subsequence(str1, str2):\n    if str1.length <= 10^5:\n        return True\n    else:\n        return False\n\nstr1 = \"abc\"\nstr2 = \"ad\"\n\nprint(is_subsequence(str1, str2))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def transform_sats(s, t, k):\n    s = s.lower()\n    t = t.lower()\n    return s\n\nprint(transform_sats(s, t, k))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def find_min_operations(nums, target):\n    nums = nums.lower()\n    target = target.lower()\n    for num in nums:\n        if num > 1:\n            nums.append(nums[i])\n        if nums[i] > 2:\n            nums[i] = nums[i-1]\n        if nums[i] < 2:\n            nums[i] = nums[i-1]\n        nums[i] = nums[i-1]\n    return nums\n\nprint(find_min_operations(nums, target))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def matrix_product(n, m):\n    if n == 0:\n        return 0\n    else:\n        matrix_product = 0\n        for i in range(n):\n            matrix_product[i][j] = matrix_product[i][j] * matrix_product[i][j] // 12345\n        return matrix_product\n\nprint(matrix_product(3, 4))\n",
+            "def matrix_product(n, m):\n    if n == 0:\n        return 0\n    else:\n        matrix_product = 0\n        for i in range(n):\n            matrix_product[i][j] = matrix_product[i][j] * matrix_product[i][j] // 12345\n        return matrix_product\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def make_equal_strings(s1, s2, n, x):\n    s1 = s1.length\n    s2 = s2.length\n    for i in range(n):\n        s1[i] = s1[i + 1]\n        s1[i + 2] = s1[i + 2]\n        s1[i + 3] = s1[i + 3]\n        s1[i + 4] = s1[i + 4]\n    return s1 == s2\n\nprint(make_equal_strings(s1, s2, n, x))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def count_points(nums):\n    nums = [nums[i] for i in range(nums.length, 100)]\n    return nums\n\n# Example 1\nnums = [[3,6],[1,5],[4,7]]\nnums.length = 100\nprint(count_points(nums))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def special_num(num):\n    if num <= 0:\n        return 0\n    else:\n        return num % 25\n\nprint(special_num(10))\n",
+            "def special_num(num):\n    if num <= 0:\n        return 0\n    else:\n        return num % 25\n\nprint(special_num(10))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def max_element_sum(nums):\n    nums = nums.sort(int)\n    for i in nums:\n        nums[i] = nums[i] + nums[i+1]\n    return nums\n\nnums = [8,7,3,5,7,2,4,9]\n\n# Example 1\nnums = [8,7,3,5,7,2,4,9]\nmax_element_sum = max_element_sum(nums)\nprint(max_element_sum(nums))\n",
+            "19\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def max_odd_binary(s):\n    if s <= 0:\n        return \"0\"\n    else:\n        return \"1\"\n    return max_odd_binary(s)\n\nprint(max_odd_binary(s))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def split_array(nums):\n    subarrays = []\n    for num in nums:\n        if num <= 0:\n            subarrays.append(num)\n        elif num <= 10^6:\n            subarrays.append(num)\n        else:\n            subarrays.append(num)\n        else:\n            return 0\n    return 0\n\nnums = [1,0,2,0,1,2]\n\nprint(split_array(nums))\n",
+            "subarrays = []\nfor num in nums:\n    if num <= 0:\n        subarrays.append(num)\n    elif num <= 10^6:\n        subarrays.append(num)\n    else:\n        return 0\n    return 0\n",
+            "[1,0,2,0,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n",
+            "[1,0,2,0,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n",
+            "[1,0,2,0,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n",
+            "[1,0,2,0,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n",
+            "[1,0,2,0,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n",
+            "[1,0,2,0,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n",
+            "[1,0,2,0,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n",
+            "[1,0,2,0,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n",
+            "[1,0,2,0,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n",
+            "[1,0,2,0,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n",
+            "[1,0,2,0,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n[1,0,2,3,1,2]\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def min_length(nums):\n    nums = []\n    for i in range(10):\n        nums[i] = nums[i-1]\n    return nums\n\nprint(min_length(nums))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def count_multisets(nums, l, r):\n    nums = nums.sort(len(nums) - 1)\n    l = nums[0]\n    r = nums[0]\n    for num in nums:\n        if l <= r:\n            nums[l] = nums[r]\n        else:\n            nums[l] = nums[r]\n    return nums[l] + nums[r]\n\nprint(count_multisets(5, 6, 5))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def sum_nums(nums):\n    nums = [nums.length <= 1000]\n    for num in nums:\n        if num.length <= 1000:\n            nums[num] = nums[num]\n        else:\n            nums[num] = nums[num] + nums[num]\n    return nums\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def make_empty_array(nums):\n    nums = []\n    for i in range(1, 10^5):\n        nums[i] = nums[i-1]\n    return nums\n\nnums = [2,1,2,3,3,4]\n\nprint(make_empty_array(nums))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def find_happy_group(nums):\n    # Initialize the number of students\n    nums = nums.lower()\n\n    # For each student, check if it is selected and the total number of selected students is greater than nums.\n    if nums[i] < nums.length:\n        return False\n\n    # For each student, check if it is not selected and the total number of selected students is less than nums.\n    if nums[i] < nums.length:\n        return False\n\n    # For each student, check if it is selected and the total number of selected students is greater than nums.\n    if nums[i] > nums.length:\n        return True\n\n    # Return the number of ways to select a group of students so that everyone remains happy.\n    return nums[i]\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def find_longest_subsequence(nums, target):\n    nums = nums.sort(len(nums) - 1)\n    target = target.get(nums)\n    for num in nums:\n        if num <= target:\n            return num\n        if num == target:\n            return -1\n        if num > target:\n            return num\n        return num\n\n    return nums\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def tall_tower(maxHeights):\n    tall_tower = [height for height in maxHeights if height <= height]\n    tall_tower.append(height)\n\nprint(tall_tower(maxHeights))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def find_shortest_subarray(nums, target):\n    nums = nums.get(target)\n    subarray = []\n    for num in nums:\n        if num <= target:\n            subarray.append(num)\n        else:\n            subarray.append(num)\n        return subarray\n    return -1\n\nnums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\ntarget = 5\n\nprint(find_shortest_subarray(nums, target))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def find_beautiful_substring(s, k):\n    if len(s) <= k:\n        return \"abcd\"\n    else:\n        return \"abcd\"\n    return \"11\"\n\nprint(find_beautiful_substring(100011001, 3))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def max_sum_squares(nums, k):\n    nums = nums[0] + nums[1] + nums[2] + nums[3] + nums[4] + nums[5] + nums[6] + nums[7] + nums[8] + nums[9]\n    nums[i] = nums[i-1] + nums[i-2] + nums[i-3] + nums[i-4] + nums[i-5] + nums[i-6]\n    nums[i] = nums[i-1] OR nums[i-2] OR nums[i-3] OR nums[i-4] OR nums[i-5] OR nums[i-6]\n\n    return nums[i]\n\nprint(max_sum_squares(nums, k))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def max_value(nums):\n    nums = nums.sort(int)\n    return nums\n\nnums = [1, 2, 3, 4, 7]\n\nprint(max_value(nums))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def count_distinct_counts(nums):\n    nums = nums.sort(len(nums), len(nums))\n    nums[i..j] = nums[i] + nums[i+1] - nums[i]\n    nums[i..j] = nums[i]\n    distinct_counts = nums[i..j]\n    return sum(distinct_counts)\n\nnums = [1, 2, 1]\n\nprint(count_distinct_counts(nums))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def group_assignment(nums):\n    nums = nums.lower()\n    for num in nums:\n        if num <= 1:\n            nums.lower()\n        else:\n            nums.lower()\n        for num in nums:\n            if num <= 10^9:\n                nums.lower()\n            nums.lower()\n        else:\n            nums.lower()\n        nums.lower()\n    return nums\n",
+            "def group_assignment(nums):\n    nums = nums.lower()\n    for num in nums:\n        if num <= 1:\n            nums.lower()\n        else:\n            nums.lower()\n        for num in nums:\n            if num <= 10^9:\n                nums.lower()\n            nums.lower()\n        else:\n            nums.lower()\n        nums.lower()\n    return nums\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def find_equal_sum(nums1, nums2):\n    nums1 = nums1.length * nums1.width\n    nums2 = nums2.width * nums2.height\n    return nums1 + nums2\n\nnums1 = [2, 0, 2, 0, 0]\nnums2 = [1, 4]\n\nprint(find_equal_sum(nums1, nums2))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def generate_nums(num1, num2):\n    num1 = num1.sum(num1)\n    num2 = num1.sum(num1)\n    return num1 - num2\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def mountain_triplet(nums):\n    if nums <= 50:\n        return -1\n    else:\n        return nums[i] + nums[j] + nums[k]\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def is_balanced_subsequence(nums):\n    balanced_subsequence = []\n    for i in range(nums.length):\n        if nums[i] - nums[i-1] >= i - 1:\n            balanced_subsequence.append(nums[i])\n    return balanced_subsequence\n\nnums = [3,3,5,6]\n\n# Example 1\nnums = [3,3,5,6]\n\n# Example 2\nnums = [5,-1,-3,8]\n\n# Example 3\nnums = [-2,-1]\n\n# Output: 14\n\n",
+            "def is_balanced_subsequence(nums):\n    balanced_subsequence = []\n    for i in range(nums.length):\n        if nums[i] - nums[i-1] >= i - 1:\n            balanced_subsequence.append(nums[i])\n    return balanced_subsequence\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def min_operations(nums1, nums2):\n    nums1 = nums1[0]\n    nums2 = nums2[0]\n\n    while nums1[i] <= nums1[0] and nums2[i] <= nums2[0]:\n        nums1[i] = nums2[i]\n        nums1[i] -= 1\n\n    nums1[i] += nums2[i]\n\n    nums2[i] += nums1[i]\n\n    return nums1[i] == nums2[i]\n\nprint(min_operations(nums1, nums2))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def max_value(a, b, n):\n    max_value = 0\n    for a in range(a, b, n):\n        max_value = a * max_value + b * max_value\n        if max_value < max_value:\n            max_value = max_value\n        else:\n            max_value = max_value\n    return max_value\n\n# Example 1\na = 12, b = 5, n = 4\nmax_value = 98\n\n# Example 2\na = 1, b = 6, n = 3\nmax_value = 930\n\n# Example 3\na = 1, b = 6, n = 3\nmax_value = 12\n\n# Constraints\n0 <= a, b, n <= 2^50\n0 <= n <= 50\n\n# Output: 12\n",
+            "def max_value(a, b, n):\n    max_value = 0\n    for a in range(a, b, n):\n        max_value = a * max_value + b * max_value\n        if max_value < max_value:\n            max_value = max_value\n        else:\n            max_value = max_value\n    return max_value\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def find_strong_pair(nums):\n    nums = nums.sort(len(nums) - 1)\n    strong_pair = None\n    for num in nums:\n        if num - strong_pair[num] <= min(num, strong_pair[num]):\n            strong_pair = num\n        else:\n            strong_pair = None\n    return strong_pair\n\nnums = [1, 2, 3, 4, 5]\n# The function will return the maximum XOR value out of all possible strong pairs in the array nums\nprint(find_strong_pair(nums))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def group_balls(s):\n    if s <= 10^5:\n        return 0\n    else:\n        s[i] = s[i-1] + s[i-2]\n        s[i] = s[i-1]\n        s[i-1] = s[i-2]\n        s[i-1] = s[i-2]\n    return 0\n\n# Example\ns = \"101\"\nprint(group_balls(s))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def score_max(nums, k):\n    nums = nums.lower()\n    nums.upper()\n    nums.index = 0\n    nums.index = k\n\n    for num in nums:\n        nums[nums] = nums.value()\n        nums[nums] = nums.index[nums]\n\n    score = nums[nums.index] / nums[nums.index]\n    return score\n\nprint(score_max(nums, k))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def distribute_candies(n, limit):\n    total_candies = 0\n    for i in range(n, limit):\n        total_candies += i\n    return total_candies\n\nprint(distribute_candies(5, 2))  # Output: 3\nprint(distribute_candies(3, 2))  # Output: 10\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_common_elements(nums1, nums2):\n    nums1 = nums1.length\n    nums2 = nums2.length\n\n    for i in range(nums1.length, nums2.length):\n        nums1[i] = nums1[i-1] + nums1[i]\n        nums2[i] = nums2[i-1] + nums2[i-1]\n\n    return nums1[i] == nums2[i]\n\nprint(find_common_elements(nums1, nums2))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def make_equal_strings(s1, s2, s3):\n    if s1 <= s2 <= s3:\n        return s1, s2, s3\n    else:\n        return -1\n\ns1 = \"abc\"\ns2 = \"abb\"\ns3 = \"ab\"\n\nprint(make_equal_strings(s1, s2, s3))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def max_length(nums):\n    nums = nums.sort()\n    max_length = 0\n    return nums\n\nnums = [1,2,3,4,5,6]\n\nprint(max_length(nums))\n",
+            "def max_length(nums):\n    nums = nums.sort()\n    max_length = 0\n    return nums\n\nnums = [1,2,3,4,5,6]\n\nprint(max_length(nums))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def good_partitions(nums):\n    good_partitions = []\n    for num in nums:\n        if num <= 1:\n            good_partitions.append(num)\n        else:\n            good_partitions.append(num)\n    return good_partitions\n\nnums = [1, 2, 3, 4]\n\n# Test the function\ngood_partitions = good_partitions(nums)\nprint(good_partitions)\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def find_max_elements(nums, k):\n    nums = nums.split()\n    max_elements = []\n    for num in nums:\n        if num <= k:\n            max_elements.append(num)\n        else:\n            max_elements.append(num)\n    return max_elements\n\nnums = [1, 3, 2, 3, 3]\nk = 2\nprint(find_max_elements(nums, k))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def is_smallest(nums):\n    nums = []\n    for i in range(1, 10):\n        nums[i] = nums[i - 1]\n        if nums[i] < nums[i - 1]:\n            return nums[i]\n    return nums\n\nprint(is_smallest(nums))\n",
+            "def is_smallest(nums):\n    nums = []\n    for i in range(1, 10):\n        nums[i] = nums[i - 1]\n        if nums[i] < nums[i - 1]:\n            return nums[i]\n    return nums\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def test_devices(batteryPercentages):\n    if 0 <= batteryPercentages <= 100:\n        return 0\n    else:\n        # Test the device with index j\n        if batteryPercentages[j] == 0:\n            return 1\n        # Test the device with index j in the range [i + 1, n - 1]\n        if batteryPercentages[j] == 0:\n            # Decrease the battery percentage of all devices with indices j in the range [i + 1, n - 1] by 1, ensuring their battery percentage never goes below 0, i.e, batteryPercentages[j] = max(0, batteryPercentages[j] - 1).\n    else:\n        # Move to the next device without performing any test\n        # Move to the next device without testing\n        # Move to the next device without testing\n    return 0\n\nprint(test_devices(batteryPercentages))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def find_peaks(mountain):\n    peak_index = [0]\n    for i in range(1, 100):\n        peak_index += 1\n    return peak_index\n\nprint(find_peaks(mountain))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def generate_substrings(word, k):\n    substring = word.split()\n    for char in word:\n        if char in substring:\n            substring.append(char)\n        else:\n            substring.append(char)\n    return substring\n\nword = \"igigee\"\nk = 2\n\nprint(generate_substrings(word, k))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def remove_min_element(nums):\n    nums = nums.lower()\n    for i in range(1, nums.length):\n        nums[i] = nums[i-1] - nums[i-1]\n    return nums\n\ndef append_element(arr):\n    arr = arr.lower()\n    for i in range(1, arr.length):\n        arr[i] = arr[i-1] + arr[i]\n    return arr\n\ndef game_game(nums, nums[i]):\n    if nums[i] == 0:\n        return nums[i]\n    else:\n        return nums[i] + nums[i-1]\n\nprint(game_game(nums, nums[1]))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def remove_adjacent_almost_equal_characters(word):\n    word = word.lower()\n    for i in range(len(word)):\n        word[i] = word[i] - word[i-1]\n        if word[i] == word[i-1]:\n            return word[i]\n    return word\n\nprint(remove_adjacent_almost_equal_characters(word))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def partition_s(s, k):\n    s = s.lower()\n    for i in range(k):\n        s[i] = s.split(i)\n        s[i] = s.split(i)\n    return s[i]\n\nprint(partition_s(s, k))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def get_index(variables):\n    variables = [a_i, b_i, c_i, m_i]\n    for i in range(1, variables.length):\n        variables[i] = (a_i^b_i % 10) ** ci * m_i % 10) % target\n    return variables\n\n# Example 1\nvariables = [[39, 3, 1000, 1000],[39, 3, 1000, 1000],[6, 1, 1, 4]]\ntarget = 17\nprint(get_index(variables))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_missing_nums(nums):\n    nums = []\n    for num in nums:\n        nums[i] = nums[i-1] + 1\n        nums[i] = nums[i-1]\n    return nums\n\nnums = [1, 2, 3, 2, 5]\n\n# Test the function\nnums = find_missing_nums(nums)\nprint(nums)\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def make_equal(x, y):\n    if x <= 10^4:\n        return x\n    elif x <= 10^4:\n        return y\n    else:\n        return x - y\n    return min(x, y)\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def max_frequency(nums):\n    nums = [nums.length for num in nums]\n    max_frequency = nums[0]\n    return nums\n\n# Example 1\nnums = [1,2,2,3,1,4]\nmax_frequency = max_frequency(nums)\nprint(max_frequency(nums))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def power_integers(start, finish, limit, s):\n    power_num = 0\n    for i in range(start, finish, limit):\n        if start <= limit:\n            power_num += 1\n        else:\n            power_num = 0\n    s = \"s\"\n    return power_num\n\nprint(power_num)\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def generate_index(s, a, b, k):\n    index = 0\n    for i in range(s.length - a.length - 1):\n        if index <= a:\n            index = index\n        else:\n            index = index\n    return index\n\n# Example\ns = \"abcd\", a = \"a\", b = \"a\", k = 4\nprint(generate_index(s, a, b, k))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def is_possible(nums):\n    if nums <= 1:\n        return False\n    else:\n        return False\n\nnums = [1, 2, 3, 4, 5]\n\nprint(is_possible(nums))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_area(dimensions):\n    return sum(length * width)\n\nprint(find_area(dimensions))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def increment_subarrays(nums):\n    nums = [nums.length]\n    for num in nums:\n        if num.length <= 50:\n            nums.lower = nums.lower.lower()\n        else:\n            nums.lower = nums.lower.lower()\n        nums.increment = [nums.lower]\n        nums.increment[nums.lower] = nums.increment[nums.lower]\n    return nums\n\nnums = [1,2,3,4]\nprint(increment_subarrays(nums))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_max_perimeter(nums):\n    nums = [nums.lower() for num in nums]\n    max_perimeter = 0\n    for num in nums:\n        if num <= 1:\n            max_perimeter = num\n        else:\n            max_perimeter = num\n    return max_perimeter\n\nnums = [5,5,5]\nprint(find_max_perimeter(nums))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def minimize_cost(nums):\n    nums = nums.sort(len(nums), len(nums) <= 50)\n    for num in nums:\n        if num <= 1:\n            nums[nums] = nums[nums]\n        else:\n            nums[nums] = nums[nums]\n    return nums[nums]\n\nprint(minimize_cost(5))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def find_good_subarrays(nums):\n    good_subarrays = []\n    for num in nums:\n        if num < k:\n            good_subarrays.append(num)\n        else:\n            good_subarrays.append(num - k)\n    return max_sum(good_subarrays)\n\nnums = [1, 2, 3, 4, 5, 6]\nk = 1\n\n# Generate a function to find the best subarrays\ndef find_good_subarrays(nums):\n    good_subarrays = []\n    for num in nums:\n        if num < k:\n            good_subarrays.append(num)\n        else:\n            good_subarrays.append(num - k)\n    return max_sum(good_subarrays)\n\n# Print the output\nprint(find_good_subarrays(nums))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def special_substring(s):\n    if s.length <= 50:\n        return 0\n    else:\n        return length of longest special substring in s\n\nprint(special_substring(s))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def match_pattern(nums, pattern):\n    nums = nums.sort(int)\n    pattern = pattern.sort(int)\n    for num in nums:\n        if num in pattern:\n            if num > nums.length:\n                return False\n            if num < nums.length:\n                return True\n            if num[i] < nums.length:\n                return False\n            if num[i] == nums:\n                return True\n            if num[i] == 0:\n                return False\n            if num[i] == -1:\n                return False\n            return False\n    return False\n\nnums = [1,2,3,4,5,6]\npattern = [1,1]\nprint(match_pattern(nums, pattern))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def find_possible_pairs(n, m):\n    # Define the range of x and y\n    x_range = [1, n]\n    y_range = [1, m]\n\n    # Calculate the number of pairs (x, y)\n    pairs = []\n    for x in range(1, n):\n        if x <= n and x <= m:\n            pairs.append(x)\n        else:\n            pairs.append(y)\n\n    return pairs\n\nprint(find_possible_pairs(3, 2))\nprint(find_possible_pairs(1, 1))\n",
+            "def find_possible_pairs(n, m):\n    # Define the range of x and y\n    x_range = [1, n]\n    y_range = [1, m]\n\n    # Calculate the number of pairs (x, y) that satisfy the conditions\n    pairs = []\n    for x in range(1, n):\n        if x <= n and x <= m:\n            pairs.append(x)\n        else:\n            pairs.append(y)\n\n    return pairs\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def mark_indices(nums, changeIndices):\n    nums = nums.length()\n    changeIndices = changeIndices.length()\n    for num in nums:\n        nums[i] = nums[i] - 1\n        if nums[i] == 0:\n            changeIndices[i] = 1\n        else:\n            changeIndices[i] = 0\n    return nums\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def revert(word, k):\n    word = word.split()\n    for i in range(1, word.length - 1):\n        word[i] = word[i] - word[i-1]\n        word[i] = word[i] + word[i-1]\n    return word\n\nprint(revert(word, k))\n",
+            "def revert(word, k):\n    word = word.split()\n    for i in range(1, word.length - 1):\n        word[i] = word[i] - word[i-1]\n        word[i] = word[i] + word[i-1]\n    return word\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def remove_alphabet_characters(s):\n    s = s.lower()\n    for char in s:\n        if char in alphabet_char(s):\n            s.lower()\n        else:\n            s.lower()\n    return s\n\nprint(remove_alphabet_characters(s))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def isPrefixAndSuffix(str1, str2):\n    if str1 == str2:\n        return True\n    else:\n        return False\n\n    return 0\n\nstr1 = [\"a\", \"ab\", \"ab\", \"aa\"]\nstr2 = [\"pa\", \"papa\", \"ma\", \"mama\"]\n\nprint(isPrefixAndSuffix(str1, str2))  # Output: True\nprint(isPrefixAndSuffix(str1, str2))  # Output: False\nprint(isPrefixAndSuffix(str1, str2))  # Output: 0\nprint(isPrefixAndSuffix(str1, str2))  # Output: 0\nprint(isPrefixAndSuffix(str1, str2))  # Output: 0\nprint(isPrefixAndSuffix(str1, str2))  # Output: 0\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def ant_to_boundary(nums):\n    nums = nums.lower()\n    nums[i] = nums[i-1] - nums[i]\n    return nums\n\nprint(ant_to_boundary(nums))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def change_key(s):\n    if s <= 0:\n        return 0\n    elif s == 'a':\n        return 'a'\n    elif s == 'b':\n        return 'b'\n    elif s == 'c':\n        return 'c'\n    elif s == 'A':\n        return 'A'\n    elif s == 'B':\n        return 'B'\n    elif s == 'C':\n        return 'C'\n    else:\n        return 0\n\nprint(change_key(s))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def max_operations(nums):\n    nums = []\n    for num in nums:\n        if num <= 1:\n            nums.append(num)\n        else:\n            nums.append(num)\n        nums.append(num)\n    return nums\n\nprint(max_operations(nums))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def split_nums(nums):\n    nums1 = nums[i]\n    nums2 = nums[i]\n    nums1.length = nums2.length\n    nums1.distinct_elements = nums1.length - nums2.length\n    nums2.distinct_elements = nums2.length - nums1.length\n    return nums1.distinct_elements == nums2.distinct_elements\n\nnums = [1,1,2,2,3,4]\nnums1 = [1,2,3]\nnums2 = [1,2,4]\nnums1.length = 4\nnums1.distinct_elements = 4 - 4 = 0\nnums2.distinct_elements = 4 - 4 = 0\nnums1.distinct_elements == nums2.distinct_elements\nprint(nums)\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def find_longest_common_prefix(arr1, arr2):\n    # Define the length of the longest common prefix\n    longest_common_prefix = len(arr1)\n    longest_common_prefix = len(arr2)\n    return len(longest_common_prefix)\n\narr1 = [1, 10, 100]\narr2 = [1000]\n\nprint(find_longest_common_prefix(arr1, arr2))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def min_operations(nums, k):\n    nums = nums.lower()\n    nums[i] = nums[i-1] + nums[i-2]\n    nums[i] += 1\n    return nums\n\nnums = [2, 11, 10, 1, 3]\nk = 10\n\nprint(min_operations(nums, k))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def process_sequence(input_sequence):\n    # Insert the sequence into the input sequence\n    sequence = [input_sequence for i in range(input_sequence)]\n    \n    # Insert the sequence into the output sequence\n    output = [sequence for i in range(input_sequence)]\n    \n    # Print the output\n    print(output)\n\nprint(process_sequence(input_sequence))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def stamina_attack(stdin, enemy_stamina):\n    def stamina_attack(enemy_stamina):\n        if enemy_stamina <= 0:\n            return 0\n        else:\n            def stamina_attack(enemy_stamina, enemy_stamina):\n                return enemy_stamina\n                if enemy_stamina == 0:\n                    return 0\n                else:\n                    def stamina_attack(enemy_stamina, enemy_stamina):\n                    return enemy_stamina\n                else:\n                    def stamina_attack(enemy_stamina, enemy_stamina):\n                    return enemy_stamina\n                return 0\n    return 0\n\ndef stamina_attack(enemy_stamina, enemy_stamina):\n    if enemy_stamina <= 0:\n        return 0\n    else:\n        return enemy_stamina\n\ndef stamina_attack(enemy_stamina, enemy_stamina):\n    if enemy_stamina == 0:\n        return 0\n    else:\n        return enemy_stamina\n\nprint(stamina_attack(enemy_stamina, enemy_stamina))\n",
+            "def stamina_attack(enemy_stamina):\n    def stamina_attack(enemy_stamina, enemy_stamina):\n        if enemy_stamina <= 0:\n            return 0\n        else:\n            def stamina_attack(enemy_stamina, enemy_stamina):\n                return enemy_stamina\n                if enemy_stamina == 0:\n                    return 0\n                else:\n                    def stamina_attack(enemy_stamina, enemy_stamina):\n                    return enemy_stamina\n                else:\n                    def stamina_attack(enemy_stamina, enemy_stamina):\n                    return enemy_stamina\n                return 0\n    return 0\n\ndef stamina_attack(enemy_stamina, enemy_stamina):\n    def stamina_attack(enemy_stamina, enemy_stamina):\n        if enemy_stamina <= 0:\n            return 0\n        else:\n            def stamina_attack(enemy_stamina, enemy_stamina):\n                return enemy_stamina\n                if enemy_stamina == 0:\n                    return 0\n                else:\n                    def stamina_attack(enemy_stamina, enemy_stamina):\n                    return enemy_stamina\n                else:\n                    def stamina_attack(enemy_stamina, enemy_stamina):\n                    return enemy_stamina\n                return 0\n    return 0\n\nprint(stamina_attack(enemy_stamina, enemy_stamina))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def print_N(N):\n    if N <= 10^3-1:\n        print_N = N\n    else:\n        print_N = truncate(N, 10^4-1, 10^5-1, 10^6-1, 10^7-1, 10^8-1, 10^9-1)\n    else:\n        print_N = truncate(N, 10^4-1, 10^5-1, 10^6-1, 10^7-1, 10^8-1, 10^9-1)\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def A_0, A_1, A_2,..., A_63:\n    A = (A_0, A_1, A_2,..., A_63)\n    return A\n\nprint(A)\n",
+            "print(A)\n",
+            "13\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def sum_steps(N, A_i):\n    # Initialize the sum of the first i-th week\n    sum_week = 0\n    for i in range(N):\n        sum_week += A_i\n    return sum_week\n\n# Input\nN = 10\nA_1 = 1000\nA_2 = 2000\nA_3 = 3000\nA_4 = 4000\nA_5 = 5000\nA_6 = 7000\nA_7 = 8000\nA_8 = 9000\nA_9 = 10000\nA_10 = 100000\n\n# Output\nprint(sum_steps(N, A_1))\nprint(sum_steps(N, A_2))\nprint(sum_steps(N, A_3))\nprint(sum_steps(N, A_4))\nprint(sum_steps(N, A_5))\nprint(sum_steps(N, A_6))\nprint(sum_steps(N, A_7))\nprint(sum_steps(N, A_8))\nprint(sum_steps(N, A_9))\nprint(sum_steps(N, A_10))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def sort_people(people):\n    # Sort the people in descending order of their success rates\n    sorted_people = sorted(people)\n    return sorted_people\n\n# Input\nN = 3\nA1 = 1 3\nA2 = 1 3\nA3 = 1 3\n\n# Output\nprint(n)\n",
+            "1 3 4 2\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def print_grid(input_grid):\n    grid = []\n    for i in range(1, N):\n        grid[i] = grid[i-1] + 1\n    return grid\n\nprint_grid(input_grid)\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def minimize_total_payment(N, D_i, Q_i, D_i <= D_i, D_i <= 10^5)\n    total_price = 0\n    for i in range(N):\n        total_price += D_i\n    return total_price\n\nprint(min_total_payment(3, 50, 60000, 100))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def count_sticks(N, S_i):\n    if N <= 2:\n        return 0\n    else:\n        return sum(S_i) // 2\n\n    for i in range(1, N):\n        if S_i == S_j or S_i = S_j or S_i = S_j reversed:\n            return S_i == S_j or S_i == S_j or S_i = S_j reversed\n\n    print(count_sticks(N, S_i))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n",
+            "B = (B_1, B_2, \\dots, B_M)\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "import numpy as np\n\ndef taKCode(input_list):\n    # Create a list of strings\n    input_list = [input_list for input_list in input_list.items() if input_list.items() == \"string\"]\n\n    # Print the region containing the specified cells\n    region = np.array(input_list)\n    for i in range(len(input_list)):\n        region.append(i)\n\n    # Print the region containing the specified cells\n    print(region)\n\nprint(taKCode(input_list))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def generate_parenthesis_strings(S):\n    if S is not empty:\n        return 0\n    if S is a concatenation of ( and):\n        return 1\n    else:\n        return 0\n    return 0\n\nprint(generate_parenthesis_strings(S))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def min_difference(A, min_max):\n    min_value = A[0]\n    max_value = A[1]\n    min_difference = min_value - max_value\n    return min_difference\n",
+            "import math\n\ndef min_difference(A, min_max):\n    min_value = A[0]\n    max_value = A[1]\n    min_difference = min_value - max_value\n    return min_difference\n\nA = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nmin_value = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nmax_value = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nmin_difference = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nprint(min_difference)\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def pi_to_decimal(N):\n    pi_to_decimal = pi\n    for i in range(N):\n        if pi_to_decimal[i] == pi:\n            pi_to_decimal[i] = pi\n    return pi_to_decimal\n\nprint(pi_to_decimal(100))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def atCider(S, t_i, x_i, c_i, y_i):\n    if t_i == 1:\n        return S[t_i]\n    else:\n        return S[x_i]\n    else:\n        return S[y_i]\n    return S\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def maximize_satisfaction(input):\n    if not input:\n        return 0\n    return max(s, S)\n\ninput = [4, 1, 10, 2, 3, 4, 12]\n\nprint(max_satisfaction)\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def minimum_cost_trip(N, D, F_i, P_i):\n    total_fare = 0\n    for i in range(N, D + 1):\n        total_fare += F_i\n    for pass_i in range(D, 1):\n        total_fare += P_i\n    return total_fare\n\nprint(minimum_cost_trip(5, 2, 10, 1, 3, 6, 1, 2, 3, 100, 100, 100, 100, 100))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_triples(A, i, j, k):\n    triples = []\n    for i in range(1, N):\n        for j in range(1, N):\n            for k in range(1, N):\n                triples[i][j][k] = triples[i][j][k]\n    return triples\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def print_digits(N):\n    print_digits = {}\n    for i in range(N+1):\n        if N % i == 1:\n            print_digits[i] = s_i\n        else:\n            print_digits[i] = s_i\n    return print_digits\n\nprint_digits(7)\nprint_digits(17777771)\nprint_digits(1)\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def max_length_palindrome(S):\n    return S[0] + S[1] + S[2] + S[3] + S[4] + S[5] + S[6] + S[7] + S[8] + S[9] + S[10]\n\nprint(max_length_palindrome(S))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def print_321_like(N):\n    print_321_like(N)\n\nprint_321_like(N)\n",
+            "def print_321_like(N):\n    print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n",
+            "print_321_like(N)\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_ABC(S, n):\n    if n <= 3:\n        print(n)\n    else:\n        print(n)\n    return n\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def square_numbers(s, N):\n    return sum(s)\n\nprint(square_numbers(13, N))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def concatenate_surname(s, T):\n    if not T:\n        return \"Takahashi San\"\n    if not T:\n        return \"K Eyence\"\n    return concatenate_surname(s, T)\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_smallest_326_like_number(N):\n    if N <= 100:\n        return N\n    else:\n        return N + 100\n    return N\n",
+            "def find_smallest_326_like_number(N):\n    if N <= 100:\n        return N\n    else:\n        return N + 100\n    return N\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def print_result(B):\n    print_result = B\n    print_result.lower()\n\nprint_result(B)\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def generate_sequences(input_sequence):\n    # Create a sequence of length M\n    sequence = (input_sequence, M)\n\n    # Check if the sequence satisfies the given condition\n    if (sequence[i]!= sequence[j] for all i, j in range(M))\n    # Print \"Yes\"\n    print(\"Yes\")\n\n    # If the sequence does not satisfy the condition, print \"No\"\n    print(\"No\")\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def max_rating(P_i, k):\n    if k < 1:\n        return 0\n    else:\n        return max(P_i, k)\n\nprint(max_rating(P_1, k), k)\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def cost_of_spanning_tree(graph):\n    # Define the cost function\n    cost_of_spanning_tree = (sum, 0)\n    for edge in graph:\n        if edge in cost_of_spanning_tree(edge):\n            cost_of_spanning_tree += edge\n    return cost_of_spanning_tree\n\n# Given input\ninput = 5 6 328\n\n# Print the output\nprint(cost_of_spanning_tree(input))\n",
+            "def cost_of_spanning_tree(graph):\n    # Define the cost function\n    cost_of_spanning_tree = (sum, 0)\n    for edge in graph:\n        if edge in cost_of_spanning_tree(edge):\n            cost_of_spanning_tree += edge\n    return cost_of_spanning_tree\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "import math\n\ndef find_X_i(L, R):\n    # Initialize the function with the first element of the sequence\n    X_1 = 1\n    for i in range(1, N+1):\n        X_i = math.abs(X_i - A_i)\n    return X_i\n\nprint(find_X_i(L, R))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def find_minimum_value(D):\n    if 1 <= D <= 2 * 10**12:\n        return 0\n    else:\n        return max(D, -1)\n    return max(D, -1)\n",
+            "import math\n\ndef find_minimum_value(D):\n    if 1 <= D <= 2 * 10**12:\n        return 0\n    else:\n        return max(D, -1)\n    return max(D, -1)\n\nprint(find_minimum_value(D))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def print_query(A):\n    # Initialize the query to print the \\rm{mex} of A\n    A = A.get(0)\n\n    # Initialize the query to print the \\rm{mex} of A\n    A = A.get(0)\n\n    # Iterate over the sequence A\n    for i in range(1, N):\n        A[i] = A[i-1] + A[i-2] + A[i-3] + A[i-4] + A[i-5]\n\n    # Print the \\rm{mex} of A\n    print(A[i])\n\n    # Print the \\rm{mex} of A\n    print(A[i])\n\n    # Print the \\rm{mex} of A\n    print(A[i])\n\n    # Print the \\rm{mex} of A\n    print(A[i])\n\nprint_query(A)\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_minimum_amount(N, S, M, L):\n    if N <= 100:\n        return 0\n    if S <= 10^4:\n        return 0\n    if M <= 10^4:\n        return 0\n    if L <= 10^4:\n        return 0\n    if S <= 10^4:\n        return 0\n    if M <= 10^4:\n        return 0\n    if L <= 10^4:\n        return 0\n    else:\n        return N * S * M * L\n\nprint(find_minimum_amount(100, 10, 10, 10))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def sum_of_greater_than_A(A_1, A_2,..., A_N):\n    # Initialize the sum of the first N elements\n    sum_of_first_n_elements = 0\n    for i in range(1, N+1):\n        sum_of_first_n_elements += A_i\n    return sum_of_first_n_elements\n\n# Test the function\ninput_values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nprint(sum_of_greater_than_A(input_values))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def calculate_shipping_fee(total_price, shipping_fee):\n    total_price = sum(price_i for i in range(total_price))\n    shipping_fee = 0\n    total_price += shipping_fee\n    print(total_price)\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def concatenate_digits(N):\n    return (N * 10) % 10\n    print(concatenate_digits(N))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_smallest_repunit_sum(N):\n    return (N - 1) * (N - 2) * (N - 3)\n\nprint(find_smallest_repunit_sum(5))\nprint(find_smallest_repunit_sum(19))\nprint(find_smallest_repunit_sum(33))\nprint(find_smallest_repunit_sum(112222222233))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def calculate_cost(bat, glove):\n    if not bat:\n        print(f\"Bat is more expensive than glove\")\n    if not glove:\n        print(f\"Glove is more expensive than bat\")\n\nprint(calculate_cost(bat, glove))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "import math\n\n# Define the constraints\nconst A_1, A_2, \\dots, A_K = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nconst K = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\n\n# Define the problem\ntotal_weirdness = 0\n\n# Define the constraints\nconst A_1 < A_2 < \\dots < A_K < K\n\n# Define the pairs\npairs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\n\n# Calculate the total weirdness\ntotal_weirdness = sum(pair_weirdness)\n\n# Find the minimum total weirdness\nmin_total_weirdness = min(total_weirdness)\n\nprint(min_total_weirdness)\n",
+            "2\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def dragonstring(N):\n    dragonstring = \"Looong\"\n    for i in range(N):\n        dragonstring.append(i)\n    return dragonstring\n",
+            "def dragonstring(N):\n    dragonstring = \"Looong\"\n    for i in range(N):\n        dragonstring.append(i)\n    return dragonstring\n",
+            "def dragonstring(N):\n    dragonstring = \"Looong\"\n    for i in range(N):\n        dragonstring.append(i)\n    return dragonstring\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def ctz(X):\n    return max(X)\n\n# Input\nX = [2024]\n\n# Print the output\nprint(ctz(X))\n",
+            "3\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def print_extended_ABC(S):\n    print_extended_ABC(S)\n\n# Input\nS = string(\"AAABBBCCCCCCCCC\")\n\n# Output\nprint_extended_ABC(S)\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_intersection(input, chords):\n    # Define the chords\n    chords = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\n\n    # Check if all input values are distinct\n    if not all_chords_values <= 2:\n        return False\n\n    # Check if the input is within the range of the chords\n    if not all_chords_values <= 2:\n        return False\n\n    # Print the output\n    print(find_intersection(input, chords))\n    print(if not all_chords_values <= 2:\n        print(True)\n    print(if not all_chords_values <= 2:\n        print(False)\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def print_last_substring(S):\n    print_last_substring = []\n    for i in range(len(S)):\n        if S[i] == \"s\":\n            print_last_substring.append(i)\n    return last_substring\n\nprint_last_substring(S)\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def arithmetic_sequence(A, B, D):\n    return (A, B, D)\n\n# Sample Inputs\nA = 3, B = 9, D = 10\n\n# Print the terms of the arithmetic sequence\nprint(arithmetic_sequence(A, B, D))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def print_smallest_divisible_by_one(N, M, K):\n    # Initialize the smallest positive integer divisible by N and M\n    smallest_num = 1\n    for i in range(1, N + 1, M + 1):\n        smallest_num = min(smallest_num, N)\n    return smallest_num\n\nprint_smallest_divisible_by_one(N, M, K)\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_x(yay):\n    yay = yay\n    x = yay\n    print(x)\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def print_integer(X):\n    print_integer = 0\n    for i in range(1, len(X)):\n        print_integer = print(X / i)\n    return print_integer\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def sum_of_integers(A, K):\n    return sum(A[i] for i in range(K))\n\n# Input\nN = 10\nK = 2\n\n# Print the output\nprint(sum_of_integers(N, K))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def multiply_elements(A, K):\n    return (A[0] * K, A[1] * K, A[2] * K, A[3] * K, A[4] * K, A[5] * K, A[6] * K, A[7] * K, A[8] * K, A[9] * K, A[10] * K)\n\nprint(multiply_elements(A, K))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def good_string(s):\n    return s\n\ns = \"commencement\"\n\nprint(good_string(s))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def generate_good_sequences(L, R):\n    for i in range(1, R):\n        for j in range(i+1, R):\n            if i < j:\n                return S(L, R)\n            if i == 0:\n                return S(L, R)\n        return S(L, R)\n\n    return max(S(L, R), S(L, R) for i in range(1, R))\n",
+            "[1, 1, 1, 1, 1]\n",
+            "[1, 1, 1, 1, 1]\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def check_contest_abbreviation(S):\n    if S is not in the set of contests:\n        return False\n    else:\n        return True\n\nprint(check_contest_abbreviation(S))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def transform_permutation(A):\n    return (A[0] - A[1] + A[2] - A[3]) / 2\n\nprint(transform_permutation(5))\nprint(transform_permutation(4))\nprint(transform_permutation(3))\nprint(transform_permutation(2))\nprint(transform_permutation(0))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def find_new_friends(N, M):\n    new_friends = []\n    for i in range(M):\n        if A_i < B_i:\n            new_friends[i] = A_i\n            new_friends[i+1] = B_i\n    return new_friends\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_taller_buildings(N, H_1, H_2, H_3, H_4, H_5, H_6, H_7, H_8, H_9, H_10):\n    # Check if there is a building taller than the first one from the left\n    if H_i <= H_1:\n        print(f\"No building taller than the first one from the left\")\n    else:\n        print(f\"Building taller than the first one from the left\")\n\n    # Find the position of the leftmost building from the left\n    if H_i <= H_1:\n        print(f\"Position of the leftmost building from the left\")\n    else:\n        print(f\"Position of the leftmost building from the left\")\n\n    # Print the position of the leftmost building from the left\n    print(f\"Position of the leftmost building from the left\")\n\nprint(find_taller_buildings(N, H_1, H_2, H_3, H_4, H_5, H_6, H_7, H_8, H_9, H_10))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def f(x, y):\n    return max(max(x, y), max(x, y))\n\ninput = 3\nprint(f(input))\nprint(f(input))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def f(x, y):\n    z = f(x, y)\n    return z\n\n# Input\nA = (A_1, A_2, A_3, A_4, A_5, A_6, A_7, A_8, A_9, A_10)\n\n# Output\nprint(f(A_1, A_2, A_3, A_4, A_5, A_6, A_7, A_8, A_9, A_10)\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n\n# Input\nA = (A_1, A_2, A_3, A_4, A_5, A_6, A_7, A_8, A_9, A_10)\n\n# Output\nprint(f(A_1, A_2, A_3, A_4, A_5, A_6, A_7, A_8, A_9, A_10)\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n",
+            "def f(x, y):\n    z = f(x, y)\n    return z\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "import math\n\ndef black_painted_region(A, B, C, D):\n    # Calculate the area of the rectangle\n    area = math.sqrt(A*B*C)\n    # Calculate the area of the black-painted region\n    black_painted_area = math.sqrt(A*B*C) - math.sqrt(A*B*C)\n    return black_painted_area\n\nprint(black_painted_region)\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "import math\n\ndef get_remainder(A):\n    A = math.symbols('A')\n    for i in range(1, len(A) + 1):\n        if i == 0:\n            return A\n        else:\n            A[i] = A[i-1] + A[i-2] + \\dots + A[i-1]\n        return A[i] % 100\n\nprint(get_remainder(A))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def distribute_packs(apple, capacity):\n    if n <= apple.length <= 50:\n        return 0\n    else:\n        if capacity <= 50:\n            return 1\n        if apple[i] <= capacity[i]:\n            return 1\n        else:\n            return 0\n    else:\n        return 0\n\n    for i in range(1, n):\n        if capacity[i] <= capacity[i]:\n            return 1\n        else:\n            return 0\n\n    return 0\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def maximize_happiness(happiness, k):\n    max_happiness = max(happiness, 10^8)\n    for i in range(10):\n        if happiness[i] == k:\n            max_happiness += 1\n    return max_happiness\n\n# Example 1\nhappiness = [1,2,3]\nk = 2\nresult = max_happiness(happiness, k)\nprint(result)\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def find_shortest_substring(arr):\n    if arr.length <= 0:\n        return None\n    else:\n        return arr[i]\n\n    for i in range(1, len(arr)):\n        if arr[i] == arr[i.length]:\n            return arr[i]\n        else:\n            return arr[i]\n\n    return None\n\nprint(find_shortest_substring(arr))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_substring(s):\n    if s.length <= 100:\n        return False\n    else:\n        return True\n\ns = \"abcd\"\nprint(find_substring(s))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def generate_string(s, c):\n    if s.length <= 10^5:\n        return s\n    else:\n        return s.length * c\n    return total_strs(s)\n\ns = \"abada\"\nc = \"a\"\nprint(generate_string(s, c))\n",
+            "print(generate_string(s, c))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def make_word_k_special(word):\n    word = word.split()\n    for i in range(len(word)):\n        word[i] = word[i] - word[i]\n        if word[i] == word[i] - word[i] <= k:\n            word = word[i]\n    return word\n\nprint(make_word_k_special(word))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def find_min_moves(nums, k, maxChanges):\n    nums = nums[nums]\n    maxChanges = max(maxChanges, k)\n    for i in range(maxChanges):\n        if nums[i] == 1:\n            nums[i] = nums[i] + 1\n            nums[i] = nums[i]\n        else:\n            nums[i] = nums[i] - 1\n        nums[i] = nums[i]\n    return nums\n\nprint(find_min_moves(nums, k, maxChanges))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def sum_of_elements(nums):\n    nums = [1]\n    for num in nums:\n        if num < k:\n            nums.append(num)\n        else:\n            nums.append(num)\n    return nums\n\nprint(sum_of_elements(1))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def is_Harshad(x):\n    if x <= 100:\n        return -1\n    elif x >= 100:\n        return x // 2\n    else:\n        return -1\n\nprint(is_harshad(x))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def generate_subarrays(nums):\n    nums = nums.split()\n    for i in range(nums.length):\n        nums[i] = nums[i-1] + nums[i]\n    return nums\n\nnums = [0,1,1,1]\n\n# Generate the number of alternating subarrays\nnums_alternating = 5\n\n# Generate the number of alternating subarrays\nnums_alternating = nums_alternating\n\nprint(nums_alternating)\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def max_distance(points):\n    max_distance = 0\n    for point in points:\n        if point.length <= 10^5:\n            max_distance = max_distance + (point.length - 10)\n            max_distance.append(max_distance)\n    return max_distance\n\n# Example 1\npoints = [[3,10],[5,15],[10,2],[4,4]]\nprint(max_distance(points))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def longest_subarray(nums):\n    return nums[i] for i in range(1, nums.length - 1)\n\nnums = [1, 4, 3, 3, 2]\n\nprint(longest_subarray(nums))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def distance(s, k):\n    if s <= 0:\n        return 0\n    if k <= 0:\n        return 0\n    if k > 0:\n        return distance(s[i] for i in range(k + 1))\n    return max(distance(s[i], distance(s[i+1])) - distance(s[i+1], distance(s[i+1])))\n\n# Input: s = \"zbbz\", k = 3\nprint(distance(s, k))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def find_median(nums, k):\n    nums = nums.sort(len(nums) - 1)\n    k = k\n    return nums[k]\n\nnums = [2, 5, 6, 8, 5]\nk = 4\n\nprint(find_median(nums, k))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_smallest_amount(coins):\n    num_coins = 0\n    k = 7\n    for i in range(1, num_coins + 1):\n        coins[i] = coins[i - 1] + 1\n        if num_coins <= k:\n            return num_coins\n        else:\n            return min(num_coins, k)\n    return num_coins\n\nprint(find_smallest_amount(coins))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def divide_nums_and_values(nums, values):\n    nums = nums.split()\n    values = values.split()\n    for num in nums:\n        if num < 10^5:\n            nums.split()\n        else:\n            values = values.split()\n        return values\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def encrypt(nums):\n    nums = [nums.length]\n    for num in nums:\n        if num < 0:\n            nums.append(num)\n        else:\n            nums.append(num)\n    return nums\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def cost(i):\n    if s[i] <= 10^5:\n        return 0\n    else:\n        cost(i) = s[i]\n        return sum(cost(i) for i in range(s[i] - 1, 10^5))\n\nprint(cost(s) for s in s.length)\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def special_subarray(nums, k):\n    nums = nums.split()\n    nums[i] = nums[i-1] + nums[i]\n    nums[i] = nums[i-1] + nums[i-2] + nums[i-3] + nums[i-4] + nums[i-5] + nums[i-6] + nums[i-7] + nums[i-8]\n    nums[i] = nums[i-1] + nums[i-2] + nums[i-3] + nums[i-4] + nums[i-5] + nums[i-6] + nums[i-7] + nums[i-8]\n\n    return nums[i]\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def max_players_to_gain_points(possible):\n    if possible[i] == 0:\n        return -1\n    else:\n        return possible[i] - 1\n\n# Example 1\npossible = [1,0,1,0]\nmax_players_to_gain_points = max_players_to_gain_points(possible)\nprint(max_players_to_gain_points)\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def power_of_subsequence(nums, k):\n    # Initialize the power of a subsequence\n    nums = nums.get(k)\n    power_of_subsequence = None\n\n    # Calculate the sum of the powers of all subsequences of length k\n    sum_of_powers = sum(nums)\n    for i in range(k):\n        power_of_subsequence = nums[i]\n        power_of_subsequence += power_of_subsequence\n\n    return sum_of_powers\n\n# Example 1\nnums = [1, 2, 3, 4]\nk = 3\nresult = power_of_subsequence(nums, k)\nprint(result)\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def generate_subarrays(nums):\n    subarrays = []\n    for num in nums:\n        if num <= 1:\n            subarrays.append(num)\n        else:\n            subarrays.append(num)\n    return subarrays\n\nnums = [1, 4, 3, 3, 2]\n\nprint(generate_subarrays(nums))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def count_special_letters(word):\n    if word.length <= 50:\n        return 0\n    else:\n        return word.lower() * (number of special_letters in word)\n\nword = \"aaAbcBC\"\nprint(count_special_letters(word))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def is_equal(nums1, nums2):\n    nums1 = nums1.length\n    nums2 = nums2.length\n    \n    for i in range(nums1, nums2):\n        nums1[i] += x\n        nums2[i] += x\n    \n    return nums1 == nums2\n\nnums1 = [2, 6, 4]\nnums2 = [9, 7, 5]\n\nprint(is_equal(nums1, nums2))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def generate_string(word):\n    return string\n\n# Constraints\nconst word = \"a3$e\"\nconst length = 20\nconst vowels = None\nconst consonants = None\n\n# Check if the string is valid\nvalid_word = word.length <= word.length + 1\n\n# Generate the string\nstring = generate_string(valid_word)\n\nprint(string)\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def generate_word_k_periodic(word):\n    word = word.split()\n    k = 0\n    for i in range(len(word)):\n        word[i] = word[i + k - 1]\n    return word\n\nprint(generate_word_k_periodic(word))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def find_min_length_t(s):\n    s = s.lower()\n    t = s.lower()\n    return min(s.length, t.length)\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def color_matrix(grid):\n    # Convert the grid to a 2x2 matrix\n    grid = [grid.length for grid in grid if grid.length <= 3]\n    \n    # Convert the grid to a 2x2 matrix\n    color_matrix = [grid.length for grid in grid if grid.length <= 3]\n    # Convert the color of the grid to a 2x2 matrix\n    color_matrix = [color_matrix[i][j] for i, j in grid]\n    \n    # Check if the matrix is a 2x2 square\n    if color_matrix[i][j] == color_matrix[i][j]:\n        return True\n    else:\n        return False\n\nprint(color_matrix(grid))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def right_triangles(grid):\n    return (grid[i][j] for i, j in grid)\n\ngrid = [[0,1,0],[0,1,1],[0,1,0]]\n\n# Check if grid is a right triangle\nright_triangle_count = 0\n\n# Check if grid is a valid triangle\nvalid_triangle_count = 0\n\n# Check if grid is a valid triangle\nvalid_triangle_count = 0\n\n# Check if grid is a valid triangle\nvalid_triangle_count = 0\n\nprint(right_triangles(grid))\n",
+            "2\n",
+            "def right_triangles(grid):\n    return (grid[i][j] for i, j in grid)\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def stable_binary_arrays(arr):\n    if arr <= limit:\n        return arr\n    if arr == 0:\n        return arr[0]\n    elif arr == 1:\n        return arr[1]\n    else:\n        return arr[0] + arr[1]\n    return arr[0]\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def is_special_array(nums):\n    if nums <= 1:\n        return False\n    else:\n        return True\n\nnums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100\n\nprint(is_special_array(nums))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def digit_difference(nums):\n    nums = [nums.length for num in nums]\n    for num in nums:\n        nums[nums.length] = nums[nums.length]\n        nums[nums.length] - nums[nums.length] = nums[nums.length] - nums[nums.length]\n    return nums[nums.length]\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def good_pairs(nums1, nums2, k):\n    nums1[i] = nums1[i]\n    nums2[j] = nums2[j]\n    nums1[i] + nums2[j] * k == nums1[i] + nums2[j]\n    return nums1[i] + nums2[j]\n",
+            "def good_pairs(nums1, nums2, k):\n    nums1[i] = nums1[i]\n    nums2[j] = nums2[j]\n    nums1[i] + nums2[j] * k == nums1[i] + nums2[j]\n    return nums1[i] + nums2[j]\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def compress_word(word):\n    word = []\n    for word in word:\n        if word.length <= 2 * 10^5:\n            word.length = word.length\n        else:\n            word.length = word.length\n    return word\n\nprint(compress_word(word))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def find_max_sum(nums, queries):\n    nums = nums.sort(len(nums), len( queries))\n    max_sum = max(nums)\n    for i in queries:\n        if nums[i] == query[i]:\n            max_sum = nums[i]\n        else:\n            max_sum = max(nums[i] - 1)\n    return max_sum\n\nnums = [3, 5, 9]\nquery = [[1,-2],[0,-3]]\n\nprint(find_max_sum(nums, query))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "def partition_str(s):\n    if s.length <= 1000:\n        return s\n    else:\n        return s.split(s.length, s.length)\n\n    for i in range(len(s)):\n        if s.length <= i:\n            return s.split(s.length, s.length)\n\n    return max(s.split(s.length, s.length))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def find_query_index(nums, queries, x):\n    nums = nums.map(nums.length, queries.length)\n    x = x\n    for query in queries:\n        if queries[i] <= queries.length:\n            nums[i] = nums[i-1] + queries[i-1]\n            x[i] = x[i-1]\n\n    return nums[i] for i in range(nums, queries.length)\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        }
+      ],
+      "num_total": 511,
+      "solved_avg": 0.0,
+      "run_stats": [
+        {
+          "repetition": 1,
+          "num_total": 511,
+          "num_solved": 0,
+          "accuracy": 0.0
+        },
+        {
+          "repetition": 2,
+          "num_total": 511,
+          "num_solved": 0,
+          "accuracy": 0.0
+        },
+        {
+          "repetition": 3,
+          "num_total": 511,
+          "num_solved": 0,
+          "accuracy": 0.0
+        },
+        {
+          "repetition": 4,
+          "num_total": 511,
+          "num_solved": 0,
+          "accuracy": 0.0
+        },
+        {
+          "repetition": 5,
+          "num_total": 511,
+          "num_solved": 0,
+          "accuracy": 0.0
+        },
+        {
+          "repetition": 6,
+          "num_total": 511,
+          "num_solved": 0,
+          "accuracy": 0.0
+        }
+      ],
+      "num_repeat": 6
+    }
+  },
+  "config": {
+    "model": "hf",
+    "model_args": "trust_remote_code=True,pretrained=ali-elganzory/Baguettotron-SFT-Tulu3-decontaminated",
+    "tasks": "LiveCodeBench",
+    "batch_sizes": [
+      "auto"
+    ],
+    "device": null,
+    "use_cache": null,
+    "limit": null,
+    "annotator_model": "auto",
+    "max_tokens": "default",
+    "gen_kwargs": null,
+    "random_seed": 0,
+    "numpy_seed": 1234,
+    "torch_seed": 1234,
+    "fewshot_seed": 1234,
+    "model_num_parameters": 320993856,
+    "model_dtype": "torch.bfloat16",
+    "model_revision": "main",
+    "model_sha": ""
+  },
+  "git_hash": "7e136e8",
+  "date": 1776050414.9622686,
+  "pretty_env_info": "'NoneType' object has no attribute 'splitlines'",
+  "transformers_version": "4.57.6",
+  "upper_git_hash": null,
+  "tokenizer_pad_token": [
+    "[PAD]",
+    "3"
+  ],
+  "tokenizer_eos_token": [
+    "<|end_of_text|>",
+    "2"
+  ],
+  "tokenizer_bos_token": [
+    "<|begin_of_text|>",
+    "1"
+  ],
+  "eot_token_id": 2,
+  "max_length": 4096,
+  "task_hashes": {},
+  "model_source": "hf",
+  "model_name": "ali-elganzory/Baguettotron-SFT-Tulu3-decontaminated",
+  "model_name_sanitized": "ali-elganzory__Baguettotron-SFT-Tulu3-decontaminated",
+  "system_instruction": null,
+  "system_instruction_sha": null,
+  "fewshot_as_multiturn": false,
+  "chat_template": null,
+  "chat_template_sha": null,
+  "start_time": 6510889.135649529,
+  "end_time": 6543896.878677305,
+  "total_evaluation_time_seconds": "33007.74302777555"
+}

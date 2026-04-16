@@ -117,7 +117,7 @@ class IFEvalBenchmark(BaseBenchmark):
             self.logger.info("Generating responses...")
             outputs = self.compute(model, all_instances)
 
-            if model.rank != 0:
+            if self.global_rank(model) != 0:
                 return None
 
             generated_examples = []
@@ -197,7 +197,7 @@ class IFEvalBenchmark(BaseBenchmark):
 
         try:
             generation_results = self.generate_responses(model)
-            evaluation_results = self.evaluate_responses(generaiton_results)
+            evaluation_results = self.evaluate_responses(generation_results)
 
             evaluation_results.update(
                 {"benchmark_version": "ifeval", "max_tokens": self.max_tokens, "num_shot": self.num_examples}

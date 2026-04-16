@@ -1,0 +1,61 @@
+
+\documentclass{article}
+\usepackage[margin=0.5in]{geometry}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{makecell}
+
+\begin{document}
+
+\begin{table}[htbp]
+\centering
+\caption{Evaluation results of models post-trained with SFT and DPO using Tulu3's recipe.}
+\label{tab:evalchemy}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{cl | ccc | ccc | ccc}
+\toprule
+ & & \multicolumn{3}{c|}{\textbf{Base}} & \multicolumn{3}{c|}{\textbf{SFT}} & \multicolumn{3}{c}{\textbf{DPO}} \\
+\cmidrule(lr){3-5} \cmidrule(lr){6-8} \cmidrule(lr){9-11}
+ & \textbf{Benchmark} & \rotatebox{45}{MV-web} & \rotatebox{45}{MV-instruct} & \rotatebox{45}{MV} & \rotatebox{45}{MV-web} & \rotatebox{45}{MV-instruct} & \rotatebox{45}{MV} & \rotatebox{45}{MV-web} & \rotatebox{45}{MV-instruct} & \rotatebox{45}{MV} \\
+\midrule
+ & \textbf{Average} & 7.1 & -- & \underline{7.2} & 8.2 & \underline{14.1} & 13.2 & 8.9 & \underline{\textbf{15.6}} & 13.9 \\
+\midrule
+\multirow{4}{*}{\rotatebox{90}{\textit{Math}}} & AIME24 & 0.0 & -- & \underline{\textbf{3.3}} & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 \\
+ & AIME25 & 0.0 & -- & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & \underline{\textbf{3.3}} & 0.0 \\
+ & AMC23 & 0.0 & -- & 0.0 & 2.5 & \underline{7.5} & 5.0 & 2.5 & \underline{\textbf{10.0}} & 5.0 \\
+ & MATH500 & 0.4 & -- & \underline{\textbf{12.2}} & 1.8 & \underline{10.0} & 6.6 & 2.0 & \underline{\textbf{12.2}} & 8.0 \\
+\midrule
+\multirow{3}{*}{\rotatebox{90}{\textit{Code}}} & HumanEval & \underline{0.6} & -- & \underline{0.6} & 7.3 & \underline{23.6} & 22.3 & 7.0 & \underline{\textbf{25.1}} & 22.6 \\
+ & LiveCodeBench & -- & -- & -- & 1.0 & 2.3 & \underline{3.3} & 1.4 & 1.8 & \underline{\textbf{4.3}} \\
+ & MBPP & \underline{14.2} & -- & 0.2 & 15.8 & \underline{36.8} & \underline{36.8} & 15.2 & \underline{\textbf{38.0}} & 36.4 \\
+\midrule
+\multirow{2}{*}{\rotatebox{90}{\textit{Sci}}} & GPQADiamond & 23.9 & -- & \underline{24.4} & 20.7 & \underline{22.4} & 20.7 & 25.1 & \underline{\textbf{25.3}} & 24.4 \\
+ & JEEBench & 0.0 & -- & \underline{3.3} & 3.4 & \underline{3.7} & 2.5 & 4.0 & \underline{\textbf{4.3}} & 2.9 \\
+\midrule
+\multirow{1}{*}{\rotatebox{90}{\textit{IF}}} & IFEval & \underline{24.8} & -- & 21.1 & 29.9 & \underline{35.0} & 34.9 & 32.0 & \underline{\textbf{36.2}} & 35.1 \\
+\bottomrule
+\end{tabular}
+}
+\vspace{0.5em}
+\noindent
+\begin{minipage}[t]{0.6\textwidth}
+\raggedright
+\small
+\begin{tabular}{r@{: }l}
+\textbf{MV-web} & 1.7b-MixtureVitae-web_curated-100BT \\
+\textbf{MV-instruct} & 1.7b-MixtureVitae-curated_instruct-100BT \\
+\textbf{MV} & 1.7b-MixtureVitae-100BT \\
+\end{tabular}
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.35\textwidth}
+\raggedleft
+\footnotesize{
+\underline{Underlined}: best within stage.\\
+\textbf{Bold}: best overall.
+}
+\end{minipage}
+\end{table}
+
+\end{document}

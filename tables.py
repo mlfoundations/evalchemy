@@ -9,7 +9,8 @@ def collect_scores() -> pd.DataFrame:
         for d in os.scandir("logs")
         for f in os.scandir(d)
         if f.is_file()
-        if list(json.load(open(f.path))["results"].values())[0] != {}
+        if open(f.path).read().strip() != ""
+        and list(json.load(open(f.path))["results"].values())[0] != {}
     ]
 
     # Metadata fields to exclude (not actual scores)
@@ -53,6 +54,8 @@ def collect_scores() -> pd.DataFrame:
                     )
 
     df = pd.DataFrame(rows)
+    df = df.groupby(["huggingface_model_id", "benchmark", "metric"])
+    df = df.agg({"score": "max"}).reset_index()
     df = df.groupby(["huggingface_model_id", "benchmark"])
     df = df.agg({"score": "mean"}).reset_index()
     df["score"] = df["score"] * 100.0
@@ -134,10 +137,16 @@ def generate_and_save_latex(
             [
                 (
                     "MV-noinstruct-16k",
-                    "ontocord/1.7b-MixtureVitae-web_curated-100BT-longsft_16k",
+                    "ali-elganzory/1.7b-MixtureVitae-web_curated-100BT-longsft_16k",
                 ),
-                ("MV-noinstruct-16k + SFT", None),
-                ("MV-noinstruct-16k + DPO", None),
+                (
+                    "MV-noinstruct-16k + SFT",
+                    "ali-elganzory/1.7b-MixtureVitae-web_curated-100BT-longsft_16k-SFT-Tulu3-decontaminated",
+                ),
+                (
+                    "MV-noinstruct-16k + DPO",
+                    "ali-elganzory/1.7b-MixtureVitae-web_curated-100BT-longsft_16k-DPO-Tulu3-decontaminated",
+                ),
             ],
         ),
         (
@@ -159,7 +168,7 @@ def generate_and_save_latex(
             [
                 (
                     "MV-noweb-16k",
-                    "ontocord/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k",
+                    "ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT-longsft_16k",
                 ),
                 (
                     "MV-noweb-16k + SFT",
@@ -188,7 +197,7 @@ def generate_and_save_latex(
         (
             "MV-16k",
             [
-                ("MV-16k", "ontocord/1.7b-MixtureVitae-100BT-longsft_16k"),
+                ("MV-16k", "ali-elganzory/1.7b-MixtureVitae-100BT-longsft_16k"),
                 (
                     "MV-16k + SFT",
                     "ali-elganzory/1.7b-MixtureVitae-100BT-longsft_16k-SFT-Tulu3-decontaminated",
@@ -346,7 +355,7 @@ def generate_and_save_latex(
         (
             "SmolLM2-16k",
             [
-                ("SmolLM2-16k", "ontocord/SmolLM2-1.7B-16k"),
+                ("SmolLM2-16k", "ali-elganzory/SmolLM2-1.7B-16k"),
                 (
                     "SmolLM2-16k + SFT",
                     "ali-elganzory/SmolLM2-1.7B-16k-SFT-Tulu3-decontaminated",
@@ -442,7 +451,7 @@ def generate_and_save_latex(
         (
             "Baguettotron",
             [
-                ("Baguettotron", "PleIAs/Baguettotron"),
+                ("Baguettotron", "ali-elganzory/Baguettotron"),
                 (
                     "Baguettotron + SFT",
                     "ali-elganzory/Baguettotron-SFT-Tulu3-decontaminated",
@@ -456,9 +465,15 @@ def generate_and_save_latex(
         (
             "Baguettotron 16k",
             [
-                ("Baguettotron 16k", "ontocord/Baguettotron-longsft_16k"),
-                ("Baguettotron 16k + SFT", None),
-                ("Baguettotron 16k + DPO", None),
+                ("Baguettotron 16k", "ali-elganzory/Baguettotron-longsft_16k"),
+                (
+                    "Baguettotron 16k + SFT",
+                    "ali-elganzory/Baguettotron-longsft_16k-SFT-Tulu3-decontaminated",
+                ),
+                (
+                    "Baguettotron 16k + DPO",
+                    "ali-elganzory/Baguettotron-longsft_16k-DPO-Tulu3-decontaminated",
+                ),
             ],
         ),
         (
@@ -483,10 +498,16 @@ def generate_and_save_latex(
             [
                 (
                     "MV-16k (0.4B)",
-                    "ontocord/0.4b-mixturevitae-v1-decontaminated-300B-4096-longsft_16k",
+                    "ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096-longsft_16k",
                 ),
-                ("MV-16k (0.4B) + SFT", None),
-                ("MV-16k (0.4B) + DPO", None),
+                (
+                    "MV-16k (0.4B) + SFT",
+                    "ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096-longsft_16k-SFT-Tulu3-decontaminated",
+                ),
+                (
+                    "MV-16k (0.4B) + DPO",
+                    "ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096-longsft_16k-DPO-Tulu3-decontaminated",
+                ),
             ],
         ),
     ]
@@ -624,7 +645,11 @@ def generate_and_save_latex(
             for model_name, hf_id in models:
                 if hf_id is not None and model_name != "DIVIDER":
                     # Escape underscores and add \allowbreak{} after hyphens and slashes
-                    escaped_hf_id = hf_id.replace("_", r"\_").replace("-", r"-\allowbreak{}").replace("/", r"/\allowbreak{}")
+                    escaped_hf_id = (
+                        hf_id.replace("_", r"\_")
+                        .replace("-", r"-\allowbreak{}")
+                        .replace("/", r"/\allowbreak{}")
+                    )
                     extracted_models[model_name] = escaped_hf_id
 
     appendix_latex = []
@@ -686,11 +711,10 @@ def generate_and_save_latex(
                     identifier = hf_id if hf_id else model_name
                     for b in benchmarks_full_names:
                         if get_score(hf_id, b) == "-":
-                            missing_data.append({
-                                "model_id_or_name": identifier,
-                                "missing_benchmark": b
-                            })
-                            
+                            missing_data.append(
+                                {"model_id_or_name": identifier, "missing_benchmark": b}
+                            )
+
     missing_df = pd.DataFrame(missing_data).drop_duplicates()
     missing_df.to_csv("missing_scores.csv", index=False)
     print("Missing benchmarks successfully written to missing_scores.csv")

@@ -107,7 +107,7 @@ class HMMTBenchmark(BaseBenchmark):
             outputs = self.compute(model, all_instances)
             all_outputs.append(outputs)
         # Return None early for non-primary ranks
-        if model.rank != 0:
+        if self.global_rank(model) != 0:
             return None
 
         for example, outputs in zip(examples, zip(*all_outputs)):

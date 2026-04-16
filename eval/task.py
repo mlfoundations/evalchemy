@@ -118,6 +118,12 @@ class BaseBenchmark(ABC):
 
         return messages
 
+    def global_rank(self, model: LM) -> int:
+        if isinstance(model, lm_eval_models.huggingface.HFLM):
+            return model.accelerator.process_index
+        else:
+            return model.rank
+
     def compute(self, model: LM, inputs: List[Instance], do_slice: bool = True) -> List[str]:
         inputs = self._normalize_model_args(model, inputs)
 
@@ -127,7 +133,7 @@ class BaseBenchmark(ABC):
             instance.task_name = task_name
 
         if model.world_size > 1 and do_slice:
-            prompts = list(islice(inputs, model.rank, len(inputs), model.world_size))
+            prompts = list(islice(inputs, self.global_rank(model), len(inputs), model.world_size))
         else:
             prompts = inputs
 

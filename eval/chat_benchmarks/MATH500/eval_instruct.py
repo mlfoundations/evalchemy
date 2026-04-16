@@ -97,7 +97,7 @@ class MATH500Benchmark(BaseBenchmark):
         outputs = self.compute(model, all_instances)
 
         # Return None early for non-primary ranks
-        if model.rank != 0:
+        if self.global_rank(model) != 0:
             return None
 
         for example, output in zip(examples, outputs):

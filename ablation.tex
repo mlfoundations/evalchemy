@@ -1,0 +1,67 @@
+
+\documentclass{article}
+\usepackage[margin=0.5in]{geometry}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{makecell}
+
+\begin{document}
+
+\begin{table}[htbp]
+\centering
+\caption{Evaluation results of models post-trained with SFT and DPO using Tulu3's recipe.}
+\label{tab:evalchemy}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{cl | ccccccccc | ccccccccc | ccccccccc}
+\toprule
+ & & \multicolumn{9}{c|}{\textbf{Base}} & \multicolumn{9}{c|}{\textbf{SFT}} & \multicolumn{9}{c}{\textbf{DPO}} \\
+\cmidrule(lr){3-11} \cmidrule(lr){12-20} \cmidrule(lr){21-29}
+ & \textbf{Benchmark} & \rotatebox{45}{MV} & \rotatebox{45}{MV-16k} & \rotatebox{45}{OpenSci-NM-16k} & \rotatebox{45}{FineWeb-Edu} & \rotatebox{45}{Comma0.1} & \rotatebox{45}{SmolLM2} & \rotatebox{45}{SmolLM2-16k} & \rotatebox{45}{Qwen2.5} & \rotatebox{45}{Qwen3} & \rotatebox{45}{MV} & \rotatebox{45}{MV-16k} & \rotatebox{45}{OpenSci-NM-16k} & \rotatebox{45}{FineWeb-Edu} & \rotatebox{45}{Comma0.1} & \rotatebox{45}{SmolLM2} & \rotatebox{45}{SmolLM2-16k} & \rotatebox{45}{Qwen2.5} & \rotatebox{45}{Qwen3} & \rotatebox{45}{MV} & \rotatebox{45}{MV-16k} & \rotatebox{45}{OpenSci-NM-16k} & \rotatebox{45}{FineWeb-Edu} & \rotatebox{45}{Comma0.1} & \rotatebox{45}{SmolLM2} & \rotatebox{45}{SmolLM2-16k} & \rotatebox{45}{Qwen2.5} & \rotatebox{45}{Qwen3} \\
+\midrule
+ & \textbf{Average} & 13.2 & \underline{\textbf{38.0}} & 6.1 & 5.0 & 7.1 & 6.1 & 16.3 & 12.2 & 29.1 & 18.0 & \underline{29.2} & 7.4 & 6.9 & 10.1 & 14.5 & 17.4 & 23.5 & 26.5 & 18.4 & \underline{30.2} & 8.1 & 7.0 & 10.8 & 14.4 & 18.7 & 21.3 & 29.1 \\
+\midrule
+\multirow{4}{*}{\rotatebox{90}{\textit{Math}}} & AIME24 & 0.0 & -- & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & -- & 0.0 & 0.0 & -- & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & \underline{\textbf{3.3}} & 0.0 & -- & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & \underline{\textbf{3.3}} & \underline{\textbf{3.3}} \\
+ & AIME25 & \underline{\textbf{10.0}} & -- & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & -- & -- & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & -- & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 \\
+ & AMC23 & 7.5 & -- & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & -- & \underline{\textbf{22.5}} & 7.5 & -- & 0.0 & 5.0 & 0.0 & 2.5 & 0.0 & 10.0 & \underline{12.5} & \underline{15.0} & \underline{15.0} & 2.5 & 2.5 & 0.0 & 2.5 & 2.5 & 7.5 & 7.5 \\
+ & MATH500 & 17.4 & 46.0 & 0.0 & 0.0 & 0.0 & 0.0 & 12.2 & -- & \underline{\textbf{46.4}} & 28.6 & \underline{31.0} & 2.0 & 0.4 & 0.6 & 6.0 & 8.2 & 19.0 & 29.6 & 27.4 & \underline{33.6} & 3.0 & 0.4 & 1.6 & 7.4 & 8.2 & 22.8 & 30.4 \\
+\midrule
+\multirow{3}{*}{\rotatebox{90}{\textit{Code}}} & HumanEval & 11.7 & 31.9 & 0.0 & 0.0 & 4.3 & 0.0 & 13.2 & 13.8 & \underline{33.0} & 27.9 & 33.2 & 2.1 & 0.6 & 8.6 & 19.3 & 19.3 & 38.9 & \underline{\textbf{48.7}} & 27.9 & 33.2 & 2.1 & 0.3 & 9.5 & 18.7 & 20.9 & 38.8 & \underline{47.8} \\
+ & LiveCodeBench & -- & -- & -- & 0.0 & -- & -- & -- & -- & -- & 2.2 & -- & -- & 0.2 & 1.8 & \underline{4.9} & -- & -- & 2.9 & 1.8 & \underline{\textbf{14.9}} & -- & 0.0 & 1.8 & 4.7 & -- & 8.4 & -- \\
+ & MBPP & 18.6 & 39.8 & 0.2 & 0.0 & 9.0 & 1.8 & 36.0 & 0.0 & \underline{46.8} & 41.2 & 40.6 & 2.4 & 3.2 & 22.8 & 37.6 & 36.2 & 44.6 & \underline{55.0} & 40.8 & 40.0 & 3.0 & 3.0 & 22.6 & 38.2 & 38.2 & 44.4 & \underline{\textbf{56.0}} \\
+\midrule
+\multirow{2}{*}{\rotatebox{90}{\textit{Sci}}} & GPQADiamond & 23.9 & \underline{25.3} & 21.0 & 20.9 & 22.1 & 22.7 & 24.6 & -- & 24.7 & 26.1 & 23.4 & 24.2 & 24.9 & 25.8 & 24.9 & 25.8 & 26.6 & \underline{\textbf{30.1}} & 24.6 & 25.3 & 25.1 & 25.6 & 27.8 & 23.1 & 28.1 & \underline{28.3} & 28.1 \\
+ & JEEBench & \underline{4.1} & -- & -- & 0.0 & 0.0 & -- & -- & -- & -- & 4.2 & -- & -- & 0.9 & 4.3 & \underline{5.5} & -- & -- & -- & 3.1 & -- & -- & 1.9 & 5.6 & 4.2 & -- & \underline{\textbf{7.9}} & -- \\
+\midrule
+\multirow{1}{*}{\rotatebox{90}{\textit{IF}}} & IFEval & 25.6 & \underline{46.9} & 27.8 & 28.7 & 28.5 & 24.6 & 44.3 & 22.7 & 30.1 & 42.4 & 47.1 & 28.4 & 33.6 & 36.8 & 44.5 & 49.4 & 49.1 & \underline{56.1} & 42.9 & 49.5 & 28.9 & 35.9 & 39.2 & 45.6 & 51.4 & 51.4 & \underline{\textbf{60.0}} \\
+\bottomrule
+\end{tabular}
+}
+\vspace{0.5em}
+\noindent
+\begin{minipage}[t]{0.6\textwidth}
+\raggedright
+\small
+\begin{tabular}{r@{: }l}
+\textbf{MV} & 1.7b-MixtureVitae-300BT-v1-decontaminated \\
+\textbf{MV-16k} & 1.7b-MixtureVitae-300BT-v1-decontaminated-16k \\
+\textbf{OpenSci-NM-16k} & open-sci-ref-v0.01-1.7b-nemotron-hq-300B-16384 \\
+\textbf{FineWeb-Edu} & ablation-model-fineweb-edu \\
+\textbf{Comma0.1} & 1.7b-Comma0.1-300BT \\
+\textbf{SmolLM2} & SmolLM2-1.7B \\
+\textbf{SmolLM2-16k} & SmolLM2-1.7B-16k \\
+\textbf{Qwen2.5} & Qwen2.5-1.5B \\
+\textbf{Qwen3} & Qwen3-1.7B \\
+\end{tabular}
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.35\textwidth}
+\raggedleft
+\footnotesize{
+\underline{Underlined}: best within stage.\\
+\textbf{Bold}: best overall.
+}
+\end{minipage}
+\end{table}
+
+\end{document}

@@ -1,0 +1,3609 @@
+{
+  "results": {
+    "LiveCodeBench": {
+      "accuracy_avg": 0.0,
+      "accuracy_std_err": 0.0,
+      "accuracy_easy_avg": 0.0,
+      "accuracy_easy_std_err": 0.0,
+      "accuracy_medium_avg": 0.0,
+      "accuracy_medium_std_err": 0.0,
+      "accuracy_hard_avg": 0.0,
+      "accuracy_hard_std_err": 0.0,
+      "raw_metrics": [
+        {
+          "total_correct": 0,
+          "total_finish": 511,
+          "accuracy": 0.0,
+          "per_difficulty_correct": {
+            "easy": 0,
+            "medium": 0,
+            "hard": 0
+          },
+          "per_difficulty_total": {
+            "easy": 182,
+            "medium": 206,
+            "hard": 123
+          },
+          "accuracy_easy": 0.0,
+          "accuracy_medium": 0.0,
+          "accuracy_hard": 0.0
+        },
+        {
+          "total_correct": 0,
+          "total_finish": 511,
+          "accuracy": 0.0,
+          "per_difficulty_correct": {
+            "easy": 0,
+            "medium": 0,
+            "hard": 0
+          },
+          "per_difficulty_total": {
+            "easy": 182,
+            "medium": 206,
+            "hard": 123
+          },
+          "accuracy_easy": 0.0,
+          "accuracy_medium": 0.0,
+          "accuracy_hard": 0.0
+        },
+        {
+          "total_correct": 0,
+          "total_finish": 511,
+          "accuracy": 0.0,
+          "per_difficulty_correct": {
+            "easy": 0,
+            "medium": 0,
+            "hard": 0
+          },
+          "per_difficulty_total": {
+            "easy": 182,
+            "medium": 206,
+            "hard": 123
+          },
+          "accuracy_easy": 0.0,
+          "accuracy_medium": 0.0,
+          "accuracy_hard": 0.0
+        },
+        {
+          "total_correct": 0,
+          "total_finish": 511,
+          "accuracy": 0.0,
+          "per_difficulty_correct": {
+            "easy": 0,
+            "medium": 0,
+            "hard": 0
+          },
+          "per_difficulty_total": {
+            "easy": 182,
+            "medium": 206,
+            "hard": 123
+          },
+          "accuracy_easy": 0.0,
+          "accuracy_medium": 0.0,
+          "accuracy_hard": 0.0
+        },
+        {
+          "total_correct": 0,
+          "total_finish": 511,
+          "accuracy": 0.0,
+          "per_difficulty_correct": {
+            "easy": 0,
+            "medium": 0,
+            "hard": 0
+          },
+          "per_difficulty_total": {
+            "easy": 182,
+            "medium": 206,
+            "hard": 123
+          },
+          "accuracy_easy": 0.0,
+          "accuracy_medium": 0.0,
+          "accuracy_hard": 0.0
+        },
+        {
+          "total_correct": 0,
+          "total_finish": 511,
+          "accuracy": 0.0,
+          "per_difficulty_correct": {
+            "easy": 0,
+            "medium": 0,
+            "hard": 0
+          },
+          "per_difficulty_total": {
+            "easy": 182,
+            "medium": 206,
+            "hard": 123
+          },
+          "accuracy_easy": 0.0,
+          "accuracy_medium": 0.0,
+          "accuracy_hard": 0.0
+        }
+      ],
+      "examples": [
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "class Solution:\n    def maxScore(self, nums: List[List[int]]) -> int:\n        if not nums:\n            return 0\n        \n        max_score = 0\n        \n        for row in nums:\n            max_score = max(max_score, max(row))\n        \n        return max_score\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "class Solution:\n    def adjacentColors(self, n: int, queries: List[List[int]]) -> List[int]:\n        ans = []\n        for i in range(n):\n            ans.append(0)\n        for i in range(n):\n            for j in range(i+1, n):\n                if queries[i][0] == queries[j][0] and queries[i][1] == queries[j][1]:\n                    ans[i] += 1\n        return ans\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "class Solution:\n    def powerOfGroups(self, nums: List[int]) -> int:\n        \"\"\"\n        :type nums: List[int]\n        :rtype: int\n        \"\"\"\n        power = 0\n        for i in range(len(nums)):\n            power += (nums[i] ** 2) * min(nums[i], nums[i+1])\n        return power % 10**9 + 7\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "\nSolution 2:\n\nclass Solution:\n    def minSwaps(self, nums: List[int]) -> int:\n        if not nums:\n            return 0\n        \n        def swap(i, j):\n            if i == j:\n                return\n            \n            nums[i], nums[j] = nums[j], nums[i]\n            \n            swap(i + 1, j)\n            swap(i, j + 1)\n            swap(i + 1, j + 1)\n            \n        swap(0, 1)\n        swap(1, 2)\n        swap(2, 3)\n        \n        return min(swap(i, j) for i in range(len(nums) - 1) for j in range(i + 1, len(nums)))\n",
+            "\nSolution 4:\n\nclass Solution:\n    def minSwaps(self, nums: List[int]) -> int:\n        if not nums:\n            return 0\n        \n        def swap(i, j):\n            if i == j:\n                return\n            \n            nums[i], nums[j] = nums[j], nums[i]\n            \n            swap(i + 1, j)\n            swap(i, j + 1)\n            swap(i + 1, j + 1)\n            \n        swap(0, 1)\n        swap(1, 2)\n        swap(2, 3)\n        \n        return min(swap(i, j) for i in range(len(nums) - 1) for j in range(i + 1, len(nums)))\n",
+            "\nSolution 6:\n\nclass Solution:\n    def minSwaps(self, nums: List[int]) -> int:\n        if not nums:\n            return 0\n        \n        def swap(i, j):\n            if i == j:\n                return\n            \n            nums[i], nums[j] = nums[j], nums[i]\n            \n            swap(i + 1, j)\n            swap(i, j + 1)\n            swap(i + 1, j + 1)\n            \n        swap(0, 1)\n        swap(1, 2)\n        swap(2, 3)\n        \n        return min(swap(i, j) for i in range(len(nums) - 1) for j in range(i + 1, len(nums)))\n",
+            "\nSolution 8:\n\nclass Solution:\n    def minSwaps(self, nums: List[int]) -> int:\n        if not nums:\n            return 0\n        \n        def swap(i, j):\n            if i == j:\n                return\n            \n            nums[i], nums[j] = nums[j], nums[i]\n            \n            swap(i + 1, j)\n            swap(i, j + 1)\n            swap(i + 1, j + 1)\n            \n        swap(0, 1)\n        swap(1, 2)\n        swap(2, 3)\n        \n        return min(swap(i, j) for i in range(len(nums) - 1) for j in range(i + 1, len(nums)))\n",
+            "\nSolution 10:\n\nclass Solution:\n    def minSwaps(self, nums: List[int]) -> int:\n        if not nums:\n            return 0\n        \n        def swap(i, j):\n            if i == j:\n                return\n            \n            nums[i], nums[j] = nums[j], nums[i]\n            \n            swap(i + 1, j)\n            swap(i, j + 1)\n            swap(i + 1, j + 1)\n            \n        swap(0, 1)\n        swap(1, 2)\n        swap(2, 3)\n        \n        return min(swap(i, j) for i in range(len(nums) - 1) for j in range(i + 1, len(nums)))\n",
+            "\nSolution 12:\n\nclass Solution:\n    def minSwaps(self, nums: List[int]) -> int:\n        if not nums:\n            return 0\n        \n        def swap(i, j):\n            if i == j:\n                return\n            \n            nums[i], nums[j] = nums[j], nums[i]\n            \n            swap(i + 1, j)\n            swap(i, j + 1)\n            swap(i + 1, j + 1)\n            \n        swap(0, 1)\n        swap(1, 2)\n        swap(2, 3)\n        \n        return min(swap(i, j) for i in range(len(nums) - 1) for j in range(i + 1, len(nums)))\n",
+            "\nSolution 14:\n\nclass Solution:\n    def minSwaps(self, nums: List[int]) -> int:\n        if not nums:\n            return 0\n        \n        def swap(i, j):\n            if i == j:\n                return\n            \n            nums[i], nums[j] = nums[j], nums[i]\n            \n            swap(i + 1, j)\n            swap(i, j + 1)\n            swap(i + 1, j + 1)\n            \n        swap(0, 1)\n        swap(1, 2)\n        swap(2, 3)\n        \n        return min(swap(i, j) for i in range(len(nums) - 1) for j in range(i + 1, len(nums)))\n",
+            "\nSolution 16:\n\nclass Solution:\n    def minSwaps(self, nums: List[int]) -> int:\n        if not nums:\n            return 0\n        \n        def swap(i, j):\n            if i == j:\n                return\n            \n            nums[i], nums[j] = nums[j], nums[i]\n            \n            swap(i + 1, j)\n            swap(i, j + 1)\n            swap(i + 1, j + 1)\n            \n        swap(0, 1)\n        swap(1, 2)\n        swap(2, 3)\n        \n        return min(swap(i, j) for i in range(len(nums) - 1) for j in range(i + 1, len(nums)))\n",
+            "\nSolution 18:\n\nclass Solution:\n    def minSwaps(self, nums: List[int]) -> int:\n        if not nums:\n            return 0\n        \n        def swap(i, j):\n            if i == j:\n                return\n            \n            nums[i], nums[j] = nums[j], nums[i]\n            \n            swap(i + 1, j)\n            swap(i, j + 1)\n            swap(i + 1, j + 1)\n            \n        swap(0, 1)\n        swap(1, 2)\n        swap(2, 3)\n        \n        return min(swap(i, j) for i in range(len(nums) - 1) for j in range(i + 1, len(nums)))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "\n## Solution 2:\n\n",
+            "\n## Solution 3:\n\n",
+            "\n## Solution 4:\n\n",
+            "\n## Solution 5:\n\n",
+            "\n## Solution 6:\n\n",
+            "\n## Solution 7:\n\n",
+            "\n## Solution 8:\n\n",
+            "\n## Solution 9:\n\n",
+            "\n## Solution 10:\n\n",
+            "\n## Solution 11:\n\n",
+            "\n## Solution 12:\n\n",
+            "\n## Solution 13:\n\n",
+            "\n## Solution 14:\n\n",
+            "\n## Solution 15:\n\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "class Solution:\n    def canGo(self, nums: List[int]) -> bool:\n        \"\"\"\n        :type nums: List[int]\n        :rtype: bool\n        \"\"\"\n        if not nums:\n            return False\n        \n        def dfs(i, j):\n            if i == j:\n                return True\n            \n            if i < j:\n                if gcd(nums[i], nums[j]) > 1:\n\n            \n            if i > j:\n                if gcd(nums[i], nums[j]) < 1:\n\n            \n            return False\n        \n        return all(dfs(i, j) for i, j in enumerate(nums))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "#### File: leetcode/python/max_subarray.py\n",
+            "#### File: leetcode/python/max_subarray_ii.py\n",
+            "#### File: leetcode/python/max_subarray_ii_2.py\n",
+            "#### File: leetcode/python/max_subarray_ii_3.py\n",
+            "#### File: leetcode/python/max_subarray_ii_4.py\n",
+            "#### File: leetcode/python/max_subarray_ii_5.py\n",
+            "#### File: leetcode/python/max_subarray_ii_6.py\n",
+            "#### File: leetcode/python/max_subarray_ii_7.py\n",
+            "#### File: leetcode/python/max_subarray_ii_8.py\n",
+            "#### File: leetcode/python/max_subarray_ii_9.py\n",
+            "#### File: leetcode/python/max_subarray_ii_10.py\n",
+            "#### File: leetcode/python/max_subarray_ii_11.py\n",
+            "#### File: leetcode/python/max_subarray_ii_12.py\n",
+            "#### File: leetcode/python/max_subarray_ii_13.py\n",
+            "#### File: leetcode/python/max_subarray_ii_14.py\n",
+            "#### File: leetcode/python/max_subarray_ii_15.py\n",
+            "#### File: leetcode/python/max_subarray_ii_16.py\n",
+            "#### File: leetcode/python/max_subarray_ii_17.py\n",
+            "#### File: leetcode/python/max_subarray_ii_18.py\n",
+            "#### File: leetcode/python/max_subarray_ii_19.py\n",
+            "#### File: leetcode/python/max_subarray_ii_20.py\n",
+            "#### File: leetcode/python/max_subarray_ii_21.py\n",
+            "#### File: leetcode/python/max_subarray_ii_22.py\n",
+            "#### File: leetcode/python/max_subarray_ii_23.py\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "#### File: leetcode/python/min_path_sum.py\n",
+            "#### File: leetcode/python/min_path_sum_ii.py\n",
+            "#### File: leetcode/python/min_path_sum_iii.py\n",
+            "#### File: leetcode/python/min_path_sum_iv.py\n",
+            "#### File: leetcode/python/min_path_sum_v.py\n",
+            "#### File: leetcode/python/min_path_sum_vi.py\n",
+            "#### File: leetcode/python/min_path_sum_vii.py\n",
+            "#### File: leetcode/python/min_path_sum_viii.py\n",
+            "#### File: leetcode/python/min_path_sum_ix.py\n",
+            "#### File: leetcode/python/min_path_sum_x.py\n",
+            "#### File: leetcode/python/min_path_sum_xi.py\n",
+            "#### File: leetcode/python/min_path_sum_xii.py\n",
+            "#### File: leetcode/python/min_path_sum_xiii.py\n",
+            "#### File: leetcode/python/min_path_sum_xiv.py\n",
+            "#### File: leetcode/python/min_path_sum_xv.py\n",
+            "#### File: leetcode/python/min_path_sum_xvi.py\n",
+            "#### File: leetcode/python/min_path_sum_xvii.py\n",
+            "#### File: leetcode/python/min_path_sum_xviii.py\n",
+            "#### File: leetcode/python/min_path_sum_xix.py\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "class Solution:\n    def maxPairs(self, words: List[str]) -> int:\n        \"\"\"\n        :type words: List[str]\n        :rtype: int\n        \"\"\"\n        if not words:\n            return 0\n        \n        def helper(words, i, j):\n            if i == j:\n                return 1\n            \n            if words[i] == words[j]:\n                return helper(words, i+1, j) + helper(words, i, j+1)\n            \n            return helper(words, i+1, j)\n        \n        return max(helper(words, 0, len(words)-1))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "class Solution:\n    def numSubarrays(self, nums: List[int]) -> int:\n        \"\"\"\n        :type nums: List[int]\n        :rtype: int\n        \"\"\"\n        if not nums:\n            return 0\n        nums.sort()\n        res = 0\n        for i in range(len(nums)):\n            if nums[i] == 1:\n                res += 1\n        return res % 10**9 + 7\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "class Solution:\n    def longestSubarray(self, nums1: List[int], nums2: List[int]) -> int:\n        if len(nums1) == 0 or len(nums2) == 0:\n            return 0\n        \n        nums3 = [nums1[0], nums2[0]]\n        \n        for i in range(1, len(nums1)):\n            if nums1[i] > nums2[i]:\n                nums3.append(nums1[i])\n            else:\n                nums3.append(nums2[i])\n        \n        return max(len(nums3), len(nums1) + len(nums2))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "\n## 题目\n\n给定一个 0-indexed 整数数组 nums，找出所有有效的两个非空的非负整数，并且两个数字之间的间隔最大。\n\n示例 1：\n\n输入：nums = [2,3,4,3,4]\n输出：4\n解释：有以下两个有效的两个非空的非负整数：[3,4], [3,4,3], [3,4,3,4]。最长的是 [3,4,3,4] 的长度为 4。\n\n示例 2：\n\n输入：nums = [4,5,6]\n输出：2\n解释：有以下两个有效的两个非空的非负整数：[4,5] 和 [5,6]。两个数字之间的间隔最大为 2。\n\n提示：\n\n2 <= nums.length <= 100\n1 <= nums[i] <= 10^4\n\n## 解答\n\n",
+            "\n## 题目\n\n给定一个 0-indexed 整数数组 nums，找出所有有效的两个非空的非负整数，并且两个数字之间的间隔最大。\n\n示例 1：\n\n输入：nums = [2,3,4,3,4]\n输出：4\n解释：有以下两个有效的两个非空的非负整数：[3,4], [3,4,3], [3,4,3,4]。最长的是 [3,4,3,4] 的长度为 4。\n\n示例 2：\n\n输入：nums = [4,5,6]\n输出：2\n解释：有以下两个有效的两个非空的非负整数：[4,5] 和 [5,6]。两个数字之间的间隔最大为 2。\n\n提示：\n\n2 <= nums.length <= 100\n1 <= nums[i] <= 10^4\n\n## 解答\n\n",
+            "\n## 题目\n\n给定一个 0-indexed 整数数组 nums，找出所有有效的两个非空的非负整数，并且两个数字之间的间隔最大。\n\n示例 1：\n\n输入：nums = [2,3,4,3,4]\n输出：4\n解释：有以下两个有效的两个非空的非负整数：[3,4], [3,4,3], [3,4,3,4]。最长的是 [3,4,3,4] 的长度为 4。\n\n示例 2：\n\n输入：nums = [4,5,6]\n输出：2\n解释：有以下两个有效的两个非空的非负整数：[4,5] 和 [5,6]。两个数字之间的间隔最大为 2。\n\n提示：\n\n2 <= nums.length <= 100\n1 <= nums[i] <= 10^4\n\n## 解答\n\n",
+            "\n## 题目\n\n给定一个 0-indexed 整数数组 nums，找出所有有效的两个非空的非负整数，并且两个数字之间的间隔最大。\n\n示例 1：\n\n输入：nums = [2,3,4,3,4]\n输出：4\n解释：有以下两个有效的两个非空的非负整数：[3,4], [3,4,3], [3,4,3,4]。最长的是 [3,4,3,4] 的长度为 4。\n\n示例 2：\n\n输入：nums = [4,5,6]\n输出：2\n解释：有以下两个有效的两个非空的非负整数：[4,5] 和 [5,6]。两个数字之间的间隔最大为 2。\n\n提示：\n\n2 <= nums.length <= 100\n1 <= nums[i] <= 10^4\n\n## 解答\n\n",
+            "\n## 题目\n\n给定一个 0-indexed 整数数组 nums，找出所有有效的两个非空的非负整数，并且两个数字之间的间隔最大。\n\n示例 1：\n\n输入：nums = [2,3,4,3,4]\n输出：4\n解释：有以下两个有效的两个非空的非负整数：[3,4], [3,4,3], [3,4,3,4]。最长的是 [3,4,3,4] 的长度为 4。\n\n示例 2：\n\n输入：nums = [4,5,6]\n输出：2\n解释：有以下两个有效的两个非空的非负整数：[4,5] 和 [5,6]。两个数字之间的间隔最大为 2。\n\n提示：\n\n2 <= nums.length <= 100\n1 <= nums[i] <= 10^4\n\n## 解答\n\n",
+            "\n## 题目\n\n给定一个 0-indexed 整数数组 nums，找出所有有效的两个非空的非负整数，并且两个数字之间的间隔最大。\n\n示例 1：\n\n输入：nums = [2,3,4,3,4]\n输出：4\n解释：有以下两个有效的两个非空的非负整数：[3,4], [3,4,3], [3,4,3,4]。最长的是 [3,4,3,4] 的长度为 4。\n\n示例 2：\n\n输入：nums = [4,5,6]\n输出：2\n解释：有以下两个有效的两个非空的非负整数：[4,5] 和 [5,6]。两个数字之间的间隔最大为 2。\n\n提示：\n\n2 <= nums.length <= 100\n1 <= nums[i] <= 10^4\n\n## 解答\n\n",
+            "\n## 题目\n\n给定一个 0-indexed 整数数组 nums，找出所有有效的两个非空的非负整数，并且两个数字之间的间隔最大。\n\n示例 1：\n\n输入：nums = [2,3,4,3,4]\n输出：4\n解释：有以下两个有效的两个非空的非负整数：[3,4], [3,4,3], [3,4,3,4]。最长的是 [3,4,3,4] 的长度为 4。\n\n示例 2：\n\n输入：nums = [4,5,6]\n输出：2\n解释：有以下两个有效的两个非空的非负整数：[4,5] 和 [5,6]。两个数字之间的间隔最大为 2。\n\n提示：\n\n2 <= nums.length <= 100\n1 <= nums[i] <= 10^4\n\n## 解答\n\n",
+            "\n## 题目\n\n给定一个 0-indexed 整数数组 nums，找出所有有效的两个非空的非负整数，并且两个数字之间的间隔最大。\n\n示例 1：\n\n输入：nums = [2,3,4,3,4]\n输出：4\n解释：有以下两个有效的两个非空的非负整数：[3,4], [3,4,3], [3,4,3,4]。最长的是 [3,4,3,4] 的长度为 4。\n\n示例 2：\n\n输入：nums = [4,5,6]\n输出：2\n解释：有以下两个有效的两个非空的非负整数：[4,5] 和 [5,6]。两个数字之间的间隔最大为 2。\n\n提示：\n\n2 <= nums.length <= 100\n1 <= nums[i] <= 10^4\n\n## 解答\n\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "\n## 二分法\n\n",
+            "\n## 二分法\n\n",
+            "\n## 二分法\n\n",
+            "\n## 二分法\n\n",
+            "\n## 二分法\n\n",
+            "\n## 二分法\n\n",
+            "\n## 二分法\n\n",
+            "\n## 二分法\n\n",
+            "\n## 二分法\n\n",
+            "\n## 二分法\n\n",
+            "\n## 二分法\n\n",
+            "\n## 二分法\n\n",
+            "\n## 二分法\n\n",
+            "\n## 二分法\n\n",
+            "\n## 二分法\n\n",
+            "\n## 二分法\n\n",
+            "\n## 二分法\n\n",
+            "\n## 二分法\n\n",
+            "\n## 二分法\n\n",
+            "\n## 二分法\n\n",
+            "\n## 二分法\n\n",
+            "\n## 二分法\n\n",
+            "\n## 二分法\n\n",
+            "\n## 二分法\n\n",
+            "\n## 二分法\n\n",
+            "\n## 二分法\n\n",
+            "\n## 二分法\n\n",
+            "\n## 二分法\n\n",
+            "\n## 二分法\n\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "class Solution:\n    def countInterestingSubarrays(self, nums, modulo, k):\n        \"\"\"\n        :type nums: List[int]\n        :type modulo: int\n        :type k: int\n        :rtype: int\n        \"\"\"\n        cnt = 0\n        for i in range(len(nums)):\n            if nums[i] % modulo == k:\n                cnt += 1\n        return cnt\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "class Solution:\n    def minEqualize(self, nums: List[int]) -> int:\n        if not nums:\n            return 0\n        \n        def equalize(nums, i):\n            if i == len(nums):\n                return 0\n            \n            if nums[i] == nums[i - 1] + nums[i + 1]:\n                return 1\n            \n            if nums[i] == nums[i - 1]:\n                return 2\n            \n            return 3\n        \n        return min(equalize(nums, i) for i in range(len(nums)))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "class Solution:\n    def swap(self, s1, s2):\n        \"\"\"\n        :type s1: str\n        :type s2: str\n        :rtype: bool\n        \"\"\"\n        if len(s1) != len(s2):\n            return False\n        \n        for i in range(len(s1)):\n            if s1[i] != s2[i]:\n                return False\n        \n        return True\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "class Solution:\n    def isSubsequence(self, str1: str, str2: str) -> bool:\n        if len(str1) != len(str2):\n            return False\n        \n        def get_index(str1, str2, index):\n            if index == len(str1):\n                return len(str2)\n            \n            if str1[index] == str2[index]:\n                return get_index(str1, str2, index + 1)\n            \n            return get_index(str1, str2, index + 1)\n        \n        return get_index(str1, str2, 0) == get_index(str1, str2, 1)\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "class Solution:\n    def product(self, grid):\n        \"\"\"\n        :type grid: List[List[int]]\n        :rtype: List[int]\n        \"\"\"\n        n, m = len(grid), len(grid[0])\n        p = [[0] * m for _ in range(n)]\n        for i in range(n):\n            for j in range(m):\n                p[i][j] = grid[i][j] % 12345\n        return p\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "class Solution:\n    def maxSubarrayScore(self, nums: List[int]) -> int:\n        \"\"\"\n        :type nums: List[int]\n        :rtype: int\n        \"\"\"\n        if not nums:\n            return 0\n        \n        def helper(nums, i, j):\n            if i >= len(nums):\n                return 0\n            if j >= len(nums[i]):\n                return 0\n            if nums[i] == nums[j]:\n                return helper(nums, i + 1, j) + helper(nums, i, j + 1)\n            return helper(nums, i, j + 1)\n        \n        return max(helper(nums, 0, len(nums) - 1))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n",
+            "\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "class Solution:\n    def maxSumOfHeights(self, maxHeights: List[int]) -> int:\n        \"\"\"\n        :type maxHeights: List[int]\n        :rtype: int\n        \"\"\"\n        max_sum = 0\n        for i in range(len(maxHeights)):\n            max_sum = max(max_sum, maxHeights[i])\n        return max_sum\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "class Solution:\n    def findBeautifulSubstring(self, s: str, k: int) -> str:\n        if k == 0:\n            return \"\"\n        if k == 1:\n            return s\n        if k == 2:\n            return s[0]\n        if k == 3:\n            return s[0]\n        if k == 4:\n            return s[0]\n        if k == 5:\n            return s[0]\n        if k == 6:\n            return s[0]\n        if k == 7:\n            return s[0]\n        if k == 8:\n            return s[0]\n        if k == 9:\n            return s[0]\n        if k == 10:\n            return s[0]\n        if k == 11:\n            return s[0]\n        if k == 12:\n            return s[0]\n        if k == 13:\n            return s[0]\n        if k == 14:\n            return s[0]\n        if k == 15:\n            return s[0]\n        if k == 16:\n            return s[0]\n        if k == 17:\n            return s[0]\n        if k == 18:\n            return s[0]\n        if k == 19:\n            return s[0]\n        if k == 20:\n            return s[0]\n        if k == 21:\n            return s[0]\n        if k == 22:\n            return s[0]\n        if k == 23:\n            return s[0]\n        if k == 24:\n            return s[0]\n        if k == 25:\n            return s[0]\n        if k == 26:\n            return s[0]\n        if k == 27:\n            return s[0]\n        if k == 28:\n            return s[0]\n        if k == 29:\n            return s[0]\n        if k == 30:\n            return s[0]\n        if k == 31:\n            return s[0]\n        if k == 32:\n            return s[0]\n        if k == 33:\n            return s[0]\n        if k == 34:\n            return s[0]\n        if k == 35:\n            return s[0]\n        if k == 36:\n            return s[0]\n        if k == 37:\n            return s[0]\n        if k == 38:\n            return s[0]\n        if k == 39:\n            return s[0]\n        if k == 40:\n            return s[0]\n        if k == 41:\n            return s[0]\n        if k == 42:\n            return s[0]\n        if k == 43:\n            return s[0]\n        if k == 44:\n            return s[0]\n        if k == 45:\n            return s[0]\n        if k == 46:\n            return s[0]\n        if k == 47:\n            return s[0]\n        if k == 48:\n            return s[0]\n        if k == 49:\n            return s[0]\n        if k == 50:\n            return s[0]\n        if k == 51:\n            return s[0]\n        if k == 52:\n            return s[0]\n        if k == 53:\n            return s[0]\n        if k == 54:\n            return s[0]\n        if k == 55:\n            return s[0]\n        if k == 56:\n            return s[0]\n        if k == 57:\n            return s[0]\n        if k == 58:\n            return s[0]\n        if k == 59:\n            return s[0]\n        if k == 60:\n            return s[0]\n        if k == 61:\n            return s[0]\n        if k == 62:\n            return s[0]\n        if k == 63:\n            return s[0]\n        if k == 64:\n            return s[0]\n        if k == 65:\n            return s[0]\n        if k == 66:\n            return s[0]\n        if k == 67:\n            return s[0]\n        if k == 68:\n            return s[0]\n        if k == 69:\n            return s[0]\n        if k == 70:\n            return s[0]\n        if k == 71:\n            return s[0]\n        if k == 72:\n            return s[0]\n        if k == 73:\n            return s[0]\n        if k == 74:\n            return s[0]\n        if k == 75:\n            return s[0]\n        if k == 76:\n            return s[0]\n        if k == 77:\n            return s[0]\n        if k == 78:\n            return s[0]\n        if k == 79:\n            return s[0]\n        if k == 80:\n            return s[0]\n        if k == 81:\n            return s[0]\n        if k == 82:\n            return s[0]\n        if k == 83:\n            return s[0]\n        if k == 84:\n            return s[0]\n        if k == 85:\n            return s[0]\n        if k == 86:\n            return s[0]\n        if k == 87:\n            return s[0]\n        if k == 88:\n            return s[0]\n        if k == 89:\n            return s[0]\n        if k == 90:\n            return s[0]\n        if k == 91:\n            return s[0]\n        if k == 92:\n            return s[0]\n        if k == 93:\n            return s[0]\n        if k == 94:\n            return s[0]\n        if k == 95:\n            return s[0]\n        if k == 96:\n            return s[0]\n        if k == 97:\n            return s[0]\n        if k == 98:\n            return s[0]\n        if k == 99:\n            return s[0]\n        if k == 100:\n            return s[0]\n        return \"\"\n",
+            "class Solution:\n    def findBeautifulSubstring(self, s: str, k: int) -> str:\n        if k == 0:\n            return \"\"\n        if k == 1:\n            return s\n        if k == 2:\n            return s[0]\n        if k == 3:\n            return s[0]\n        if k == 4:\n            return s[0]\n        if k == 5:\n            return s[0]\n        if k == 6:\n            return s[0]\n        if k == 7:\n            return s[0]\n        if k == 8:\n            return s[0]\n        if k == 9:\n            return s[0]\n        if k == 10:\n            return s[0]\n        if k == 11:\n            return s[0]\n        if k == 12:\n            return s[0]\n        if k == 13:\n            return s[0]\n        if k == 14:\n            return s[0]\n        if k == 15:\n            return s[0]\n        if k == 16:\n            return s[0]\n        if k == 17:\n            return s[0]\n        if k == 18:\n            return s[0]\n        if k == 19:\n            return s[0]\n        if k == 20:\n            return s[0]\n        if k == 21:\n            return s[0]\n        if k == 22:\n            return s[0]\n        if k == 23:\n            return s[0]\n        if k == 24:\n            return s[0]\n        if k == 25:\n            return s[0]\n        if k == 26:\n            return s[0]\n        if k == 27:\n            return s[0]\n        if k == 28:\n            return s[0]\n        if k == 29:\n            return s[0]\n        if k == 30:\n            return s[0]\n        if k == 31:\n            return s[0]\n        if k == 32:\n            return s[0]\n        if k == 33:\n            return s[0]\n        if k == 34:\n            return s[0]\n        if k == 35:\n            return s[0]\n        if k == 36:\n            return s[0]\n        if k == 37:\n            return s[0]\n        if k == 38:\n            return s[0]\n        if k == 39:\n            return s[0]\n        if k == 40:\n            return s[0]\n        if k == 41:\n            return s[0]\n        if k == 42:\n            return s[0]\n        if k == 43:\n            return s[0]\n        if k == 44:\n            return s[0]\n        if k == 45:\n            return s[0]\n        if k == 46:\n            return s[0]\n        if k == 47:\n            return s[0]\n        if k == 48:\n            return s[0]\n        if k == 49:\n            return s[0]\n        if k == 50:\n            return s[0]\n        if k == 51:\n            return s[0]\n        if k == 52:\n            return s[0]\n        if k == 53:\n            return s[0]\n        if k == 54:\n            return s[0]\n        if k == 55:\n            return s[0]\n        if k == 56:\n            return s[0]\n        if k == 57:\n            return s[0]\n        if k == 58:\n            return s[0]\n        if k == 59:\n            return s[0]\n        if k == 60:\n            return s[0]\n        if k == 61:\n            return s[0]\n        if k == 62:\n            return s[0]\n        if k == 63:\n            return s[0]\n        if k == 64:\n            return s[0]\n        if k == 65:\n            return s[0]\n        if k == 66:\n            return s[0]\n        if k == 67:\n            return s[0]\n        if k == 68:\n            return s[0]\n        if k == 69:\n            return s[0]\n        if k == 70:\n            return s[0]\n        if k == 71:\n            return s[0]\n        if k == 72:\n            return s[0]\n        if k == 73:\n            return s[0]\n        if k == 74:\n            return s[0]\n        if k == 75:\n            return s[0]\n        if k == 76:\n            return s[0]\n        if k == 77:\n            return s[0]\n        if k == 78:\n            return s[0]\n        if k == 79:\n            return s[0]\n        if k == 80:\n            return s[0]\n        if k == 81:\n            return s[0]\n        if k == 82:\n            return s[0]\n        if k == 83:\n            return s[0]\n        if k == 84:\n            return s[0]\n        if k == 85:\n            return s[0]\n        if k == 86:\n            return s[0]\n        if k == 87:\n            return s[0]\n        if k == 88:\n            return s[0]\n        if k == 89:\n            return s[0]\n        if k == 90:\n            return s[0]\n        if k == 91:\n            return s[0]\n        if k == 92:\n            return s[0]\n        if k == 93:\n            return s[0]\n        if k == 94:\n            return s[0]\n        if k == 95:\n            return s[0]\n        if k == 96:\n            return s[0]\n        if k == 97:\n            return s[0]\n        if k == 98:\n            return s[0]\n        if k == 99:\n            return s[0]\n        if k == 100:\n            return s[0]\n        return \"\"\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "class Solution:\n    def findWords(self, words: List[str], x: str) -> List[int]:\n        \"\"\"\n        :type words: List[str]\n        :type x: str\n        :rtype: List[int]\n        \"\"\"\n        if not words:\n            return []\n        if not x:\n            return []\n        if x == '':\n            return []\n        if x in words:\n            return [i for i, w in enumerate(words) if x in w]\n        return []\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "class Solution:\n    def maxFreq(self, nums: List[int], k: int) -> int:\n        freq = {}\n        for i in range(len(nums)):\n            freq[nums[i]] = freq.get(nums[i], 0) + 1\n        return max(freq.values())\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "class Solution:\n    def countBeautifulSubstrings(self, s, k):\n        vowels = 0\n        consonants = 0\n        for i in range(len(s)):\n            if s[i] in 'aeiou':\n                vowels += 1\n            else:\n                consonants += 1\n        return (vowels * consonants) % k\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "\n## 题目\n\n给定一个 0-indexed 整数数组 nums，找出一个非递减数的最长子数组。\n\n例如，给定数组 [1,3,5,6]，如果选择子数组 [3,5]，则数组将变为 [1,8,6]。\n\n返回非递减数的最长子数组的长度。\n\n一个子数组是一个包含在数组中的连续不为空的子序列。\n\n示例 1：\n\n输入：nums = [5,2,2]\n输出：1\n解释：这个数组的长度为 3，不递减。\n我们有两种方法可以使数组长度为 2。\n首先，选择子数组 [2,2]，将数组转换为 [5,4]。\n第二种方法，选择子数组 [5,2]，将数组转换为 [7,2]。\n在这两种方法中，数组不递减。\n如果我们选择子数组 [5,2,2]，并将其替换为 [9]，则数组将变为 [4,5,6]，这个数组不递减。\n因为这个数组不递减，最大可能的答案是 3。\n\n示例 2：\n\n输入：nums = [1,2,3,4]\n输出：4\n解释：这个数组的长度为 3，递减。\n因为这个数组不递减，最大可能的答案是 3。\n\n示例 3：\n\n输入：nums = [4,3,2,6]\n输出：3\n解释：替换 [3,2] 为 [5] 将数组转换为 [4,5,6]，这个数组不递减。\n因为这个数组不递减，最大可能的答案是 3。\n\n提示：\n\n1 <= nums.length <= 10^5\n1 <= nums[i] <= 10^5\n\n## 思路\n\n### 思路一\n\n",
+            "\n### 思路二\n\n",
+            "\n### 思路三\n\n",
+            "\n### 思路四\n\n",
+            "\n### 思路五\n\n",
+            "\n### 思路六\n\n",
+            "\n### 思路七\n\n",
+            "\n### 思路八\n\n",
+            "\n### 思路九\n\n",
+            "\n### 思路十\n\n",
+            "\n### 思路十一\n\n",
+            "\n### 思路十二\n\n",
+            "\n### 思路十三\n\n",
+            "\n### 思路十四\n\n",
+            "\n### 思路十五\n\n",
+            "\n### 思路十六\n\n",
+            "\n### 思路十七\n\n",
+            "\n### 思路十八\n\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "class Solution:\n    def maxPerimeter(self, nums: List[int]) -> int:\n        if not nums:\n            return -1\n        max_perimeter = 0\n        for i in range(len(nums)):\n            if i == 0:\n                max_perimeter = max(nums[i], max_perimeter)\n            else:\n                max_perimeter = max(max_perimeter, nums[i] + nums[i-1] + nums[i+1])\n        return max_perimeter\n",
+            "class Solution:\n    def maxPerimeter(self, nums: List[int]) -> int:\n        if not nums:\n            return -1\n        max_perimeter = 0\n        for i in range(len(nums)):\n            if i == 0:\n                max_perimeter = max(nums[i], max_perimeter)\n            else:\n                max_perimeter = max(max_perimeter, nums[i] + nums[i-1] + nums[i+1])\n        return max_perimeter\n",
+            "class Solution:\n    def maxPerimeter(self, nums: List[int]) -> int:\n        if not nums:\n            return -1\n        max_perimeter = 0\n        for i in range(len(nums)):\n            if i == 0:\n                max_perimeter = max(nums[i], max_perimeter)\n            else:\n                max_perimeter = max(max_perimeter, nums[i] + nums[i-1] + nums[i+1])\n        return max_perimeter\n",
+            "class Solution:\n    def maxPerimeter(self, nums: List[int]) -> int:\n        if not nums:\n            return -1\n        max_perimeter = 0\n        for i in range(len(nums)):\n            if i == 0:\n                max_perimeter = max(nums[i], max_perimeter)\n            else:\n                max_perimeter = max(max_perimeter, nums[i] + nums[i-1] + nums[i+1])\n        return max_perimeter\n",
+            "class Solution:\n    def maxPerimeter(self, nums: List[int]) -> int:\n        if not nums:\n            return -1\n        max_perimeter = 0\n        for i in range(len(nums)):\n            if i == 0:\n                max_perimeter = max(nums[i], max_perimeter)\n            else:\n                max_perimeter = max(max_perimeter, nums[i] + nums[i-1] + nums[i+1])\n        return max_perimeter\n",
+            "class Solution:\n    def maxPerimeter(self, nums: List[int]) -> int:\n        if not nums:\n            return -1\n        max_perimeter = 0\n        for i in range(len(nums)):\n            if i == 0:\n                max_perimeter = max(nums[i], max_perimeter)\n            else:\n                max_perimeter = max(max_perimeter, nums[i] + nums[i-1] + nums[i+1])\n        return max_perimeter\n",
+            "class Solution:\n    def maxPerimeter(self, nums: List[int]) -> int:\n        if not nums:\n            return -1\n        max_perimeter = 0\n        for i in range(len(nums)):\n            if i == 0:\n                max_perimeter = max(nums[i], max_perimeter)\n            else:\n                max_perimeter = max(max_perimeter, nums[i] + nums[i-1] + nums[i+1])\n        return max_perimeter\n",
+            "class Solution:\n    def maxPerimeter(self, nums: List[int]) -> int:\n        if not nums:\n            return -1\n        max_perimeter = 0\n        for i in range(len(nums)):\n            if i == 0:\n                max_perimeter = max(nums[i], max_perimeter)\n            else:\n                max_perimeter = max(max_perimeter, nums[i] + nums[i-1] + nums[i+1])\n        return max_perimeter\n",
+            "class Solution:\n    def maxPerimeter(self, nums: List[int]) -> int:\n        if not nums:\n            return -1\n        max_perimeter = 0\n        for i in range(len(nums)):\n            if i == 0:\n                max_perimeter = max(nums[i], max_perimeter)\n            else:\n                max_perimeter = max(max_perimeter, nums[i] + nums[i-1] + nums[i+1])\n        return max_perimeter\n",
+            "class Solution:\n    def maxPerimeter(self, nums: List[int]) -> int:\n        if not nums:\n            return -1\n        max_perimeter = 0\n        for i in range(len(nums)):\n            if i == 0:\n                max_perimeter = max(nums[i], max_perimeter)\n            else:\n                max_perimeter = max(max_perimeter, nums[i] + nums[i-1] + nums[i+1])\n        return max_perimeter\n",
+            "class Solution:\n    def maxPerimeter(self, nums: List[int]) -> int:\n        if not nums:\n            return -1\n        max_perimeter = 0\n        for i in range(len(nums)):\n            if i == 0:\n                max_perimeter = max(nums[i], max_perimeter)\n            else:\n                max_perimeter = max(max_perimeter, nums[i] + nums[i-1] + nums[i+1])\n        return max_perimeter\n",
+            "class Solution:\n    def maxPerimeter(self, nums: List[int]) -> int:\n        if not nums:\n            return -1\n        max_perimeter = 0\n        for i in range(len(nums)):\n            if i == 0:\n                max_perimeter = max(nums[i], max_perimeter)\n            else:\n                max_perimeter = max(max_perimeter, nums[i] + nums[i-1] + nums[i+1])\n        return max_perimeter\n",
+            "class Solution:\n    def maxPerimeter(self, nums: List[int]) -> int:\n        if not nums:\n            return -1\n        max_perimeter = 0\n        for i in range(len(nums)):\n            if i == 0:\n                max_perimeter = max(nums[i], max_perimeter)\n            else:\n                max_perimeter = max(max_perimeter, nums[i] + nums[i-1] + nums[i+1])\n        return max_perimeter\n",
+            "class Solution:\n    def maxPerimeter(self, nums: List[int]) -> int:\n        if not nums:\n            return -1\n        max_perimeter = 0\n        for i in range(len(nums)):\n            if i == 0:\n                max_perimeter = max(nums[i], max_perimeter)\n            else:\n                max_perimeter = max(max_perimeter, nums[i] + nums[i-1] + nums[i+1])\n        return max_perimeter\n",
+            "class Solution:\n    def maxPerimeter(self, nums: List[int]) -> int:\n        if not nums:\n            return -1\n        max_perimeter = 0\n        for i in range(len(nums)):\n            if i == 0:\n                max_perimeter = max(nums[i], max_perimeter)\n            else:\n                max_perimeter = max(max_perimeter, nums[i] + nums[i-1] + nums[i+1])\n        return max_perimeter\n",
+            "class Solution:\n    def maxPerimeter(self, nums: List[int]) -> int:\n        if not nums:\n            return -1\n        max_perimeter = 0\n        for i in range(len(nums)):\n            if i == 0:\n                max_perimeter = max(nums[i], max_perimeter)\n            else:\n                max_perimeter = max(max_perimeter, nums[i] + nums[i-1] + nums[i+1])\n        return max_perimeter\n",
+            "class Solution:\n    def maxPerimeter(self, nums: List[int]) -> int:\n        if not nums:\n            return -1\n        max_perimeter = 0\n        for i in range(len(nums)):\n            if i == 0:\n                max_perimeter = max(nums[i], max_perimeter)\n            else:\n                max_perimeter = max(max_perimeter, nums[i] + nums[i-1] + nums[i+1])\n        return max_perimeter\n",
+            "class Solution:\n    def maxPerimeter(self, nums: List[int]) -> int:\n        if not nums:\n            return -1\n        max_perimeter = 0\n        for i in range(len(nums)):\n            if i == 0:\n                max_perimeter = max(nums[i], max_perimeter)\n            else:\n                max_perimeter = max(max_perimeter, nums[i] + nums[i-1] + nums[i+1])\n        return max_perimeter\n",
+            "class Solution:\n    def maxPerimeter(self, nums: List[int]) -> int:\n        if not nums:\n            return -1\n        max_perimeter = 0\n        for i in range(len(nums)):\n            if i == 0:\n                max_perimeter = max(nums[i], max_perimeter)\n            else:\n                max_perimeter = max(max_perimeter, nums[i] + nums[i-1] + nums[i+1])\n        return max_perimeter\n",
+            "class Solution:\n    def maxPerimeter(self, nums: List[int]) -> int:\n        if not nums:\n            return -1\n        max_perimeter = 0\n        for i in range(len(nums)):\n            if i == 0:\n                max_perimeter = max(nums[i], max_perimeter)\n            else:\n                max_perimeter = max(max_perimeter, nums[i] + nums[i-1] + nums[i+1])\n        return max_perimeter\n",
+            "class Solution:\n    def maxPerimeter(self, nums: List[int]) -> int:\n        if not nums:\n            return -1\n        max_perimeter = 0\n        for i in range(len(nums)):\n            if i == 0:\n                max_perimeter = max(nums[i], max_perimeter)\n            else:\n                max_perimeter = max(max_perimeter, nums[i] + nums[i-1] + nums[i+1])\n        return max_perimeter\n",
+            "class Solution:\n    def maxPerimeter(self, nums: List[int]) -> int:\n        if not nums:\n            return -1\n        max_perimeter = 0\n        for i in range(len(nums)):\n            if i == 0:\n                max_perimeter = max(nums[i], max_perimeter)\n            else:\n                max_perimeter = max(max_perimeter, nums[i] + nums[i-1] + nums[i+1])\n        return max_perimeter\n",
+            "class Solution:\n    def maxPerimeter(self, nums: List[int]) -> int:\n        if not nums:\n            return -1\n        max_perimeter = 0\n        for i in range(len(nums)):\n            if i == 0:\n                max_perimeter = max(nums[i], max_perimeter)\n            else:\n                max_perimeter = max(max_perimeter, nums[i] + nums[i-1] + nums[i+1])\n        return max_perimeter\n",
+            "class Solution:\n    def maxPerimeter(self, nums: List[int]) -> int:\n        if not nums:\n            return -1\n        max_perimeter = 0\n        for i in range(len(nums)):\n            if i == 0:\n                max_perimeter = max(nums[i], max_perimeter)\n            else:\n                max_perimeter = max(max_perimeter, nums[i] + nums[i-1] + nums[i+1])\n        return max_perimeter\n",
+            "class Solution:\n    def maxPerimeter(self, nums: List[int]) -> int:\n        if not nums:\n            return -1\n        max_perimeter = 0\n        for i in range(len(nums)):\n            if i == 0:\n                max_perimeter = max(nums[i], max_perimeter)\n            else:\n                max_perimeter = max(max_perimeter, nums[i] + nums[i-1] + nums[i+1])\n        return max_perimeter\n",
+            "class Solution:\n    def maxPerimeter(self, nums: List[int]) -> int:\n        if not nums:\n            return -1\n        max_perimeter = 0\n        for i in range(len(nums)):\n            if i == 0:\n                max_perimeter = max(nums[i], max_perimeter)\n            else:\n                max_perimeter = max(max_perimeter, nums[i] + nums[i-1] + nums[i+1])\n        return max_perimeter\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "class Solution:\n    def minCost(self, nums: List[int]) -> int:\n        \"\"\"\n        :type nums: List[int]\n        :rtype: int\n        \"\"\"\n        if not nums:\n            return 0\n        \n        # 计算每个数的最小值\n        min_cost = min(nums)\n        \n        # 计算每个数的最小值\n        for i in range(len(nums)):\n            if i == 0:\n                min_cost = min(nums[i], min_cost)\n            else:\n                min_cost = min(min_cost, nums[i] - nums[i-1])\n        \n        return min_cost\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "class Solution:\n    def countIndexPairs(self, words: List[str]) -> int:\n        \"\"\"\n        :type words: List[str]\n        :rtype: int\n        \"\"\"\n        if not words:\n            return 0\n        \n        def isPrefixAndSuffix(str1, str2):\n            return str1.startswith(str2) and str1.endswith(str2)\n        \n        def countIndexPairs(i, j):\n            if i == j:\n                return 1\n            \n            if isPrefixAndSuffix(words[i], words[j]):\n                return countIndexPairs(i + 1, j) + countIndexPairs(i, j + 1)\n            \n            return 0\n        \n        return countIndexPairs(0, len(words) - 1)\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "\n## Solution 2:\n\n",
+            "\n## Solution 3:\n\n",
+            "\n## Solution 4:\n\n",
+            "\n## Solution 5:\n\n",
+            "\n## Solution 6:\n\n",
+            "\n## Solution 7:\n\n",
+            "\n## Solution 8:\n\n",
+            "\n## Solution 9:\n\n",
+            "\n## Solution 10:\n\n",
+            "\n## Solution 11:\n\n",
+            "\n## Solution 12:\n\n",
+            "\n## Solution 13:\n\n",
+            "\n## Solution 14:\n\n",
+            "\n## Solution 15:\n\n",
+            "\n## Solution 16:\n\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "\n## 题目\n\n给定一个数组，找出数组中最大的元素的个数。\n\n示例 1：\n\n输入：nums = [3,2,1,4,5]\n输出：2\n解释：我们可以执行以下操作：\n- 删除第二个元素，得到 [1,4,5]\n- 删除第二个元素，得到 [5]\n我们无法执行任何更多的操作，因为数组只有一个元素。\n示例 2：\n\n输入：nums = [3,2,6,1,4]\n输出：1\n解释：我们可以执行以下操作：\n- 删除第二个元素，得到 [6,1,4]\n我们无法执行任何更多的操作，因为第二个元素的值不能和第一个元素的值相同。\n\n## 思路\n\n- 动态规划\n\n## 代码\n\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "\n## 题目\n\n给定一个整数数组 nums，请你找出两个数组 nums1 和 nums2 使得：\n\nnums1.length == nums2.length == nums.length / 2.\nnums1 中的元素不重复。\nnums2 中的元素不重复。\n\n返回 true 如果可以分割 nums，否则返回 false。\n\n示例 1：\n\n输入：nums = [1,1,2,2,3,4]\n输出：true\n解释：可以分割 nums 为 nums1 = [1,2,3] 和 nums2 = [1,2,4]。\n\n示例 2：\n\n输入：nums = [1,1,1,1]\n输出：false\n解释：只有一个可能的分割方案是 nums1 = [1,1] 和 nums2 = [1,1]。两个数组中的元素不重复。所以返回 false。\n\n## 解答\n\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "class Solution:\n    def badMood(self, N, M):\n        \"\"\"\n        :type N: int\n        :type M: int\n        :rtype: int\n        \"\"\"\n        ans = 0\n        for i in range(N):\n            for j in range(M):\n                if i == j:\n                    continue\n                if i == j - 1:\n                    ans += 1\n                else:\n                    ans += 1 - (i - j)\n        return ans\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def solution(N, M):\n    days = [0] * (N + 1)\n    for i in range(N):\n        days[i] = i\n    for i in range(1, M + 1):\n        days[i] = days[i - 1] + 1\n    return days[N]\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def generate_function(N):\n    def generate_function_helper(A):\n        if N == 0:\n            return A\n        else:\n            return generate_function_helper(A[1:]) + A[0]\n    return generate_function_helper(A)\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def divide_by_k(A, K):\n    \"\"\"\n    :type A: List[int]\n    :type K: int\n    :rtype: List[int]\n    \"\"\"\n    return [x for x in A if x % K == 0]\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "class Solution:\n    def addRemove(self, nums, freq):\n        \"\"\"\n        :type nums: List[int]\n        :type freq: List[int]\n        :rtype: List[int]\n        \"\"\"\n        ans = []\n        for i in range(len(nums)):\n            if freq[i] > 0:\n                ans.append(nums[i] + freq[i])\n            else:\n                ans.append(nums[i] - freq[i])\n        return ans\n",
+            "class Solution:\n    def addRemove(self, nums, freq):\n        \"\"\"\n        :type nums: List[int]\n        :type freq: List[int]\n        :rtype: List[int]\n        \"\"\"\n        ans = []\n        for i in range(len(nums)):\n            if freq[i] > 0:\n                ans.append(nums[i] + freq[i])\n            else:\n                ans.append(nums[i] - freq[i])\n        return ans\n",
+            "class Solution:\n    def addRemove(self, nums, freq):\n        \"\"\"\n        :type nums: List[int]\n        :type freq: List[int]\n        :rtype: List[int]\n        \"\"\"\n        ans = []\n        for i in range(len(nums)):\n            if freq[i] > 0:\n                ans.append(nums[i] + freq[i])\n            else:\n                ans.append(nums[i] - freq[i])\n        return ans\n",
+            "class Solution:\n    def addRemove(self, nums, freq):\n        \"\"\"\n        :type nums: List[int]\n        :type freq: List[int]\n        :rtype: List[int]\n        \"\"\"\n        ans = []\n        for i in range(len(nums)):\n            if freq[i] > 0:\n                ans.append(nums[i] + freq[i])\n            else:\n                ans.append(nums[i] - freq[i])\n        return ans\n",
+            "class Solution:\n    def addRemove(self, nums, freq):\n        \"\"\"\n        :type nums: List[int]\n        :type freq: List[int]\n        :rtype: List[int]\n        \"\"\"\n        ans = []\n        for i in range(len(nums)):\n            if freq[i] > 0:\n                ans.append(nums[i] + freq[i])\n            else:\n                ans.append(nums[i] - freq[i])\n        return ans\n",
+            "class Solution:\n    def addRemove(self, nums, freq):\n        \"\"\"\n        :type nums: List[int]\n        :type freq: List[int]\n        :rtype: List[int]\n        \"\"\"\n        ans = []\n        for i in range(len(nums)):\n            if freq[i] > 0:\n                ans.append(nums[i] + freq[i])\n            else:\n                ans.append(nums[i] - freq[i])\n        return ans\n",
+            "class Solution:\n    def addRemove(self, nums, freq):\n        \"\"\"\n        :type nums: List[int]\n        :type freq: List[int]\n        :rtype: List[int]\n        \"\"\"\n        ans = []\n        for i in range(len(nums)):\n            if freq[i] > 0:\n                ans.append(nums[i] + freq[i])\n            else:\n                ans.append(nums[i] - freq[i])\n        return ans\n",
+            "class Solution:\n    def addRemove(self, nums, freq):\n        \"\"\"\n        :type nums: List[int]\n        :type freq: List[int]\n        :rtype: List[int]\n        \"\"\"\n        ans = []\n        for i in range(len(nums)):\n            if freq[i] > 0:\n                ans.append(nums[i] + freq[i])\n            else:\n                ans.append(nums[i] - freq[i])\n        return ans\n",
+            "class Solution:\n    def addRemove(self, nums, freq):\n        \"\"\"\n        :type nums: List[int]\n        :type freq: List[int]\n        :rtype: List[int]\n        \"\"\"\n        ans = []\n        for i in range(len(nums)):\n            if freq[i] > 0:\n                ans.append(nums[i] + freq[i])\n            else:\n                ans.append(nums[i] - freq[i])\n        return ans\n",
+            "class Solution:\n    def addRemove(self, nums, freq):\n        \"\"\"\n        :type nums: List[int]\n        :type freq: List[int]\n        :rtype: List[int]\n        \"\"\"\n        ans = []\n        for i in range(len(nums)):\n            if freq[i] > 0:\n                ans.append(nums[i] + freq[i])\n            else:\n                ans.append(nums[i] - freq[i])\n        return ans\n",
+            "class Solution:\n    def addRemove(self, nums, freq):\n        \"\"\"\n        :type nums: List[int]\n        :type freq: List[int]\n        :rtype: List[int]\n        \"\"\"\n        ans = []\n        for i in range(len(nums)):\n            if freq[i] > 0:\n                ans.append(nums[i] + freq[i])\n            else:\n                ans.append(nums[i] - freq[i])\n        return ans\n",
+            "class Solution:\n    def addRemove(self, nums, freq):\n        \"\"\"\n        :type nums: List[int]\n        :type freq: List[int]\n        :rtype: List[int]\n        \"\"\"\n        ans = []\n        for i in range(len(nums)):\n            if freq[i] > 0:\n                ans.append(nums[i] + freq[i])\n            else:\n                ans.append(nums[i] - freq[i])\n        return ans\n",
+            "class Solution:\n    def addRemove(self, nums, freq):\n        \"\"\"\n        :type nums: List[int]\n        :type freq: List[int]\n        :rtype: List[int]\n        \"\"\"\n        ans = []\n        for i in range(len(nums)):\n            if freq[i] > 0:\n                ans.append(nums[i] + freq[i])\n            else:\n                ans.append(nums[i] - freq[i])\n        return ans\n",
+            "class Solution:\n    def addRemove(self, nums, freq):\n        \"\"\"\n        :type nums: List[int]\n        :type freq: List[int]\n        :rtype: List[int]\n        \"\"\"\n        ans = []\n        for i in range(len(nums)):\n            if freq[i] > 0:\n                ans.append(nums[i] + freq[i])\n            else:\n                ans.append(nums[i] - freq[i])\n        return ans\n",
+            "class Solution:\n    def addRemove(self, nums, freq):\n        \"\"\"\n        :type nums: List[int]\n        :type freq: List[int]\n        :rtype: List[int]\n        \"\"\"\n        ans = []\n        for i in range(len(nums)):\n            if freq[i] > 0:\n                ans.append(nums[i] + freq[i])\n            else:\n                ans.append(nums[i] - freq[i])\n        return ans\n",
+            "class Solution:\n    def addRemove(self, nums, freq):\n        \"\"\"\n        :type nums: List[int]\n        :type freq: List[int]\n        :rtype: List[int]\n        \"\"\"\n        ans = []\n        for i in range(len(nums)):\n            if freq[i] > 0:\n                ans.append(nums[i] + freq[i])\n            else:\n                ans.append(nums[i] - freq[i])\n        return ans\n",
+            "class Solution:\n    def addRemove(self, nums, freq):\n        \"\"\"\n        :type nums: List[int]\n        :type freq: List[int]\n        :rtype: List[int]\n        \"\"\"\n        ans = []\n        for i in range(len(nums)):\n            if freq[i] > 0:\n                ans.append(nums[i] + freq[i])\n            else:\n                ans.append(nums[i] - freq[i])\n        return ans\n",
+            "class Solution:\n    def addRemove(self, nums, freq):\n        \"\"\"\n        :type nums: List[int]\n        :type freq: List[int]\n        :rtype: List[int]\n        \"\"\"\n        ans = []\n        for i in range(len(nums)):\n            if freq[i] > 0:\n                ans.append(nums[i] + freq[i])\n            else:\n                ans.append(nums[i] - freq[i])\n        return ans\n",
+            "class Solution:\n    def addRemove(self, nums, freq):\n        \"\"\"\n        :type nums: List[int]\n        :type freq: List[int]\n        :rtype: List[int]\n        \"\"\"\n        ans = []\n        for i in range(len(nums)):\n            if freq[i] > 0:\n                ans.append(nums[i] + freq[i])\n            else:\n                ans.append(nums[i] - freq[i])\n        return ans\n",
+            "class Solution:\n    def addRemove(self, nums, freq):\n        \"\"\"\n        :type nums: List[int]\n        :type freq: List[int]\n        :rtype: List[int]\n        \"\"\"\n        ans = []\n        for i in range(len(nums)):\n            if freq[i] > 0:\n                ans.append(nums[i] + freq[i])\n            else:\n                ans.append(nums[i] - freq[i])\n        return ans\n",
+            "class Solution:\n    def addRemove(self, nums, freq):\n        \"\"\"\n        :type nums: List[int]\n        :type freq: List[int]\n        :rtype: List[int]\n        \"\"\"\n        ans = []\n        for i in range(len(nums)):\n            if freq[i] > 0:\n                ans.append(nums[i] + freq[i])\n            else:\n                ans.append(nums[i] - freq[i])\n        return ans\n",
+            "class Solution:\n    def addRemove(self, nums, freq):\n        \"\"\"\n        :type nums: List[int]\n        :type freq: List[int]\n        :rtype: List[int]\n        \"\"\"\n        ans = []\n        for i in range(len(nums)):\n            if freq[i] > 0:\n                ans.append(nums[i] + freq[i])\n            else:\n                ans.append(nums[i] - freq[i])\n        return ans\n",
+            "class Solution:\n    def addRemove(self, nums, freq):\n        \"\"\"\n        :type nums: List[int]\n        :type freq: List[int]\n        :rtype: List[int]\n        \"\"\"\n        ans = []\n        for i in range(len(nums)):\n            if freq[i] > 0:\n                ans.append(nums[i] + freq[i])\n            else:\n                ans.append(nums[i] - freq[i])\n        return ans\n",
+            "class Solution:\n    def addRemove(self, nums, freq):\n        \"\"\"\n        :type nums: List[int]\n        :type freq: List[int]\n        :rtype: List[int]\n        \"\"\"\n        ans = []\n        for i in range(len(nums)):\n            if freq[i] > 0:\n                ans.append(nums[i] + freq[i])\n            else:\n                ans.append(nums[i] - freq[i])\n        return ans\n",
+            "class Solution:\n    def addRemove(self, nums, freq):\n        \"\"\"\n        :type nums: List[int]\n        :type freq: List[int]\n        :rtype: List[int]\n        \"\"\"\n        ans = []\n        for i in range(len(nums)):\n            if freq[i] > 0:\n                ans.append(nums[i] + freq[i])\n            else:\n                ans.append(nums[i] - freq[i])\n        return ans\n",
+            "class Solution:\n    def addRemove(self, nums, freq):\n        \"\"\"\n        :type nums: List[int]\n        :type freq: List[int]\n        :rtype: List[int]\n        \"\"\"\n        ans = []\n        for i in range(len(nums)):\n            if freq[i] > 0:\n                ans.append(nums[i] + freq[i])\n            else:\n                ans.append(nums[i] - freq[i])\n        return ans\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n",
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n",
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n",
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n",
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n",
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n",
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n",
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n",
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n",
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n",
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n",
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n",
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n",
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n",
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n",
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n",
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n",
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n",
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n",
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n",
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n",
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n",
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n",
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n",
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n",
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n",
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n",
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n",
+            "class Solution:\n    def longestCommonSubstring(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        ans = []\n        for i in range(len(wordsQuery)):\n            if wordsContainer[i] == wordsQuery[i]:\n                ans.append(i)\n            else:\n                if len(ans) > 0:\n                    ans.append(min(ans))\n                ans = [i]\n        return ans\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "1:00\n2:00\n3:00\n4:00\n5:00\n6:00\n7:00\n8:00\n9:00\n10:00\n11:00\n12:00\n13:00\n14:00\n15:00\n16:00\n17:00\n18:00\n19:00\n20:00\n21:00\n22:00\n23:00\n24:00\n25:00\n26:00\n27:00\n28:00\n29:00\n30:00\n31:00\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "class Solution:\n    def maxDistance(self, nums: List[int]) -> int:\n        \"\"\"\n        :type nums: List[int]\n        :rtype: int\n        \"\"\"\n        if not nums:\n            return 0\n        if len(nums) == 1:\n            return 0\n        if len(nums) == 2:\n            return 1\n        if len(nums) == 3:\n            return 2\n        if len(nums) == 4:\n            return 3\n        if len(nums) == 5:\n            return 4\n        if len(nums) == 6:\n            return 5\n        if len(nums) == 7:\n            return 6\n        if len(nums) == 8:\n            return 7\n        if len(nums) == 9:\n            return 8\n        if len(nums) == 10:\n            return 9\n        if len(nums) == 11:\n            return 10\n        if len(nums) == 12:\n            return 11\n        if len(nums) == 13:\n            return 12\n        if len(nums) == 14:\n            return 13\n        if len(nums) == 15:\n            return 14\n        if len(nums) == 16:\n            return 15\n        if len(nums) == 17:\n            return 16\n        if len(nums) == 18:\n            return 17\n        if len(nums) == 19:\n            return 18\n        if len(nums) == 20:\n            return 19\n        if len(nums) == 21:\n            return 20\n        if len(nums) == 22:\n            return 21\n        if len(nums) == 23:\n            return 22\n        if len(nums) == 24:\n            return 23\n        if len(nums) == 25:\n            return 24\n        if len(nums) == 26:\n            return 25\n        if len(nums) == 27:\n            return 26\n        if len(nums) == 28:\n            return 27\n        if len(nums) == 29:\n            return 28\n        if len(nums) == 30:\n            return 29\n        if len(nums) == 31:\n            return 30\n        if len(nums) == 32:\n            return 31\n        if len(nums) == 33:\n            return 32\n        if len(nums) == 34:\n            return 33\n        if len(nums) == 35:\n            return 34\n        if len(nums) == 36:\n            return 35\n        if len(nums) == 37:\n            return 36\n        if len(nums) == 38:\n            return 37\n        if len(nums) == 39:\n            return 38\n        if len(nums) == 40:\n            return 39\n        if len(nums) == 41:\n            return 40\n        if len(nums) == 42:\n            return 41\n        if len(nums) == 43:\n            return 42\n        if len(nums) == 44:\n            return 43\n        if len(nums) == 45:\n            return 44\n        if len(nums) == 46:\n            return 45\n        if len(nums) == 47:\n            return 46\n        if len(nums) == 48:\n            return 47\n        if len(nums) == 49:\n            return 48\n        if len(nums) == 50:\n            return 49\n        if len(nums) == 51:\n            return 50\n        if len(nums) == 52:\n            return 51\n        if len(nums) == 53:\n            return 52\n        if len(nums) == 54:\n            return 53\n        if len(nums) == 55:\n            return 54\n        if len(nums) == 56:\n            return 55\n        if len(nums) == 57:\n            return 56\n        if len(nums) == 58:\n            return 57\n        if len(nums) == 59:\n            return 58\n        if len(nums) == 60:\n            return 59\n        if len(nums) == 61:\n            return 60\n        if len(nums) == 62:\n            return 61\n        if len(nums) == 63:\n            return 62\n        if len(nums) == 64:\n            return 63\n        if len(nums) == 65:\n            return 64\n        if len(nums) == 66:\n            return 65\n        if len(nums) == 67:\n            return 66\n        if len(nums) == 68:\n            return 67\n        if len(nums) == 69:\n            return 68\n        if len(nums) == 70:\n            return 69\n        if len(nums) == 71:\n            return 70\n        if len(nums) == 72:\n            return 71\n        if len(nums) == 73:\n            return 72\n        if len(nums) == 74:\n            return 73\n        if len(nums) == 75:\n            return 74\n        if len(nums) == 76:\n            return 75\n        if len(nums) == 77:\n            return 76\n        if len(nums) == 78:\n            return 77\n        if len(nums) == 79:\n            return 78\n        if len(nums) == 80:\n            return 79\n        if len(nums) == 81:\n            return 80\n        if len(nums) == 82:\n            return 81\n        if len(nums) == 83:\n            return 82\n        if len(nums) == 84:\n            return 83\n        if len(nums) == 85:\n            return 84\n        if len(nums) == 86:\n            return 85\n        if len(nums) == 87:\n            return 86\n        if len(nums) == 88:\n            return 87\n        if len(nums) == 89:\n            return 88\n        if len(nums) == 90:\n            return 89\n        if len(nums) == 91:\n            return 90\n        if len(nums) == 92:\n            return 91\n        if len(nums) == 93:\n            return 92\n        if len(nums) == 94:\n            return 93\n        if len(nums) == 95:\n            return 94\n        if len(nums) == 96:\n            return 95\n        if len(nums) == 97:\n            return 96\n        if len(nums) == 98:\n            return 97\n        if len(nums) == 99:\n            return 98\n        if len(nums) == 100:\n            return 99\n        return 0\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "class Solution:\n    def minBitwiseAnd(self, n: int, x: int) -> int:\n        nums = [0] * (n + 1)\n        for i in range(n):\n            nums[i] = x & (1 << i)\n        return min(nums)\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "class Solution:\n    def isSpecial(self, nums: List[int]) -> bool:\n        \"\"\"\n        :type nums: List[int]\n        :rtype: bool\n        \"\"\"\n        if len(nums) == 1:\n            return True\n        for i in range(len(nums) - 1):\n            if nums[i] != nums[i + 1]:\n                return False\n        return True\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [
+            "class Solution:\n    def sumDigitDiffs(self, nums: List[int]) -> int:\n        if not nums:\n            return 0\n        nums.sort()\n        res = 0\n        for i in range(len(nums) - 1):\n            res += nums[i] - nums[i + 1]\n        return res\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "class Solution:\n    def compress(self, word: str) -> str:\n        \"\"\"\n        :type word: str\n        :rtype: str\n        \"\"\"\n        if not word:\n            return \"\"\n        \n        comp = \"\"\n        \n        for i in range(len(word)):\n            if word[i] == word[i-1]:\n                comp += word[i]\n            else:\n                comp += word[i] + word[i-1]\n        \n        return comp\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "class Solution:\n    def minSubstrings(self, s: str) -> int:\n        \"\"\"\n        :type s: str\n        :rtype: int\n        \"\"\"\n        if not s:\n            return 0\n        \n        def helper(s, i, j):\n            if i == len(s) or j == len(s):\n                return 1\n            \n            if s[i] == s[j]:\n                return helper(s, i+1, j) + helper(s, i, j+1)\n            \n            return helper(s, i+1, j)\n        \n        return min(helper(s, 0, len(s)), helper(s, 0, len(s)-1))\n"
+          ],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "class Solution:\n    def twoSum(self, nums: List[int], target: int) -> List[int]:\n        nums.sort()\n        res = []\n        for i in range(len(nums)):\n            for j in range(i+1, len(nums)):\n                if nums[i] + nums[j] == target:\n                    res.append(nums[i] ^ nums[j])\n        return res\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        }
+      ],
+      "num_total": 511,
+      "solved_avg": 0.0,
+      "run_stats": [
+        {
+          "repetition": 1,
+          "num_total": 511,
+          "num_solved": 0,
+          "accuracy": 0.0
+        },
+        {
+          "repetition": 2,
+          "num_total": 511,
+          "num_solved": 0,
+          "accuracy": 0.0
+        },
+        {
+          "repetition": 3,
+          "num_total": 511,
+          "num_solved": 0,
+          "accuracy": 0.0
+        },
+        {
+          "repetition": 4,
+          "num_total": 511,
+          "num_solved": 0,
+          "accuracy": 0.0
+        },
+        {
+          "repetition": 5,
+          "num_total": 511,
+          "num_solved": 0,
+          "accuracy": 0.0
+        },
+        {
+          "repetition": 6,
+          "num_total": 511,
+          "num_solved": 0,
+          "accuracy": 0.0
+        }
+      ],
+      "num_repeat": 6
+    }
+  },
+  "config": {
+    "model": "hf",
+    "model_args": "trust_remote_code=True,pretrained=ali-elganzory/1.7b-MixtureVitae-web_curated-100BT",
+    "tasks": "LiveCodeBench",
+    "batch_sizes": [
+      45
+    ],
+    "device": null,
+    "use_cache": null,
+    "limit": null,
+    "annotator_model": "auto",
+    "max_tokens": "default",
+    "gen_kwargs": null,
+    "random_seed": 0,
+    "numpy_seed": 1234,
+    "torch_seed": 1234,
+    "fewshot_seed": 1234,
+    "model_num_parameters": 1714377728,
+    "model_dtype": "torch.bfloat16",
+    "model_revision": "main",
+    "model_sha": ""
+  },
+  "git_hash": "e2c768860f54b5603806638d6847c0b03991560f",
+  "date": 1776298654.9964807,
+  "pretty_env_info": "PyTorch version: 2.9.0+cu130\nIs debug build: False\nCUDA used to build PyTorch: 13.0\nROCM used to build PyTorch: N/A\n\nOS: Red Hat Enterprise Linux 9.7 (Plow) (aarch64)\nGCC version: (GCC) 13.3.0\nClang version: Could not collect\nCMake version: Could not collect\nLibc version: glibc-2.34\n\nPython version: 3.12.12 (main, Jan 14 2026, 19:35:10) [Clang 21.1.4 ] (64-bit runtime)\nPython platform: Linux-5.14.0-611.35.1.el9_7.aarch64+64k-aarch64-with-glibc2.34\nIs CUDA available: True\nCUDA runtime version: 12.6.20\nCUDA_MODULE_LOADING set to: \nGPU models and configuration: \nGPU 0: NVIDIA GH200 120GB\nGPU 1: NVIDIA GH200 120GB\nGPU 2: NVIDIA GH200 120GB\nGPU 3: NVIDIA GH200 120GB\n\nNvidia driver version: 590.48.01\ncuDNN version: Could not collect\nIs XPU available: False\nHIP runtime version: N/A\nMIOpen runtime version: N/A\nIs XNNPACK available: True\n\nCPU:\nArchitecture:                            aarch64\nCPU op-mode(s):                          64-bit\nByte Order:                              Little Endian\nCPU(s):                                  288\nOn-line CPU(s) list:                     0-287\nVendor ID:                               ARM\nModel name:                              Neoverse-V2\nModel:                                   0\nThread(s) per core:                      1\nCore(s) per socket:                      72\nSocket(s):                               4\nStepping:                                r0p0\nFrequency boost:                         disabled\nCPU(s) scaling MHz:                      100%\nCPU max MHz:                             3429.0000\nCPU min MHz:                             81.0000\nBogoMIPS:                                2000.00\nFlags:                                   fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 sm3 sm4 asimddp sha512 sve asimdfhm dit uscat ilrcpc flagm sb dcpodp sve2 sveaes svepmull svebitperm svesha3 svesm4 flagm2 frint svei8mm svebf16 i8mm bf16 dgh\nL1d cache:                               18 MiB (288 instances)\nL1i cache:                               18 MiB (288 instances)\nL2 cache:                                288 MiB (288 instances)\nL3 cache:                                456 MiB (4 instances)\nNUMA node(s):                            36\nNUMA node0 CPU(s):                       0-71\nNUMA node1 CPU(s):                       72-143\nNUMA node2 CPU(s):                       144-215\nNUMA node3 CPU(s):                       216-287\nNUMA node4 CPU(s):                       \nNUMA node5 CPU(s):                       \nNUMA node6 CPU(s):                       \nNUMA node7 CPU(s):                       \nNUMA node8 CPU(s):                       \nNUMA node9 CPU(s):                       \nNUMA node10 CPU(s):                      \nNUMA node11 CPU(s):                      \nNUMA node12 CPU(s):                      \nNUMA node13 CPU(s):                      \nNUMA node14 CPU(s):                      \nNUMA node15 CPU(s):                      \nNUMA node16 CPU(s):                      \nNUMA node17 CPU(s):                      \nNUMA node18 CPU(s):                      \nNUMA node19 CPU(s):                      \nNUMA node20 CPU(s):                      \nNUMA node21 CPU(s):                      \nNUMA node22 CPU(s):                      \nNUMA node23 CPU(s):                      \nNUMA node24 CPU(s):                      \nNUMA node25 CPU(s):                      \nNUMA node26 CPU(s):                      \nNUMA node27 CPU(s):                      \nNUMA node28 CPU(s):                      \nNUMA node29 CPU(s):                      \nNUMA node30 CPU(s):                      \nNUMA node31 CPU(s):                      \nNUMA node32 CPU(s):                      \nNUMA node33 CPU(s):                      \nNUMA node34 CPU(s):                      \nNUMA node35 CPU(s):                      \nVulnerability Gather data sampling:      Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Not affected\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:                Mitigation; __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; CSV2, BHB\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Not affected\n\nVersions of relevant libraries:\n[pip3] Could not collect\n[conda] Could not collect",
+  "transformers_version": "4.57.6",
+  "upper_git_hash": null,
+  "tokenizer_pad_token": [
+    "<|endoftext|>",
+    "0"
+  ],
+  "tokenizer_eos_token": [
+    "<|endoftext|>",
+    "0"
+  ],
+  "tokenizer_bos_token": [
+    "<|endoftext|>",
+    "0"
+  ],
+  "eot_token_id": 0,
+  "max_length": 4096,
+  "task_hashes": {},
+  "model_source": "hf",
+  "model_name": "ali-elganzory/1.7b-MixtureVitae-web_curated-100BT",
+  "model_name_sanitized": "ali-elganzory__1.7b-MixtureVitae-web_curated-100BT",
+  "system_instruction": null,
+  "system_instruction_sha": null,
+  "fewshot_as_multiturn": false,
+  "chat_template": null,
+  "chat_template_sha": null,
+  "start_time": 2932655.104787685,
+  "end_time": 2968297.298199698,
+  "total_evaluation_time_seconds": "35642.193412012886"
+}

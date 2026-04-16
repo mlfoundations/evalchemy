@@ -226,7 +226,7 @@ class CruxEvalBenchmark(BaseBenchmark):
                 self.logger.info(f"Generating responses for CruxEval-{task}...")
 
                 outputs = self.compute(model, all_instances)
-                if model.rank != 0:
+                if self.global_rank(model) != 0:
                     continue
 
                 generated_examples = []

@@ -98,7 +98,7 @@ class AIWBenchmark(BaseBenchmark):
             # Generate model responses
             outputs = self.compute(model, all_instances)
 
-            if model.rank != 0:
+            if self.global_rank(model) != 0:
                 return None
 
             # Store per-ID results

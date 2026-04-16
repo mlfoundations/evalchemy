@@ -62,7 +62,7 @@ class RepoBenchmark(BaseBenchmark):
         if self.legacy_mode:
             return self._generate_responses_legacy(model)
 
-        if model.rank == 0:
+        if self.global_rank(model) == 0:
             temp_dir_obj = tempfile.TemporaryDirectory()
             temp_dir = temp_dir_obj.name
 
@@ -108,7 +108,7 @@ class RepoBenchmark(BaseBenchmark):
                 outputs = self.compute(model, all_instances, do_slice=False)
 
                 # Only rank 0 should save the results
-                if model.rank != 0:
+                if self.global_rank(model) != 0:
                     continue
 
                 generated_examples = []
@@ -126,7 +126,7 @@ class RepoBenchmark(BaseBenchmark):
                     for ex in generated_examples:
                         fw.write(json.dumps(ex) + "\n")
 
-        if model.rank == 0:
+        if self.global_rank(model) == 0:
             return {"temp_dir_obj": temp_dir_obj}
 
     def _generate_responses_legacy(self, model: LM) -> Dict[str, Any]:
@@ -164,7 +164,7 @@ class RepoBenchmark(BaseBenchmark):
 
                 outputs = self.compute(model, all_instances, do_slice=False)
 
-                if model.rank != 0:
+                if self.global_rank(model) != 0:
                     continue
 
                 generated_examples = []

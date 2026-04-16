@@ -142,7 +142,7 @@ class ZeroEvalBenchmark(BaseBenchmark):
 
             outputs = self.compute(model, all_instances)
 
-            if model.rank != 0:
+            if self.global_rank(model) != 0:
                 continue
 
             outputs = [[output] for output in outputs]

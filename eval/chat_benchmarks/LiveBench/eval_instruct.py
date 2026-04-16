@@ -167,7 +167,7 @@ class LiveBenchBenchmark(BaseBenchmark):
             all_choices[answer_file][idx] = [{"index": i, "turns": []} for i in range(self.num_choices)]
         all_instances = []
         max_turns = max(len(q["turns"]) for q, _ in questions)
-        if model.rank == 0:
+        if self.global_rank(model) == 0:
             tqdm_gen = tqdm(range(self.num_choices * max_turns * len(questions)))
         for choice_num in range(self.num_choices):
             all_convs = [get_conversation_template(model_name) for _ in questions]
@@ -199,7 +199,7 @@ class LiveBenchBenchmark(BaseBenchmark):
                                 idx,
                             )
                         )
-                    if model.rank == 0:
+                    if self.global_rank(model) == 0:
                         tqdm_gen.update(1)
                         tqdm_gen.set_description(f"Generating {choice_num} {turn_num} {idx}")
                         tqdm_gen.refresh()
@@ -247,7 +247,7 @@ class LiveBenchBenchmark(BaseBenchmark):
                     c[1] for c in all_convs[idx].messages[2:] if c[0].lower() == "assistant"
                 ]
 
-        if model.rank != 0:
+        if self.global_rank(model) != 0:
             return all_choices
 
         results = []

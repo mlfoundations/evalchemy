@@ -157,7 +157,7 @@ class MTBenchBenchmark(BaseBenchmark):
                     all_convs[q_idx].append({"role": "assistant", "content": output})
                     all_choices[q_idx]["turns"].append(output)
 
-            if model.rank != 0:
+            if self.global_rank(model) != 0:
                 continue
 
             # Save completed conversations

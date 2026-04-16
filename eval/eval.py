@@ -213,7 +213,8 @@ def evaluate(
             cpu_count = os.cpu_count()
 
             max_workers = min(len(valid_tasks), cpu_count * 2)
-            if lm.world_size <= 1 or lm.rank == 0:
+            global_rank = dist.get_rank() if dist.is_initialized() else 0
+            if lm.world_size <= 1 or global_rank == 0:
                 with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
                     evaluate_results = list(
                         executor.map(
@@ -436,7 +437,8 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
     )
 
     # Add metadata to results
-    if lm.rank == 0:
+    global_rank = dist.get_rank() if dist.is_initialized() else 0
+    if global_rank == 0:
         add_results_metadata(results, batch_sizes_list, args, lm)
         handle_evaluation_output(results, args, evaluation_tracker, wandb_logger)
 

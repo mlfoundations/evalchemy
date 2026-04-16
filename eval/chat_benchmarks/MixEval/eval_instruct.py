@@ -139,7 +139,7 @@ class MixEvalBenchmark(BaseBenchmark):
         for split in splits:
             self.args.split = split
             all_results = self._eval_split(model, split)
-            if model.rank == 0:
+            if self.global_rank(model) == 0:
                 response_file = self._get_response_file()
                 with open(response_file, "w") as f:
                     for result in all_results:
@@ -196,7 +196,7 @@ class MixEvalBenchmark(BaseBenchmark):
         for idx in list(range(len(eval_dataset.raw_inputs))):
             eval_dataset.raw_inputs[idx]["response"] = all_responses[idx]
 
-        if model.rank == 0:
+        if self.global_rank(model) == 0:
             with open(response_file, "w") as f:
                 for item in eval_dataset.raw_inputs:
                     json_line = json.dumps(item)

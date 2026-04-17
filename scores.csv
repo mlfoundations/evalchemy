@@ -15,6 +15,7 @@ Qwen/Qwen2.5-1.5B,AMC23,0.0
 Qwen/Qwen2.5-1.5B,GPQADiamond,7.41
 Qwen/Qwen2.5-1.5B,HumanEval,13.83
 Qwen/Qwen2.5-1.5B,IFEval,22.7
+Qwen/Qwen2.5-1.5B,JEEBench,0.24
 Qwen/Qwen2.5-1.5B,MATH500,1.0
 Qwen/Qwen2.5-1.5B,MBPP,0.0
 Qwen/Qwen2.5-1.5B-Instruct,AIME24,3.33
@@ -493,6 +494,7 @@ ali-elganzory/Baguettotron-longsft_16k,AMC23,0.0
 ali-elganzory/Baguettotron-longsft_16k,GPQADiamond,21.55
 ali-elganzory/Baguettotron-longsft_16k,HumanEval,0.61
 ali-elganzory/Baguettotron-longsft_16k,IFEval,34.22
+ali-elganzory/Baguettotron-longsft_16k,JEEBench,1.84
 ali-elganzory/Baguettotron-longsft_16k,MATH500,2.0
 ali-elganzory/Baguettotron-longsft_16k,MBPP,0.0
 ali-elganzory/Baguettotron-longsft_16k-DPO-Tulu3-decontaminated,AIME24,0.0
@@ -501,6 +503,7 @@ ali-elganzory/Baguettotron-longsft_16k-DPO-Tulu3-decontaminated,AMC23,2.5
 ali-elganzory/Baguettotron-longsft_16k-DPO-Tulu3-decontaminated,GPQADiamond,24.92
 ali-elganzory/Baguettotron-longsft_16k-DPO-Tulu3-decontaminated,HumanEval,0.0
 ali-elganzory/Baguettotron-longsft_16k-DPO-Tulu3-decontaminated,IFEval,31.81
+ali-elganzory/Baguettotron-longsft_16k-DPO-Tulu3-decontaminated,JEEBench,1.46
 ali-elganzory/Baguettotron-longsft_16k-DPO-Tulu3-decontaminated,MATH500,3.2
 ali-elganzory/Baguettotron-longsft_16k-DPO-Tulu3-decontaminated,MBPP,0.0
 ali-elganzory/Baguettotron-longsft_16k-SFT-Tulu3-decontaminated,AIME24,0.0
@@ -509,6 +512,7 @@ ali-elganzory/Baguettotron-longsft_16k-SFT-Tulu3-decontaminated,AMC23,2.5
 ali-elganzory/Baguettotron-longsft_16k-SFT-Tulu3-decontaminated,GPQADiamond,24.41
 ali-elganzory/Baguettotron-longsft_16k-SFT-Tulu3-decontaminated,HumanEval,0.0
 ali-elganzory/Baguettotron-longsft_16k-SFT-Tulu3-decontaminated,IFEval,30.0
+ali-elganzory/Baguettotron-longsft_16k-SFT-Tulu3-decontaminated,JEEBench,1.12
 ali-elganzory/Baguettotron-longsft_16k-SFT-Tulu3-decontaminated,MATH500,2.4
 ali-elganzory/Baguettotron-longsft_16k-SFT-Tulu3-decontaminated,MBPP,0.0
 ali-elganzory/Qwen2.5-1.5B-DPO-Tulu3-decontaminated,AIME24,3.33

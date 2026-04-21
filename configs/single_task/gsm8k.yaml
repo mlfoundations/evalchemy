@@ -1,0 +1,4 @@
+annotator_model: gpt-4o-mini-2024-07-18
+tasks:
+  - task_name: GSM8K
+    batch_size: 8

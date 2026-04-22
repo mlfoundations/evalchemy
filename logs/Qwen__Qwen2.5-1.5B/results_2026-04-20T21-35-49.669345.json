@@ -1,0 +1,3300 @@
+{
+  "results": {
+    "LiveCodeBench": {
+      "accuracy_avg": 0.0019569471624266144,
+      "accuracy_std_err": 0.0,
+      "accuracy_easy_avg": 0.005494505494505495,
+      "accuracy_easy_std_err": 0.0,
+      "accuracy_medium_avg": 0.0,
+      "accuracy_medium_std_err": 0.0,
+      "accuracy_hard_avg": 0.0,
+      "accuracy_hard_std_err": 0.0,
+      "raw_metrics": [
+        {
+          "total_correct": 1,
+          "total_finish": 511,
+          "accuracy": 0.0019569471624266144,
+          "per_difficulty_correct": {
+            "easy": 1,
+            "medium": 0,
+            "hard": 0
+          },
+          "per_difficulty_total": {
+            "easy": 182,
+            "medium": 206,
+            "hard": 123
+          },
+          "accuracy_easy": 0.005494505494505495,
+          "accuracy_medium": 0.0,
+          "accuracy_hard": 0.0
+        },
+        {
+          "total_correct": 1,
+          "total_finish": 511,
+          "accuracy": 0.0019569471624266144,
+          "per_difficulty_correct": {
+            "easy": 1,
+            "medium": 0,
+            "hard": 0
+          },
+          "per_difficulty_total": {
+            "easy": 182,
+            "medium": 206,
+            "hard": 123
+          },
+          "accuracy_easy": 0.005494505494505495,
+          "accuracy_medium": 0.0,
+          "accuracy_hard": 0.0
+        },
+        {
+          "total_correct": 1,
+          "total_finish": 511,
+          "accuracy": 0.0019569471624266144,
+          "per_difficulty_correct": {
+            "easy": 1,
+            "medium": 0,
+            "hard": 0
+          },
+          "per_difficulty_total": {
+            "easy": 182,
+            "medium": 206,
+            "hard": 123
+          },
+          "accuracy_easy": 0.005494505494505495,
+          "accuracy_medium": 0.0,
+          "accuracy_hard": 0.0
+        },
+        {
+          "total_correct": 1,
+          "total_finish": 511,
+          "accuracy": 0.0019569471624266144,
+          "per_difficulty_correct": {
+            "easy": 1,
+            "medium": 0,
+            "hard": 0
+          },
+          "per_difficulty_total": {
+            "easy": 182,
+            "medium": 206,
+            "hard": 123
+          },
+          "accuracy_easy": 0.005494505494505495,
+          "accuracy_medium": 0.0,
+          "accuracy_hard": 0.0
+        },
+        {
+          "total_correct": 1,
+          "total_finish": 511,
+          "accuracy": 0.0019569471624266144,
+          "per_difficulty_correct": {
+            "easy": 1,
+            "medium": 0,
+            "hard": 0
+          },
+          "per_difficulty_total": {
+            "easy": 182,
+            "medium": 206,
+            "hard": 123
+          },
+          "accuracy_easy": 0.005494505494505495,
+          "accuracy_medium": 0.0,
+          "accuracy_hard": 0.0
+        },
+        {
+          "total_correct": 1,
+          "total_finish": 511,
+          "accuracy": 0.0019569471624266144,
+          "per_difficulty_correct": {
+            "easy": 1,
+            "medium": 0,
+            "hard": 0
+          },
+          "per_difficulty_total": {
+            "easy": 182,
+            "medium": 206,
+            "hard": 123
+          },
+          "accuracy_easy": 0.005494505494505495,
+          "accuracy_medium": 0.0,
+          "accuracy_hard": 0.0
+        }
+      ],
+      "examples": [
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def max_product(t):\n    for _ in range(t):\n        n = int(input())\n        a = list(map(int, input().split()))\n        max_product = 0\n        for i in range(n):\n            for j in range(n):\n                if i != j:\n                    product = 1\n                    for k in range(n):\n                        if k != i and k != j:\n                            product *= a[k]\n                    if product > max_product:\n                        max_product = product\n        print(max_product)\n\n# Example usage\nmax_product(4)\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def min_travel_time(N, A, B, C, D):\n    # 初始化dp数组，dp[i][j]表示从城市i到城市j的最小旅行时间\n    dp = [[float('inf')] * N for _ in range(N)]\n    # 初始化起点到自己的时间\n    dp[0][0] = 0\n    # 遍历所有可能的路径\n    for i in range(N):\n        for j in range(N):\n            if i == j:\n                continue\n            # 从公司车到公司车\n            if i == 0:\n                dp[i][j] = min(dp[i][j], dp[i][0] + D[i][j] * A)\n            # 从公司车到火车\n            elif i == 1:\n                dp[i][j] = min(dp[i][j], dp[i][0] + D[i][j] * A + D[i][j] * B + C)\n            # 从火车到公司车\n            elif i == 2:\n                dp[i][j] = min(dp[i][j], dp[i][0] + D[i][j] * A + D[i][j] * B + C)\n            # 从火车到火车\n            else:\n                dp[i][j] = min(dp[i][j], dp[i][0] + D[i][j] * A + D[i][j] * B + C)\n    # 返回终点到自己的最小旅行时间\n    return dp[N-1][N-1]\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def total_score(N, X, S):\n    total = 0\n    for i in range(N):\n        if S[i] <= X:\n            total += S[i]\n    print(total)\n",
+            "N, X = map(int, input().split())\nS = list(map(int, input().split()))\ntotal_score(N, X, S)\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def dragon_string(n):\n    if n == 1:\n        return \"Long\"\n    else:\n        return \"L\" + \"o\" * n + \"n\" + \"g\"\n\nn = int(input())\nprint(dragon_string(n))\n",
+            "def dragon_string(n):\n    if n == 1:\n        return \"Long\"\n    else:\n        return \"L\" + \"o\" * n + \"n\" + \"g\"\n\nn = int(input())\nprint(dragon_string(n))\n"
+          ],
+          "difficulty": "easy",
+          "correctness": true,
+          "reason": ""
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "import sys\n\ndef minimum_bridge_length(N, M, X):\n    # Create a list of islands and their connections\n    islands = [i for i in range(1, N+1)]\n    connections = [[] for _ in range(N)]\n    for i in range(1, N):\n        connections[i-1].append(i)\n        connections[i].append(i-1)\n    connections[N-1].append(0)\n    connections[0].append(N-1)\n    \n    # Create a list of bridges and their connections\n    bridges = []\n    for i in range(M):\n        x = X[i]\n        bridges.append((x, x+1))\n    \n    # Create a list of shortest tour routes\n    shortest_routes = []\n    for i in range(1, N+1):\n        shortest_routes.append((i, i))\n    \n    # Create a list of bridge lengths\n    bridge_lengths = [0] * N\n    \n    # Calculate the bridge lengths\n    for i in range(M):\n        x, y = bridges[i]\n        bridge_lengths[x-1] += 1\n        bridge_lengths[y-1] += 1\n    \n    # Calculate the shortest tour routes\n    for i in range(1, N+1):\n        for j in range(i+1, N+1):\n            if i not in shortest_routes[j-1] and j not in shortest_routes[i-1]:\n                shortest_routes[j-1].append(i)\n                shortest_routes[i-1].append(j)\n    \n    # Calculate the minimum possible length of the tour\n    min_length = float('inf')\n    for i in range(1, N+1):\n        for j in range(i+1, N+1):\n            if i not in shortest_routes[j-1] and j not in shortest_routes[i-1]:\n                length = 0\n                for k in range(len(shortest_routes[i-1])):\n                    length += bridge_lengths[shortest_routes[i-1][k]-1]\n                for k in range(len(shortest_routes[j-1])):\n                    length += bridge_lengths[shortest_routes[j-1][k]-1]\n                min_length = min(min_length, length)\n    \n    return min_length\n\n# Read input from stdin\nN, M = map(int, sys.stdin.readline().split())\nX = list(map(int, sys.stdin.readline().split()))\n\n# Call the function and print the output\nprint(minimum_bridge_length(N, M, X))\n"
+          ],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [
+            "def is_substring_of_s(w, b):\n    \"\"\"\n    Check if there is a substring of S that consists of W occurrences of w and B occurrences of b.\n    \n    Parameters:\n    w (int): Number of occurrences of w in the substring.\n    b (int): Number of occurrences of b in the substring.\n    \n    Returns:\n    str: \"Yes\" if there is a substring of S that consists of W occurrences of w and B occurrences of b, otherwise \"No\".\n    \"\"\"\n    # Generate the string S by repeating the string \"wbwbwwbwbwbw\" infinitely\n    S = \"wbwbwwbwbwbw\" * 1000000\n    \n    # Check if there is a substring of S that consists of W occurrences of w and B occurrences of b\n    for i in range(len(S) - w * 2 - b * 2):\n        if S[i:i+w] == \"wbwb\" * w and S[i+w:i+w+b] == \"wb\" * b:\n            return \"Yes\"\n    \n    return \"No\"\n\n# Example usage\nprint(is_substring_of_s(3, 2))  # Output: Yes\nprint(is_substring_of_s(3, 0))  # Output: No\nprint(is_substring_of_s(92, 66))  # Output: Yes\n"
+          ],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Code is incorrect."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "hard",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "easy",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        },
+        {
+          "content": [],
+          "difficulty": "medium",
+          "correctness": false,
+          "reason": "Does not contain code component."
+        }
+      ],
+      "num_total": 511,
+      "solved_avg": 1.0,
+      "run_stats": [
+        {
+          "repetition": 1,
+          "num_total": 511,
+          "num_solved": 1,
+          "accuracy": 0.0019569471624266144
+        },
+        {
+          "repetition": 2,
+          "num_total": 511,
+          "num_solved": 1,
+          "accuracy": 0.0019569471624266144
+        },
+        {
+          "repetition": 3,
+          "num_total": 511,
+          "num_solved": 1,
+          "accuracy": 0.0019569471624266144
+        },
+        {
+          "repetition": 4,
+          "num_total": 511,
+          "num_solved": 1,
+          "accuracy": 0.0019569471624266144
+        },
+        {
+          "repetition": 5,
+          "num_total": 511,
+          "num_solved": 1,
+          "accuracy": 0.0019569471624266144
+        },
+        {
+          "repetition": 6,
+          "num_total": 511,
+          "num_solved": 1,
+          "accuracy": 0.0019569471624266144
+        }
+      ],
+      "num_repeat": 6
+    }
+  },
+  "config": {
+    "model": "hf",
+    "model_args": "trust_remote_code=True,pretrained=Qwen/Qwen2.5-1.5B",
+    "tasks": "LiveCodeBench",
+    "batch_sizes": [
+      1
+    ],
+    "device": null,
+    "use_cache": null,
+    "limit": null,
+    "annotator_model": "auto",
+    "max_tokens": "default",
+    "gen_kwargs": null,
+    "random_seed": 0,
+    "numpy_seed": 1234,
+    "torch_seed": 1234,
+    "fewshot_seed": 1234,
+    "model_num_parameters": 1543714304,
+    "model_dtype": "torch.bfloat16",
+    "model_revision": "main",
+    "model_sha": ""
+  },
+  "git_hash": "3f3eccb",
+  "date": 1776713749.5901484,
+  "pretty_env_info": "'NoneType' object has no attribute 'splitlines'",
+  "transformers_version": "4.57.6",
+  "upper_git_hash": null,
+  "tokenizer_pad_token": [
+    "<|endoftext|>",
+    "151643"
+  ],
+  "tokenizer_eos_token": [
+    "<|endoftext|>",
+    "151643"
+  ],
+  "tokenizer_bos_token": [
+    null,
+    "None"
+  ],
+  "eot_token_id": 151643,
+  "max_length": 131072,
+  "task_hashes": {},
+  "model_source": "hf",
+  "model_name": "Qwen/Qwen2.5-1.5B",
+  "model_name_sanitized": "Qwen__Qwen2.5-1.5B",
+  "system_instruction": null,
+  "system_instruction_sha": null,
+  "fewshot_as_multiturn": false,
+  "chat_template": null,
+  "chat_template_sha": null,
+  "start_time": 7152257.156785463,
+  "end_time": 7207230.515053744,
+  "total_evaluation_time_seconds": "54973.358268281445"
+}

@@ -185,7 +185,32 @@
     "IFEval": 45,
     "JEEBench": 45,
     "LiveCodeBench": 45,
-    "MATH500": 45
+    "MATH500": 45,
+    "MBPP": 15
+  },
+  "ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-16k-merged-DPO-Tulu3-decontaminated": {
+    "AIME24": 15,
+    "AIME25": 15,
+    "AMC23": 15,
+    "GPQADiamond": 15,
+    "HumanEval": 15,
+    "IFEval": 15,
+    "JEEBench": 15,
+    "LiveCodeBench": 15,
+    "MATH500": 15,
+    "MBPP": 15
+  },
+  "ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-16k-merged-SFT-Tulu3-decontaminated": {
+    "AIME24": 11,
+    "AIME25": 11,
+    "AMC23": 11,
+    "GPQADiamond": 11,
+    "HumanEval": 11,
+    "IFEval": 11,
+    "JEEBench": 11,
+    "LiveCodeBench": 11,
+    "MATH500": 11,
+    "MBPP": 11
   },
   "ali-elganzory/1.7b-MixtureVitae-curated_instruct-100BT": {
     "LiveCodeBench": 45
@@ -370,6 +395,78 @@
     "JEEBench": 25,
     "LiveCodeBench": 25
   },
+  "ali-elganzory/open-sci-ref-v0.02-1.7b-dclm-300B-4096": {
+    "AIME24": 45,
+    "AIME25": 45,
+    "AMC23": 45,
+    "GPQADiamond": 45,
+    "HumanEval": 45,
+    "IFEval": 45,
+    "JEEBench": 45,
+    "LiveCodeBench": 45,
+    "MATH500": 45,
+    "MBPP": 45
+  },
+  "ali-elganzory/open-sci-ref-v0.02-1.7b-dclm-300B-4096-DPO-Tulu3-decontaminated": {
+    "AIME24": 64,
+    "AIME25": 64,
+    "AMC23": 64,
+    "GPQADiamond": 64,
+    "HumanEval": 64,
+    "IFEval": 64,
+    "JEEBench": 64,
+    "LiveCodeBench": 64,
+    "MATH500": 64,
+    "MBPP": 64
+  },
+  "ali-elganzory/open-sci-ref-v0.02-1.7b-dclm-300B-4096-SFT-Tulu3-decontaminated": {
+    "AIME24": 45,
+    "AIME25": 45,
+    "AMC23": 45,
+    "GPQADiamond": 45,
+    "HumanEval": 45,
+    "IFEval": 45,
+    "JEEBench": 45,
+    "LiveCodeBench": 45,
+    "MATH500": 45,
+    "MBPP": 45
+  },
+  "ali-elganzory/open-sci-ref-v0.02-1.7b-dclm-300B-4096-longsft_16k": {
+    "AIME24": 15,
+    "AIME25": 15,
+    "AMC23": 15,
+    "GPQADiamond": 15,
+    "HumanEval": 15,
+    "IFEval": 15,
+    "JEEBench": 15,
+    "LiveCodeBench": 15,
+    "MATH500": 15,
+    "MBPP": 15
+  },
+  "ali-elganzory/open-sci-ref-v0.02-1.7b-dclm-300B-4096-longsft_16k-DPO-Tulu3-decontaminated": {
+    "AIME24": 15,
+    "AIME25": 15,
+    "AMC23": 15,
+    "GPQADiamond": 15,
+    "HumanEval": 15,
+    "IFEval": 15,
+    "JEEBench": 15,
+    "LiveCodeBench": 15,
+    "MATH500": 15,
+    "MBPP": 15
+  },
+  "ali-elganzory/open-sci-ref-v0.02-1.7b-dclm-300B-4096-longsft_16k-SFT-Tulu3-decontaminated": {
+    "AIME24": 11,
+    "AIME25": 11,
+    "AMC23": 11,
+    "GPQADiamond": 11,
+    "HumanEval": 11,
+    "IFEval": 11,
+    "JEEBench": 11,
+    "LiveCodeBench": 11,
+    "MATH500": 11,
+    "MBPP": 11
+  },
   "ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096": {
     "AIME24": 45,
     "AIME25": 45,
@@ -401,6 +498,7 @@
     "GPQADiamond": 64,
     "HumanEval": 64,
     "IFEval": 64,
+    "JEEBench": 64,
     "MATH500": 64,
     "MBPP": 64
   },
@@ -411,6 +509,8 @@
     "GPQADiamond": 45,
     "HumanEval": 45,
     "IFEval": 45,
+    "JEEBench": 45,
+    "LiveCodeBench": 45,
     "MATH500": 45,
     "MBPP": 45
   },
@@ -457,6 +557,7 @@
     "GPQADiamond": 15,
     "HumanEval": 15,
     "IFEval": 15,
+    "JEEBench": 15,
     "MATH500": 15,
     "MBPP": 15
   },
@@ -489,6 +590,7 @@
     "GPQADiamond": 64,
     "HumanEval": 64,
     "IFEval": 64,
+    "JEEBench": 64,
     "LiveCodeBench": 64,
     "MATH500": 64,
     "MBPP": 64

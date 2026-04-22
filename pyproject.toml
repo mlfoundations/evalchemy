@@ -155,6 +155,9 @@ dependencies = [
 
     # LM Eval
     "lm-eval[vllm] @ git+https://github.com/EtashGuha/lm-evaluation-harness@etashg/tokenize_fix",
+
+    # Utilities
+    "pdflatex",
 ]
 
 [project.urls]

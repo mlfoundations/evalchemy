@@ -21,7 +21,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 NUM_NODES = 1
 
 # Number of GPUs per node.
-GPUS_PER_NODE = 4
+GPUS_PER_NODE = 1
 
 # Optional: set on multi-node if Jupiter/cluster docs require a specific host interface
 # for NCCL or for Gloo/TCP rendezvous (the latter runs before NCCL collectives).
@@ -46,6 +46,8 @@ MODELS = [
     "ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16384-rope_theta-1M-long_sft_16k",
     "ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096",
     "ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-4096-longsft_16k",
+    "ali-elganzory/open-sci-ref-v0.02-1.7b-dclm-300B-4096",
+    "ali-elganzory/open-sci-ref-v0.02-1.7b-dclm-300B-4096-longsft_16k",
     "ali-elganzory/1.7b-Comma0.1-300BT-WithChatTemplate",
     "ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k",
     "ali-elganzory/SmolLM2-1.7B-WithChatTemplate",
@@ -73,6 +75,8 @@ MODELS = [
     "ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16k-SFT-Tulu3-decontaminated",
     "ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-SFT-Tulu3-decontaminated",
     "ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-longsft_16k-SFT-Tulu3-decontaminated",
+    "ali-elganzory/open-sci-ref-v0.02-1.7b-dclm-300B-4096-SFT-Tulu3-decontaminated",
+    "ali-elganzory/open-sci-ref-v0.02-1.7b-dclm-300B-4096-longsft_16k-SFT-Tulu3-decontaminated",
     "ali-elganzory/1.7b-Comma0.1-300BT-SFT-Tulu3-decontaminated",
     "ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-SFT-Tulu3-decontaminated",
     "ali-elganzory/SmolLM2-1.7B-SFT-Tulu3-decontaminated",
@@ -100,6 +104,8 @@ MODELS = [
     "ali-elganzory/open-sci-ref-v0.02-1.7b-nemotron-hq-300B-16k-DPO-Tulu3-decontaminated",
     "ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-DPO-Tulu3-decontaminated",
     "ali-elganzory/open-sci-ref-v0.02-1.7b-fineweb-edu-1.4t-300B-4096-longsft_16k-DPO-Tulu3-decontaminated",
+    "ali-elganzory/open-sci-ref-v0.02-1.7b-dclm-300B-4096-DPO-Tulu3-decontaminated",
+    "ali-elganzory/open-sci-ref-v0.02-1.7b-dclm-300B-4096-longsft_16k-DPO-Tulu3-decontaminated",
     "ali-elganzory/1.7b-Comma0.1-300BT-DPO-Tulu3-decontaminated",
     "ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-DPO-Tulu3-decontaminated",
     "ali-elganzory/SmolLM2-1.7B-DPO-Tulu3-decontaminated",
@@ -121,23 +127,30 @@ MODELS = [
     "ali-elganzory/Baguettotron-longsft_16k-DPO-Tulu3-decontaminated",
     "ali-elganzory/0.4b-mixturevitae-v1-decontaminated-300B-4096-longsft_16k-DPO-Tulu3-decontaminated",
     # ---------------------------------------------------------
-    # Merged Models
+    # Merged Models (100% Finished)
     # ---------------------------------------------------------
-    # "ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-16k-merged",
+    "ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-16k-merged",
+    "ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-16k-merged-SFT-Tulu3-decontaminated",
+    "ali-elganzory/1.7b-MixtureVitae-300BT-v1-decontaminated-16k-merged-DPO-Tulu3-decontaminated",
+    # ---------------------------------------------------------
+    # OT3 Models (100% Finished)
+    # ---------------------------------------------------------
+    "open-sci/sft_ot30k_1.7b-MixtureVitae-300BT-v1-decontaminated-16k_base",
 ]
 
 # Define the tasks
 TASKS = [
-    "IFEval",
-    "HumanEval",
-    "MBPP",
-    "AIME24",
-    "AIME25",
-    "AMC23",
-    "MATH500",
-    "LiveCodeBench",
-    "GPQADiamond",
-    "JEEBench",
+    # "IFEval",
+    # "HumanEval",
+    # "MBPP",
+    # "AIME24",
+    # "AIME25",
+    # "AMC23",
+    "gsm8k",
+    # "MATH500",
+    # "LiveCodeBench",
+    # "GPQADiamond",
+    # "JEEBench",
 ]
 
 
@@ -235,7 +248,7 @@ def generate_discovery_script(model: str, task: str) -> str:
 #SBATCH --account=reformo
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-gpu=18
 #SBATCH --gres=gpu:1
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=alielganzory@hotmail.com
@@ -259,6 +272,8 @@ module load Stages/2025
 module load CUDA/12
 source .venv/bin/activate
 
+export SRUN_CPUS_PER_TASK=18
+
 for MODEL in "${{MODEL_NAMES[@]}}"; do
     for TASK in "${{TASKS[@]}}"; do
         echo "==========================================================="
@@ -266,7 +281,7 @@ for MODEL in "${{MODEL_NAMES[@]}}"; do
         echo "Model: $MODEL"
         echo "Task: $TASK"
         echo "==========================================================="
-        python mv_exp/discover_batch_size.py \\
+        srun --ntasks=1 --export=ALL --wait=60 --kill-on-bad-exit=1 python mv_exp/discover_batch_size.py \\
             --model "$MODEL" \\
             --task "$TASK" \\
             --cache-file "$EVALCHEMY_DIR/mv_exp/{BATCH_SIZE_CACHE_FILENAME}" \\
@@ -276,7 +291,7 @@ done
 """
 
 
-def generate_script(model: str, task: str, cached_batch_size: int | None) -> str:
+def generate_script(model: str, task: str, cached_batch_size: int | str | None) -> str:
     """Generate the full script content for a model-task combination."""
 
     model_names_section = generate_model_names_section(model)
@@ -330,16 +345,9 @@ echo "NCCL_SOCKET_IFNAME=${{NCCL_SOCKET_IFNAME:-}}  GLOO_SOCKET_IFNAME=${{GLOO_S
         # Match alignment-handbook jupiter_sft.slurm.j2: LAUNCHER + CMD, then
         # srun ... bash -c so each node runs one shell that expands $SLURM_PROCID locally.
         if cached_batch_size is None:
-            run_eval_inner = (
-                """        echo "ERROR: Missing cached batch size for $MODEL / $TASK" >&2
-        echo "Run the matching discovery script in mv_exp/"""
-                + DISCOVERY_SCRIPTS_DIRNAME
-                + """/ first." >&2
-        exit 1
-"""
-            )
-        else:
-            run_eval_inner = rf"""        export LAUNCHER="accelerate launch \
+            cached_batch_size = "auto"
+
+        run_eval_inner = rf"""        export LAUNCHER="accelerate launch \
     --num_machines $NUM_NODES \
     --num_processes $WORLD_SIZE \
     --main_process_ip $MASTER_IP \
@@ -355,22 +363,15 @@ echo "NCCL_SOCKET_IFNAME=${{NCCL_SOCKET_IFNAME:-}}  GLOO_SOCKET_IFNAME=${{GLOO_S
     else:
         multi_node_logic = ""
         if cached_batch_size is None:
-            run_eval_inner = (
-                """        echo "ERROR: Missing cached batch size for $MODEL / $TASK" >&2
-        echo "Run the matching discovery script in mv_exp/"""
-                + DISCOVERY_SCRIPTS_DIRNAME
-                + """/ first." >&2
-        exit 1
-"""
-            )
-        else:
-            run_eval_inner = f"""        accelerate launch --num-processes "$GPUS_PER_NODE" --num-machines 1 \\
+            cached_batch_size = "auto"
+
+        run_eval_inner = f"""        srun --ntasks=1 --export=ALL --wait=60 --kill-on-bad-exit=1 accelerate launch --num-processes "$GPUS_PER_NODE" --num-machines 1 \\
             --multi-gpu -m eval.eval \\
             --model hf \\
-            --tasks "$TASK" \\
-            --model_args "trust_remote_code=True,pretrained=$MODEL" \\
-            --batch_size {cached_batch_size} \\
-            --output_path logs
+        --tasks "$TASK" \\
+        --model_args "trust_remote_code=True,pretrained=$MODEL" \\
+        --batch_size {cached_batch_size} \\
+        --output_path logs
 """
 
     # Create a safe name for the job
@@ -386,7 +387,7 @@ echo "NCCL_SOCKET_IFNAME=${{NCCL_SOCKET_IFNAME:-}}  GLOO_SOCKET_IFNAME=${{GLOO_S
 #SBATCH --account=reformo
 #SBATCH --nodes={NUM_NODES}
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=32
+#SBATCH --cpus-per-gpu=18
 #SBATCH --gres=gpu:{GPUS_PER_NODE}
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=alielganzory@hotmail.com
@@ -422,6 +423,8 @@ cd $EVALCHEMY_DIR
 module load Stages/2025
 module load CUDA/12
 source .venv/bin/activate
+
+export SRUN_CPUS_PER_TASK={18 * GPUS_PER_NODE}
 
 # 4. Run evaluation
 for MODEL in "${{MODEL_NAMES[@]}}"; do
@@ -472,9 +475,7 @@ def cache_models_with_transformers(model_ids: list[str]) -> None:
         print(f"[{i:0{num_digits}d}/{n}] Caching: {model_id}")
         try:
             AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
-            model = AutoModelForCausalLM.from_pretrained(
-                model_id, trust_remote_code=True
-            )
+            model = AutoModelForCausalLM.from_pretrained(model_id, trust_remote_code=True)
         except Exception as e:
             print(
                 f"ERROR: failed to cache {model_id}: {e}\n"

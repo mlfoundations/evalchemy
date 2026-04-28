@@ -16,6 +16,7 @@ Qwen/Qwen2.5-1.5B,GPQADiamond,7.41
 Qwen/Qwen2.5-1.5B,HumanEval,13.83
 Qwen/Qwen2.5-1.5B,IFEval,22.7
 Qwen/Qwen2.5-1.5B,JEEBench,0.24
+Qwen/Qwen2.5-1.5B,LiveCodeBench,0.2
 Qwen/Qwen2.5-1.5B,MATH500,1.0
 Qwen/Qwen2.5-1.5B,MBPP,0.0
 Qwen/Qwen2.5-1.5B-Instruct,AIME24,3.33
@@ -149,6 +150,7 @@ ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-DPO-Tulu3-decontaminated,GPQADiamo
 ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-DPO-Tulu3-decontaminated,HumanEval,7.36
 ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-DPO-Tulu3-decontaminated,IFEval,43.5
 ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-DPO-Tulu3-decontaminated,JEEBench,5.63
+ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-DPO-Tulu3-decontaminated,LiveCodeBench,2.35
 ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-DPO-Tulu3-decontaminated,MATH500,1.8
 ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-DPO-Tulu3-decontaminated,MBPP,6.0
 ali-elganzory/1.7b-Comma0.1-300BT-longsft_16k-SFT-Tulu3-decontaminated,AIME24,0.0

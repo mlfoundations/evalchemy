@@ -74,7 +74,7 @@ dependencies = [
     "reka-api",
     "together",
     "dashscope",
-    "fschat @ file:eval/chat_benchmarks/MTBench",  # Use relative path that pip will resolve during installation
+    "fschat",  # Use relative path that pip will resolve during installation, may not work with pip but work with uv pip
     
     # Cloud & Storage
     "gcsfs",
@@ -154,7 +154,7 @@ dependencies = [
     "swebench>=3.0.4",
 
     # LM Eval
-    "lm-eval[vllm] @ git+https://github.com/EtashGuha/lm-evaluation-harness@etashg/tokenize_fix",
+    "lm-eval[vllm]>=0.4.9.1,<0.4.10"
 ]
 
 [project.urls]
@@ -193,3 +193,6 @@ packages = ["evalchemy"]
 
 [tool.setuptools.package-dir]
 evalchemy = "evalchemy"
+
+[tool.uv.sources]
+fschat = { path = "eval/chat_benchmarks/MTBench", editable = true }

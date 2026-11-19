@@ -15,7 +15,6 @@ import lm_eval.models
 import torch.distributed as dist
 import yaml
 from lm_eval import evaluator as pretrain_evaluator
-from lm_eval import utils
 from lm_eval.__main__ import parse_eval_args, setup_parser
 from lm_eval.api.model import LM
 from lm_eval.loggers import EvaluationTracker, WandbLogger
@@ -31,6 +30,7 @@ from eval.constants import LIST_OPENAI_MODELS
 from eval.eval_tracker import DCEvaluationTracker
 from eval.task import TaskManager as InstructTaskManager
 
+eval_logger = logging.getLogger(__name__)
 
 _BIT_CAP = 15_000
 
@@ -170,8 +170,8 @@ def evaluate(
             Dictionary mapping task names to their evaluation results.
             Each result dictionary contains metrics specific to that task.
     """
-    eval_logger = utils.eval_logger
-    eval_logger.setLevel(getattr(logging, f"{verbosity}"))
+    eval_logger = logging.getLogger(__name__)
+    eval_logger.setLevel(getattr(logging, verbosity or "INFO"))
 
     # Split tasks between benchmark and pretrain
     benchmark_tasks = [t for t in task_list if t in task_manager.tasks]
@@ -352,16 +352,16 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
         try:
             model_name = evaluation_tracker.get_model_attribute_from_db(args.model_id, "weights_location")
             args.model_args = update_model_args_with_name(args.model_args or "", model_name)
-            utils.eval_logger.info(f"Retrieved model name from database: {model_name}")
+            eval_logger.info(f"Retrieved model name from database: {model_name}")
         except Exception as e:
-            utils.eval_logger.error(f"Failed to retrieve model name from database: {str(e)}")
+            eval_logger.error(f"Failed to retrieve model name from database: {str(e)}")
             sys.exit(1)
         if not args.overwrite_database:
             task_list = [
                 task for task in task_list if not evaluation_tracker.check_if_already_done(task, args.model_id)
             ]
             if len(task_list) == 0:
-                utils.eval_logger.info("All tasks passed in were found in the database.")
+                eval_logger.info("All tasks passed in were found in the database.")
                 exit()
     elif args.model_name:
         model_name = args.model_name
@@ -376,9 +376,9 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
         task_list=task_list,
         system_instruction=args.system_instruction,
     )
-    pretrain_task_manager = PretrainTaskManager(args.verbosity, include_path=args.include_path)
+    pretrain_task_manager = PretrainTaskManager(args.verbosity or "INFO", include_path=args.include_path)
 
-    utils.eval_logger.info(f"Selected Tasks: {[task for task in task_list]}")
+    eval_logger.info(f"Selected Tasks: {[task for task in task_list]}")
 
     # Only check for OpenAI API keys if at least one task requires an annotator model
     # TODO: Should we just skip the evaluation that requires the annotator model if the annotator model is not set or fail completely?
@@ -401,7 +401,7 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
     try:
         lm = initialize_model(args.model, args.model_args, batch_size=args.batch_size)
     except Exception as e:
-        utils.eval_logger.error(f"Failed to initialize model: {str(e)}")
+        eval_logger.error(f"Failed to initialize model: {str(e)}")
         sys.exit(1)
 
     # Log experiment configuration
@@ -415,8 +415,7 @@ def cli_evaluate(args: Optional[argparse.Namespace] = None) -> None:
         )
 
     # Initialize logging and environment
-    eval_logger = utils.eval_logger
-    eval_logger.setLevel(getattr(logging, f"{args.verbosity}"))
+    eval_logger.setLevel(getattr(logging, args.verbosity or "INFO"))
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
     # Setup wandb logging if requested
@@ -614,7 +613,7 @@ def handle_evaluation_output(
             if args.log_samples:
                 wandb_logger.log_eval_samples(samples)
         except Exception as e:
-            utils.eval_logger.info(f"Logging to Weights and Biases failed due to {e}")
+            eval_logger.info(f"Logging to Weights and Biases failed due to {e}")
 
     evaluation_tracker.save_results_aggregated(results=results, samples=samples if args.log_samples else None)
     if args.use_database and not args.debug:
@@ -632,7 +631,7 @@ def handle_evaluation_output(
         for task_name, config in results["configs"].items():
             evaluation_tracker.save_results_samples(task_name=task_name, samples=samples[task_name])
 
-    utils.eval_logger.info(
+    eval_logger.info(
         f"Eval arugments: {args.model} ({args.model_args}), gen_kwargs: ({args.gen_kwargs}), "
         f"limit: {args.limit}, num_fewshot: {args.num_fewshot}, annotator_model: {args.annotator_model}, "
         f"batch_size: {args.batch_size}{f' ({batch_sizes})' if batch_sizes else ''}"

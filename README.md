@@ -78,8 +78,9 @@ git clone git@github.com:mlfoundations/evalchemy.git
 cd evalchemy
 
 # Install dependencies
-pip install -e .
-pip install -e eval/chat_benchmarks/alpaca_eval
+pip install uv
+uv pip install -e .
+uv pip install -e eval/chat_benchmarks/alpaca_eval
 
 # Note: On some HPC systems you may need to modify pyproject.toml 
 # to use absolute paths for the fschat dependency:
@@ -211,6 +212,28 @@ NOTE: This is configured for specific HPC clusters, but can easily be adapted. F
 
 ### Multi-GPU Evaluation 
 
+A. Data-Parallel Evaluation with vllm
+```bash
+python -m eval.eval \
+    --model vllm \
+    --tasks AIME24 \
+    --model_args "pretrained=Qwen/Qwen2.5-7B-Instruct,data_parallel_size=8" \
+    --batch_size auto \
+    --output_path logs \
+    --apply_chat_template True
+```
+If the model is too large, you can also combine tensor parallelism:
+```bash
+python -m eval.eval \
+    --model vllm \
+    --tasks AIME24 \
+    --model_args "pretrained=Qwen/Qwen2.5-7B-Instruct,tensor_parallel_size=2,data_parallel_size=4" \
+    --batch_size auto \
+    --output_path logs \
+    --apply_chat_template True
+```
+
+B. Multi-GPU Evaluation with Accelerate
 NOTE: this is slower than doing fully data parallel evaluation (see previous section)
 
 ```bash
@@ -222,6 +245,7 @@ accelerate launch --num-processes <num-gpus> --num-machines <num-nodes> \
     --batch_size 2 \
     --output_path logs
 ```
+
 
 ### Large Model Evaluation
 

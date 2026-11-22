@@ -13,6 +13,9 @@ from .eval_utils import (
 )
 
 
+_ANSWER_RE = re.compile(r"^\s*(-?\d+(?:\.\d+)?)\s*(?:[a-zA-Z%°]+(?:\^\d+)?)?\s*$")
+
+
 def sanitize_math_answers(answer):
     # ignore symbols like $
     answer = answer.replace("$", "").strip()
@@ -85,7 +88,8 @@ def eval_model(model, filepath):
         model_answer = sanitize_math_answers(model_answer)
         correct_answer = sanitize_math_answers(correct_answer)
 
-        first_number_in_model_answer = re.search(r"-?\d+(\.\d+)?", model_answer)
+        _match = _ANSWER_RE.match(model_answer)
+        first_number_in_model_answer = _match and re.match(r"-?\d+(?:\.\d+)?", _match.group(1))
         first_number_in_correct_answer = re.search(r"-?\d+(\.\d+)?", correct_answer)
         correct = False
         if first_number_in_model_answer and first_number_in_correct_answer:

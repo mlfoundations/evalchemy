@@ -31,6 +31,11 @@ from eval.constants import LIST_OPENAI_MODELS
 from eval.eval_tracker import DCEvaluationTracker
 from eval.task import TaskManager as InstructTaskManager
 
+# Register OpenLM/DCLM models with HuggingFace Transformers
+try:
+    import open_lm.hf
+except ImportError:
+    pass
 
 _BIT_CAP = 15_000
 

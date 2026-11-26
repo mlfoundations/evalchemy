@@ -95,9 +95,9 @@ def execute_command(cmd):
     return stdout.strip()
 
 
-def create_evaluation_dataset(tasks, eval_dataset_hash, system_instruction=None):
+def create_evaluation_dataset(tasks, eval_dataset_hash, namespace, system_instruction=None):
     """Create or use cached evaluation dataset."""
-    cached_dataset_id = f"mlfoundations-dev/evalset_{eval_dataset_hash}"
+    cached_dataset_id = f"{namespace}/evalset_{eval_dataset_hash}"
     if check_dataset_exists(cached_dataset_id):
         print(f"Using cached evaluation dataset: {cached_dataset_id}")
     else:
@@ -149,6 +149,13 @@ def main():
     parser.add_argument(
         "--dependency", type=str, default=None, help="Dependency for the sbatch job. (e.g. afterok:123456)"
     )
+    parser.add_argument(
+        "--hf_namespace",
+        type=str,
+        default=os.environ.get("EVALCHEMY_HF_NAMESPACE", "DCAgent2"),
+        help="Hugging Face namespace (user or org) for cached datasets and uploads. "
+        "Set via CLI or EVALCHEMY_HF_NAMESPACE env var.",
+    )
     args = parser.parse_args()
 
     # Generate evaluation dataset hash
@@ -156,7 +163,9 @@ def main():
     evaluation_dataset_hash = generate_evaluation_dataset_hash(tasks, args.system_instruction)
 
     # Download or create input dataset
-    input_dataset = create_evaluation_dataset(tasks, evaluation_dataset_hash, args.system_instruction)
+    input_dataset = create_evaluation_dataset(
+        tasks, evaluation_dataset_hash, args.hf_namespace, args.system_instruction
+    )
 
     # Create output dataset name
     if args.timestamp:
@@ -165,7 +174,7 @@ def main():
     else:
         suffix = f"_eval_{evaluation_dataset_hash}"
     output_dataset_name = args.model_name.split("/")[-1] + suffix
-    output_dataset = f"mlfoundations-dev/{output_dataset_name}"
+    output_dataset = f"{args.hf_namespace}/{output_dataset_name}"
     print(f"Output dataset: {output_dataset}")
 
     # Create output log dir
